@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Machine Learning,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="聚类聚类任务在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。 假设有样本集D = {x1,x2…xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l=1,2,…,k}。 作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。 性能度量性能的度量主要是为了评估聚类结果的">
+<meta name="keywords" content="Machine Learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Clustering.md">
+<meta property="og:url" content="http://yoursite.com/2018/04/19/Clustering/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="聚类聚类任务在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。 假设有样本集D = {x1,x2…xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l=1,2,…,k}。 作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。 性能度量性能的度量主要是为了评估聚类结果的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-9.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-10.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-11.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png">
+<meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png">
+<meta property="og:image" content="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png">
+<meta property="og:image" content="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png">
+<meta property="og:updated_time" content="2018-04-19T13:24:08.304Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Clustering.md">
+<meta name="twitter:description" content="聚类聚类任务在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。 假设有样本集D = {x1,x2…xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l=1,2,…,k}。 作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。 性能度量性能的度量主要是为了评估聚类结果的">
+<meta name="twitter:image" content="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/19/Clustering/">
+
+
+
+
+
+  <title>Clustering.md | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/Clustering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Clustering.md</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T21:23:25+08:00">
+                2018-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="聚类"><a href="#聚类" class="headerlink" title="聚类"></a>聚类</h1><h2 id="聚类任务"><a href="#聚类任务" class="headerlink" title="聚类任务"></a>聚类任务</h2><p>在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。</p>
+<p>假设有样本集D = {x1,x2…xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l=1,2,…,k}。</p>
+<p>作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。</p>
+<h2 id="性能度量"><a href="#性能度量" class="headerlink" title="性能度量"></a>性能度量</h2><p>性能的度量主要是为了评估聚类结果的好坏，一般来说我们使用两种方法：</p>
+<ol>
+<li>将聚类结果与某个“参考模板”进行比较，也就是使用外部指标。</li>
+</ol>
+<p>假设λ与λ<em>分别表示C和C</em>对应的簇标记向量，我们将样本两两配对考虑。</p>
+<p><img src="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png" alt="img"></p>
+<blockquote>
+<p>其中集合SS包含了在C中属于相同簇，且在C<em>也属于相同簇的样本对；<br>集合SD则是包含了在C中属于相同簇，但在C</em>中不属于相同簇的样本对；<br>如此类推。。。。</p>
+</blockquote>
+<p>由于每个样本对(xi,xj)只能出现在一个集合中，因此有<strong>a+b+c+d=C(m,2)=m(m-1)/2</strong>。</p>
+<p>最后导出以下的外部度量指标：</p>
+<ul>
+<li>Jaccard系数: JC = a/(a+b+c)</li>
+<li>FM指数：FMI = &radic;(a/a+b)*(a/a+c)</li>
+<li>Rand指数：RI = 2(a+b)/(m*(m-1))</li>
+</ul>
+<p>上述指标都在[0, 1]之间，值越大越好</p>
+<ol start="2">
+<li>直接考虑聚类结果，不参考任何的模型</li>
+</ol>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-9.png" alt="img"></p>
+<blockquote>
+<p>其中dist(.,.)用来计算两个样本之间的距离；diam(C)表示簇C内样本间的最远距离；dmin(Ci,Cj)对应于簇Ci与Cj最近样本的距离；dcen(Ci,Cj)表示簇Ci与簇Cj中心点间的距离</p>
+</blockquote>
+<p>一般用以下的指标去评估聚类性能:</p>
+<ul>
+<li>DB指数：</li>
+</ul>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-10.png" alt="img"></p>
+<ul>
+<li>Dunn指数：</li>
+</ul>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-11.png" alt="img"></p>
+<p>显然，DBI越小越好，表示簇内距离小，簇间距离大；而DI则相反，越大越好，表示簇间距离大，簇内距离小</p>
+<h2 id="距离计算"><a href="#距离计算" class="headerlink" title="距离计算"></a>距离计算</h2><p>一般来说，我们希望函数dist(.,.)，也就是距离度量，满足以下的一些基本性质：</p>
+<ul>
+<li>非负性：dist(xi,xj)&gt;=0</li>
+<li>同一性：dist(xi,xj)=0，当且仅当xi=xj</li>
+<li>对称性：dist(xi,xj)=dist(xj,xi)</li>
+<li>直递性：dist(xi,xj)&lt;=dist(xj,xk)+dist(xk,xj)</li>
+</ul>
+<p>在讨论距离计算时，属性是否有序很关键，例如定义域为{1,2,3}的属性，能直接在属性值上计算距离，这种就称为有序属性；而对于定义域为{飞机，火车，轮船}这些，称为无序属性</p>
+<h3 id="有序属性"><a href="#有序属性" class="headerlink" title="有序属性"></a>有序属性</h3><p>给定样本xi=(xi1,xi2,…,xin)与xj=(xj1,xj2,…,xjn)，最常用的就是<strong>Minkowski distance</strong></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png" alt="img"></p>
+<p>当p=2，也叫欧式距离</p>
+<h3 id="无序属性"><a href="#无序属性" class="headerlink" title="无序属性"></a>无序属性</h3><p>首先来看几个假设：m(u,a)表示在属性u取值为a的样本数，m(u,a,i)则是表示第i个样本簇在属性u取值为a的样本数。于是得到以下的公式(VDN)来计算距离。</p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png" alt="img"></p>
+<p>另外，还可以结合Minkowski distance和VDM，保证处理混合属性</p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png" alt="img"></p>
+<p>但对于无序属性，有可能会出现直递性失效，以“人”，“马”，“人马”为例，“人”和“马”都与“人马”很接近，但“人”与“马”差距很大，这种就叫做<strong>非度量距离</strong>。</p>
+<h2 id="原型聚类"><a href="#原型聚类" class="headerlink" title="原型聚类"></a>原型聚类</h2><p>prototype-based clustering，此类算法假设聚类结构能够基于一组原型刻画</p>
+<h3 id="k-means-算法"><a href="#k-means-算法" class="headerlink" title="k-means 算法"></a>k-means 算法</h3><p>对于一个样本集和目标簇数，我们希望最小化以下的误差，其中ui就是簇Ci的均值向量。</p>
+<p><img src="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png" alt="img"></p>
+<p>算法思想比较简单：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 随机选择k个样本作为初始的均值向量</span><br><span class="line"><span class="number">2.</span> 进入循环</span><br><span class="line"><span class="number">3.</span> 计算每个样本与各个均值向量的距离，将样本划分到距离最小的均值向量所代表的簇中</span><br><span class="line"><span class="number">4.</span> 根据划分的聚类，计算新的均值中心</span><br><span class="line"><span class="number">5.</span> 如果均值向量没有变化，则退出循环</span><br></pre></td></tr></table></figure>
+<h3 id="学习向量量化"><a href="#学习向量量化" class="headerlink" title="学习向量量化"></a>学习向量量化</h3><p><strong>Learning Vector Quantization</strong>是针对带有标记的数据样本的。对于这种情况，我们可以根据簇数选择一组n维向量（维度与样本一致）</p>
+<p>具体算法为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先初始化一组原型向量</span><br><span class="line"><span class="number">2.</span> 从样本集中随机抽取样本(xi,yi)</span><br><span class="line"><span class="number">3.</span> 找出与样本距离最近的一个原型向量</span><br><span class="line"><span class="number">4.</span> 比较两者类别是否一致</span><br><span class="line"><span class="number">5.</span> 一致则通过公式逼近，否则则使其离得更远</span><br><span class="line"><span class="number">6.</span> 直到迭代次数最大或者原型向量不怎么更新为止</span><br><span class="line">==========================================</span><br><span class="line"><span class="number">7.</span> 得到原型向量之后，再对样本进行相应的分类</span><br></pre></td></tr></table></figure>
+<p>这里的关键是如何更新原型向量：</p>
+<ul>
+<li>如果类型一致：新的向量 p = pi + u(xj-pi);</li>
+<li>如果类型不一致： p = pi - u(xj-pi);</li>
+</ul>
+<p>这里的u是学习率，范围为[0,1]。之所以满足逼近或者离得更远：</p>
+<blockquote>
+<p>|p-xj| = |pi+u(xj-pi)-xj| = (1-u)|pi-xj|</p>
+</blockquote>
+<p>由此可见，这种情况下p会在更新之后逼近xj</p>
+<h3 id="高斯混合聚类"><a href="#高斯混合聚类" class="headerlink" title="高斯混合聚类"></a>高斯混合聚类</h3><p>高斯混合聚类采用的是概率模型来表达聚类原型，我们定义高斯混合分布公式为：</p>
+<p><img src="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png" alt="img"></p>
+<p>该分布为k个高斯分布的叠加，其中ai为相应的混合系数,且权重和为1。</p>
+<p>算法步骤为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 初始化混合高斯分布的三个模型参数：ai，ui(平均值)，协方差矩阵</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> repeat：</span><br><span class="line"><span class="number">3.</span> 将样本投射到高斯分布中,计算其在各个高斯分布下的概率</span><br><span class="line"><span class="number">4.</span> 针对每一个高斯分布，计算每一个样本在该分布下的概率，即计算其对该分布的贡献。根据该贡献，重新去计算上面三个模型参数</span><br><span class="line"><span class="number">5.</span> 直到参数收敛，或者迭代次数达到最大</span><br></pre></td></tr></table></figure>
+<p>至于如何求解这三个参数，可以参考EM算法：<a href="https://blog.csdn.net/u011974639/article/details/78302024" target="_blank" rel="noopener">https://blog.csdn.net/u011974639/article/details/78302024</a></p>
+<p>简单概括，就是两步：</p>
+<ul>
+<li>先根据上一轮的参数来计算每个样本属于每个高斯分布的后验概率；</li>
+<li>再根据后验概率去更新参数；</li>
+</ul>
+<h2 id="密度聚类"><a href="#密度聚类" class="headerlink" title="密度聚类"></a>密度聚类</h2><p>这个算法假设聚类结构能够通过样本分布的紧密程度来确定，先来确定几个概念：</p>
+<ul>
+<li>邻域：对于样本集中的xj，邻域包含了样本集中与xj距离不大于某个值的样本</li>
+<li>核心对象：若xj的邻域包含了至少MinPts个样本，则xj就是一个核心对象</li>
+<li>密度直达：若xj位于xi的领域中，则xj由xj密度直达</li>
+<li>密度可达：若存在样本序列p1,…,pn，其中p1=xi，pn=xj，且pi+1可由pi密度直达，则称xj可由xi密度可达</li>
+</ul>
+<p>具体算法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先根据邻域参数选出所有的核心对象；</span><br><span class="line"><span class="number">2.</span> 从任意一个核心对象出发，找出其密度可达的样本生成聚类簇，并将簇中的核心对象从第一步找到的核心对象集合中删除；</span><br><span class="line"><span class="number">3.</span> 紧接着从更新后的核心对象集合中随机选取一个核心对象，重复第二步；</span><br></pre></td></tr></table></figure>
+<h2 id="层次聚类"><a href="#层次聚类" class="headerlink" title="层次聚类"></a>层次聚类</h2><p>层次聚类可以采用“自底向上”或者“自顶向下”的策略，在这里我们介绍AGNES的策略，这是一种自底向上的聚合策略。</p>
+<p>它首先将每个样本看成一个初始聚类簇，然后在每次算法运行时找出距离最近的两个聚类簇进行合并，因此这里的关键就是计算两个聚类簇之间的距离，显然最小距离由两个簇的最近样本决定，最大距离由两个簇的最远样本决定，至于平均距离则是由两个簇的所有样本共同决定。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/13/TCP套接字选项介绍/" rel="next" title="TCP套接字选项介绍">
+                <i class="fa fa-chevron-left"></i> TCP套接字选项介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/25/DecisionTree/" rel="prev" title="DecisionTree">
+                DecisionTree <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">185</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#聚类"><span class="nav-number">1.</span> <span class="nav-text">聚类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#聚类任务"><span class="nav-number">1.1.</span> <span class="nav-text">聚类任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能度量"><span class="nav-number">1.2.</span> <span class="nav-text">性能度量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#距离计算"><span class="nav-number">1.3.</span> <span class="nav-text">距离计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#有序属性"><span class="nav-number">1.3.1.</span> <span class="nav-text">有序属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无序属性"><span class="nav-number">1.3.2.</span> <span class="nav-text">无序属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原型聚类"><span class="nav-number">1.4.</span> <span class="nav-text">原型聚类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#k-means-算法"><span class="nav-number">1.4.1.</span> <span class="nav-text">k-means 算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#学习向量量化"><span class="nav-number">1.4.2.</span> <span class="nav-text">学习向量量化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高斯混合聚类"><span class="nav-number">1.4.3.</span> <span class="nav-text">高斯混合聚类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#密度聚类"><span class="nav-number">1.5.</span> <span class="nav-text">密度聚类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#层次聚类"><span class="nav-number">1.6.</span> <span class="nav-text">层次聚类</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

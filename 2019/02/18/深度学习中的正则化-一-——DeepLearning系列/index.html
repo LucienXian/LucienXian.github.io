@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Deep Learning,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="深度学习中的正则化&amp;lt;一&amp;gt;概述深度学习的一个核心问题就是提高模型的泛化性，即不仅仅要在训练数据上表现好，还能在新输入上有更好的泛化，这些策略就是正则化。 首先来理解偏差和方差的含义：  方差度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响。 偏差度量了学习算法的期望预测与真实结果的偏离程度，即刻画了学习算法本身的拟合能力   在一些过拟合的场景下，正则化会">
+<meta name="keywords" content="Deep Learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度学习中的正则化&lt;一&gt;——DeepLearning系列">
+<meta property="og:url" content="http://yoursite.com/2019/02/18/深度学习中的正则化-一-——DeepLearning系列/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="深度学习中的正则化&amp;lt;一&amp;gt;概述深度学习的一个核心问题就是提高模型的泛化性，即不仅仅要在训练数据上表现好，还能在新输入上有更好的泛化，这些策略就是正则化。 首先来理解偏差和方差的含义：  方差度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响。 偏差度量了学习算法的期望预测与真实结果的偏离程度，即刻画了学习算法本身的拟合能力   在一些过拟合的场景下，正则化会">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/var_bias_dl.png">
+<meta property="og:updated_time" content="2019-02-17T16:23:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深度学习中的正则化&lt;一&gt;——DeepLearning系列">
+<meta name="twitter:description" content="深度学习中的正则化&amp;lt;一&amp;gt;概述深度学习的一个核心问题就是提高模型的泛化性，即不仅仅要在训练数据上表现好，还能在新输入上有更好的泛化，这些策略就是正则化。 首先来理解偏差和方差的含义：  方差度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响。 偏差度量了学习算法的期望预测与真实结果的偏离程度，即刻画了学习算法本身的拟合能力   在一些过拟合的场景下，正则化会">
+<meta name="twitter:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/var_bias_dl.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/02/18/深度学习中的正则化-一-——DeepLearning系列/">
+
+
+
+
+
+  <title>深度学习中的正则化<一>——DeepLearning系列 | LucienXian's Blog</一></title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/18/深度学习中的正则化-一-——DeepLearning系列/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深度学习中的正则化<一>——DeepLearning系列</一></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-18T00:23:19+08:00">
+                2019-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="深度学习中的正则化-lt-一-gt"><a href="#深度学习中的正则化-lt-一-gt" class="headerlink" title="深度学习中的正则化&lt;一&gt;"></a>深度学习中的正则化&lt;一&gt;</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>深度学习的一个核心问题就是提高模型的泛化性，即不仅仅要在训练数据上表现好，还能在新输入上有更好的泛化，这些策略就是正则化。</p>
+<p>首先来理解偏差和方差的含义：</p>
+<ul>
+<li>方差度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响。</li>
+<li>偏差度量了学习算法的期望预测与真实结果的偏离程度，即刻画了学习算法本身的拟合能力</li>
+</ul>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/var_bias_dl.png" alt="img"></p>
+<p>在一些过拟合的场景下，正则化会以偏差的增加来换取方差的减少。</p>
+<h2 id="参数范数惩罚"><a href="#参数范数惩罚" class="headerlink" title="参数范数惩罚"></a>参数范数惩罚</h2><p>许多正则化方法会对目标函数J增加一个参数范数惩罚$\Omega(\theta)$，限制模型的学习能力，目标函数变为：<br>$$<br>J’(\theta, X, y) = J(\theta, X, y) + \alpha \Omega(\theta)<br>$$<br>$\alpha$越大，对应的正则化惩罚就越大。当我们的训练算法最小化正则化后的目标函数J时，它会降低原始目标J关于<br>训练数据的误差并同时减小在某些衡量标准下参数θ(或参数子集)的规模。</p>
+<p>一般情况下，在神经网络中我们只对权重做惩罚而不对偏置做惩罚。精确拟合偏置所需要的数据比拟合权重少，我们不对其进行正则化也不会导致太大的方差，而且正则化偏置参数可能会导致明显的欠拟合。</p>
+<h3 id="L2参数正则化"><a href="#L2参数正则化" class="headerlink" title="L2参数正则化"></a>L2参数正则化</h3><p>$L^2$参数范数惩罚是最简单最常见的正则化方式，这个策略添加了一个正则项（权值向量w中各个元素的平方和），使得权重更加接近原点。这个目标函数就变成了：<br>$$<br>J’(w, X, y)=\frac{\alpha}{2}w^Tw+J(w, X, y)<br>$$<br>与之对应的梯度为：<br>$$<br>\nabla_wJ’(w, X, y) = \alpha w+\nabla_wJ(w, X, y)<br>$$<br>那么更新权重的方式也会发生变化：<br>$$<br>w = w-\epsilon(\alpha w+\nabla_wJ(w, X, y)) = (1-\epsilon \alpha)w-\epsilon \nabla_wJ(w, X, y)<br>$$<br>我们可以看到每步更新执行时都会先收缩权重向量。</p>
+<p>我们进一步分析整个训练过程中会发生什么，令w<em>为未正则化的目标函数取得最小训练误差时的权重向量，那么近似的误差函数就是：<br>$$<br>J’(\theta) = J(w^</em>) + \frac{1}{2}(w-w^<em>)^TH(w-w^</em>)<br>$$<br>其中H是J在w<em>处计算的Hessian矩阵，当$J’$取得最小时，其梯度为：<br>$$<br>\nabla_wJ’(w) = H(w-w^</em>) = 0<br>$$<br>然后我们添加上权重衰减的梯度，其中w是此时的最优点：<br>$$<br>\alpha w+H(w-w^*) = 0<br>$$</p>
+<p>$$<br>w = (H+\alpha I)^{-1}Hw^*<br>$$</p>
+<p>可以看到当$\alpha$趋向于0的时候，正则化的解w会趋向$w^*$。那么当$\alpha$增加时，在显著减小目标函数方向上的参数会保留得相对完好，而在无助于目标函数减小的方向(对应 Hessian 矩阵较小的特征值)上改变参数不会显著增加梯度，这种不重要方向对应的分量会在训练过程中因正则化而衰减掉。</p>
+<p>简单来说，L2正则化能让学习算法对与具有较高方差的输入x更加敏感，使得与输出目标的协方差较小的特征的权重收缩，</p>
+<h3 id="L1参数正则化"><a href="#L1参数正则化" class="headerlink" title="L1参数正则化"></a>L1参数正则化</h3><p>L1正则化则是添加一个另外的正则化项（权值向量w中各个元素的绝对值之和）：<br>$$<br>J’(w, X, y)=\alpha||w||_1+J(w, X, y)<br>$$<br>对应的梯度为：<br>$$<br>\nabla_wJ’(w, X, y) = \alpha sign(w)+\nabla_wJ(w, X, y)<br>$$<br>其中sign(w)只是简单地取w各个元素的正负号，其中若w&gt;0，则sign(w)=1；若w&lt;0，则sign(w)=−1；若w=0，则sign(w)=0。</p>
+<p>相比L2正则化，L1正则化会产生更加稀疏的解，这里的稀疏指的是最优值中的一些参数为0。由L1正则化导出的稀疏性质被广泛用于特征选择机制，从可用的特征子集中选择出有意义的特征。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/17/消除未检查警告/" rel="next" title="消除未检查警告">
+                <i class="fa fa-chevron-left"></i> 消除未检查警告
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/26/列表优先于数组/" rel="prev" title="列表优先于数组">
+                列表优先于数组 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">185</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#深度学习中的正则化-lt-一-gt"><span class="nav-number">1.</span> <span class="nav-text">深度学习中的正则化&lt;一&gt;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参数范数惩罚"><span class="nav-number">1.2.</span> <span class="nav-text">参数范数惩罚</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#L2参数正则化"><span class="nav-number">1.2.1.</span> <span class="nav-text">L2参数正则化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#L1参数正则化"><span class="nav-number">1.2.2.</span> <span class="nav-text">L1参数正则化</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Unix,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="I/O复用：select和poll函数概述IO复用：一旦一个或者多个IO条件就绪了，内核就会通知进程 应用场景：  当客户处理多个描述符，例如交互输入和网络套接字 一个客户处理多个套接字 服务器既要处理监听套接字，又要处理已连接套接字 服务器既要处理TCP，又要处理UDP 服务器处理多个服务或者多个协议  I/O模型阻塞型I/O；非阻塞型I/O；I/O复用；信号驱动式I/O；异步I/O 套接字上的">
+<meta name="keywords" content="Unix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unix网络编程——chap6">
+<meta property="og:url" content="http://yoursite.com/2018/03/17/Unix网络编程——chap6/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="I/O复用：select和poll函数概述IO复用：一旦一个或者多个IO条件就绪了，内核就会通知进程 应用场景：  当客户处理多个描述符，例如交互输入和网络套接字 一个客户处理多个套接字 服务器既要处理监听套接字，又要处理已连接套接字 服务器既要处理TCP，又要处理UDP 服务器处理多个服务或者多个协议  I/O模型阻塞型I/O；非阻塞型I/O；I/O复用；信号驱动式I/O；异步I/O 套接字上的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://notes.shichao.io/unp/figure_6.1.png">
+<meta property="og:image" content="https://notes.shichao.io/unp/figure_6.2.png">
+<meta property="og:image" content="https://notes.shichao.io/unp/figure_6.3.png">
+<meta property="og:image" content="https://notes.shichao.io/unp/figure_6.4.png">
+<meta property="og:image" content="https://notes.shichao.io/unp/figure_6.5.png">
+<meta property="og:image" content="https://notes.shichao.io/unp/figure_6.23.png">
+<meta property="og:updated_time" content="2018-03-17T03:35:14.600Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unix网络编程——chap6">
+<meta name="twitter:description" content="I/O复用：select和poll函数概述IO复用：一旦一个或者多个IO条件就绪了，内核就会通知进程 应用场景：  当客户处理多个描述符，例如交互输入和网络套接字 一个客户处理多个套接字 服务器既要处理监听套接字，又要处理已连接套接字 服务器既要处理TCP，又要处理UDP 服务器处理多个服务或者多个协议  I/O模型阻塞型I/O；非阻塞型I/O；I/O复用；信号驱动式I/O；异步I/O 套接字上的">
+<meta name="twitter:image" content="https://notes.shichao.io/unp/figure_6.1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/17/Unix网络编程——chap6/">
+
+
+
+
+
+  <title>Unix网络编程——chap6 | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/Unix网络编程——chap6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Unix网络编程——chap6</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T11:34:46+08:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="I-O复用：select和poll函数"><a href="#I-O复用：select和poll函数" class="headerlink" title="I/O复用：select和poll函数"></a>I/O复用：select和poll函数</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>IO复用：一旦一个或者多个IO条件就绪了，内核就会通知进程</p>
+<p>应用场景：</p>
+<ul>
+<li>当客户处理多个描述符，例如交互输入和网络套接字</li>
+<li>一个客户处理多个套接字</li>
+<li>服务器既要处理监听套接字，又要处理已连接套接字</li>
+<li>服务器既要处理TCP，又要处理UDP</li>
+<li>服务器处理多个服务或者多个协议</li>
+</ul>
+<h2 id="I-O模型"><a href="#I-O模型" class="headerlink" title="I/O模型"></a>I/O模型</h2><p>阻塞型I/O；非阻塞型I/O；I/O复用；信号驱动式I/O；异步I/O</p>
+<p>套接字上的输入分为两步：首先是等待数据从网络中到达。到达后会先将数据复制到内核缓冲区，接着复制到应用进程缓冲区。</p>
+<h3 id="阻塞式I-O模型"><a href="#阻塞式I-O模型" class="headerlink" title="阻塞式I/O模型"></a>阻塞式I/O模型</h3><p><img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img"></p>
+<p>进程在调用recvfrom()之后，一直阻塞直到数据复制到应用进程缓冲区或者返回错误</p>
+<h3 id="非阻塞式I-O模型"><a href="#非阻塞式I-O模型" class="headerlink" title="非阻塞式I/O模型"></a>非阻塞式I/O模型</h3><p><img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img"></p>
+<p>应用进程持续的轮询，查看操作是否就绪。如果没有就绪就会返回一个错误。这种做法会耗费大量的CPU时间</p>
+<h3 id="I-O复用模型"><a href="#I-O复用模型" class="headerlink" title="I/O复用模型"></a>I/O复用模型</h3><p><img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img"></p>
+<p>对于这种模型，我们可以使用select或者poll来完成我们的需求。通过select这个系统调用（阻塞于此），让内核在IO就绪的情况下通知应用进程，然后应用进程再调用recvfrom。这里使用了两个系统调用，但好处是可以等待多个描述符就绪。</p>
+<h3 id="信号驱动式I-O"><a href="#信号驱动式I-O" class="headerlink" title="信号驱动式I/O"></a>信号驱动式I/O</h3><p><img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img"></p>
+<p>对于这种模型，首先是安装一个信号驱动函数，并马上返回。在内核发现描述符就绪后，通过信号通知应用进程。这样，在等待数据到达的期间进程不会被阻塞。</p>
+<h3 id="异步I-O"><a href="#异步I-O" class="headerlink" title="异步I/O"></a>异步I/O</h3><p><img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img"></p>
+<p>这种模型比之信号驱动式I/O更绝，它是内核完成IO操作之后才会通知应用进程</p>
+<p>前面四种模型都是同步I/O模型，因为进程都会因为IO请求而阻塞，知道IO操作完成</p>
+<h2 id="select函数"><a href="#select函数" class="headerlink" title="select函数"></a>select函数</h2><p>先来看函数原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">select</span><span class="params">(<span class="keyword">int</span> maxfdpl, fd_set *readset, fd_set *writeset, fd_set *exceptest, <span class="keyword">const</span> struct timeval *timeout)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>对于最后一个函数，这是一个时间参数，控制的是在内核等待操作就绪需要花费多少时间：</p>
+<ul>
+<li>永远等待，直到有一个描述符就绪。设置为NULL</li>
+<li>等待一定的时间，在时间范围内直到有一个描述符就绪</li>
+<li>不等待，轮询，马上返回</li>
+</ul>
+<p>至于中间三个参数：readset，writeset，exceptest。控制的是内核需要测试哪些描述符的读写，异常操作。</p>
+<p>注意的是，fd_set是一个描述符集，通常是一个整数数组。每个元素是32位，每一个位对应的是一个描述符，其中第一个元素对应的是描述符0-31，第二个元素对应的是32-63。例如，3对应的就是描述符123。通过某些宏定义的操作可以设置需要检查的描述符。</p>
+<p>另外就是，由于这里传入的指针会被修改，也就是作为值——结果返回。通过调用select之后检查指针的值就知道哪些bit修改了，也就是描述符的操作就绪了。也因此，每次调用select都要重新设置。</p>
+<p>第一个参数就是待测试的最大描述符+1，也就是测试的描述符个数。</p>
+<h3 id="描述符就绪条件"><a href="#描述符就绪条件" class="headerlink" title="描述符就绪条件"></a>描述符就绪条件</h3><table>
+<thead>
+<tr>
+<th>Condition</th>
+<th style="text-align:center">Readable?</th>
+<th style="text-align:right">Writable?</th>
+<th style="text-align:right">Exception</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data to read</td>
+<td style="text-align:center">x</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td>Read half of the connection closed</td>
+<td style="text-align:center">x</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td>New connection ready for listening socket</td>
+<td style="text-align:center">x</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td>Space available for writing</td>
+<td style="text-align:center"></td>
+<td style="text-align:right">x</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td>Write half of the connection closed</td>
+<td style="text-align:center"></td>
+<td style="text-align:right">x</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td>Pending error</td>
+<td style="text-align:center">x</td>
+<td style="text-align:right">x</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td>TCP out-of-band data</td>
+<td style="text-align:center"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right">x</td>
+</tr>
+</tbody>
+</table>
+<h2 id="shutdown函数"><a href="#shutdown函数" class="headerlink" title="shutdown函数"></a>shutdown函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">shutdown</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">int</span> howto)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>与close函数相比，shutdown函数不需理会引用计数是否为0，它可以直接激发TCP的正常连接终止；</li>
+<li>另外，close终止的是读与写两个方向的数据传送，而shutdown函数则是告诉对端我们已经完成了数据传送，即使对端仍有数据发送。</li>
+</ul>
+<p>也就是shutdown函数的调用会关闭一半的TCP连接。</p>
+<h2 id="poll函数"><a href="#poll函数" class="headerlink" title="poll函数"></a>poll函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">poll</span><span class="params">(struct pollfd *fdarray, <span class="keyword">unsigned</span> <span class="keyword">long</span> nfds, <span class="keyword">int</span> timeout)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>poll函数与select类似，但它能提供额外的信息，而且用的不是值——结果参数。</p>
+<p>注意第一个参数，fdarray是这样的一个结果体指针：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">short</span> events;</span><br><span class="line">    <span class="keyword">short</span> revents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要测试的条件由events指定，函数会在revents成员中返回描述符的测试结果。具体表现如下图：</p>
+<p><img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img"></p>
+<p>从这个表可以看到，我们可以测试读写和异常三种操作，另外还能识别三类数据：普通数据，优先级带，高优先级带。至于怎么区分这些数据的类型，就有些争议了，这里就不写了。</p>
+<p>timeout参数跟select的类似，也是指定poll函数返回前等待多长时间。</p>
+<ul>
+<li>INFTIM：永远等待</li>
+<li>0：立即返回，不阻塞进程</li>
+<li><blockquote>
+<p>0：等待指定的时间</p>
+</blockquote>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unix/" rel="tag"># Unix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/15/Unix网络编程——chap5/" rel="next" title="Unix网络编程——chap5">
+                <i class="fa fa-chevron-left"></i> Unix网络编程——chap5
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/18/linker/" rel="prev" title="linker">
+                linker <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">185</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#I-O复用：select和poll函数"><span class="nav-number">1.</span> <span class="nav-text">I/O复用：select和poll函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-O模型"><span class="nav-number">1.2.</span> <span class="nav-text">I/O模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞式I-O模型"><span class="nav-number">1.2.1.</span> <span class="nav-text">阻塞式I/O模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非阻塞式I-O模型"><span class="nav-number">1.2.2.</span> <span class="nav-text">非阻塞式I/O模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#I-O复用模型"><span class="nav-number">1.2.3.</span> <span class="nav-text">I/O复用模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信号驱动式I-O"><span class="nav-number">1.2.4.</span> <span class="nav-text">信号驱动式I/O</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步I-O"><span class="nav-number">1.2.5.</span> <span class="nav-text">异步I/O</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#select函数"><span class="nav-number">1.3.</span> <span class="nav-text">select函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#描述符就绪条件"><span class="nav-number">1.3.1.</span> <span class="nav-text">描述符就绪条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shutdown函数"><span class="nav-number">1.4.</span> <span class="nav-text">shutdown函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#poll函数"><span class="nav-number">1.5.</span> <span class="nav-text">poll函数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
