@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Machine Learning,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="集成学习个体与集成集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，  集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。 假设存在二分类问题和真实函数f，如果基分类">
+<meta name="keywords" content="Machine Learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ensemble Learning">
+<meta property="og:url" content="http://yoursite.com/2019/03/22/Ensemble-Learning/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="集成学习个体与集成集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，  集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。 假设存在二分类问题和真实函数f，如果基分类">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png">
+<meta property="og:updated_time" content="2019-03-22T13:39:23.138Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ensemble Learning">
+<meta name="twitter:description" content="集成学习个体与集成集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，  集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。 假设存在二分类问题和真实函数f，如果基分类">
+<meta name="twitter:image" content="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/22/Ensemble-Learning/">
+
+
+
+
+
+  <title>Ensemble Learning | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/22/Ensemble-Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ensemble Learning</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-22T21:38:20+08:00">
+                2019-03-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="集成学习"><a href="#集成学习" class="headerlink" title="集成学习"></a>集成学习</h1><h2 id="个体与集成"><a href="#个体与集成" class="headerlink" title="个体与集成"></a>个体与集成</h2><p>集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，</p>
+<p><img src="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png" alt="img"></p>
+<p>集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。</p>
+<p>假设存在二分类问题和真实函数f，如果基分类器的错误率为$\epsilon$，则对于每个分类器hi有：<br>$$<br>P(h_i(x) \ne f(x)) = \epsilon<br>$$<br>如果基分类器的错误率相互独立，那么集成学习的错误率有：<br>$$<br>P(h_i(x) \ne f(x)) = \sum_{k=0}^{[T/2]} C_T^k (1-\epsilon)^k \epsilon^{T-k} \<br>\leq exp(-1/2T(1-2\epsilon)^2)<br>$$<br>可以看到随着个体学习器数目的增加，集成的错误率降指数下降。</p>
+<p>但往往基学习器的误差不是相互独立的，而且一般准确性很高的话，要增加多样性就必须牺牲准确性，</p>
+<p>目前集成学习中，个体学习强依赖的代表是Boosting，而非强依赖的代表是Bagging和Random Forest。</p>
+<h2 id="Boosting"><a href="#Boosting" class="headerlink" title="Boosting"></a>Boosting</h2><p>Boosting是将弱学习器提升为强学习器的算法：先从初始训练集中训练出一个基学习器，然后根据该学习器的表现对训练样本的分布进行调整，根据调整后的样本分布来训练下一个基学习器。</p>
+<p>Boost的代表是AdaBoost。</p>
+<p>AdaBoost有多种推导方式，我们这里采用基学习器的线性组合：<br>$$<br>H(x) = \sum_{t=1}^T\alpha_th_t(x)<br>$$<br>AdaBoost的算法如下：</p>
+<p>给定一个训练数据集D={(x1,y1), (x2,y2)…(xN,yN)}，yi属于标记集合{-1,+1}。</p>
+<ol>
+<li>$D_1(x) = 1/m$，每一个训练样本最开始时都被赋予相同的权值：1/N；</li>
+<li>进行多轮迭代，假设迭代T次。for t = 1, 2, .. ,T</li>
+</ol>
+<ul>
+<li>$h_t = \xi(D, D_t);$基于分布$D_t$从数据集中训练出分类器$h_t$；</li>
+<li>$\epsilon_{t} = P_{x-D_t}(h_t(x)\ne f(x));$计算分类器的错误率；</li>
+<li>如果错误率比随机猜测还要差，那么意味着当前的基学习器不满足基本条件，放弃该学习器；</li>
+<li>$\alpha_t = 1/2 ln(\frac{1-\epsilon_t}{\epsilon_t})$；确定该分类器的权重；</li>
+<li>$D_{t+1}(x) = \frac{D_t(x) exp(-\alpha_tf(x)h_t(x))}{Z_t}$；更新样本的权重，其中Z是一个规范化因子，以确保$D_{t+1}$是一个分布；每个样本的新权值是变大还是变小，取决于它是被分错还是被分正确；</li>
+</ul>
+<ol start="3">
+<li>输出$H(x)=sign(\sum_{t=1}^T \alpha_th_t(x))$；</li>
+</ol>
+<p>若H(x)能令指数损失函数最小化，可以求偏导：<br>$$<br>\frac {\alpha l_{exp}(H|D)} {\alpha H(x)} = -e^{-H(x)} P(f(x)=1|x) + e^{H(x)}P(f(x)=-1|x)<br>$$<br>令上式为0，可求解：<br>$$<br>H(x) = 1/2 ln \frac{P(f(x)=1|x)}{P(f(x)=-1|x)}<br>$$<br>依赖这个式子，我们可以求得分类器权重的更新公式。</p>
+<p>对于无法重新赋权的训练样本，可以通过重新采样的方法来处理。如上所述，如果初始设置的学习轮数还没到T，可能导致只包含少量基学习器而性能不佳的情况。重采样可以在抛弃不满足基本条件的基学习器之后，根据当前分布重新对样本进行采样，再基于采样结果训练出基学习器，使得学习过程可以在T轮完成。</p>
+<p>Boosting主要关注降低偏差，可以基于泛化能力较弱的学习器构建出强的集成。</p>
+<h2 id="Bagging与随机森林"><a href="#Bagging与随机森林" class="headerlink" title="Bagging与随机森林"></a>Bagging与随机森林</h2><p>为了得到泛化能力强的集成，集成中的个体学习器应该尽可能独立，一种可能的做法是进行随机取样，根据不同的样本训练得到相对独立的基学习器。但这种做法又可能因为数据量不够而导致学习器的准确性不够高。</p>
+<h3 id="Bagging"><a href="#Bagging" class="headerlink" title="Bagging"></a>Bagging</h3><p>bagging是一种并行式的集成学习方法。给定m个样本的数据集，我们每次随机从中抽出一个样本放入采样集中，抽出的样本需要重新放回去。经过m次抽取，我们得到一个m个样本的数据集。其中采样集中有可能存在重复的数据。</p>
+<p>采样了T个含有m个训练样本的数据集，然后基于每个数据集训练出一个基学习器，然后将这些基学习器进行组合，对于分类任务使用简单投票法，而对于回归任务则是使用简单平均法。</p>
+<p>优点：</p>
+<ul>
+<li>Bagging可以应用于多分类、回归等任务；</li>
+<li>由于每个基学习器只用了六成的数据，因此可以用剩下的数据坐泛化能力的”包外预计”；</li>
+</ul>
+<h3 id="随机森林"><a href="#随机森林" class="headerlink" title="随机森林"></a>随机森林</h3><p>随机森林是Bagging的一个扩展变形，在以决策树为基学习器构建Bagging集成的基础上，进一步在决策树的训练过程中引入了随机属性的选择。</p>
+<p>传统决策树在当前节点从d个属性中选择一个最优属性，而在RF中，则是先从该节点的属性集合中随机选择一个包含k个属性的子集，然后再从中选择一个最优属性。</p>
+<p>一般情况下，推荐$k=log_2d$。</p>
+<p>随机森林的泛化误差比Bagging更小。</p>
+<h2 id="结合策略"><a href="#结合策略" class="headerlink" title="结合策略"></a>结合策略</h2><p>学习器结合的优点：</p>
+<ul>
+<li>减小因为单学习器可能带来的误选而导致泛化能力不佳的风险；</li>
+<li>多次运行进行结合，避免陷入局部最小点；</li>
+<li>某些学习任务的真实假设可能并不在单学习器当前学习算法所考虑的假设空间中；</li>
+</ul>
+<h3 id="平均法"><a href="#平均法" class="headerlink" title="平均法"></a>平均法</h3><p>加权平均法：<br>$$<br>H(x) = \sum_{i=1}^Tw_ih_i(w)<br>$$<br>其中，$w_i \ge 0, \sum_{i=1}^Tw_i=1$；简单平均法，则是令$w_i=1/T$的特例。</p>
+<p>一般而言，在个体学习器性能相差较大时宜使用加权平均法，而在个体学习器性能相近时则使用简单平均法。</p>
+<h3 id="投票法"><a href="#投票法" class="headerlink" title="投票法"></a>投票法</h3><p>投票法有几种，假设$h_i^j(x)$是分类器$h_i$在类别标记$c_j$上的输出。</p>
+<ul>
+<li>绝对多数投票法</li>
+</ul>
+<p>$$<br>H(x)=\left{<br>\begin{array}{rcl}<br>c_j       &amp;      &amp; {if \sum_{i=1}^T h_i^j(x) \ge 0.5\sum_{k=1}^T \sum_{i=1}^T h_i^k(x)}\<br>reject     &amp;      &amp; {otherwise}<br>\end{array} \right.<br>$$</p>
+<p>对于可靠性的学习任务中，这个机制提供了拒绝预测的选项</p>
+<ul>
+<li>相对多数投票法</li>
+</ul>
+<p>$$<br>H(x) = c_{arg max <em>j } \sum</em>{i=1}^Th_i^j(x)<br>$$</p>
+<p>若同时有多个类别获得了最高票，则随机选一个。</p>
+<ul>
+<li>加权投票法</li>
+</ul>
+<p>$$<br>H(x) = c_{arg max <em>j } \sum</em>{i=1}^T w_ih_i^j(x)<br>$$</p>
+<p>一般情况下，对于不同的学习器可能会产生不同类型的值，比如类标记和类概率。在这种情况下，类概率输出转化为类标记输出（例如将类概率最大的设置为1，其它为0），然后再投票。</p>
+<h3 id="学习法"><a href="#学习法" class="headerlink" title="学习法"></a>学习法</h3><p>当训练数据很多时，我们可以使用另一种更为强大的结合策略——通过另一个学习器进行结合。</p>
+<p>Stacking是这类策略的代表，其先从初始数据集训练出初级学习器，然后”生成”一个新的数据集用于训练次级学习器。</p>
+<p>为了避免过拟合，一般是采用交叉验证的方式，即用训练初级学习器未使用的样本来产生次级学习器的训练样本。以k折交叉验证为例，初始训练集D被随机划分为k个大小相似的集合$D_1,..,D_k$。令$D_j$和$\overline D_j = D-D_j$分别表示在第j折的测试集和训练集。</p>
+<p>算法的具体过程如下：</p>
+<ul>
+<li>给定T个初级学习算法，初级学习器$h_t^{(j)}$通过在$\overline D_j$上使用第t个学习算法而得；</li>
+<li>对$D_j$中每个样本$x_i$，计算$z_{it}=h_t^{(j)}(x_i)$，则由样本产生的次级训练样例为$z_i=(z_{i1},…,z_{iT})$，标记部分为$y_i$；</li>
+<li>交叉验证结束之后，由初级学习器产生的次级训练集$D’ = {(z_i,y_i)}^m_{i=1}$，并由此训练次级学习器；</li>
+</ul>
+<p>次级学习器的输入属性表示和次级学习算法对stacking集成的泛化性能由很大的影响。</p>
+<h2 id="多样性"><a href="#多样性" class="headerlink" title="多样性"></a>多样性</h2><h3 id="误差——分歧分解"><a href="#误差——分歧分解" class="headerlink" title="误差——分歧分解"></a>误差——分歧分解</h3><p>为了使得泛化能力提高，个体学习器应该”好而不同”。因此我们来做一点理论分析：</p>
+<p>假设对于数据x，定义学习器h得分歧为：<br>$$<br>A(h_i|x) = (h_i(x)-H(x))^2\<br>则集成的分歧为：\overline A(h_i|x) = \sum_{i=1}^Tw_i(h_i(x)-H(x))^2<br>$$<br>而个体学习器和集成学习器的平方误差为：<br>$$<br>E(h_i|x) = (f(x)-h_i(x))^2 \<br>\overline E(h|x) = \sum_{i=1}^T w_i E(h_i|x) \<br>E(H|x) = (f(x)-H(x))^2<br>$$<br>则可以根据上式求得：<br>$$<br>\overline A(h|x) = \overline E(h|x) -E(H|x)<br>$$<br>因此可以求得$E = \overline E - \overline A$，即个体学习器准确性越高，多样性越好，则集成效果越好。</p>
+<h3 id="多样性度量"><a href="#多样性度量" class="headerlink" title="多样性度量"></a>多样性度量</h3><p>多样性度量其实就是度量集成个体分类器的多样性，比较典型的做法是考虑个体分类器的两两相似/不相似性，以两分类为例：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Hi = +1</th>
+<th>Hi = -1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hj = +1</td>
+<td>a</td>
+<td>c</td>
+</tr>
+<tr>
+<td>Hj = -1</td>
+<td>b</td>
+<td>d</td>
+</tr>
+</tbody>
+</table>
+<p>其中，a表示两个分类器都预测为正类的样本数目，a+b+c+d=m。以下是一些常见的多样性度量：</p>
+<ul>
+<li>不合度量</li>
+</ul>
+<p>$$<br>dis_{ij} = \frac{b+c}{m}<br>$$</p>
+<ul>
+<li>相关系数</li>
+</ul>
+<p>$$<br>p_{ij} = \frac{ad-bc}{\sqrt{(a+b)(a+c)(c+d)(b+d)}}<br>$$</p>
+<p>该系数的值域为[-1,1]，若两分类器无关，则值为0.若为正相关，则值为正，否则为负；</p>
+<ul>
+<li>Q-统计量</li>
+</ul>
+<p>$$<br>Q_{ij} = \frac{ad-bc}{ad+bc}<br>$$</p>
+<p>其与上面相关系数符号相同；</p>
+<ul>
+<li>k-统计量</li>
+</ul>
+<p>$$<br>k = \frac{p1-p2}{1-p2}<br>$$</p>
+<p>其中，p1是两个分类器取得一致的概率；p2是两个分类器偶然达成一致的概率：<br>$$<br>p1 = \frac{a+d}{m} \<br>p2 = \frac{(a+b)(a+c)+(c+d)(b+d)}{m^2}<br>$$<br>若分类器在数据集上完全一致，则k=1；若它们仅仅是偶然性达成一致，则k=0；k通常为非负值，仅仅在分类器达成一致的概率比偶然性的情况下还低时取负值。</p>
+<h3 id="多样性增强"><a href="#多样性增强" class="headerlink" title="多样性增强"></a>多样性增强</h3><p>要生成多样性大的个体学习器，比较直接的方法是在学习过程引入随机性。</p>
+<ul>
+<li>数据样本扰动</li>
+</ul>
+<p>基于采样法，对训练样本稍加变化。但有些稳定学习器对数据样本的扰动并不敏感。</p>
+<ul>
+<li>输入属性扰动</li>
+</ul>
+<p>该方法一般是从初始属性集中抽出若干个属性子集，这样做不但能增加多样性，还能减少训练时间。但对于属性较少的样本不适宜。</p>
+<ul>
+<li>输出表示扰动</li>
+</ul>
+<p>此类做法的基本思路是对输出表示进行操纵以增强多样性，可以对训练样本的类标记做少许改动，也可以对输出表示进行转化，还可以将原任务拆解成多个子任务。</p>
+<ul>
+<li>算法参数扰动</li>
+</ul>
+<p>对基学习算法的一些参数进行设置，比较常见的是神经网络的参数设置。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/18/GFS-MIT6-824/" rel="next" title="GFS--MIT6.824">
+                <i class="fa fa-chevron-left"></i> GFS--MIT6.824
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">186</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#集成学习"><span class="nav-number">1.</span> <span class="nav-text">集成学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#个体与集成"><span class="nav-number">1.1.</span> <span class="nav-text">个体与集成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Boosting"><span class="nav-number">1.2.</span> <span class="nav-text">Boosting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bagging与随机森林"><span class="nav-number">1.3.</span> <span class="nav-text">Bagging与随机森林</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bagging"><span class="nav-number">1.3.1.</span> <span class="nav-text">Bagging</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#随机森林"><span class="nav-number">1.3.2.</span> <span class="nav-text">随机森林</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结合策略"><span class="nav-number">1.4.</span> <span class="nav-text">结合策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#平均法"><span class="nav-number">1.4.1.</span> <span class="nav-text">平均法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#投票法"><span class="nav-number">1.4.2.</span> <span class="nav-text">投票法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#学习法"><span class="nav-number">1.4.3.</span> <span class="nav-text">学习法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多样性"><span class="nav-number">1.5.</span> <span class="nav-text">多样性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#误差——分歧分解"><span class="nav-number">1.5.1.</span> <span class="nav-text">误差——分歧分解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多样性度量"><span class="nav-number">1.5.2.</span> <span class="nav-text">多样性度量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多样性增强"><span class="nav-number">1.5.3.</span> <span class="nav-text">多样性增强</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -265,6 +265,153 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/支持向量机/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/支持向量机/" itemprop="url">支持向量机</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:09:13+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="支持向量机"><a href="#支持向量机" class="headerlink" title="支持向量机"></a>支持向量机</h1><h2 id="间隔与支持向量"><a href="#间隔与支持向量" class="headerlink" title="间隔与支持向量"></a>间隔与支持向量</h2><p>考虑这样的训练样本$D = {(x_1, y_1), (x_2, y_2), … , (x_m, y_m)}, y_i \in {-1, +1}$。分类学习最重要的基于训练集D找到一个划分超平面，使得不同类别的样本能够分考。虽然划分平面可能很多，但我们应该尽量找到<strong>“位于正中间”</strong>的平面，使得robust最好。</p>
+<p>在样本空间中，划分超平面可以这样描述：<br>$$<br>w^Tx + b = 0<br>$$<br>其中$w=(w_1;w_2;…;w_d)$为法向量，决定平面的方向，而b则是位移，决定的事平面与原点的距离。</p>
+<p>样本空间中任意点x到平面的距离记为：<br>$$<br>r = \frac {|w^Tx+b|} {||w||}<br>$$<br>假设平面能够正确分类，那么对于<br>$$<br>w^T x_i + b \geq +1, y_i +1 \<br>w^T x_i + b \leq -1, y_i -1<br>$$<br>根据这个公式可以得知，距离平面最近的点使得上式成立，那么这几个样本就成为支持向量，两个异类支持向量到平面的距离之和为：<br>$$<br>\gamma = \frac {2} {||w||}<br>$$<br>这就是间隔(margin)。</p>
+<p>但如果我们希望找到具有最大间隔的平面，应该要最大化$\gamma$，则使得$\frac{1}{2}{||w||}^2$最大化。</p>
+<p>这就是<strong>support vector machine(SVM)</strong>的基本模型。</p>
+<h2 id="对偶问题"><a href="#对偶问题" class="headerlink" title="对偶问题"></a>对偶问题</h2><p>TODO</p>
+<h2 id="核函数"><a href="#核函数" class="headerlink" title="核函数"></a>核函数</h2><p>在现实生活中，很可能无法找到使得原始样本空间可分的超平面，比如抑或问题就是这样。但我们可以将样本从原始空间映射到一个更高维空间，使得样本在这个特征空间内是线性可分。</p>
+<p>经过映射后，假设超平面模型为：<br>$$<br>f(x) = w^T \Phi(x) + b<br>$$<br>在利用对偶问题求解时会涉及得到计算内积——$\Phi(x)^T\Phi(x)$，由于映射后的特征空间可能维度很高，甚至是无穷维，要想直接计算通常是困难的。因此可以设计这样一个函数，即$x_i$与$x_j$在特征空间的内积等于它们在原始空间中通过函数k计算的结果。重写解为：<br>$$<br>f(x) = w^T\Phi(x) + b \<br>=\sum_{i=1}^{m}\alpha_iy_i\Phi(x_i)^T\Phi(x) + b \<br>=\sum_{i=1}^{m}\alpha_iy_ik(x, x_i) + b<br>$$<br>但这样还存在一个问题，在不知道$ \Phi(x) $形式时该怎么得到核函数呢？</p>
+<blockquote>
+<p>有这么一个定理，如果有这么一个对称函数，它在输入空间中对应的核矩阵是半正定的，那么它就能作为核函数使用。（不懂？？）</p>
+</blockquote>
+<p>以下为一些常见和核函数：</p>
+<ul>
+<li>线性核：$k(x_i, x_j) = x_i^Tx_i$</li>
+<li>多项式核：$k(x_i, x_j) = (x_i^Tx_j)^d$</li>
+<li>高斯核：$k(x_i, x_j) = exp(- \frac{ || x_i - x_j ||^2 }{2\sigma^2})$</li>
+<li>拉普拉斯核：$k(x_i, x_j) = exp(- \frac{ || x_i - x_j ||^2 }{\sigma})$</li>
+<li>sigmoid核：$k(x_i, x_j) = tanh(\beta x_i^T x_j + \theta)$</li>
+</ul>
+<h2 id="软间隔与正则化"><a href="#软间隔与正则化" class="headerlink" title="软间隔与正则化"></a>软间隔与正则化</h2><p>todo</p>
+<h2 id="支持向量回归"><a href="#支持向量回归" class="headerlink" title="支持向量回归"></a>支持向量回归</h2><p>这样的训练样本$D = {(x_1, y_1), (x_2, y_2), … , (x_m, y_m)}$，希望学得一个回归模型，使得f(x)与y尽可能接近，在传统的回归模型中，我们是基于模型输出f(x)与真实输出y之间的差别来计算损失，在这种情况中当且仅当f(x)与y完全相同时，损失才为零。</p>
+<p>但是对于SVR，假设我们能容忍f(x)与y之间最多有$\epsilon$的偏差，这相当于以f(x)为中心，构建了一个宽度为$2\epsilon$的间隔带，若训练样本落入间隔带，则认为是被预测正确的。</p>
+<p>于是，SVR问题可以转化为：</p>
+<p>$$<br>min_{w, b} \frac{1}{2}||w||^2+C\sum_{i=1}^{m}\ell_{\epsilon}(f(x_i)-y_i) \<br>$$</p>
+<p>$$<br>f(x)=\left{<br>\begin{aligned}<br>0, if |z| \le \epsilon \<br>|z| - \epsilon,otherwise \<br>\end{aligned}<br>\right.<br>$$</p>
+<p>引入松弛变量：<br>$$<br>min_{w, b, \xi_{i2}, \xi_{i1}} \frac{1}{2}||w||^2+C\sum_{i=1}^{m}(\xi_{i2}+\xi_{i1})<br>$$</p>
+<p>通过引入拉格朗日乘子，并对目标参数求偏导，最后得到SVR表示为：<br>$$<br>f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b<br>$$</p>
+<h2 id="核方法"><a href="#核方法" class="headerlink" title="核方法"></a>核方法</h2><p>todo</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/11/linux内核分析——页高速缓存和页回写/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1685,140 +1832,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/19/Linux内核学习——中断和中断处理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/19/Linux内核学习——中断和中断处理/" itemprop="url">Linux内核学习——中断和中断处理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-19T15:43:25+08:00">
-                2018-07-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="中断和中断处理"><a href="#中断和中断处理" class="headerlink" title="中断和中断处理"></a>中断和中断处理</h1><h1 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h1><p>中断本质上是一种电信号，由硬件设备发向处理器，处理器接受到中断之后，就会向操作系统反映该中断，让操作系统去处理新来的数据。</p>
-<p>不同的设备对应的中断不同，因此每个中断需要通过一个中断值来进行标识。</p>
-<blockquote>
-<p>异常也是一种同步中断，很多处理器体系结构处理异常的方式与中断类似</p>
-</blockquote>
-<h2 id="中断处理程序"><a href="#中断处理程序" class="headerlink" title="中断处理程序"></a>中断处理程序</h2><p>在Linux中，中断处理程序就是普通的C函数，但要按照特定的类型进行声明，这样内核才能用这个处理程序去响应中断。同时，这个中断响应程序位于中断上下文中，这是一种原子上下文，不可被阻塞。</p>
-<p>中断发生后，操作系统接受到信号会通知硬件设备，并且还会做一下数据操作。</p>
-<h2 id="上半部与下半部的对比"><a href="#上半部与下半部的对比" class="headerlink" title="上半部与下半部的对比"></a>上半部与下半部的对比</h2><p>为了使得中断处理程序能够运行得又快，完成工作量也大，一般把中断处理程序分为两部分，上半部处理紧急的，有严格限时的工作，下半部会执行一些其它的诸如处理和操作数据的工作。</p>
-<h2 id="中断上下文"><a href="#中断上下文" class="headerlink" title="中断上下文"></a>中断上下文</h2><p>当中断处理程序运行时，内核处于中断上下文中。</p>
-<p>中断上下文不能睡眠，应该尽量简洁，避免循环出现，这样才能保证中断处理程序迅速。</p>
-<h2 id="中断处理机制的实现"><a href="#中断处理机制的实现" class="headerlink" title="中断处理机制的实现"></a>中断处理机制的实现</h2><p>中断处理系统在Linux中是依赖于体系结构的。</p>
-<p>设备产生中断——&gt;电信号被传到中断控制器——&gt;如果中断线是激活状态，则把信号传到CPU——&gt;CPU接收到信号之后，会定义正在做的事，关闭中断系统，跳转到内核预定义的内存位置，则中断处理程序的入口点。</p>
-<h2 id="proc-interrupts"><a href="#proc-interrupts" class="headerlink" title="/proc/interrupts"></a>/proc/interrupts</h2><p>在这个文件中存放着系统中与中断相关的统计信息，可以看看：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">          CPU0       CPU1       CPU2       CPU3       </span><br><span class="line"> 0:         15          0          0          0   IO-APIC   2-edge      timer</span><br><span class="line"> 1:          9       9438       1199       1250   IO-APIC   1-edge      i8042</span><br><span class="line"> 8:          0          1          0          0   IO-APIC   8-edge      rtc0</span><br><span class="line"> 9:        144         26         16         13   IO-APIC   9-fasteoi   acpi</span><br><span class="line">12:         36      10535       1621       1496   IO-APIC  12-edge      i8042</span><br><span class="line">16:        353     545207         28         43   IO-APIC  16-fasteoi   ehci_hcd:usb1, wlp8s0</span><br><span class="line">23:          8         19          6          2   IO-APIC  23-fasteoi   ehci_hcd:usb2</span><br><span class="line">24:          0          0          0          0   PCI-MSI 16384-edge      PCIe PME</span><br><span class="line">25:          0          0          0          0   PCI-MSI 458752-edge      PCIe PME</span><br><span class="line">26:          0          0          0          0   PCI-MSI 466944-edge      PCIe PME</span><br><span class="line">27:        255       6690      14093      39701   PCI-MSI 327680-edge      xhci_hcd</span><br></pre></td></tr></table></figure>
-<p>这里就显示了中断号，和对应的接收中断数目的计数器。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1867,7 +1880,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">185</span>
+                <span class="site-state-item-count">186</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

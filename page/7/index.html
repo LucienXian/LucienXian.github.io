@@ -265,6 +265,140 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/19/Linux内核学习——中断和中断处理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/19/Linux内核学习——中断和中断处理/" itemprop="url">Linux内核学习——中断和中断处理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-19T15:43:25+08:00">
+                2018-07-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="中断和中断处理"><a href="#中断和中断处理" class="headerlink" title="中断和中断处理"></a>中断和中断处理</h1><h1 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h1><p>中断本质上是一种电信号，由硬件设备发向处理器，处理器接受到中断之后，就会向操作系统反映该中断，让操作系统去处理新来的数据。</p>
+<p>不同的设备对应的中断不同，因此每个中断需要通过一个中断值来进行标识。</p>
+<blockquote>
+<p>异常也是一种同步中断，很多处理器体系结构处理异常的方式与中断类似</p>
+</blockquote>
+<h2 id="中断处理程序"><a href="#中断处理程序" class="headerlink" title="中断处理程序"></a>中断处理程序</h2><p>在Linux中，中断处理程序就是普通的C函数，但要按照特定的类型进行声明，这样内核才能用这个处理程序去响应中断。同时，这个中断响应程序位于中断上下文中，这是一种原子上下文，不可被阻塞。</p>
+<p>中断发生后，操作系统接受到信号会通知硬件设备，并且还会做一下数据操作。</p>
+<h2 id="上半部与下半部的对比"><a href="#上半部与下半部的对比" class="headerlink" title="上半部与下半部的对比"></a>上半部与下半部的对比</h2><p>为了使得中断处理程序能够运行得又快，完成工作量也大，一般把中断处理程序分为两部分，上半部处理紧急的，有严格限时的工作，下半部会执行一些其它的诸如处理和操作数据的工作。</p>
+<h2 id="中断上下文"><a href="#中断上下文" class="headerlink" title="中断上下文"></a>中断上下文</h2><p>当中断处理程序运行时，内核处于中断上下文中。</p>
+<p>中断上下文不能睡眠，应该尽量简洁，避免循环出现，这样才能保证中断处理程序迅速。</p>
+<h2 id="中断处理机制的实现"><a href="#中断处理机制的实现" class="headerlink" title="中断处理机制的实现"></a>中断处理机制的实现</h2><p>中断处理系统在Linux中是依赖于体系结构的。</p>
+<p>设备产生中断——&gt;电信号被传到中断控制器——&gt;如果中断线是激活状态，则把信号传到CPU——&gt;CPU接收到信号之后，会定义正在做的事，关闭中断系统，跳转到内核预定义的内存位置，则中断处理程序的入口点。</p>
+<h2 id="proc-interrupts"><a href="#proc-interrupts" class="headerlink" title="/proc/interrupts"></a>/proc/interrupts</h2><p>在这个文件中存放着系统中与中断相关的统计信息，可以看看：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">          CPU0       CPU1       CPU2       CPU3       </span><br><span class="line"> 0:         15          0          0          0   IO-APIC   2-edge      timer</span><br><span class="line"> 1:          9       9438       1199       1250   IO-APIC   1-edge      i8042</span><br><span class="line"> 8:          0          1          0          0   IO-APIC   8-edge      rtc0</span><br><span class="line"> 9:        144         26         16         13   IO-APIC   9-fasteoi   acpi</span><br><span class="line">12:         36      10535       1621       1496   IO-APIC  12-edge      i8042</span><br><span class="line">16:        353     545207         28         43   IO-APIC  16-fasteoi   ehci_hcd:usb1, wlp8s0</span><br><span class="line">23:          8         19          6          2   IO-APIC  23-fasteoi   ehci_hcd:usb2</span><br><span class="line">24:          0          0          0          0   PCI-MSI 16384-edge      PCIe PME</span><br><span class="line">25:          0          0          0          0   PCI-MSI 458752-edge      PCIe PME</span><br><span class="line">26:          0          0          0          0   PCI-MSI 466944-edge      PCIe PME</span><br><span class="line">27:        255       6690      14093      39701   PCI-MSI 327680-edge      xhci_hcd</span><br></pre></td></tr></table></figure>
+<p>这里就显示了中断号，和对应的接收中断数目的计数器。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/19/Tensorflow安装指南/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1889,142 +2023,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/cs231n-lecture4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/cs231n-lecture4/" itemprop="url">cs231n@lecture4</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-17T23:05:45+08:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Backpropagation-and-Neural-Networks"><a href="#Backpropagation-and-Neural-Networks" class="headerlink" title="Backpropagation and Neural Networks"></a>Backpropagation and Neural Networks</h1><p>计算图：每个节点表示一个计算步骤</p>
-<p>反向传播：链式法则的递归调用</p>
-<p>用微积分可能无法求解</p>
-<p>可以组合某些结点成更复杂的结点，只要能求解导数即可</p>
-<p>add gate, max gate</p>
-<p>如果有一个结点连接到了多个结点</p>
-<p>雅克比矩阵</p>
-<blockquote>
-<p>方向转播：利用链式法则递归计算表达式的梯度的方法</p>
-</blockquote>
-<h2 id="简单理解"><a href="#简单理解" class="headerlink" title="简单理解"></a>简单理解</h2><p>其实学过微积分的同学应该都能理解导数的含义，简单概括就是<strong>变量变化导致的函数在该变量方向上的变化率</strong>，指明了整个表达式对于该变量的敏感度。<br>$$<br>f(x, y) = x + y -&gt; \frac{df}{dx} = \frac{df}{dy} = 1<br>$$<br>同样对于取最大值的操作：<br>$$<br>f(x, y) = max(x, y) -&gt; \frac{df}{dx} = 1(x&gt;=y) \frac{df}{dy} = 1(y&gt;=x)<br>$$</p>
-<h2 id="使用链式法则计算符合表达式"><a href="#使用链式法则计算符合表达式" class="headerlink" title="使用链式法则计算符合表达式"></a>使用链式法则计算符合表达式</h2><p>考虑这样的一个符合函数$f(x, y, z)=(x+y)z$，将其分为两个部分$q=x+y和f=qz$。根据链式法则，将梯度表达式连起来的方式就是相乘：<br>$$<br>\frac{\alpha f}{\alpha x} = \frac{\alpha f}{\alpha q} \frac{\alpha q}{\alpha x}<br>$$<br><img src="https://pic4.zhimg.com/80/213da7f66594510b45989bd134fc2d8b_hd.jpg" alt="img"></p>
-<p>这个计算线路图展示了计算的视觉化过程，前向传播从输入计算到输出（绿色），后向传播从尾部开始。</p>
-<h2 id="反向传播的理解"><a href="#反向传播的理解" class="headerlink" title="反向传播的理解"></a>反向传播的理解</h2><p>在前向传播过程中计算两个东西：输出和局部梯度。这样在反向传播的时候，就可以将上游回传的梯度乘以局部梯度。</p>
-<p>至于常见的几种单元，诸如加法门单元、取最大值门单元、乘法门单元都比较好理解。例如在线性分类器中，权重和输入进行点积$w^T x_i$，假设所有的输入样本都乘以1000，那么权重的梯度将会增大1000倍，这样就必须降低学习率来弥补。</p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>反向传播，简单的理解就是复合函数的链式法则。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://www.cnblogs.com/charlotte77/p/5629865.html" target="_blank" rel="noopener">http://www.cnblogs.com/charlotte77/p/5629865.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2073,7 +2071,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">185</span>
+                <span class="site-state-item-count">186</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
