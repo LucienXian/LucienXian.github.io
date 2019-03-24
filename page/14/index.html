@@ -265,6 +265,188 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux进程管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/10/linux进程管理/" itemprop="url">linux进程管理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:08:30+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="linux进程管理"><a href="#linux进程管理" class="headerlink" title="linux进程管理"></a>linux进程管理</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
+<li>资源分配的基本单位；</li>
+<li>调度的基本单位</li>
+<li>当程序在系统中运行时，形成一个进程</li>
+<li>组成：<ul>
+<li>text：代码</li>
+<li>用户数据段：进程处理的数据</li>
+<li>系统数据段：包括PCB</li>
+</ul>
+</li>
+<li>进程状态<ul>
+<li>TASK_RUNNING</li>
+<li>TASK_INTERRUPTIBLE</li>
+<li>TASK_UNINTERRUPTIBLE</li>
+<li>TASK_STOPPED</li>
+<li>TASK_TRACED：被跟踪，一般调式时用到</li>
+<li>EXIT_ZOMBIE：进程结束前的状态</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>EXIT_DEAD</li>
+</ul>
+<h2 id="task-struct"><a href="#task-struct" class="headerlink" title="task_struct"></a>task_struct</h2><ul>
+<li>PCB的数据结构，进程存在的唯一标识</li>
+<li>进程创建时，就会建立一个task_struct，在专门存储task_struct的地方存放着。有最多进程数限制</li>
+<li>主要组成：<ul>
+<li>进程标识号，pid；</li>
+<li>进程的虚拟内存信息：struct mm_struct* mm</li>
+<li>进程打开的文件：struct files_struct *files</li>
+<li>进程映像所在的文件系统：struct files_struct *files</li>
+</ul>
+</li>
+<li>内核2.8后用thread_info替代了task_struct的位置，该结构内部有一个指向task_struct的指针</li>
+</ul>
+<h2 id="进程创建"><a href="#进程创建" class="headerlink" title="进程创建"></a>进程创建</h2><ul>
+<li>通过fork()创建</li>
+<li>子进程继承了父进程的资源（只读）</li>
+<li>写时拷贝</li>
+<li>子进程通过exec()执行真正的任务</li>
+<li>注意：<ul>
+<li>父进程执行fork()返回的是子进程的pid</li>
+<li>子进程执行fork()返回的是0</li>
+</ul>
+</li>
+</ul>
+<h2 id="linux内核线程"><a href="#linux内核线程" class="headerlink" title="linux内核线程"></a>linux内核线程</h2><ul>
+<li>linux中线程也有自己的task_struct结果</li>
+<li>但其共享进程的资源</li>
+<li>内核线程：在内核态下创建，独立执行的一个内核函数</li>
+</ul>
+<h2 id="linux的进程调度"><a href="#linux的进程调度" class="headerlink" title="linux的进程调度"></a>linux的进程调度</h2><ul>
+<li>抢占式，无论是内核态还是用户态都可以抢占</li>
+<li>分时技术：根据进程优先级去分配时间片</li>
+<li>时间片轮转：对于优先级相同的进程，使用时间片轮转的方法</li>
+</ul>
+<ul>
+<li>linux有两种进程：普通进程（100~149）和实时进程（0~99）<ul>
+<li>实时进程优先级更高：有FIFO和RR两种策略</li>
+<li>普通进程只有时间片轮转算法</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux内存管理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1725,141 +1907,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/09/Effective-cpp-15/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/09/Effective-cpp-15/" itemprop="url">Effective-cpp-#15</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-09T23:56:09+08:00">
-                2017-12-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="provide-access-to-raw-resources-in-resource-managing-classes"><a href="#provide-access-to-raw-resources-in-resource-managing-classes" class="headerlink" title="provide access to raw resources in resource-managing classes"></a>provide access to raw resources in resource-managing classes</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>在条款13中，我们使用智能指针去保存一个原始资源，但有些时候AP需要绕过诸如智能指针这类资源管理对象去获得原始资源，因此我们需要留下一个途径让API有机会去使用原始资源</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
-<li>get()方法</li>
-</ul>
-<p>在shared_ptr和auto_ptr中都提供了一个get成员函数，用来显式地返回智能指针内部的资源</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> days = daysHeld(pInv.get())<span class="comment">//shared_ptr&lt;Investment&gt; pInv</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>提供隐式转换</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Font</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  explict Font(FontHandle fh):f(fh)&#123;&#125;</span><br><span class="line">  ~Font() &#123;releaseFont(f);&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  FontHandle f;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在上述RAII类中，每次要使用原始资源，都必须要利用get()方法；因此我们可以提供一个隐式的转换</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Font</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  ...</span><br><span class="line">  <span class="function"><span class="keyword">operator</span> <span class="title">FontHandle</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="keyword">return</span> f;&#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>RAII类应该提供一个访问原始资源的接口，这虽然会破环类的封装，但因为RAII的目的是保证资源的正确释放，所以影响不大</li>
-<li>对资源的访问可以通过显示转换或隐式转换，个人建议显式转换，比较安全</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1908,7 +1955,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">186</span>
+                <span class="site-state-item-count">187</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

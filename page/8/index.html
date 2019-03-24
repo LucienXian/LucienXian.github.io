@@ -265,6 +265,181 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/07/Redis学习《一》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/07/Redis学习《一》/" itemprop="url">Redis学习《一》</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-07T00:06:18+08:00">
+                2018-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Redis学习《一》"><a href="#Redis学习《一》" class="headerlink" title="Redis学习《一》"></a>Redis学习《一》</h1><h2 id="Redis-简介"><a href="#Redis-简介" class="headerlink" title="Redis 简介"></a>Redis 简介</h2><p>Redis是一个远程的，高性能的，内存数据库。Redis有几个特点：</p>
+<ul>
+<li>性能高——读写速度比传统数据库更快；</li>
+<li>数据类型丰富——支持二进制的strings，lists，hash，sets和ordered sets五种类型；</li>
+<li>支持数据备份——拥有两种不同形式的持久化方法，可以用小而紧凑的格式将内存中的数据写入到磁盘；</li>
+</ul>
+<h2 id="Redis安装"><a href="#Redis安装" class="headerlink" title="Redis安装"></a>Redis安装</h2><p>在Ubuntu下安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span>sudo apt-get update</span><br><span class="line"><span class="meta">$</span>sudo apt-get install redis-server</span><br></pre></td></tr></table></figure>
+<p>我用的是docker-redis：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span>docker search redis</span><br></pre></td></tr></table></figure>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/docker-redis-search.png" alt="img"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span>docker pull redis</span><br><span class="line"><span class="meta">$</span>docker run -p 6379:6379 -v $PWD/data:/data  -d redis redis-server --appendonly yes</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>命令说明：</p>
+<p><strong>-p 6379:6379 :</strong> 将容器的6379端口映射到主机的6379端口</p>
+<p><strong>-v $PWD/data:/data :</strong> 将主机中当前目录下的data挂载到容器的/data</p>
+<p><strong>redis-server –appendonly yes :</strong> 在容器执行redis-server启动命令，并打开redis持久化配置</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it 43f7a65ec7f8 redis-cli</span><br></pre></td></tr></table></figure>
+<p>执行redis-cli命令连接刚启动的容器服务器</p>
+<h2 id="redis基本类型"><a href="#redis基本类型" class="headerlink" title="redis基本类型"></a>redis基本类型</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">存储值</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">string</td>
+<td style="text-align:center">字符串、整数或者浮点数</td>
+<td style="text-align:center">redis最基本的类型。该类型是二进制安全的，比如JPG图片或者序列化的对象</td>
+</tr>
+<tr>
+<td style="text-align:center">list</td>
+<td style="text-align:center">一个链表，结点是字符串</td>
+<td style="text-align:center">该链表按照插入顺序排序，可以添加一个元素到头部或者尾部</td>
+</tr>
+<tr>
+<td style="text-align:center">hash</td>
+<td style="text-align:center">key-value无序散列表</td>
+<td style="text-align:center">一个key-value的集合</td>
+</tr>
+<tr>
+<td style="text-align:center">set</td>
+<td style="text-align:center">包含字符串的无序集合</td>
+<td style="text-align:center">string类型的无序集合，并且该集合是通过哈希表实现的</td>
+</tr>
+<tr>
+<td style="text-align:center">zset</td>
+<td style="text-align:center">有序集合，字符串成员与score的映射</td>
+<td style="text-align:center">有序集合，每个元素都会关联到一个double类型的分数。 通过分数来为集合中的成员进行从小到大的排序，成员是唯一的，分数可以重复。分数一样的按照字符串排序。</td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/cs231n-lecture4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1637,231 +1812,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/04/词法分析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/04/词法分析/" itemprop="url">词法分析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-04T21:55:23+08:00">
-                2018-05-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="词法分析"><a href="#词法分析" class="headerlink" title="词法分析"></a>词法分析</h1><blockquote>
-<p>lexical analysis：将输入分解成一个个独立的符号，即tokens</p>
-</blockquote>
-<h2 id="词法单词"><a href="#词法单词" class="headerlink" title="词法单词"></a>词法单词</h2><p>token是由字符组成的序列，例如在常见的程序设计语言都有这样的一些单词类型：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">类型</th>
-<th style="text-align:center">例子</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">ID</td>
-<td style="text-align:center">foo n14 last</td>
-</tr>
-<tr>
-<td style="text-align:center">NUM</td>
-<td style="text-align:center">11 2 34</td>
-</tr>
-<tr>
-<td style="text-align:center">IF</td>
-<td style="text-align:center">if</td>
-</tr>
-<tr>
-<td style="text-align:center">COMMA</td>
-<td style="text-align:center">,</td>
-</tr>
-<tr>
-<td style="text-align:center">LPAREN</td>
-<td style="text-align:center">（</td>
-</tr>
-</tbody>
-</table>
-<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>由于我们在谈论某种语言时，需要为其中的字符串赋予特别的意义，因此我们可以用正则表达式去表示。</p>
-<p>正则表达式的表达符号：</p>
-<table>
-<thead>
-<tr>
-<th>表示</th>
-<th>意义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>a</td>
-<td>一个表示字符串本身的原始字符</td>
-</tr>
-<tr>
-<td>ε</td>
-<td>空字符串</td>
-</tr>
-<tr>
-<td>M\</td>
-<td>N</td>
-<td>可选，alternation，M和N之间选择</td>
-</tr>
-<tr>
-<td>M*N</td>
-<td>联结，concentration，M后面跟着N，也可以写成MN</td>
-</tr>
-<tr>
-<td>M*</td>
-<td>重复，0次或者以上</td>
-</tr>
-<tr>
-<td>M+</td>
-<td>重复，1次或以上</td>
-</tr>
-<tr>
-<td>M?</td>
-<td>选择M出现0次或者1次</td>
-</tr>
-<tr>
-<td>[a-zA-Z]</td>
-<td>字符集合</td>
-</tr>
-<tr>
-<td>.</td>
-<td>表示除了换行符外的所有字符</td>
-</tr>
-<tr>
-<td>“xxxx”</td>
-<td>引号内的字符串本身文字字符串本身</td>
-</tr>
-</tbody>
-</table>
-<p>但是，考虑这样一个字符串<strong>if8</strong>，到底是认为其为一个标识符，还是两个tokens：if和8呢？为了消除二义性，我们可以试用一下两个规则：</p>
-<ul>
-<li>Longest match：对于输入的字符串，取可以与任意正则表达式规则匹配的字符串中最长的那一个作为下一个token；</li>
-<li>Rule priority：给正则表达式赋予某些优先权，选择优先级高的；</li>
-</ul>
-<h2 id="有限自动机"><a href="#有限自动机" class="headerlink" title="有限自动机"></a>有限自动机</h2><p>虽然用正则表达式已经可以很好地指明词法规则，但我们还需要一种能用计算机程序来实现的的形式化方法。这就是有限自动机<strong>(DFA)</strong>所做的事情。有限自动机包含了有限状态的集合和一些从一个状态到另一个状态的边。</p>
-<p>在DFA中，不会有从同一个状态出发的两条边却包含了相同的符号。若对n个字符的字符串，进行了n次的转换之后，如果自动机到达了一个终态，则选择接收该字符串。如果没有到达终态，或者找不到与输入字符匹配的边，则拒绝接收字符串。</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-3.png" alt="img"></p>
-<h3 id="识别最长的匹配"><a href="#识别最长的匹配" class="headerlink" title="识别最长的匹配"></a>识别最长的匹配</h3><p>为了识别一个字符串是否会被接收，词法分析器往往会选择最长的匹配，作为合法的token。因此需要两个变量来记住自动机最近一次处于final states的时机。</p>
-<h2 id="非确定有限自动机"><a href="#非确定有限自动机" class="headerlink" title="非确定有限自动机"></a>非确定有限自动机</h2><p>与确定有限自动机不同，非确定有限自动机<strong>(NFA)</strong>需要做出选择，对从一个状态出发的<strong>多条标有相同符号</strong>的边进行选择。</p>
-<h3 id="将正则表达式转换为NFA"><a href="#将正则表达式转换为NFA" class="headerlink" title="将正则表达式转换为NFA"></a>将正则表达式转换为NFA</h3><p>有了NFA之后，我们可以很容易地将正则表达式转化为NFA，一个正则表达式要么是一个简单的primitive，要么是由多个较小的表达式组合而成。如图：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-6.png" alt="img"></p>
-<h3 id="将NFA转换为DFA"><a href="#将NFA转换为DFA" class="headerlink" title="将NFA转换为DFA"></a>将NFA转换为DFA</h3><p>先来看NFA的模拟算法：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d&lt;-closure(&#123;s1&#125;)</span><br><span class="line"><span class="keyword">for</span> i&lt;<span class="number">-1</span> to k</span><br><span class="line">	d &lt;- DFAedge(d, ci)</span><br></pre></td></tr></table></figure>
-<p>首先构造s1的eplison闭包，然后从该闭包的状态集合出发，吃进符号c，到达一个新的状态集合。</p>
-<p>看一个例子：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-7.png" alt="img"></p>
-<p>以字符串in为例子，先计算出eplison闭包，即求得状态集合为{1,4,9,14}；接着要根据字符i来进行状态转换，从状态1可到状态2，4可以到5，9无处可去，14可以到15，因此得到状态集合{2,5,15}，但是我们还要计算一次闭包，因此得到最终状态集合为{2,5,6,8,15}；同理，根据字符n进行转换。</p>
-<p>这样的自动机还不是最理想的，我们还可以构造最小的自动机。我们只会在这种情况下称两个状态是等价的，如果一个开始于s1的自动机接收字符串a，当且仅当一个开始s2的自动机接收字符串a。这样我们就可以使得所有进入s2的边指向s1，并删除s2。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1910,7 +1860,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">186</span>
+                <span class="site-state-item-count">187</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

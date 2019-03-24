@@ -265,6 +265,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/30/Generative-Models/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/30/Generative-Models/" itemprop="url">Generative Models</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-30T16:24:51+08:00">
+                2019-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Generative-Models"><a href="#Generative-Models" class="headerlink" title="Generative Models"></a>Generative Models</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><blockquote>
+<p>Given training data, generate new samples from same distribution.</p>
+</blockquote>
+<p>这是非监督学习的一种，目标是学习生成一个模型。使用Generative Models，我们可以构造一些艺术工作的真实样式，通过时间序列的数据去仿真，还有就是Generative Models可以用来推荐潜在的表示模式。</p>
+<p>Generative Models有两种：Explicit density模型和implicit density模型。</p>
+<p>生成模型族谱：</p>
+<p><img src="https://static.leiphone.com/uploads/new/article/740_740/201702/589978abeec64.png?imageMogr2/format/jpg/quality/90" alt="img"></p>
+<h2 id="Pixel-Rnn-amp-Pixel-Cnn"><a href="#Pixel-Rnn-amp-Pixel-Cnn" class="headerlink" title="Pixel Rnn &amp; Pixel Cnn"></a>Pixel Rnn &amp; Pixel Cnn</h2><p>在讨论具体的显式密度模型之前，我们先来看一下<strong>完全可见置信网络 Fully visible belief networks</strong>。该模型通过使用概率的链式规则来将一个n维的向量x的概率分布分解为一个一维的概率分布：<br>$$<br>P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,…,x_{i-1})<br>$$</p>
+<ul>
+<li>Pixel Rnn</li>
+</ul>
+<p>从Corner开始生成图像像素，然后往周边序列化地生成像素，一般可以通过RNN或者LSTN去生成周边的像素。缺点就是序列化生成非常慢。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelRNN.png" alt="img"></p>
+<ul>
+<li>Pixel Cnn</li>
+</ul>
+<p>跟前面一样，从Corner开始生成图像像素。但不同的是，下一个像素的生成是利用上一个像素丢入CNN后生成的。相对pixel rnn会更快，但是总体来说还是比较慢的。 </p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelCNN.png" alt="img"></p>
+<h2 id="Autoencoders"><a href="#Autoencoders" class="headerlink" title="Autoencoders"></a>Autoencoders</h2><p>这是非监督学习的一种方法，可以从没有标记过的数据中学习到一些低维度的特征。z是比x维度更低的数据，z包含了重要的信息，并且z应该能够学习到可以被抓取的特征。z能够通过decoder重建输入数据。 </p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/autoencoders1.png" alt="img"></p>
+<h2 id="GAN"><a href="#GAN" class="headerlink" title="GAN"></a>GAN</h2><p> GAN的提出是为了解决从一个复杂的、高维的训练分布数据中进行采样的问题，我们可以从一个简单分布进行采样，例如随机噪声，然后去学习transformation到训练的分布。我们使用神经网络去表示这个复杂的transformation。</p>
+<h3 id="Two-player-game"><a href="#Two-player-game" class="headerlink" title="Two player game"></a>Two player game</h3><ul>
+<li>Generator network: try to fool the discriminator by generating real-looking images;</li>
+<li>Discriminator network: try to distinguish between real and fake images;</li>
+</ul>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/gan1.png" alt="img"></p>
+<p>目标函数：<br>$$<br>\underset{\theta_g}{min}\ \underset{\theta_d}{max} [E_{x-p_{data} }logD_{\theta_d(x)} + E_{x-p_z }log(1-D_{\theta_d}(G_{\theta_g}(z)))]<br>$$<br>其中，$D_{\theta_d(x)}$是真实数据x的Discriminator的输出，$D_{\theta_d}(G_{\theta_g}(z))$是假数据的输出。Discriminator想要最大化目标函数，使得D(x)接近1，并且D(G(z))接近0；而Generator则是最小化目标函数，使得D(G(z))接近1。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/28/接口优于抽象类/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1482,132 +1628,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/在公有类中使用访问方法而非公有域/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/26/在公有类中使用访问方法而非公有域/" itemprop="url">在公有类中使用访问方法而非公有域</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:39:22+08:00">
-                2019-01-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="在公有类中使用访问方法而非公有域"><a href="#在公有类中使用访问方法而非公有域" class="headerlink" title="在公有类中使用访问方法而非公有域"></a>在公有类中使用访问方法而非公有域</h1><p>不提供封装的类，如果不改变API，就无法改变它的数据表示法，也无法强加任何约束条件；</p>
-<p>例如这种：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">double</span> x;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">double</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如果类是包级私有的，或者是私有的嵌套类，直接暴露它的数据域并没有本质的错误</p>
-</blockquote>
-<p>Java的平台类库中有几个类违反了“公有类不应该直接暴露数据域”的告诫，比如java.awt包中的Point和Dimension类。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1656,7 +1676,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">186</span>
+                <span class="site-state-item-count">187</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
