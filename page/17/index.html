@@ -265,6 +265,146 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/Effective-cpp-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/20/Effective-cpp-3/" itemprop="url">[Effective cpp]-#3</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-20T22:46:12+08:00">
+                2017-11-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="use-const-whenever-possible"><a href="#use-const-whenever-possible" class="headerlink" title="use const whenever possible"></a>use const whenever possible</h1><p>关于const的使用，之前的文章里也做过相似的介绍，但《effective C++》里还是做了一些规则推荐，那就来学习一下。</p>
+<h2 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a>函数声明</h2><p>讲道理，之前对这种用法并不熟悉，但书上做了很详细的介绍。令函数返回一个常量值在某些情况下是非常有用的。举个例子，考虑有理数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</span>&#125;;</span><br><span class="line"><span class="keyword">const</span> Rational <span class="keyword">operator</span>* (<span class="keyword">const</span> Rational&amp; lhs, <span class="keyword">const</span> Rational&amp; rhs);</span><br></pre></td></tr></table></figure>
+<p>这样一个重载函数返回的是一个常量值，倘若不加上const关键字，就有可能发生这种情况：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Rational a, b, c;</span><br><span class="line">(a * b) = c;<span class="comment">//这样做毫无意义</span></span><br><span class="line"><span class="comment">//又或者出现这种情况</span></span><br><span class="line"><span class="keyword">if</span> (a*b = c)<span class="comment">//也许只是写错</span></span><br></pre></td></tr></table></figure>
+<h2 id="const成员函数"><a href="#const成员函数" class="headerlink" title="const成员函数"></a>const成员函数</h2><ul>
+<li>这里需要注意的是如果两个成员函数只是不同，它们是可以被重载的；</li>
+<li>由于这个原因，重载的两个成员函数可能会出现代码重复的情况；</li>
+<li>因此我们可以这样使用：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TextBlock</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="built_in">std</span>::<span class="keyword">size_t</span> position) <span class="keyword">const</span>&#123;... <span class="keyword">return</span> text[position];&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="built_in">std</span>::<span class="keyword">size_t</span> position)&#123;</span><br><span class="line">      <span class="keyword">return</span> const_char&lt;<span class="keyword">char</span>&amp;&gt;(<span class="keyword">static_cast</span>&lt;<span class="keyword">const</span> TextBlock&gt;(*<span class="keyword">this</span>)[position]);</span><br><span class="line">  	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过在non-const operator[]经过两次转换，即可以减少代码量，也可以返回non-const值；<ul>
+<li>non-const转换成const是安全转换；</li>
+</ul>
+</li>
+</ul>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>将某些东西声明为const可以帮助编译器检查出错误的用法；</li>
+<li>当const和non-const有着类似的实现时，可以让non-const调用const来避免代码重复；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/Effective-cpp-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1519,179 +1659,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/CPU调度/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/14/CPU调度/" itemprop="url">CPU调度</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T11:37:40+08:00">
-                2017-11-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="CPU调度"><a href="#CPU调度" class="headerlink" title="CPU调度"></a>CPU调度</h1><blockquote>
-<p>一般来说，CPU调度==处理机调度==进程调度</p>
-</blockquote>
-<h2 id="发生时刻"><a href="#发生时刻" class="headerlink" title="发生时刻"></a>发生时刻</h2><ul>
-<li>running to waiting</li>
-<li>running to ready</li>
-<li>waiting to ready</li>
-<li>terminates</li>
-</ul>
-<h2 id="调度方式"><a href="#调度方式" class="headerlink" title="调度方式"></a>调度方式</h2><ul>
-<li>抢占式：一旦给某个进程分配完cpu就让该进程进行下去；</li>
-<li>非抢占式：当一个进程在运行中，系统基于某种原则，剥夺分配给该进程的CPU；</li>
-</ul>
-<h2 id="调度策略"><a href="#调度策略" class="headerlink" title="调度策略"></a>调度策略</h2><p>先来看几个指标，这几个指标可以用来判断调度策略优劣的：</p>
-<blockquote>
-<p>Throughput(吞吐量)：单位时间内进程完成的数量；</p>
-<p>Turnaround time(周转时间)：执行一个进程花费的时间(从进入就绪队列到完成 Termination time - Arrival time)；</p>
-<p>Waiting time：一个进程在ready队列中等待的时间；</p>
-<p>Response time：从进程提出请求道首次被响应的时间（不包括执行完成）；</p>
-</blockquote>
-<h2 id="First-come-First-served"><a href="#First-come-First-served" class="headerlink" title="First come, First served"></a>First come, First served</h2><p>非抢占式的，根据它们的到达时间，系统维一个FIFO的进程列表；</p>
-<h2 id="Shortest-Job-First"><a href="#Shortest-Job-First" class="headerlink" title="Shortest-Job-First"></a>Shortest-Job-First</h2><p>系统在ready queue中，优先选择那些CPU burst time最少的进程。</p>
-<p>这种调度策略分为抢占式和非抢占式两种，抢占式的没什么好说，非抢占式的：当一个新的需要更少CPU burst time的进程到达时，CPU便会重新分配。</p>
-<p>SJF还有一种变形，即highest response ration next（等待时间+要求执行时间/要求执行时间）</p>
-<h2 id="Priority"><a href="#Priority" class="headerlink" title="Priority"></a>Priority</h2><p>同样，优先级策略也分为抢占式和非抢占式两种。</p>
-<p>这种调度策略会导致一个非常严重的问题——<strong>starvation</strong>，优先级低的进程可能一直无法被执行。为了解决这个问题，我们可以采取动态优先级的策略，随着时间推移，我们提升某些进程的优先级。</p>
-<h3 id="优先级范围"><a href="#优先级范围" class="headerlink" title="优先级范围"></a>优先级范围</h3><ul>
-<li>windows的线程<ul>
-<li>windows的每一个线程都有优先级，范围是0-31，0最低，31最高；</li>
-</ul>
-</li>
-<li>linux的进程<ul>
-<li>linux的进程范围是-20-19，值越小，优先级越高。通常情况下，linux的进程优先级是由父进程继承而来，通常是0；</li>
-<li>nice值反映了进程优先级；</li>
-<li>我们可以通过<strong>nice</strong>命令来对一个将要执行的命令进程nice值；通过<strong>renice</strong>重新设置nice值；</li>
-</ul>
-</li>
-</ul>
-<h2 id="Round-Robin"><a href="#Round-Robin" class="headerlink" title="Round Robin"></a>Round Robin</h2><p>这是一种抢占式的策略，给队列里的每个进程分配相同的时间片，无论进程是否执行完，当时间懂啊了都切换到下一个进程。</p>
-<blockquote>
-<p>当时间片Q太大时，就变成了FIFO；</p>
-<p>当Q太小，但不能小到切换上下文的花费比Q还小时；</p>
-</blockquote>
-<p>这种策略的turnaround time会比SJF更高，因为SJF选择的是更低burst time，避免等待时间增多；但response time会更少，因为它的切换频率更快，使得响应更快；</p>
-<h2 id="Multilevel-Queue"><a href="#Multilevel-Queue" class="headerlink" title="Multilevel Queue"></a>Multilevel Queue</h2><p>分配进程到多个队列中，每个队列使用不同的调度算法：</p>
-<p>前台交互式(foreground)——RR</p>
-<p>后台批处理(background)——FCFS</p>
-<h2 id="Multilevel-Feedback"><a href="#Multilevel-Feedback" class="headerlink" title="Multilevel Feedback"></a>Multilevel Feedback</h2><p>这是一种动态的调度策略，该策略需要定义以下这些部分：</p>
-<blockquote>
-<p>队列个数；</p>
-<p>每个队列的调度算法；</p>
-<p>更新队列所属队列的方法；</p>
-<p>提升或降低进程优先级的方法；</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1740,7 +1707,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">187</span>
+                <span class="site-state-item-count">188</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
