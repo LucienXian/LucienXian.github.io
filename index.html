@@ -265,6 +265,162 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-二-——MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-二-——MIT6-824/" itemprop="url">In Search of an Understandable Consensus Algorithm<二>——MIT6.824</二></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-08T20:51:24+08:00">
+                2019-04-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt"><a href="#In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt" class="headerlink" title="In Search of an Understandable Consensus Algorithm&lt;二&gt;"></a>In Search of an Understandable Consensus Algorithm&lt;二&gt;</h1><h2 id="Cluster-membership-changes"><a href="#Cluster-membership-changes" class="headerlink" title="Cluster membership changes"></a>Cluster membership changes</h2><p>上一篇<a href="http://www.lucienxian.top/2019/03/27/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%B8%80-%E2%80%94%E2%80%94MIT6-824/" target="_blank" rel="noopener">博文</a>中，我们都假设集群配置是固定的。但在实践中往往需要更改配置，可能需要更换服务器或者更改备份配置。为了使配置变更机制更加安全，在过渡期间不存在任意一个时间点会存在两个leader，但任何从旧配置切换到新配置的方法都是不够安全的，在切换期间可能会存在分裂成两个集群，如图：</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_two_disjoint_majorities.png" alt="img"></p>
+<p>为了确保安全，配置更改可以使用两阶段的方法。在raft中，集群首先切换到过渡配置，即为<strong>joint consensus</strong>。一旦commit了joint consensus，系统就会切换到新配置。</p>
+<ul>
+<li>日志会被复制到两种配置中的所有服务器；</li>
+<li>两种配置中的任何服务器就可以成为leader；</li>
+<li>选举等协议需要新旧两种配置的大多数票；</li>
+</ul>
+<p>我们使用复制的日志中特殊条目来存储和传送集群配置，下图就是配置更改过程：</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_Timeline_Conf_change.png" alt="img"></p>
+<p>当leader收到请求，从Cold配置更改为Cnew时，它会将联合共识即$C_{old, new}$存储为日志。如果leader crash了，新的leader会在$C_{old}$和$C_{old, new}$中选择。</p>
+<p>更改配置后还有三个问题需要解决；</p>
+<ul>
+<li>新服务器可能一开始不会存储任何日志；raft的解决方法是在更改配置之前引入一个额外的阶段，在该阶段新的服务器以非投票成员的身份加入集群，leader会将日志复制到它们，但不参与投票；</li>
+<li>集群leader可能并不属于新配置；在这种情况下，leader在提交了日志$C_{new}$之后就会返回到follower阶段；</li>
+<li>删除的服务器可能会破坏集群；这些服务器不再接受心跳，因此会超时用新的term发送RequestVote RPC请求选举，并且重复这个过程。为了避免这个问题，服务器会在当前leader存在时，忽略掉RequestVote RPC，不会更新term或者授予票数；</li>
+</ul>
+<h2 id="Log-compaction"><a href="#Log-compaction" class="headerlink" title="Log compaction"></a>Log compaction</h2><p>日志会在服务器运行期间无限增长，如果我们不及时丢弃过期的日志，那么对着日志的增长，它会占据更多的内存空间并需要更多时间来重新执行日志。</p>
+<p>snapshot是最简单的压缩方法，下图就是raft的快照方式：</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_snapshot.png" alt="img"></p>
+<p>每个服务器独立获取快照，快照内容仅仅覆盖了已提交的条目。快照除了包括状态集信息之外，还包含了少量的元数据信息，如上图就包含了最近索引和term。包含了这些信息，可以帮助支持快照后第一个日志条目的AppendEntries一致性检查。</p>
+<p>虽然服务器独立生成快照，但一般情况下，如果有一个落后非常多的follower或者新的服务器加入集群，leader会通过InstallSnapshot RPC往其它服务器发送快照。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_InstallSnapshot_RPC.png" alt="img"></p>
+<p>如果snapshot中包含了follower未包含的日志新内容，该follower会丢弃整个日志，并用snapshot替代。如果接收者收到的snapshot是当前日志的前缀部分，则该快照后面的条目保留，其余删除。</p>
+<p>如果是由leader生成snapshot再转发到各个follower，这种做法会浪费网络带宽并降低生成快照的速度。另外还有两个问题会影响性能：</p>
+<ul>
+<li>服务器必须决定何时进行快照。一个简单的策略是在日志达到固定大小（以字节为单位）时拍摄快照，此大小设置为远大于快照的预期大小，则用于快照的磁盘带宽开销将很小</li>
+<li>写快照可能需要很长时间，我们不希望这会延迟正常操作。解决方案是写时拷贝</li>
+</ul>
+<h2 id="Client-interaction"><a href="#Client-interaction" class="headerlink" title="Client interaction"></a>Client interaction</h2><p>本节主要描述raft客户端与raft的交互。</p>
+<p>raft将所有的客户端请求发送到leader，如果客户端联系的不是leader，那么服务器会拒绝这一请求，并提供最新的leader地址。</p>
+<p>我们对Raft的目标是实现可线性化的语义（即每个操作似乎在其调用和响应之间的某个时刻只执行一次）。但如果leader在提交日志条目之后但在响应客户端之前发生了冲突，则客户端将使用新的leader重试该命令，从而变成了二次执行。解决方案是客户端为每个命令分配唯一的序列号，如果它收到一个序列号已经执行的命令，它会立即响应而不重新执行请求。</p>
+<p>只读操作可能会因为leader的重新选举而返回过时的数据，raft需要在不使用日志的情况下确保自己不返回过期的数据，这里采取两个措施：</p>
+<ul>
+<li>首先，leader必须拥有关于提交的日志的最新信息。虽然leader拥有所有提交了的日志，但leader不知道这是什么，Raft通过让每个leader在其任期开始时将空白的无操作日志条目输入到日志中来处理此问题。</li>
+<li>其次，leader必须在处理只读请求之前检查它是否已被废除；这个可以通过与大多数集群交换心跳来解决；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/06/特征选择与稀疏学习/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1920,137 +2076,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/17/消除未检查警告/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/17/消除未检查警告/" itemprop="url">消除未检查警告</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-17T15:25:05+08:00">
-                2019-02-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>在编译过程中出现warning的时候，我们应该根据编译器的指示来进行修正，让警告消失。</p>
-<p>对于不能消除的警告，如果能够引起这个警告的代码是类型安全的话，那么就可以使用注解<strong>@SuppressWarnings(“unchecked”)</strong>来禁止这个警告。该注解可以在任意声明上使用，从单独的局部变量到整个类都可以，但我们应该在尽可能小的作用域上使用该注解。永远不要在整个类上使用SuppressWarnings注解。</p>
-<p>对于以下的方法，编译的时候会生成warning：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123; </span><br><span class="line">    <span class="keyword">if</span> (a.length &lt; size)</span><br><span class="line">        <span class="keyword">return</span> (T[]) Arrays.copyOf(elements, size, a.getClass()); </span><br><span class="line">    System.arraycopy(elements, <span class="number">0</span>, a, <span class="number">0</span>, size);</span><br><span class="line">    <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">        a[size] = <span class="keyword">null</span>; </span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ArrayList.java:<span class="number">305</span>: warning: [unchecked] <span class="function">unchecked cast <span class="title">return</span> <span class="params">(T[])</span> Arrays.<span class="title">copyOf</span><span class="params">(elements, size, a.getClass()</span>)</span>;</span><br><span class="line">                                                                     ^ </span><br><span class="line">required: T[]</span><br><span class="line">found: Object[]</span><br></pre></td></tr></table></figure>
-<p>对于这种情况，我们不能将注解放在返回语句上，因为其不是一个声明。因此我们可以声明一个局部变量来保存返回值，并注解这个局部变量的声明，并且需要在注释里记录禁止warning的原因：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Adding local variable to reduce scope of @SuppressWarnings</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123;</span><br><span class="line">    <span class="keyword">if</span> (a.length &lt; size) &#123;</span><br><span class="line">        <span class="comment">// This cast is correct because the array we're creating</span></span><br><span class="line">        <span class="comment">// is of the same type as the one passed in, which is T[].</span></span><br><span class="line">        <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>) </span><br><span class="line">        T[] result = (T[]) Arrays.copyOf(elements, size, a.getClass());</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    System.arraycopy(elements, <span class="number">0</span>, a, <span class="number">0</span>, size); </span><br><span class="line">    <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">        a[size] = <span class="keyword">null</span>; </span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2094,7 +2124,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">190</span>
+                <span class="site-state-item-count">191</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

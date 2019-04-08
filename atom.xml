@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-06T14:21:17.332Z</updated>
+  <updated>2019-04-08T12:52:40.231Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>In Search of an Understandable Consensus Algorithm&lt;二&gt;——MIT6.824</title>
+    <link href="http://yoursite.com/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%BA%8C-%E2%80%94%E2%80%94MIT6-824/"/>
+    <id>http://yoursite.com/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-二-——MIT6-824/</id>
+    <published>2019-04-08T12:51:24.000Z</published>
+    <updated>2019-04-08T12:52:40.231Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt"><a href="#In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt" class="headerlink" title="In Search of an Understandable Consensus Algorithm&lt;二&gt;"></a>In Search of an Understandable Consensus Algorithm&lt;二&gt;</h1><h2 id="Cluster-membership-changes"><a href="#Cluster-membership-changes" class="headerlink" title="Cluster membership changes"></a>Cluster membership changes</h2><p>上一篇<a href="http://www.lucienxian.top/2019/03/27/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%B8%80-%E2%80%94%E2%80%94MIT6-824/" target="_blank" rel="noopener">博文</a>中，我们都假设集群配置是固定的。但在实践中往往需要更改配置，可能需要更换服务器或者更改备份配置。为了使配置变更机制更加安全，在过渡期间不存在任意一个时间点会存在两个leader，但任何从旧配置切换到新配置的方法都是不够安全的，在切换期间可能会存在分裂成两个集群，如图：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_two_disjoint_majorities.png" alt="img"></p><p>为了确保安全，配置更改可以使用两阶段的方法。在raft中，集群首先切换到过渡配置，即为<strong>joint consensus</strong>。一旦commit了joint consensus，系统就会切换到新配置。</p><ul><li>日志会被复制到两种配置中的所有服务器；</li><li>两种配置中的任何服务器就可以成为leader；</li><li>选举等协议需要新旧两种配置的大多数票；</li></ul><p>我们使用复制的日志中特殊条目来存储和传送集群配置，下图就是配置更改过程：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_Timeline_Conf_change.png" alt="img"></p><p>当leader收到请求，从Cold配置更改为Cnew时，它会将联合共识即$C_{old, new}$存储为日志。如果leader crash了，新的leader会在$C_{old}$和$C_{old, new}$中选择。</p><p>更改配置后还有三个问题需要解决；</p><ul><li>新服务器可能一开始不会存储任何日志；raft的解决方法是在更改配置之前引入一个额外的阶段，在该阶段新的服务器以非投票成员的身份加入集群，leader会将日志复制到它们，但不参与投票；</li><li>集群leader可能并不属于新配置；在这种情况下，leader在提交了日志$C_{new}$之后就会返回到follower阶段；</li><li>删除的服务器可能会破坏集群；这些服务器不再接受心跳，因此会超时用新的term发送RequestVote RPC请求选举，并且重复这个过程。为了避免这个问题，服务器会在当前leader存在时，忽略掉RequestVote RPC，不会更新term或者授予票数；</li></ul><h2 id="Log-compaction"><a href="#Log-compaction" class="headerlink" title="Log compaction"></a>Log compaction</h2><p>日志会在服务器运行期间无限增长，如果我们不及时丢弃过期的日志，那么对着日志的增长，它会占据更多的内存空间并需要更多时间来重新执行日志。</p><p>snapshot是最简单的压缩方法，下图就是raft的快照方式：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_snapshot.png" alt="img"></p><p>每个服务器独立获取快照，快照内容仅仅覆盖了已提交的条目。快照除了包括状态集信息之外，还包含了少量的元数据信息，如上图就包含了最近索引和term。包含了这些信息，可以帮助支持快照后第一个日志条目的AppendEntries一致性检查。</p><p>虽然服务器独立生成快照，但一般情况下，如果有一个落后非常多的follower或者新的服务器加入集群，leader会通过InstallSnapshot RPC往其它服务器发送快照。</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_InstallSnapshot_RPC.png" alt="img"></p><p>如果snapshot中包含了follower未包含的日志新内容，该follower会丢弃整个日志，并用snapshot替代。如果接收者收到的snapshot是当前日志的前缀部分，则该快照后面的条目保留，其余删除。</p><p>如果是由leader生成snapshot再转发到各个follower，这种做法会浪费网络带宽并降低生成快照的速度。另外还有两个问题会影响性能：</p><ul><li>服务器必须决定何时进行快照。一个简单的策略是在日志达到固定大小（以字节为单位）时拍摄快照，此大小设置为远大于快照的预期大小，则用于快照的磁盘带宽开销将很小</li><li>写快照可能需要很长时间，我们不希望这会延迟正常操作。解决方案是写时拷贝</li></ul><h2 id="Client-interaction"><a href="#Client-interaction" class="headerlink" title="Client interaction"></a>Client interaction</h2><p>本节主要描述raft客户端与raft的交互。</p><p>raft将所有的客户端请求发送到leader，如果客户端联系的不是leader，那么服务器会拒绝这一请求，并提供最新的leader地址。</p><p>我们对Raft的目标是实现可线性化的语义（即每个操作似乎在其调用和响应之间的某个时刻只执行一次）。但如果leader在提交日志条目之后但在响应客户端之前发生了冲突，则客户端将使用新的leader重试该命令，从而变成了二次执行。解决方案是客户端为每个命令分配唯一的序列号，如果它收到一个序列号已经执行的命令，它会立即响应而不重新执行请求。</p><p>只读操作可能会因为leader的重新选举而返回过时的数据，raft需要在不使用日志的情况下确保自己不返回过期的数据，这里采取两个措施：</p><ul><li>首先，leader必须拥有关于提交的日志的最新信息。虽然leader拥有所有提交了的日志，但leader不知道这是什么，Raft通过让每个leader在其任期开始时将空白的无操作日志条目输入到日志中来处理此问题。</li><li>其次，leader必须在处理只读请求之前检查它是否已被废除；这个可以通过与大多数集群交换心跳来解决；</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt&quot;&gt;&lt;a href=&quot;#In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt&quot; cl
+      
+    
+    </summary>
+    
+    
+      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
+  </entry>
   
   <entry>
     <title>特征选择与稀疏学习</title>
@@ -453,29 +476,6 @@
     
     
       <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>实例：学习XOR——DeepLearning系列</title>
-    <link href="http://yoursite.com/2019/02/06/%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%AD%A6%E4%B9%A0XOR%E2%80%94%E2%80%94DeepLearning%E7%B3%BB%E5%88%97/"/>
-    <id>http://yoursite.com/2019/02/06/实例：学习XOR——DeepLearning系列/</id>
-    <published>2019-02-05T17:11:48.000Z</published>
-    <updated>2019-02-05T17:12:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="实例：学习XOR"><a href="#实例：学习XOR" class="headerlink" title="实例：学习XOR"></a>实例：学习XOR</h1><h2 id="前馈神经网络"><a href="#前馈神经网络" class="headerlink" title="前馈神经网络"></a>前馈神经网络</h2><p>前馈神经网络(feedforward netural network)是典型的深度学习模型，目标是近似某个函数f*。例如对于分类器，则是</p><p>$y = f^*{(x)}$将输入x映射到一个类别y，前馈网络定义了一个映射$y=f(x, \theta)$，并且学习参数$\theta$的值，使得它可以获得最佳的函数近似。</p><p>前馈神经网络是由许多不同的函数符合组成表示的，例如，我们有这样的结构$f(x)=f^{(3)}(f^{(2)}(f^{(1)}(x)))$，这种链式结构是比较典型的神经网络结构。前馈网络的最后一层被称为输出层，每个样本x都伴随着一个类别$y \approx f^*(x)$。由于训练数据没有指明隐藏层在每一点x上必须做什么，因此学习算法必须要自行决定产生想要的输出。</p><h2 id="实例：学习XOR-1"><a href="#实例：学习XOR-1" class="headerlink" title="实例：学习XOR"></a>实例：学习XOR</h2><p>为了了解前馈网络，我们从一个完整的前馈网络说起：学习XOR函数，这是两个二进制值x1和x2的运算。这个例子中，我们不关心统计泛化，而是希望在四个点{[0, 0], [0, 1], [1, 0], [1, 1]}上都表现正确。</p><p>评估整个训练集上表现的的MSE损失函数为：<br>$$<br>J(\theta) = 1/4 \sum_x (f^*(x) - f(x, \theta))^2<br>$$<br>假设我们选择一个线性模型：<br>$$<br>f(x, w, b) = x^Tw+b<br>$$<br>我们如果使用正规方程关于w和b最小化$J(\theta)$，得到w=0以及b=1/2。但这不是一个正确的解，因为直接应用于原始输入的线性模型不能实现XOR函数，当x1=0时，模型的输出必须随着x2的增大而增大。而x1=1时，模型的输出必须随着x2的增大而减小。</p><p>因此，我们必须引入一个前馈神经网络，它有一层隐藏层并且隐藏层包含两个单元。这个网络通过函数f(x, W, x)计算的搭配的隐藏单元的向量h，这些隐藏单元的值被用作第二层即输出层，输出层还是一个线性回归模型。在由神经网络提取的特征表示的变换空间中，非线性特征点映射到另外的特征空间，这样就可以使用线性模型。</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/xor_sample1.png" alt="img"></p><p>由于我们必须使用非线性函数来描述这些特征，因此大多数神经网络通过仿射变换后紧跟着一个激活函数的固定非线性函数来实现这个目标。默认推荐的是使用激活函数$g(z)=max{0, z}$定义的整流线性单元或者ReLU。</p><p>那么就可以指明现在的整个网络是：<br>$$<br>f(x, W, c, w, b) = w^T max{0, W^Tx+c} + b<br>$$</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;实例：学习XOR&quot;&gt;&lt;a href=&quot;#实例：学习XOR&quot; class=&quot;headerlink&quot; title=&quot;实例：学习XOR&quot;&gt;&lt;/a&gt;实例：学习XOR&lt;/h1&gt;&lt;h2 id=&quot;前馈神经网络&quot;&gt;&lt;a href=&quot;#前馈神经网络&quot; class=&quot;headerli
-      
-    
-    </summary>
-    
-    
-      <category term="Deep Learning" scheme="http://yoursite.com/tags/Deep-Learning/"/>
     
   </entry>
   
