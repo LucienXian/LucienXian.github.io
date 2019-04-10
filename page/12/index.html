@@ -265,6 +265,140 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/10/APUE-一/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/10/APUE-一/" itemprop="url">APUE<一></一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-10T23:44:31+08:00">
+                2018-03-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="unix基础知识"><a href="#unix基础知识" class="headerlink" title="unix基础知识"></a>unix基础知识</h1><h2 id="unix体系结构"><a href="#unix体系结构" class="headerlink" title="unix体系结构"></a>unix体系结构</h2><p>内核的接口称之为系统调用；<br>公用函数库建立在系统调用上，用户既可以调用函数库函数，也可以使用系统调用；<br>shell是特殊的应用程序，为其它应用程序提供接口；</p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>登录项通常在<strong>/etc/passwd</strong>文件中，但加密口令不在此；</p>
+<h2 id="文件和目录"><a href="#文件和目录" class="headerlink" title="文件和目录"></a>文件和目录</h2><p>目录是一个包含目录项的文件，而目录项包含一个文件名和相关的文件属性；</p>
+<p>工作目录：当前目录</p>
+<p>起始目录：登陆后的当前目录</p>
+<h2 id="输入和输出"><a href="#输入和输出" class="headerlink" title="输入和输出"></a>输入和输出</h2><p>文件描述符：一个非负整数，用来标识一个特定进程正在访问的文件；</p>
+<p>标注输入、输出、错误：0,1,2；</p>
+<p>不带缓冲的IO：open、read、write、lseek、close；</p>
+<p>带缓冲：fgets、fgetc、printf等等；</p>
+<h2 id="程序与进程"><a href="#程序与进程" class="headerlink" title="程序与进程"></a>程序与进程</h2><p>程序：磁盘上的可执行文件，内核通过exec将程序读入内存；</p>
+<p>进程：程序的执行实例；</p>
+<p>线程：线程的ID只在本进程下有效；</p>
+<h2 id="出错处理"><a href="#出错处理" class="headerlink" title="出错处理"></a>出错处理</h2><p>当Unix的系统函数出错时，会返回一个负数，同时errno变量会被设置为一定的相关值。</p>
+<h2 id="用户标识"><a href="#用户标识" class="headerlink" title="用户标识"></a>用户标识</h2><p>用户ID为0的是root；组ID的登录项在<strong>/etc/group</strong>；</p>
+<h2 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h2><p>处理信号的三种方式：忽略信号，按照系统默认终止进程，提供一个函数去处理信号</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/09/Unix网络编程——chap3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1515,158 +1649,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/04/C-内存分配方式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/04/C-内存分配方式/" itemprop="url">C++内存分配方式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-04T19:49:17+08:00">
-                2018-03-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="内存分配的５个区域"><a href="#内存分配的５个区域" class="headerlink" title="内存分配的５个区域"></a>内存分配的５个区域</h1><ul>
-<li>堆</li>
-</ul>
-<p>由操作符new分配的空间，它们的释放不由编译器管理，需要程序员手动释放，或者在程序结束时由操作系统回收释放。</p>
-<ul>
-<li>栈</li>
-</ul>
-<p>一般存储局部变量和函数参数，由编译器去分配</p>
-<ul>
-<li>自由存储区</li>
-</ul>
-<p>与堆类似，但它是由malloc\free来分配和释放的</p>
-<ul>
-<li>静态存储区</li>
-</ul>
-<p>在C++中，全局变量和静态变量都存储在这</p>
-<ul>
-<li>常量存储区</li>
-</ul>
-<p>比较好理解，就是存储常量的区域</p>
-<h2 id="堆和栈的区别"><a href="#堆和栈的区别" class="headerlink" title="堆和栈的区别"></a>堆和栈的区别</h2><ul>
-<li><p>堆是由程序员控制的，而栈是由编译器控制的</p>
-</li>
-<li><p>堆的空间大小一般为4G，而栈相对较小，比如１M</p>
-</li>
-<li><p>堆有可能产生碎片，而栈是先进后出的模式，不会产生碎片</p>
-</li>
-<li><p>堆是自下往上，往高地址生长的；而栈则相反</p>
-</li>
-<li><p>栈分配效率较高，只需要从寄存器中找到存放栈的地址；而堆比较麻烦，需要通过一定的算法找到内存大小合适的空间（链表），或者因为碎片太多，先进行压缩抖动等</p>
-</li>
-</ul>
-<p>引用自：<br><a href="http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html" target="_blank" rel="noopener">http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1715,7 +1697,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">191</span>
+                <span class="site-state-item-count">192</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -265,6 +265,195 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/15/Bayesian/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/15/Bayesian/" itemprop="url">Bayesian</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-15T22:41:15+08:00">
+                2018-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="贝叶斯分类器"><a href="#贝叶斯分类器" class="headerlink" title="贝叶斯分类器"></a>贝叶斯分类器</h1><h2 id="贝叶斯决策论"><a href="#贝叶斯决策论" class="headerlink" title="贝叶斯决策论"></a>贝叶斯决策论</h2><p>先来看几个公式：</p>
+<ul>
+<li>条件风险：</li>
+</ul>
+<p>$$<br>R(c_j|x)=\sum_{j=1}^{N}{\lambda}_{ij}P(c_i|x)<br>$$</p>
+<p>其中λij是将一个真实标记为cj的样本错分类为ci所产生的损失，这里的条件风险也叫作expected loss</p>
+<ul>
+<li>总体风险</li>
+</ul>
+<p>R(h) = Ex[R(h(x)|x)]</p>
+<p>其中，h就是我们希望找到的准则，使得R(h)最小化，显然只需要在每个样本上选择那个能使得条件风险R(c|x)最低的类别标记，即<strong>h*(x) = arg min R(c|x)</strong></p>
+<p>因此R(h<em>)就是贝叶斯风险，而1-R(h</em>)则反映了分类器能到达的最好性能。</p>
+<p>若将误判损失λij表示为：λij = 1，if i = j; λij = 0, otherwise</p>
+<p>那么条件风险将变成：<br>$$<br>R(c_j|x)=\sum_{i=1}^{N}P(c_i|x) - P(c_j|x) = 1-P(c_j|x)<br>$$</p>
+<p>因此贝叶斯最小分类器就变成了：h*(x) = arg max P(c|x),然后根据贝叶斯定理有：<br>$$<br>P(c|x) = P(c)P(x|c) / P(x)<br>$$<br>如果要根据贝叶斯判断准则来最小化决策风险，那么就要获得后验概率<strong>P(c|x)</strong>，总体有两种策略：给定x，通过直接建模P(c|x)来预测c，这叫<strong>discriminative models</strong>；也可以先对联合概率分布P(x, c)建模，由此得到P(c|x)，这是<strong>generative models</strong>。一般来说，决策树，BP神经网络，支持向量机，都是前者。</p>
+<h2 id="极大似然估计"><a href="#极大似然估计" class="headerlink" title="极大似然估计"></a>极大似然估计</h2><p>这里的介绍说的很好，结合一下：<a href="https://www.zhihu.com/question/20447622" target="_blank" rel="noopener">https://www.zhihu.com/question/20447622</a></p>
+<p>最好的理解就是：<strong>利用已知的样本结果，反推最有可能（最大概率）导致这样结果的参数值。</strong></p>
+<p>举个例子，麻袋里有白球和黑球，抽取十个球，有放回地抽到了七个黑球和三个白球，那么如果我们需要估计黑白球的比例时就可以用极大似然估计。假设抽到黑球的概率为p，也就是求解导致这个结果的参数值的最大可能性：P(七个黑球)=p<em>7 </em> (1-p)*3。要使得概率最大，那就需要求导。</p>
+<p>往往求导之前，我们需要取对数，这样就变成了线性相加，避免下溢。</p>
+<p>需要注意的是，这种方法需要预先假设概率分数，因此这十分依赖假设的概率分布是否符合真实数据分布。</p>
+<h2 id="朴素贝叶斯分类器"><a href="#朴素贝叶斯分类器" class="headerlink" title="朴素贝叶斯分类器"></a>朴素贝叶斯分类器</h2><p>基于上面的贝叶斯公式可以看到，计算后验概率的主要困难是条件概率P(x|c)为所有属性上的联合计算，很难直接估计而得。为了避开这个问题，朴素贝叶斯分类器(naive Bayes classifier)采用了属性条件独立性假设。则将贝叶斯公式写成<br>$$<br>P(c|x) = \frac{P(c)P(x|c)}{P(x)}= \frac{P(c)}{P(x)}* \prod_{i=1}^{d}P(x_i|c)<br>$$</p>
+<p>由于对所有的类别P(x)都是一样的，因此贝叶斯的判断准则就变成了这样的分类器<br>$$<br>h_{nb}(x) = \underset{c\in\gamma}{\arg\max}<br>               P(c)\prod_{i=1}^{d}P(x_i|c)<br>                \underset{}{}<br>$$</p>
+<p>假设Dc表示训练集D中第c类样本组成的集合，那么<br>$$<br>P(c) = \frac{|Dc|} {|D|}<br>$$</p>
+<p>对于离散属性则有<br>$$<br>P(x_i|c) = \frac{|D_{c,i}|}{|D_c|}<br>$$</p>
+<p>至于连续属性，则可考虑使用概率密度函数，假定</p>
+<p>$$<br>P(x_i|c) \sim N(\mu_{c,i}, \sigma_{c,i}^2)<br>$$</p>
+<p><strong>需要注意的是</strong>，若某个属性值在训练集中没有与某个类同时出现过，如果直接进行概率估计，那么概率就为0，在分类器的公式计算结果最后也为0。为了便民其它属性携带的信息被该属性值抹去，我们需要在估计概率值时进行<strong>拉普拉斯修正</strong>。则上面的式子会被修正为（其中N为类别数）：</p>
+<p>$$<br>P(c) = \frac{|Dc|+1} {|D|+N}<br>$$</p>
+<p>$$<br>P(x_i|c) = \frac{|D_{c,i}|+1}{|D_c|+N}<br>$$</p>
+<h2 id="半朴素贝叶斯分类器"><a href="#半朴素贝叶斯分类器" class="headerlink" title="半朴素贝叶斯分类器"></a>半朴素贝叶斯分类器</h2><p>在上面一节中，我们提到了用属性条件独立性假设来降低计算后验概率P(c|x)的困难，但独立性在现实中很难成立。因此人们便提出了半朴素贝叶斯分类器。</p>
+<blockquote>
+<p>半朴素贝叶斯分类器的基本想法是适当考虑一部分属性间的相互依赖信息，从而既不需要进行完全联合概率计算，也不至于彻底忽略了比较强的属性依赖关系</p>
+</blockquote>
+<p>因此，公式改写成：<br>$$<br>P(c|x)  \propto P(c) \prod_{i=1}^{d}P(x_i|c, pa_i)<br>$$<br>其中，$pa_i$为属性$x_i$的父属性，即$x_i$所依赖的属性。</p>
+<p>那么现在的问题就是如何确定每个属性的父属性，有以下两种方法：</p>
+<ul>
+<li>一种是假设所有属性都依赖于同一个属性，称为”超父”，即SPODE方法：</li>
+<li>另一种则是TAN，在最大带权生成树的基础上，将依赖关系简约为树形结构；</li>
+</ul>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/ml_xigua_7_1.png" alt="img"></p>
+<p>AODE<strong>(Averaged One-Dependent Estimator)</strong>是一种基于集成学习机制，更加强大的独依赖分类器。它会将每个维度的特征属性作为超父来构建SPODE，然后线性组合出最终的模型。</p>
+<h2 id="贝叶斯网"><a href="#贝叶斯网" class="headerlink" title="贝叶斯网"></a>贝叶斯网</h2><p>贝叶斯网（Bayesian network）借助有向无环图来刻画属性之间的依赖关系，另外还利用了条件概率表来描述属性的联合概率。所以贝叶斯网是由结构G和参数$\theta$组成的。</p>
+<h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p>贝叶斯网的结构表示了属性间的条件独立性，因此所有属性的联合概率定义为：<br>$$<br>P_B(x_1,x_2,…,x_d) = \prod_{i=1}^{d}P_B(x_i|\pi_i) =  \prod_{i=1}^{d}\theta_&#123;&#123;x_i}|{\pi_i&#125;&#125;<br>$$<br>下图展示贝叶斯网中三个变量之间的典型依赖关系</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/ml_xigua_7_3.png" alt="img"></p>
+<p>我们一个一个看</p>
+<ul>
+<li>在同父结构中，给定父节点x1的取值，则x3与x4条件独立</li>
+</ul>
+<p>$$<br>P(x_1, x_3, x_4) = P(x_1)P(x_3|x1)P(x_4|x_1)  ==&gt;<br>P(x_3,x_4|x_1) = P(x_3|x_1)P(x_4|x_1)<br>$$</p>
+<ul>
+<li>在V型结构中，给定子结点x4，则x1与x2必不独立，若x4完全未知，则x1与x2独立</li>
+</ul>
+<p>$$<br>P(x1, x2) = \sum_{x_4}P(x_1,x_2,x_4)=\sum_{x_4}P(x_4|x_1,x_2) = P(x_1)P(x_2)<br>$$</p>
+<ul>
+<li>在顺序结构中，给定x的值，则y与z条件独立，先要通过贝叶斯公式转化$P(x|z)$</li>
+</ul>
+<p>$$<br>P(x,y,z) = P(z)P(x|z)P(y|x) ==&gt; P(y,z|x)=P(y|x)P(z|x)<br>$$</p>
+<p>为了分析有向图中变量间的条件独立性，我们可以使用有向分离的方法将有向图转化为无向图，由上面的叙述可以知道除了V型图的非中间节点没有条件独立性之外，其它两个与依赖是否有向是无关的。</p>
+<p>基于这种事实，我们可以找出图中所有的V型结构，在V型结构的两个父节点之间加上一条无向边，并且将所有的有向边改为无向边，构成道德图(moral graph)。</p>
+<p>在道德图中，如果变量x和y能够被变量z分开，则称x和y被z有向分离，同时具有条件独立性：$x\perp y | z$</p>
+<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><p>如果得到了贝叶斯网的结构，即得到了属性间的依赖关系，那么只需要对训练样本“计数”即对贝叶斯网进行学习。因此我们的首要任务就是找出结构最“恰当”的结构。</p>
+<p>为了达到这个目的，我们定义一个评分函数（score function），来评估贝叶斯网与训练数据的契合度。给定训练集D={x1,x2,…,xm}，贝叶斯网B=&lt;G, $\theta$&gt;在D上的评分函数为：<br>$$<br>s(B|D) = f(\theta)|B| - LL(B|D)<br>$$<br>其中|B|为参数个数，$f(\theta)$为每个参数需要的字节数，至于LL(B|D)则是贝叶斯网B的对数似然，描述的是B对应的概率分布对D描述得有多好。</p>
+<h3 id="推断"><a href="#推断" class="headerlink" title="推断"></a>推断</h3><p>贝叶斯网训练好之后就能通过一些属性变量的观测值来推测其它属性变量的取值了。但直接根据贝叶斯网定义的联合概率分布来精确计算后验概率，是一个NP难的问题。</p>
+<p>在现实应用中，往往采取的是吉布斯采样（Gibbs sampling）。具体算法原理不大懂，大致的步骤就是首先产生一个与证据变量一致的样本作为初始点，然后每步从当前样本出发产生下一个样本，然后逐个地对非证据变量进行采样以改变其初值。假定经过T次后采样得到的与q一致的样本共有nq个，那么后验概率就是：<br>$$<br>P(Q=q|E=e) = \frac{n_q}{T}<br>$$</p>
+<h2 id="EM算法"><a href="#EM算法" class="headerlink" title="EM算法"></a>EM算法</h2><p>前面的讨论都是基于所有属性变量的值都已经被观测到了，但很多情况下，训练样本可能是不完整的，那么我们应该怎样对参数进行估计呢。</p>
+<p>简单来说就是从某个参数值$\theta^{0}$为起点，执行以下步骤，直至收敛：</p>
+<ul>
+<li>基于$\theta^t$推断隐变量Z的期望，记为$Z^t$；</li>
+<li>基于已经观测的变量X和$Z^t$对参数$\theta$做极大似然估计；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/14/cs231n-lecture1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1769,195 +1958,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/predictive-parsing/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/01/predictive-parsing/" itemprop="url">predictive parsing</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T23:04:02+08:00">
-                2018-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="predictive-parsing"><a href="#predictive-parsing" class="headerlink" title="predictive parsing"></a>predictive parsing</h1><p>能预测使用哪一个production：</p>
-<ul>
-<li>通过观察接下来的tokens；</li>
-<li>没有回溯；</li>
-</ul>
-<p>predictIve parsers接收LL(k)语法（left to right，leftmost derivation），k代码向前看k个tokens</p>
-<p>LL(1):每一个step，只能选择一个production</p>
-<p>但这里有一个问题就是，对于这样的grammar：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;T+E|T</span><br><span class="line"></span><br><span class="line">T-&gt;<span class="keyword">int</span> | <span class="keyword">int</span> * T | (E)</span><br></pre></td></tr></table></figure>
-<p>很难去根据next token预测T和E；</p>
-<p>解决方法就是：left factoring，即去除公共前缀；</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;TX</span><br><span class="line">X-&gt;+E|epsilon</span><br><span class="line"></span><br><span class="line">T-&gt;intX|(E)</span><br><span class="line">X-&gt;*T|epsilon</span><br></pre></td></tr></table></figure>
-<h1 id="First-Sets"><a href="#First-Sets" class="headerlink" title="First Sets"></a>First Sets</h1><p>如果a-&gt;tB，即a能推导出在第一个位置的t,那么t属于First(a)</p>
-<p>定义：</p>
-<p>First(X) = {t|X-&gt;<em>ta}并{ε|X-&gt;</em>ε}</p>
-<p>算法：</p>
-<ol>
-<li>First(t)={t}</li>
-<li>ε属于First(X)</li>
-</ol>
-<ul>
-<li>if X-&gt;ε</li>
-<li>if X-&gt;A1A2…Ana and ε属于First(Aj)for 1&lt;=j&lt;=n</li>
-</ul>
-<ol start="3">
-<li>First(a)属于Frist(X) if X-&gt;A1..An a and ε属于First(Aj) for 1&lt;=j&lt;=n</li>
-</ol>
-<h1 id="Follow-Sets"><a href="#Follow-Sets" class="headerlink" title="Follow Sets"></a>Follow Sets</h1><p>定义：</p>
-<p>Follow(X)={t|S-&gt;*βXtε}</p>
-<p>follow sets没有ε</p>
-<p>Intution:</p>
-<p>if X-&gt;AB, then First(B)属于Follow(A) and Follow(X)属于Follow(B)</p>
-<ul>
-<li>if B-&gt;*ε then Follow(X)属于Follow(B)</li>
-</ul>
-<p>if S 是开始symbol，$属于Follow(S)</p>
-<p>algorithm sketch</p>
-<ol>
-<li>$属于Follow(S)</li>
-<li>First(β)-{ε} 属于 Follow(X), when A-&gt;aXβ</li>
-<li>Follow(A)属于Follow(X)</li>
-</ol>
-<ul>
-<li>对于每一个production， A-&gt;aXB 都有B-&gt;ε</li>
-</ul>
-<h1 id="LL-1-Parsing-tables"><a href="#LL-1-Parsing-tables" class="headerlink" title="LL(1) Parsing tables"></a>LL(1) Parsing tables</h1><p>构建一个parsing tables：</p>
-<p>对于每一个production：A-&gt;a:</p>
-<ul>
-<li>对于每一个终止符t属于First(a): T[A, t] = a</li>
-<li>如果ε属于First(a), 对于每一个终止符t属于Follow(A): T[A, t] = a</li>
-<li>如果ε属于First(a)，并且$属于Follow(A): T[A, $] = a</li>
-</ul>
-<p>如果parsing table中的entry有两项，就会有冲突：</p>
-<p>比如：S-&gt;Sa|b</p>
-<p>First(S) = {b};</p>
-<p>Follow(S) = {$, a};</p>
-<p>这种情况下，就不是LL(1)。</p>
-<h1 id="bottom-up-parsing"><a href="#bottom-up-parsing" class="headerlink" title="bottom up parsing"></a>bottom up parsing</h1><ul>
-<li>bottom up比top down更加常用和有效</li>
-</ul>
-<p>这种方式就是主键的规约，回到start symbol：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * <span class="keyword">int</span> + <span class="keyword">int</span>    T-&gt;<span class="keyword">int</span></span><br><span class="line"><span class="keyword">int</span> * T + <span class="keyword">int</span>      T-&gt;<span class="keyword">int</span> * T</span><br><span class="line">T + <span class="keyword">int</span>            T-&gt;<span class="keyword">int</span></span><br><span class="line">T + T              E-&gt;T</span><br><span class="line">T + E              E-&gt;T+E</span><br><span class="line">E</span><br></pre></td></tr></table></figure>
-<ul>
-<li>trace a rightmost derivation in reverse</li>
-</ul>
-<h1 id="shift-reduce-parsing"><a href="#shift-reduce-parsing" class="headerlink" title="shift-reduce parsing"></a>shift-reduce parsing</h1><p>shift,reduce是bottom-up parsing的两个操作</p>
-<ul>
-<li>Shift a terminal to the left string</li>
-<li>apply an inverse production at the right end of the left string</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2006,7 +2006,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">191</span>
+                <span class="site-state-item-count">192</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
