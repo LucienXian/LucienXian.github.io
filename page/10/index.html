@@ -265,6 +265,149 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/Synchronization-mechanism/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/02/Synchronization-mechanism/" itemprop="url">Synchronization mechanism</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T23:23:28+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="同步机制与原理"><a href="#同步机制与原理" class="headerlink" title="同步机制与原理"></a>同步机制与原理</h1><h2 id="进程、线程的同步"><a href="#进程、线程的同步" class="headerlink" title="进程、线程的同步"></a>进程、线程的同步</h2><p>先说结论：线程之间的叫同步，进程之间的叫通信。</p>
+<p>对于进程来说，由于进程能够通信就意味是同步机制，所以先来说一下进程的同步机制：</p>
+<ul>
+<li>信号量：用来实现进程间的同步与互斥，但不能存储通信数据；</li>
+<li>消息队列：由链表，存放在内核中并由消息队列标识符标识。</li>
+<li>共享内存：能实现内存被多个进程共享；</li>
+<li>管道(pipe)：半双工的通信方式，单向通信，而且只能在具有亲缘关系的进程间通信；</li>
+<li>命名管道：同样半双工，但允许非亲缘关系的进程通信；</li>
+<li>信号：通知某个进程事件的发生；</li>
+<li>套接字</li>
+</ul>
+<p>由于进程有独立的地址空间，所以一般不会有互斥锁这些锁机制，除非是像文件锁这种大锁。而在这种情况下，由于线程共享同一进程下的内存空间，就会有锁机制来保证同步。</p>
+<p>而对于线程来讲，主要的同步机制有以下几种：互斥锁，信号量，临界区，条件变量。</p>
+<h2 id="同步原理"><a href="#同步原理" class="headerlink" title="同步原理"></a>同步原理</h2><h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>互斥锁是一种时间和空间代价都比较低廉的，实现对资源互斥访问的手段。主要有两种状态：<strong>lock &amp; unlock</strong>。</p>
+<p>当一个线程想要进入临界区操作数据的时候会尝试给它加锁，如果锁已经处于unlock状态，该线程就会被阻塞，直到锁被释放。</p>
+<h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>与互斥锁不同的是，条件变量是自动阻塞进程进入等待状态而不是用来上锁，它会等待某个信号的接收。</p>
+<p>通常来说会用互斥锁来保护条件变量，避免多线程竞争条件变量。</p>
+<p>另外，互斥锁和条件变量结合可以解决一个互斥锁的问题，就是避免互斥锁频繁地被线程进行加锁和释放锁。</p>
+<h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3><p>信号量也是用来保护互斥区的。信号量是一个特殊的变量，程序对信号量的访问都是原子操作的，并且只允许对其进行两种操作P和V。</p>
+<p>虽然信号量使得共享资源在一个时间内只有一个线程能够使用，这是二值信号量，但往往，我们可以使用计数信号量，来表明最多允许有多少个持有者。</p>
+<p>内核信号量的原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;include\linux\semaphore.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">　　 <span class="keyword">atomic_t</span> count;</span><br><span class="line">　　 <span class="keyword">int</span> sleepers;</span><br><span class="line">　　 <span class="keyword">wait_queue_head_t</span> wait;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>与自旋锁不同的是，自旋锁会不断轮询锁的状态，而信号量会因为任务想要的信号量被占用了，只能进入等待队列，并进入睡眠状态（这时处理器可以去处理其它操作）。</p>
+<p>所以信号量适用于<strong>锁会被长期占用的状态</strong>。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/predictive-parsing/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1780,144 +1923,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/18/深度探索C-对象模型-五/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/18/深度探索C-对象模型-五/" itemprop="url">深度探索C++对象模型<五></五></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-18T21:49:43+08:00">
-                2018-03-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Program-Transformation-Semantics"><a href="#Program-Transformation-Semantics" class="headerlink" title="Program Transformation Semantics"></a>Program Transformation Semantics</h1><h2 id="明确的初始化"><a href="#明确的初始化" class="headerlink" title="明确的初始化"></a>明确的初始化</h2><p>考虑这样的显式定义：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">X x0;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo_bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">X <span class="title">x1</span><span class="params">(x0)</span></span>;</span><br><span class="line">    X x2 = x0;</span><br><span class="line">    X x3 = X(x0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里的定义会分两个阶段进行：重写定义和安插copy constructor。如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo_bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X x1;</span><br><span class="line">    X x2;</span><br><span class="line">    X x3;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//安插代码</span></span><br><span class="line">    x1.X::X(x0);</span><br><span class="line">    x2.X::X(x0);</span><br><span class="line">    x3.X:;X(x0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参数的初始化"><a href="#参数的初始化" class="headerlink" title="参数的初始化"></a>参数的初始化</h2><p>C++标准中要求的是，当把一个class object当做参数传入函数或者作为返回值时，会这样初始化：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">X xx = arg;<span class="comment">//arg是实参</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">(X x0)</span></span>;</span><br><span class="line"></span><br><span class="line">X xx;</span><br><span class="line">foo(xx);</span><br></pre></td></tr></table></figure>
-<p>而编译器的优化技术有两种方法，一个是采用临时值，然后修改foo函数；另一个方法就是采用<strong>copy contruct</strong>的方式把实参直接构建在应该的位置上。</p>
-<p>对于第一个方法，如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//产生临时对象</span></span><br><span class="line"></span><br><span class="line">X _temp0;</span><br><span class="line">_temp0.X::X(x0);</span><br><span class="line"></span><br><span class="line">foo(_temp0);</span><br><span class="line"></span><br><span class="line"><span class="comment">//修改foo函数，变成穿引用</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">(X &amp;x0)</span></span>;</span><br></pre></td></tr></table></figure>
-<h2 id="返回值的初始化"><a href="#返回值的初始化" class="headerlink" title="返回值的初始化"></a>返回值的初始化</h2><p>考虑这样的函数定义：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">X <span class="title">bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X xx;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="keyword">return</span> xx</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>那么，这个局部对象是如何返回的呢？编译器采用的是双阶段的转化.</p>
-<ul>
-<li>首先是添加一个引用参数，作为返回值；</li>
-<li>在return之前安插copy constructor的操作，以便将要传回的object作为初始值；</li>
-</ul>
-<p>修改的代码如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">bar</span><span class="params">(X &amp;__result)</span><span class="comment">//额外参数</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X xx;</span><br><span class="line">    xx.X:XX();</span><br><span class="line"></span><br><span class="line">    __result.X::X(xx);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>由于copy constructor的应用,编译器会对代码进行一定程度的优化。尤其是当函数以穿值的方式传回一个object时,编译器会对copy constructor进行优化,以一个额外的第一参数取代NRV。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1966,7 +1971,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">192</span>
+                <span class="site-state-item-count">193</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

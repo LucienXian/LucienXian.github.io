@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-10T12:07:07.156Z</updated>
+  <updated>2019-04-11T03:58:46.655Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>std::bind</title>
+    <link href="http://yoursite.com/2019/04/11/std-bind/"/>
+    <id>http://yoursite.com/2019/04/11/std-bind/</id>
+    <published>2019-04-11T03:58:05.000Z</published>
+    <updated>2019-04-11T03:58:46.655Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="std-bind"><a href="#std-bind" class="headerlink" title="std::bind"></a>std::bind</h1><p>std::bind是一个标准的函数对象，它就像一个功能适配器，接受一个函数作为输入，并返回一个新函数对象作为输出。另外还附带若干个传递进函数的参数。</p><p>假设存在这样一个函数：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> first, <span class="keyword">int</span> second)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="keyword">return</span> first + second;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>bind函数的第一个参数就是函数指针，后面的参数则是该函数的参数：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> add_func = <span class="built_in">std</span>::bind(&amp;add, _1, _2);</span><br></pre></td></tr></table></figure><p>这里add_func是一个函数对象，我们可以这样调用：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add_func(<span class="number">4</span>,<span class="number">5</span>);</span><br></pre></td></tr></table></figure><p>它将在内部调用add()函数，并在_1的位置传递第一个参数，在_2的位置传递第二个参数。</p><p>现在假设我们想在一个特殊场景中使用这个add函数，我们应该将第一个参数始终固定为12，并让第二个参数由用户传递，即：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> new_add_func = <span class="built_in">std</span>::bind(&amp;add, <span class="number">12</span>, _1);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x = new_add_func(<span class="number">5</span>);</span><br><span class="line"><span class="comment">// Will return 17</span></span><br></pre></td></tr></table></figure><p>我们也可以使用std :: bind()重新排列参数，即_1和_2等决定要传递的参数的位：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> mod_add_func = <span class="built_in">std</span>::bind(&amp;add, _2, _1);</span><br><span class="line"></span><br><span class="line"><span class="comment">// mod_add_func(12,15) === add(15, 12).</span></span><br></pre></td></tr></table></figure><h2 id="Use-of-std-bind-in-STL-algorithms"><a href="#Use-of-std-bind-in-STL-algorithms" class="headerlink" title="Use of std::bind in STL algorithms"></a>Use of std::bind in STL algorithms</h2><p>由于std :: bind充当功能适配器并提供新的函数对象，因此它对于许多STL算法非常有用。</p><p>例如，<br>我们有一个数字列表，我们想要计算5的倍数。要实现这一点，我们有一个现有的函数，即:</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">divisible</span><span class="params">(<span class="keyword">int</span> num , <span class="keyword">int</span> den)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(num % den == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>一般的算法是遍历判断，但我们可以使用std :: count_if这一个STL算法，即：</p><p><strong><em>count_if (InputIterator firstValue, InputIterator lastValue, UnaryPredicate predFunctionObject);</em></strong></p><p>通过bind函数，我们就可以将divisible转换为一元参数：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">approach_2</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[<span class="number">10</span>] = &#123;<span class="number">1</span>,<span class="number">20</span>,<span class="number">13</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">10</span>,<span class="number">28</span>,<span class="number">19</span>,<span class="number">15</span>&#125;;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::count_if(arr, arr + <span class="keyword">sizeof</span>(arr)/<span class="keyword">sizeof</span>(<span class="keyword">int</span>) , <span class="built_in">std</span>::bind(&amp;divisible, _1, <span class="number">5</span>));</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="What-std-bind-returns"><a href="#What-std-bind-returns" class="headerlink" title="What std::bind returns ?"></a>What std::bind returns ?</h2><p>除了auto，我们也可以使用std:;function Function对象存储它们，即</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::function&lt;<span class="keyword">int</span> (<span class="keyword">int</span>) &gt; mod_add_funcObj = <span class="built_in">std</span>::bind(&amp;add, <span class="number">20</span>, _1);</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;std-bind&quot;&gt;&lt;a href=&quot;#std-bind&quot; class=&quot;headerlink&quot; title=&quot;std::bind&quot;&gt;&lt;/a&gt;std::bind&lt;/h1&gt;&lt;p&gt;std::bind是一个标准的函数对象，它就像一个功能适配器，接受一个函数作为输入，并返
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>C++11 ‘delete’ keyword and deleted functions</title>
@@ -447,29 +470,6 @@
       
         &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;嵌套类是定义在另一个类中的类，一共有四种嵌套类：静态成员类、非静态成员类、匿名类以及局部类。&lt;/p&gt;
 &lt;h2 id=&quot;静态成员类&quot;&gt;&lt;a h
-      
-    
-    </summary>
-    
-    
-      <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>优先使用类层次，而不是标签类</title>
-    <link href="http://yoursite.com/2019/02/07/%E4%BC%98%E5%85%88%E4%BD%BF%E7%94%A8%E7%B1%BB%E5%B1%82%E6%AC%A1%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E6%A0%87%E7%AD%BE%E7%B1%BB/"/>
-    <id>http://yoursite.com/2019/02/07/优先使用类层次，而不是标签类/</id>
-    <published>2019-02-07T05:54:38.000Z</published>
-    <updated>2019-02-07T05:59:01.483Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="优先使用类层次，而不是标签类"><a href="#优先使用类层次，而不是标签类" class="headerlink" title="优先使用类层次，而不是标签类"></a>优先使用类层次，而不是标签类</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>标签类是指这样的类：一个类含有两种或者多种风格的实例，这个类包含了一个指明实例风格的标签，例如：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Tagged class - vastly inferior to a class hierarchy!</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Figure</span> </span>&#123;</span><br><span class="line">    <span class="keyword">enum</span> Shape &#123; RECTANGLE, CIRCLE &#125;;</span><br><span class="line">    <span class="comment">// Tag field - the shape of this figure</span></span><br><span class="line">    <span class="keyword">final</span> Shape shape;</span><br><span class="line">    <span class="comment">// These fields are used only if shape is RECTANGLE</span></span><br><span class="line">    <span class="keyword">double</span> length;</span><br><span class="line">    <span class="keyword">double</span> width;</span><br><span class="line">    <span class="comment">// This field is used only if shape is CIRCLE</span></span><br><span class="line">    <span class="keyword">double</span> radius;</span><br><span class="line">    <span class="comment">// Constructor for circle</span></span><br><span class="line">    Figure(<span class="keyword">double</span> radius) &#123;</span><br><span class="line">        shape = Shape.CIRCLE;</span><br><span class="line">        <span class="keyword">this</span>.radius = radius;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">// Constructor for rectangle</span></span><br><span class="line">    Figure(<span class="keyword">double</span> length, <span class="keyword">double</span> width) &#123;</span><br><span class="line">        shape = Shape.RECTANGLE;</span><br><span class="line">        <span class="keyword">this</span>.length = length;</span><br><span class="line">        <span class="keyword">this</span>.width = width;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="function"><span class="keyword">double</span> <span class="title">area</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span>(shape) &#123;</span><br><span class="line">            <span class="keyword">case</span> RECTANGLE:</span><br><span class="line">                <span class="keyword">return</span> length * width;</span><br><span class="line">            <span class="keyword">case</span> CIRCLE:</span><br><span class="line">                <span class="keyword">return</span> Math.PI * (radius * radius);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(shape);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>但这种做法是非常糟糕的，因为这里面包含了枚举声明、标签域，还有switch语句。这里面扩展性很差，并且内存中包含了不必要的占用。</p><p>我们应该改换成类层次，定义好抽象类，采用继承的方法实现。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;优先使用类层次，而不是标签类&quot;&gt;&lt;a href=&quot;#优先使用类层次，而不是标签类&quot; class=&quot;headerlink&quot; title=&quot;优先使用类层次，而不是标签类&quot;&gt;&lt;/a&gt;优先使用类层次，而不是标签类&lt;/h1&gt;&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot;
       
     
     </summary>

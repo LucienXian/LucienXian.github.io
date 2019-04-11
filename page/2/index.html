@@ -265,6 +265,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/26/列表优先于数组/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/26/列表优先于数组/" itemprop="url">列表优先于数组</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-26T18:36:37+08:00">
+                2019-02-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="列表优先于数组"><a href="#列表优先于数组" class="headerlink" title="列表优先于数组"></a>列表优先于数组</h1><h2 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h2><ol>
+<li>数组和泛型的不同首先体现在数组是covariant的，所以如果Sub是Super的一个子类型，那么数组类型Sub[]也是数组类型Super[]的子类型。相反，泛型列表对此则有限制。这意味着：</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Object[] objectArray = <span class="keyword">new</span> Long[<span class="number">1</span>];</span><br><span class="line">objectArray[<span class="number">0</span>] = <span class="string">"I don't fit in"</span>; <span class="comment">//在运行时会报错</span></span><br></pre></td></tr></table></figure>
+<p>但如果使用列表：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt; ol = <span class="keyword">new</span> ArrayList&lt;Long&gt;(); <span class="comment">// Incompatible types</span></span><br><span class="line">ol.add(<span class="string">"I don't fit in"</span>);</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>数组是具化的，数组只有在运行时才能直到并检查元素类型，而泛型是通过擦除来实现的，这意味着泛型只在编译时进行类型约束的检查，而运行时是忽略元素类型的。因此无法混合使用数组和泛型，以下的操作都是不合法的：</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> List&lt;E&gt;[], <span class="keyword">new</span> List&lt;String&gt;[], <span class="keyword">new</span> E[]</span><br></pre></td></tr></table></figure>
+<h2 id="优先使用列表"><a href="#优先使用列表" class="headerlink" title="优先使用列表"></a>优先使用列表</h2><p>当你强转成数组类型时，若得到一个泛型数组创建错误或者未检查强转警告，最好的解决办法是，总是优先采用集合类型List\<e>，而不是数组类型E[]。</e></p>
+<p>考虑这样一个类，构造器接受一个集合：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Chooser</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object[] choiceArray;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Chooser</span><span class="params">(Collection choices)</span> </span>&#123;</span><br><span class="line">        choiceArray = choices.toArray();</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">choose</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Random rnd = ThreadLocalRandom.current();</span><br><span class="line">        <span class="keyword">return</span> choiceArray[rnd.nextInt(choiceArray.length)];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么在使用时，我们每次都要在调用choose方法之后，将Object类型转换为需要的类型，有可能强转失败，如果我们使用泛型：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Chooser</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> T[] choiceArray;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Chooser</span><span class="params">(Collection&lt;T&gt; choices)</span> </span>&#123;</span><br><span class="line">        choiceArray = choices.toArray();</span><br><span class="line">    &#125;<span class="comment">// choose method unchanged</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样会编译报错，除非我们强制换位Object数组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">choiceArray = (T[]) choices.toArray();</span><br></pre></td></tr></table></figure>
+<p>这样只会产生一个警告，因为编译器无法保证运行时强转的安全性。当然，我们可以消除warning，但最佳的做法还是使用泛型列表：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Chooser</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;T&gt; choiceList;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Chooser</span><span class="params">(Collection&lt;T&gt; choices)</span> </span>&#123; </span><br><span class="line">        choiceList = <span class="keyword">new</span> ArrayList&lt;&gt;(choices);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">choose</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Random rnd = ThreadLocalRandom.current();</span><br><span class="line">        <span class="keyword">return</span> choiceList.get(rnd.nextInt(choiceList.size()));</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/18/深度学习中的正则化-一-——DeepLearning系列/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1452,129 +1590,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/07/优先使用类层次，而不是标签类/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/07/优先使用类层次，而不是标签类/" itemprop="url">优先使用类层次，而不是标签类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-07T13:54:38+08:00">
-                2019-02-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="优先使用类层次，而不是标签类"><a href="#优先使用类层次，而不是标签类" class="headerlink" title="优先使用类层次，而不是标签类"></a>优先使用类层次，而不是标签类</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>标签类是指这样的类：一个类含有两种或者多种风格的实例，这个类包含了一个指明实例风格的标签，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Tagged class - vastly inferior to a class hierarchy!</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Figure</span> </span>&#123;</span><br><span class="line">    <span class="keyword">enum</span> Shape &#123; RECTANGLE, CIRCLE &#125;;</span><br><span class="line">    <span class="comment">// Tag field - the shape of this figure</span></span><br><span class="line">    <span class="keyword">final</span> Shape shape;</span><br><span class="line">    <span class="comment">// These fields are used only if shape is RECTANGLE</span></span><br><span class="line">    <span class="keyword">double</span> length;</span><br><span class="line">    <span class="keyword">double</span> width;</span><br><span class="line">    <span class="comment">// This field is used only if shape is CIRCLE</span></span><br><span class="line">    <span class="keyword">double</span> radius;</span><br><span class="line">    <span class="comment">// Constructor for circle</span></span><br><span class="line">    Figure(<span class="keyword">double</span> radius) &#123;</span><br><span class="line">        shape = Shape.CIRCLE;</span><br><span class="line">        <span class="keyword">this</span>.radius = radius;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">// Constructor for rectangle</span></span><br><span class="line">    Figure(<span class="keyword">double</span> length, <span class="keyword">double</span> width) &#123;</span><br><span class="line">        shape = Shape.RECTANGLE;</span><br><span class="line">        <span class="keyword">this</span>.length = length;</span><br><span class="line">        <span class="keyword">this</span>.width = width;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="function"><span class="keyword">double</span> <span class="title">area</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span>(shape) &#123;</span><br><span class="line">            <span class="keyword">case</span> RECTANGLE:</span><br><span class="line">                <span class="keyword">return</span> length * width;</span><br><span class="line">            <span class="keyword">case</span> CIRCLE:</span><br><span class="line">                <span class="keyword">return</span> Math.PI * (radius * radius);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(shape);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>但这种做法是非常糟糕的，因为这里面包含了枚举声明、标签域，还有switch语句。这里面扩展性很差，并且内存中包含了不必要的占用。</p>
-<p>我们应该改换成类层次，定义好抽象类，采用继承的方法实现。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1623,7 +1638,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">192</span>
+                <span class="site-state-item-count">193</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
