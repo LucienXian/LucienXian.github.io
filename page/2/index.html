@@ -265,6 +265,181 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/27/MapReduce-MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/27/MapReduce-MIT6-824/" itemprop="url">MapReduce--MIT6.824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-27T00:38:31+08:00">
+                2019-02-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h1><blockquote>
+<p><a href="https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf" target="_blank" rel="noopener">论文《MapReduce: Simplified Data Processing on Large Clusters》</a></p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>MapReduce是谷歌提出的一种编程模型，主要目的是为了处理和生成大数据。通过定义map函数来处理key/value对，生成中间键值对，而reduce函数则是用来归并这些中间键值对。</p>
+<p>以这种编程模式来实现的程序会自动在大的集群上并行执行。</p>
+<h2 id="Programming-Model"><a href="#Programming-Model" class="headerlink" title="Programming Model"></a>Programming Model</h2><p>运算时键值对输入，产生另外的一系列键值对。Map函数是用户编写，输入键值对，产生键值对，将具有相同的中间key的值传到reduce函数。</p>
+<p>reduce函数则是接收上面的中间键值对，将那些value合并起来。</p>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>考虑计算文档单词数目的伪代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">map(String key, String value):</span><br><span class="line">    <span class="comment">// key: document name</span></span><br><span class="line">    <span class="comment">// value: document contents</span></span><br><span class="line">    <span class="keyword">for</span> each word w in value:</span><br><span class="line">    	EmitIntermediate(w, <span class="string">"1"</span>);</span><br><span class="line"></span><br><span class="line">reduce(String key, Iterator values):</span><br><span class="line">    <span class="comment">// key: a word</span></span><br><span class="line">    <span class="comment">// values: a list of counts</span></span><br><span class="line">    <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> each v in values:</span><br><span class="line">    	result += ParseInt(v);</span><br><span class="line">    Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+<h3 id="Types"><a href="#Types" class="headerlink" title="Types"></a>Types</h3><p>map和reduce函数都是有类型的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map 	(k1, v1) 		--&gt; list(k2, v2)</span><br><span class="line">reduce	(k2, list(v2))	--&gt; list(v2)</span><br></pre></td></tr></table></figure>
+<h3 id="More-Examples"><a href="#More-Examples" class="headerlink" title="More Examples"></a>More Examples</h3><p>一些应用了mapReduce的例子：</p>
+<ul>
+<li>Distributed Grep</li>
+<li>Count of URL Access Frequency</li>
+<li>Reverse Web-Link Graph</li>
+<li>Term-Vector per Host</li>
+<li>Inverted Index</li>
+<li>Distributed Sort</li>
+</ul>
+<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>论文介绍了谷歌内部的使用。</p>
+<h3 id="Execution-Overview"><a href="#Execution-Overview" class="headerlink" title="Execution Overview"></a>Execution Overview</h3><ol>
+<li>MapReduce库先将input分成M份(16MB-64MB)，然后启动集群上多个机器上的进程；</li>
+<li>其中一个进程是master，其它都是worker；</li>
+<li>分配了map任务的worker会读取那M份输入的一份，解析键值对，将其传到自定义的Map函数中，产生的中间键值对将会缓存起来；</li>
+<li>缓存的内容会被周期性写入到磁盘上，这里磁盘被分成R个区域。写入后的位置信息将会反馈到maser，master再将位置信息传给reduce的worker；</li>
+<li>reduce的worker将会调用RPC去读取缓存，并根据中间结果的key进行排序，使得相同key的键值对分到一个组；</li>
+<li>reduce worker将会遍历键值对，然后将key和相关联的values传到自定义的reduce函数里；</li>
+<li>当所有任务完成后，master将会从MapReduce中返回；</li>
+</ol>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/MapReduceF1.png" alt="img"></p>
+<h3 id="Master-Data-Structures"><a href="#Master-Data-Structures" class="headerlink" title="Master Data Structures"></a>Master Data Structures</h3><p>master保存着多种数据结构，比如worker的状态。</p>
+<p>另外master还是map任务和reduce任务关于文件位置的沟通渠道。</p>
+<h3 id="Fault-Tolerance"><a href="#Fault-Tolerance" class="headerlink" title="Fault Tolerance"></a>Fault Tolerance</h3><h4 id="Worker-Failure"><a href="#Worker-Failure" class="headerlink" title="Worker Failure"></a>Worker Failure</h4><p>master周期性地pingworker，如果没有响应，就认为worker失败了。在失败worker上完成的map任务会设置为idle状态，而还在失败worker上运行的map或者reduce任务都会被设置为idle状态。</p>
+<p>完成的map任务此时还需要重新执行，因为中间结果被存在失败机器的磁盘上；而reduce任务不需要重新运行，因为它的输出存储在全局文件系统。另外，所有的reduce任务都应该知晓任务在重新执行，以便读取到正确磁盘上的中间结果。</p>
+<h4 id="Master-Failure"><a href="#Master-Failure" class="headerlink" title="Master Failure"></a>Master Failure</h4><p>一般情况下，是将master的数据结构持久化。一旦master任务挂了，就从上次的checkpoint点重新起来。</p>
+<h4 id="Semantics-in-the-Presence-of-Failures"><a href="#Semantics-in-the-Presence-of-Failures" class="headerlink" title="Semantics in the Presence of Failures"></a>Semantics in the Presence of Failures</h4><p>当用户的map和reduce函数是确定性的，那么MapReduce产生的结果也是唯一确定的，这是依赖于Map和Reduce任务的原子性提交实现的。</p>
+<p>而对于非确定性的Map或者Reduce操作，单个reduce操作的输出对应于整个程序某次序列化输出的结果。</p>
+<h3 id="Locality"><a href="#Locality" class="headerlink" title="Locality"></a>Locality</h3><p>由于在计算环境中，网络带宽是很重要的资源，所以谷歌文件系统将输入数据平分，存储到本地磁盘上，而且一般会进行3备份。在运行过程中，MapReduce操作会从本地读取。</p>
+<h3 id="Task-Granularity"><a href="#Task-Granularity" class="headerlink" title="Task Granularity"></a>Task Granularity</h3><p>M和R的任务数量应该要比worker机器要多，这样使得worker可以执行多种任务，从而提高负载均衡，也可以在某个worker挂掉的时候快速恢复，因为它已经完成的大量map任务都可以重新分配给其它worker机器上执行。</p>
+<p>因为master进行任务分配决策的复杂度是O(M+R)，并且需要在内存中使用O(M*R)大小的空间来保存之前所说的状态。</p>
+<h3 id="Backup-Tasks"><a href="#Backup-Tasks" class="headerlink" title="Backup Tasks"></a>Backup Tasks</h3><p>因为某些机器磁盘的故障等原因，MapReduce任务会变得特别慢。这时MapReduce采用的机制就是：</p>
+<ul>
+<li>在整个计算快要结束时，将一些还在进行的任务进行backup，当backup任务或者源任务其中一个完成时，我们就任务整个计算完成了</li>
+</ul>
+<h2 id="Refinements"><a href="#Refinements" class="headerlink" title="Refinements"></a>Refinements</h2><h3 id="Partitioning-Function"><a href="#Partitioning-Function" class="headerlink" title="Partitioning Function"></a>Partitioning Function</h3><p>该函数的作用是将中间key结构划分为R部分，默认使用<strong>hash(key) mod R</strong>，但也可以根据需求自定义</p>
+<h3 id="Ordering-Guarantees"><a href="#Ordering-Guarantees" class="headerlink" title="Ordering Guarantees"></a>Ordering Guarantees</h3><p>这个函数主要是对中间结果根据key进行排序</p>
+<h3 id="Combiner-Funct"><a href="#Combiner-Funct" class="headerlink" title="Combiner Funct"></a>Combiner Funct</h3><p>该函数是在执行map任务的机器上操作的，将一些数据合并起来，然后写到中间结果去。</p>
+<h3 id="Input-and-Output-Types"><a href="#Input-and-Output-Types" class="headerlink" title="Input and Output Types"></a>Input and Output Types</h3><p>Mapreduce支持三种文件格式：第一种是逐行读入，key是文件偏移，value是行内容；第二种是key/value读入；第三种是用户自定义reader，可以从文件、数据库或者内存中的数据结构读取。</p>
+<h3 id="Side-effects"><a href="#Side-effects" class="headerlink" title="Side-effects"></a>Side-effects</h3><p>MapReduce允许用户生成额外的输出，但其原子性应该由应用本身来实现</p>
+<h3 id="Skipping-Bad-Records"><a href="#Skipping-Bad-Records" class="headerlink" title="Skipping Bad Records"></a>Skipping Bad Records</h3><p>对于一些不好修复的bug，或者确定性的错误。worker通过一个信号处理器来捕获错误，然后在执行Map或者Reduce操作前，MapReduce会存储一个全局序列号，一旦发现了用户代码的错误，信号处理器就会发一个内含序列号的UDP包给master，如果master发现了特定记录有了多次的失败，就会指示该记录应该跳过，不再重试。</p>
+<h3 id="Local-Execution"><a href="#Local-Execution" class="headerlink" title="Local Execution"></a>Local Execution</h3><p>因为分布式环境调试不方便，MapReduce提供在本机串行化执行MapReduce的接口，方便用户调试。</p>
+<h3 id="Status-Information"><a href="#Status-Information" class="headerlink" title="Status Information"></a>Status Information</h3><p>master把内部的状态通过网页的方式展示出来</p>
+<h3 id="Counters"><a href="#Counters" class="headerlink" title="Counters"></a>Counters</h3><p>MapReduce提供一个计数器来计算各种时间的发生频率。例如这样：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase = GetCounter(<span class="string">"uppercase"</span>);</span><br><span class="line"></span><br><span class="line">map(String name, String contents):</span><br><span class="line">	<span class="keyword">for</span> each word w in contents:</span><br><span class="line">		<span class="keyword">if</span> (IsCapitalized(w)):</span><br><span class="line">			uppercase-&gt;Increment();</span><br><span class="line">		EmitIntermediate(w, <span class="string">"1"</span>);</span><br></pre></td></tr></table></figure>
+<p>计数器的值会周期性传达给master。当MapReduce操作完成时，count值会返回给用户程序，需要注意的是，重复执行的任务的count只会统计一次。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/26/列表优先于数组/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1454,142 +1629,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/09/优先考虑静态成员类/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/09/优先考虑静态成员类/" itemprop="url">优先考虑静态成员类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-09T01:13:15+08:00">
-                2019-02-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>嵌套类是定义在另一个类中的类，一共有四种嵌套类：静态成员类、非静态成员类、匿名类以及局部类。</p>
-<h2 id="静态成员类"><a href="#静态成员类" class="headerlink" title="静态成员类"></a>静态成员类</h2><p>静态成员类可以看做是一个普通的类，只是这个类恰好在别的类内部被声明，并且它可以访问外围类的所有成员，即便是私有成员。</p>
-<p>静态成员类通用的做法是作为一个公有的辅助类，与它的外围类一起工作。</p>
-<h2 id="非静态成员类"><a href="#非静态成员类" class="headerlink" title="非静态成员类"></a>非静态成员类</h2><p>语法上来说，静态成员类和非静态成员类之间的区别是，静态成员类在声明上有static标识符。非静态成员类与它的外围类的实例关联，并且可以调用外围实例的方法，或者通过标识了this的构造器来获取外围实例的引用。</p>
-<p>在非静态成员类实例被创建时，非静态成员类实例和它的外围实例的关联就被建立了，而且建立后就不能被修改了。</p>
-<p>非静态成员类的一个通常的用法是，定义一个适配器：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Typical use of a nonstatic member class</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">... <span class="comment">// Bulk of the class omitted</span></span><br><span class="line">    <span class="meta">@Override</span> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Iterator&lt;E&gt; <span class="title">iterator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyIterator();</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">MyIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外，<strong>如果你声明了一个不需要访问外围实例的成员类，那你总是应该static修饰符加到声明里去</strong>，这是因为非静态成员类每个实例都会包含一个隐含的外围实例的引用，耗费时间和空间。并且，即便外围实例已经可以被回收，但因为这个非静态的成员类实例，外围实例也会被保留。</p>
-<p>私有静态成员类通常被用来展示代表外围类对象的组件。</p>
-<h2 id="匿名类"><a href="#匿名类" class="headerlink" title="匿名类"></a>匿名类</h2><p>匿名类可以没有名字，它并不是外围类的一个成员。它不仅与其它成员一起被声明，而且它在被使用时同时被声明和初始化。其名称由Java编译器给出，一般是形如：外部类名称+$+匿名类顺序</p>
-<p>当且仅当匿名类出现在非静态的上下文当中时，匿名类才有外围实例。但即使它们出现在静态的上下文当中，也不能拥有除了常量型变量的任何的静态成员，这些常量型变量是final的基本类型，或者初始化常量表达式的字符串属性。</p>
-<h2 id="局部类"><a href="#局部类" class="headerlink" title="局部类"></a>局部类</h2><p>在四种嵌套类里，局部类是最不常用的。在可以声明局部变量的地方就可以声明局部类。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>如果一个嵌套类必须在方法外部可见，或者放在方法内部会显得太长时，就使用成员类；</li>
-<li>如果成员类的实例需要拥有该类的外围类的引用，就将其做成非静态；不然，就将其做成静态；</li>
-<li>假设一个类应当在方法内部，若你需要只从一个地方创建实例而且已经存在一个类型能说明这个类的特征，那么将其做成匿名类；否则，就将其做成局部类；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1638,7 +1677,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">193</span>
+                <span class="site-state-item-count">194</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-11T03:58:46.655Z</updated>
+  <updated>2019-04-12T03:45:02.412Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>auto specifier</title>
+    <link href="http://yoursite.com/2019/04/12/auto-specifier/"/>
+    <id>http://yoursite.com/2019/04/12/auto-specifier/</id>
+    <published>2019-04-12T03:43:55.000Z</published>
+    <updated>2019-04-12T03:45:02.412Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="auto-specifier"><a href="#auto-specifier" class="headerlink" title="auto specifier"></a>auto specifier</h1><p>auto这个关键字是由c++11引进的，使用auto，我们可以声明变量而无需指定其类型，其类型由初始化的数据进行推断。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// type int</span></span><br><span class="line"><span class="keyword">auto</span> var_1 = <span class="number">5</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// type char</span></span><br><span class="line"><span class="keyword">auto</span> var_2 = <span class="string">'C'</span>;</span><br><span class="line"> </span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;var_1&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;var_2&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure><p>我们也可以记录一些其他的类型，例如函数或者迭代器，以下就是将一个lambda函数存放在auto：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> fun_sum = [](<span class="keyword">int</span> a , <span class="keyword">int</span> b)&#123;</span><br><span class="line"><span class="keyword">return</span> a+b;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;fun_sum(<span class="number">4</span>,<span class="number">5</span>)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure><p>auto的最大优点就是，我们不需要书写很长的变量类型：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt; mapOfStrs;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Insert data in Map</span></span><br><span class="line">mapOfStrs.insert(<span class="built_in">std</span>::pair&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt;(<span class="string">"first"</span>, <span class="string">"1"</span>) );</span><br><span class="line">mapOfStrs.insert(<span class="built_in">std</span>::pair&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt;(<span class="string">"sec"</span>, <span class="string">"2"</span>) );</span><br><span class="line">mapOfStrs.insert(<span class="built_in">std</span>::pair&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt;(<span class="string">"thirs"</span>, <span class="string">"3"</span>) );</span><br><span class="line"></span><br><span class="line"><span class="comment">//std::map&lt;std::string, std::string&gt;::iterator it = mapOfStrs.begin();</span></span><br><span class="line"><span class="keyword">auto</span> it = mapOfStrs.begin();</span><br><span class="line"><span class="keyword">while</span>(it != mapOfStrs.end())</span><br><span class="line">&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;it-&gt;first&lt;&lt;<span class="string">"::"</span>&lt;&lt;it-&gt;second&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">it++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="Important-points-about-auto-variable-in-C-11"><a href="#Important-points-about-auto-variable-in-C-11" class="headerlink" title="Important points about auto variable in C++11"></a>Important points about auto variable in C++11</h2><ol><li>初始化auto变量后，您可以更改值，但不能更改类型</li><li>不能只声明而不进行初始化</li></ol><h2 id="Returning-an-auto-from-a-function"><a href="#Returning-an-auto-from-a-function" class="headerlink" title="Returning an auto from a function"></a>Returning an auto from a function</h2><p>要从函数返回auto变量，我们可以以特殊方式声明它</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">auto sum(int x, int y) -&gt; int</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">return</span> x + y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> value = sum(<span class="number">3</span>, <span class="number">5</span>);</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;auto-specifier&quot;&gt;&lt;a href=&quot;#auto-specifier&quot; class=&quot;headerlink&quot; title=&quot;auto specifier&quot;&gt;&lt;/a&gt;auto specifier&lt;/h1&gt;&lt;p&gt;auto这个关键字是由c++11引进的，使用
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>std::bind</title>
@@ -446,30 +469,6 @@
       
       
         &lt;h1 id=&quot;将源文件限制为单个顶级类&quot;&gt;&lt;a href=&quot;#将源文件限制为单个顶级类&quot; class=&quot;headerlink&quot; title=&quot;将源文件限制为单个顶级类&quot;&gt;&lt;/a&gt;将源文件限制为单个顶级类&lt;/h1&gt;&lt;p&gt;虽然Java编译器能让你在一个源文件里定义多个顶级类，但这种
-      
-    
-    </summary>
-    
-    
-      <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>优先考虑静态成员类</title>
-    <link href="http://yoursite.com/2019/02/09/%E4%BC%98%E5%85%88%E8%80%83%E8%99%91%E9%9D%99%E6%80%81%E6%88%90%E5%91%98%E7%B1%BB/"/>
-    <id>http://yoursite.com/2019/02/09/优先考虑静态成员类/</id>
-    <published>2019-02-08T17:13:15.000Z</published>
-    <updated>2019-02-08T17:31:16.171Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>嵌套类是定义在另一个类中的类，一共有四种嵌套类：静态成员类、非静态成员类、匿名类以及局部类。</p><h2 id="静态成员类"><a href="#静态成员类" class="headerlink" title="静态成员类"></a>静态成员类</h2><p>静态成员类可以看做是一个普通的类，只是这个类恰好在别的类内部被声明，并且它可以访问外围类的所有成员，即便是私有成员。</p><p>静态成员类通用的做法是作为一个公有的辅助类，与它的外围类一起工作。</p><h2 id="非静态成员类"><a href="#非静态成员类" class="headerlink" title="非静态成员类"></a>非静态成员类</h2><p>语法上来说，静态成员类和非静态成员类之间的区别是，静态成员类在声明上有static标识符。非静态成员类与它的外围类的实例关联，并且可以调用外围实例的方法，或者通过标识了this的构造器来获取外围实例的引用。</p><p>在非静态成员类实例被创建时，非静态成员类实例和它的外围实例的关联就被建立了，而且建立后就不能被修改了。</p><p>非静态成员类的一个通常的用法是，定义一个适配器：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Typical use of a nonstatic member class</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">... <span class="comment">// Bulk of the class omitted</span></span><br><span class="line">    <span class="meta">@Override</span> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Iterator&lt;E&gt; <span class="title">iterator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyIterator();</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">MyIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>另外，<strong>如果你声明了一个不需要访问外围实例的成员类，那你总是应该static修饰符加到声明里去</strong>，这是因为非静态成员类每个实例都会包含一个隐含的外围实例的引用，耗费时间和空间。并且，即便外围实例已经可以被回收，但因为这个非静态的成员类实例，外围实例也会被保留。</p><p>私有静态成员类通常被用来展示代表外围类对象的组件。</p><h2 id="匿名类"><a href="#匿名类" class="headerlink" title="匿名类"></a>匿名类</h2><p>匿名类可以没有名字，它并不是外围类的一个成员。它不仅与其它成员一起被声明，而且它在被使用时同时被声明和初始化。其名称由Java编译器给出，一般是形如：外部类名称+$+匿名类顺序</p><p>当且仅当匿名类出现在非静态的上下文当中时，匿名类才有外围实例。但即使它们出现在静态的上下文当中，也不能拥有除了常量型变量的任何的静态成员，这些常量型变量是final的基本类型，或者初始化常量表达式的字符串属性。</p><h2 id="局部类"><a href="#局部类" class="headerlink" title="局部类"></a>局部类</h2><p>在四种嵌套类里，局部类是最不常用的。在可以声明局部变量的地方就可以声明局部类。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul><li>如果一个嵌套类必须在方法外部可见，或者放在方法内部会显得太长时，就使用成员类；</li><li>如果成员类的实例需要拥有该类的外围类的引用，就将其做成非静态；不然，就将其做成静态；</li><li>假设一个类应当在方法内部，若你需要只从一个地方创建实例而且已经存在一个类型能说明这个类的特征，那么将其做成匿名类；否则，就将其做成局部类；</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;嵌套类是定义在另一个类中的类，一共有四种嵌套类：静态成员类、非静态成员类、匿名类以及局部类。&lt;/p&gt;
-&lt;h2 id=&quot;静态成员类&quot;&gt;&lt;a h
       
     
     </summary>

@@ -265,6 +265,145 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/12/Compilers-Introduction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/12/Compilers-Introduction/" itemprop="url">Compilers--Introduction</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-12T23:09:28+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>compilers &amp; interpreters</p>
+<ul>
+<li><p>compilers：输入程序，输出执行文件。offline</p>
+</li>
+<li><p>interpreters：输入程序和数据，输出结果。online</p>
+</li>
+</ul>
+<p>five aspects</p>
+<ul>
+<li><p>lexical analysis: divides program text into “words” or “tokens”</p>
+</li>
+<li><p>parsing: understand the program structrue</p>
+</li>
+<li><p>semantic analysis: perform limited semantic analysis to catch inconsistencies; should define strict rules to avoid ambiguties</p>
+</li>
+<li><p>optimization: like editing, to run faster and use less memory; x = y*0 == x = 0(x is int)</p>
+</li>
+<li><p>code generation: produces assembly code(usually)</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/12/深度探索C-对象模型-三/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1520,150 +1659,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/05/C-11-模板学习/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/05/C-11-模板学习/" itemprop="url">C++11 模板学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T18:43:31+08:00">
-                2018-03-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>模板是一种支持参数化多态的工具，使得程序员能够编写与类型无关的代码</p>
-<p>模板又分为两种：函数模板和类模板</p>
-<h2 id="模板特化"><a href="#模板特化" class="headerlink" title="模板特化"></a>模板特化</h2><p>模板特化的提出是根据C++的设计，对于特定的类型，如果你能对某个功能有更好的实现，那么应该听你的。特化必须要在同一个命名空间下进行，函数模板只可以全特化（因为偏特化可以通过函数重载实现），而类模板则可以偏特化或者是全特化。</p>
-<p>因此在模板实例化时，会优先匹配参数类型最匹配的那个特化版本。</p>
-<ul>
-<li>全特化</li>
-</ul>
-<p>通过全特化模板，可以对某些特定参数集合自定义功能。此时模板参数为空。如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//类模板</span></span><br><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>&lt;int, double&gt;&#123;</span></span><br><span class="line">    <span class="keyword">int</span> data1;</span><br><span class="line">    <span class="keyword">double</span> data2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//函数模板</span></span><br><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> lhs, <span class="keyword">const</span> <span class="keyword">int</span> rhs)</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> lhs &gt; rhs ? lhs : rhs;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>注意：类模板需要在类名后面给出模板参数，而函数则不需要，它可以自动推导。</p>
-<ul>
-<li>偏特化</li>
-</ul>
-<p>例如，针对vector进行偏特化</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">class</span> <span class="title">Allocator</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">vector</span> &#123;</span> <span class="comment">// … // &#125;;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Allocator</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">vector</span>&lt;bool, Allocator&gt; &#123;</span> <span class="comment">//…//&#125;;</span></span><br></pre></td></tr></table></figure>
-<h2 id="可变模板参数"><a href="#可变模板参数" class="headerlink" title="可变模板参数"></a>可变模板参数</h2><p>这是C++11的新特性，支持模板的可变参数。可变模板参数的写法与原来有一点不同：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T... args)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>它需要在typename或者class后面加上省略号，带省略号的参数就是一个参数包，里面包含了０~N个参数。那么如何展开参数包呢？</p>
-<p>两种方法</p>
-<h3 id="递归函数展开参数包"><a href="#递归函数展开参数包" class="headerlink" title="递归函数展开参数包"></a>递归函数展开参数包</h3><p>由于是递归调用，因此我们必须自定义递归的终止函数，保证其在参数为０时，停止递归。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//递归终止函数</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   <span class="built_in">cout</span> &lt;&lt; <span class="string">"empty"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//展开函数</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">class</span> ...<span class="title">Args</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">print</span>(<span class="title">T</span> <span class="title">head</span>, <span class="title">Args</span>... <span class="title">rest</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">   <span class="built_in">cout</span> &lt;&lt; <span class="string">"parameter "</span> &lt;&lt; head &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">   print(rest...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="逗号表达式展开参数包"><a href="#逗号表达式展开参数包" class="headerlink" title="逗号表达式展开参数包"></a>逗号表达式展开参数包</h3><p>不表</p>
-<p>C++11中的std::tuple就是一个可变参数模板类</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://harttle.land/2015/10/03/cpp-template.html" target="_blank" rel="noopener">http://harttle.land/2015/10/03/cpp-template.html</a></p>
-<p><a href="http://www.cnblogs.com/qicosmos/p/4325949.html" target="_blank" rel="noopener">http://www.cnblogs.com/qicosmos/p/4325949.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1712,7 +1707,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">193</span>
+                <span class="site-state-item-count">194</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
