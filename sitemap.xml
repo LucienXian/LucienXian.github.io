@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/14/Variadic-Templates/</loc>
+    
+    <lastmod>2019-04-14T03:19:32.763Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/12/auto-specifier/</loc>
     
     <lastmod>2019-04-12T03:45:02.412Z</lastmod>
