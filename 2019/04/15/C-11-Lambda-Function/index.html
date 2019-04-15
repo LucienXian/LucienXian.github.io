@@ -96,22 +96,18 @@
 
 
 
-<meta name="description" content="开始看这本神书，做一些笔记： 简单对象模型第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。  表格驱动对象模型存储两个指针，分别指向data member table和function member table  C++对象模型来看看重头戏——C++对象模型。有几个需要注意的：  非静态数据成员放在类">
+<meta name="description" content="C++11 Lambda FunctionWhat is a Lambda Function?lambda函数是C++中的一种匿名函数，通常用作回调使用，像普通的函数那样，也需要传递参数和返回结果。但区别就是，lambda函数没有名字，因此主要用来创建那些短小的函数。 Need of Lambda functions假设以下使用std::for_each算法的函数： 123456789101112">
 <meta name="keywords" content="C++">
 <meta property="og:type" content="article">
-<meta property="og:title" content="深度探索C++对象模型&lt;一&gt;">
-<meta property="og:url" content="http://yoursite.com/2018/03/01/深度探索C-对象模型-一/index.html">
+<meta property="og:title" content="C++11 Lambda Function">
+<meta property="og:url" content="http://yoursite.com/2019/04/15/C-11-Lambda-Function/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="开始看这本神书，做一些笔记： 简单对象模型第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。  表格驱动对象模型存储两个指针，分别指向data member table和function member table  C++对象模型来看看重头戏——C++对象模型。有几个需要注意的：  非静态数据成员放在类">
+<meta property="og:description" content="C++11 Lambda FunctionWhat is a Lambda Function?lambda函数是C++中的一种匿名函数，通常用作回调使用，像普通的函数那样，也需要传递参数和返回结果。但区别就是，lambda函数没有名字，因此主要用来创建那些短小的函数。 Need of Lambda functions假设以下使用std::for_each算法的函数： 123456789101112">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/simple_obj.png">
-<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png">
-<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png">
-<meta property="og:updated_time" content="2018-03-01T16:54:10.000Z">
+<meta property="og:updated_time" content="2019-04-15T03:22:18.863Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="深度探索C++对象模型&lt;一&gt;">
-<meta name="twitter:description" content="开始看这本神书，做一些笔记： 简单对象模型第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。  表格驱动对象模型存储两个指针，分别指向data member table和function member table  C++对象模型来看看重头戏——C++对象模型。有几个需要注意的：  非静态数据成员放在类">
-<meta name="twitter:image" content="http://ou7boskhm.bkt.clouddn.com/simple_obj.png">
+<meta name="twitter:title" content="C++11 Lambda Function">
+<meta name="twitter:description" content="C++11 Lambda FunctionWhat is a Lambda Function?lambda函数是C++中的一种匿名函数，通常用作回调使用，像普通的函数那样，也需要传递参数和返回结果。但区别就是，lambda函数没有名字，因此主要用来创建那些短小的函数。 Need of Lambda functions假设以下使用std::for_each算法的函数： 123456789101112">
 
 
 
@@ -140,13 +136,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/03/01/深度探索C-对象模型-一/">
+  <link rel="canonical" href="http://yoursite.com/2019/04/15/C-11-Lambda-Function/">
 
 
 
 
 
-  <title>深度探索C++对象模型<一> | LucienXian's Blog</一></title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title>C++11 Lambda Function | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
   
 
 
@@ -269,7 +265,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/深度探索C-对象模型-一/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/15/C-11-Lambda-Function/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="LucienXian">
@@ -286,7 +282,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">深度探索C++对象模型<一></一></h1>
+          <h1 class="post-title" itemprop="name headline">C++11 Lambda Function</h1>
         
 
         <div class="post-meta">
@@ -298,8 +294,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T23:16:17+08:00">
-                2018-03-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-15T11:21:50+08:00">
+                2019-04-15
               </time>
             
 
@@ -336,21 +332,20 @@
       
 
       
-        <p>开始看这本神书，做一些笔记：</p>
-<h1 id="简单对象模型"><a href="#简单对象模型" class="headerlink" title="简单对象模型"></a>简单对象模型</h1><p>第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img"></p>
-<h1 id="表格驱动对象模型"><a href="#表格驱动对象模型" class="headerlink" title="表格驱动对象模型"></a>表格驱动对象模型</h1><p>存储两个指针，分别指向data member table和function member table</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png" alt="img"></p>
-<h1 id="C-对象模型"><a href="#C-对象模型" class="headerlink" title="C++对象模型"></a>C++对象模型</h1><p>来看看重头戏——C++对象模型。有几个需要注意的：</p>
+        <h1 id="C-11-Lambda-Function"><a href="#C-11-Lambda-Function" class="headerlink" title="C++11 Lambda Function"></a>C++11 Lambda Function</h1><h2 id="What-is-a-Lambda-Function"><a href="#What-is-a-Lambda-Function" class="headerlink" title="What is a Lambda Function?"></a>What is a Lambda Function?</h2><p>lambda函数是C++中的一种匿名函数，通常用作回调使用，像普通的函数那样，也需要传递参数和返回结果。但区别就是，lambda函数没有名字，因此主要用来创建那些短小的函数。</p>
+<h2 id="Need-of-Lambda-functions"><a href="#Need-of-Lambda-functions" class="headerlink" title="Need of Lambda functions"></a>Need of Lambda functions</h2><p>假设以下使用std::for_each算法的函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">(<span class="keyword">int</span> a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;a&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::for_each(arr, arr + <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>), &amp;display);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的例子中，我们创建了一个单独函数，但使用lambda函数，我们可以避免这种开销。</p>
+<h2 id="Rise-of-Lambda-functions"><a href="#Rise-of-Lambda-functions" class="headerlink" title="Rise of Lambda functions"></a>Rise of Lambda functions</h2><p> lambda函数是一种匿名函数，它没有任何名称，但您可以传递参数并从中返回结果。如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[](<span class="keyword">int</span> x) &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li><p>非静态数据成员放在类的对象中；</p>
-</li>
-<li><p>静态数据成员和成员函数放在类对象之外；</p>
-</li>
-<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info object；</p>
-</li>
+<li>[]用来传递外部域的元素；</li>
+<li>(int x)则是传递进来的参数；</li>
 </ul>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png" alt="img"></p>
+<p>利用lambda函数改写：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::for_each(arr, arr + <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>), [](<span class="keyword">int</span> x) &#123;</span><br><span class="line">            <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="How-to-pass-outer-scope-elements-inside-lambda-functions"><a href="#How-to-pass-outer-scope-elements-inside-lambda-functions" class="headerlink" title="How to pass outer scope elements inside lambda functions"></a>How to pass outer scope elements inside lambda functions</h2><h3 id="case-1-使用"><a href="#case-1-使用" class="headerlink" title="case 1: 使用[=]"></a>case 1: 使用[=]</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[=](<span class="keyword">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by value</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="case-1-使用-amp"><a href="#case-1-使用-amp" class="headerlink" title="case 1: 使用[&amp;]"></a>case 1: 使用[&amp;]</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[&amp;](<span class="keyword">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by reference</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -381,8 +376,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/01/C-class-size/" rel="next" title="C++ class size">
-                <i class="fa fa-chevron-left"></i> C++ class size
+              <a href="/2019/04/14/Variadic-Templates/" rel="next" title="Variadic Templates">
+                <i class="fa fa-chevron-left"></i> Variadic Templates
               </a>
             
           </div>
@@ -390,10 +385,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/03/02/OS面试知识点-一/" rel="prev" title="OS面试知识点<一>">
-                OS面试知识点<一> <i class="fa fa-chevron-right"></i>
-              </一></a>
             
           </div>
         </div>
@@ -547,7 +538,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简单对象模型"><span class="nav-number">1.</span> <span class="nav-text">简单对象模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#表格驱动对象模型"><span class="nav-number">2.</span> <span class="nav-text">表格驱动对象模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-对象模型"><span class="nav-number">3.</span> <span class="nav-text">C++对象模型</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-11-Lambda-Function"><span class="nav-number">1.</span> <span class="nav-text">C++11 Lambda Function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-Lambda-Function"><span class="nav-number">1.1.</span> <span class="nav-text">What is a Lambda Function?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Need-of-Lambda-functions"><span class="nav-number">1.2.</span> <span class="nav-text">Need of Lambda functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rise-of-Lambda-functions"><span class="nav-number">1.3.</span> <span class="nav-text">Rise of Lambda functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#How-to-pass-outer-scope-elements-inside-lambda-functions"><span class="nav-number">1.4.</span> <span class="nav-text">How to pass outer scope elements inside lambda functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-使用"><span class="nav-number">1.4.1.</span> <span class="nav-text">case 1: 使用[=]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-使用-amp"><span class="nav-number">1.4.2.</span> <span class="nav-text">case 1: 使用[&amp;]</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

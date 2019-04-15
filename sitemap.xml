@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/15/C-11-Lambda-Function/</loc>
+    
+    <lastmod>2019-04-15T03:22:18.863Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/14/Variadic-Templates/</loc>
     
     <lastmod>2019-04-14T03:19:32.763Z</lastmod>

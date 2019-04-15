@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-14T03:19:32.763Z</updated>
+  <updated>2019-04-15T03:22:18.863Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>C++11 Lambda Function</title>
+    <link href="http://yoursite.com/2019/04/15/C-11-Lambda-Function/"/>
+    <id>http://yoursite.com/2019/04/15/C-11-Lambda-Function/</id>
+    <published>2019-04-15T03:21:50.000Z</published>
+    <updated>2019-04-15T03:22:18.863Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="C-11-Lambda-Function"><a href="#C-11-Lambda-Function" class="headerlink" title="C++11 Lambda Function"></a>C++11 Lambda Function</h1><h2 id="What-is-a-Lambda-Function"><a href="#What-is-a-Lambda-Function" class="headerlink" title="What is a Lambda Function?"></a>What is a Lambda Function?</h2><p>lambda函数是C++中的一种匿名函数，通常用作回调使用，像普通的函数那样，也需要传递参数和返回结果。但区别就是，lambda函数没有名字，因此主要用来创建那些短小的函数。</p><h2 id="Need-of-Lambda-functions"><a href="#Need-of-Lambda-functions" class="headerlink" title="Need of Lambda functions"></a>Need of Lambda functions</h2><p>假设以下使用std::for_each算法的函数：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">(<span class="keyword">int</span> a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;a&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::for_each(arr, arr + <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>), &amp;display);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>在上面的例子中，我们创建了一个单独函数，但使用lambda函数，我们可以避免这种开销。</p><h2 id="Rise-of-Lambda-functions"><a href="#Rise-of-Lambda-functions" class="headerlink" title="Rise of Lambda functions"></a>Rise of Lambda functions</h2><p> lambda函数是一种匿名函数，它没有任何名称，但您可以传递参数并从中返回结果。如下：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[](<span class="keyword">int</span> x) &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure><ul><li>[]用来传递外部域的元素；</li><li>(int x)则是传递进来的参数；</li></ul><p>利用lambda函数改写：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::for_each(arr, arr + <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>), [](<span class="keyword">int</span> x) &#123;</span><br><span class="line">            <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="How-to-pass-outer-scope-elements-inside-lambda-functions"><a href="#How-to-pass-outer-scope-elements-inside-lambda-functions" class="headerlink" title="How to pass outer scope elements inside lambda functions"></a>How to pass outer scope elements inside lambda functions</h2><h3 id="case-1-使用"><a href="#case-1-使用" class="headerlink" title="case 1: 使用[=]"></a>case 1: 使用[=]</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[=](<span class="keyword">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by value</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="case-1-使用-amp"><a href="#case-1-使用-amp" class="headerlink" title="case 1: 使用[&amp;]"></a>case 1: 使用[&amp;]</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[&amp;](<span class="keyword">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by reference</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;C-11-Lambda-Function&quot;&gt;&lt;a href=&quot;#C-11-Lambda-Function&quot; class=&quot;headerlink&quot; title=&quot;C++11 Lambda Function&quot;&gt;&lt;/a&gt;C++11 Lambda Function&lt;/h1
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>Variadic Templates</title>
@@ -452,29 +475,6 @@
     
     
       <category term="DeepLearning" scheme="http://yoursite.com/tags/DeepLearning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>基于梯度的学习——DeepLearning系列</title>
-    <link href="http://yoursite.com/2019/02/13/%E5%9F%BA%E4%BA%8E%E6%A2%AF%E5%BA%A6%E7%9A%84%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94DeepLearning%E7%B3%BB%E5%88%97/"/>
-    <id>http://yoursite.com/2019/02/13/基于梯度的学习——DeepLearning系列/</id>
-    <published>2019-02-12T16:42:15.000Z</published>
-    <updated>2019-02-12T16:42:43.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="基于梯度的学习"><a href="#基于梯度的学习" class="headerlink" title="基于梯度的学习"></a>基于梯度的学习</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>普通的线性模型和神经网络的最大区别，在于神经网络的非线性容易使得我们感兴趣的代价函数变得非凸，这样就只能使得代价函数达到一个非常小的值，而不能保证全局收敛。</p><p>除此之外，对于前馈神经网络，将所有权重值随机化为小随机数是非常重要，偏置bias则应该初始为零或者小的正值。</p><h2 id="代价函数"><a href="#代价函数" class="headerlink" title="代价函数"></a>代价函数</h2><p>神经网络的一个重要设计就是代价函数的选择，在大多数情况下，参数模型定义了一个分布式$p(y | x; \theta)$并且我们使用最大似然原理。</p><h3 id="使用最大似然学习条件分布"><a href="#使用最大似然学习条件分布" class="headerlink" title="使用最大似然学习条件分布"></a>使用最大似然学习条件分布</h3><p>如果神经网络使用最大似然来训练，这意味着代价函数就是负的对数似然。<br>$$<br>J(\theta) = - E_{x, y - p_{data} } log _{p_{model} } (y | x)<br>$$<br>代价函数的具体形式随着模型而改变，取决于$log_{Pdata}$的具体形式。</p><p>使用最大似然来导出代价函数的一个好处就是减轻了为每个模型设计代价函数的负担，因为每确定一个模型$p(y|x)$则自动确定了一个代价函数$logp(y|x)$。另外，为了避免代价函数的梯度不够大，使得预测性减弱，我们可以使用负的对数似然来避免这个问题。另外，用于实现最大似然估计的交叉熵代价函数有一个特性，就是它用于实践模型的时候，通常没有最小值。</p><h3 id="学习条件统计量"><a href="#学习条件统计量" class="headerlink" title="学习条件统计量"></a>学习条件统计量</h3><p>有时我们并不是想学习一个完整的概率分布，而是想学习在给定x时y的某个条件统计量。</p><p>我们可以吧代价函数看做是一个泛函而不仅仅是一个函数，泛函是函数到实数的映射，因此我们可以将学习看做是选择一个函数而不仅仅是一组参数。例如我们可以设计一个代价泛函，使得它的最小值处于一个特殊的函数上，这个函数将x映射到给定x时y的期望值。</p><p>对函数求解优化问题需要用到变分法，我们使用变分法导出的第一个结果是解优化问题：<br>$$<br>f^<em> = arg min <em>{f} E</em>{x, y - Pdata} || y - f(x) || ^ 2<br>$$<br>得到<br>$$<br>f^</em>(x) = E_{y - Pdata}(y|x)[y]<br>$$<br>因此可以看到，如果我们最小化均方误差代价函数，将得到一个函数，它可以用来对每个x的值预测出y的均值。</p><p>不同的代价函数给出不同的统计量，例如：<br>$$<br>f^* = arg min <em>{f} E</em>{x, y - Pdata} || y - f(x) || _1<br>$$<br>将得到一个函数可以对每个x预测y取值的中位数，这个代价函数被称为平均绝对误差。</p><h2 id="输出单元"><a href="#输出单元" class="headerlink" title="输出单元"></a>输出单元</h2><p>代价函数的选择与输出单元的选择密切相关，任何可用作输出的神经网络单元，也可以被用作隐藏单元。</p><h3 id="用于高斯输出分布的线性单元"><a href="#用于高斯输出分布的线性单元" class="headerlink" title="用于高斯输出分布的线性单元"></a>用于高斯输出分布的线性单元</h3><p>一种简单的输出单元是基于仿射变换，这些单元是线性单元。</p><p>给定特征h，线性输出单元层产生一个向量$y’= W^Th+b$。线性输出层经常被用来产生条件高斯分布的均值：<br>$$<br>p(y|x) = N (y, y’, I)<br>$$<br>最大化其对数似然此时等价于最小化均方误差。</p><h3 id="用于Bernoulli输出分布的sigmoid单元"><a href="#用于Bernoulli输出分布的sigmoid单元" class="headerlink" title="用于Bernoulli输出分布的sigmoid单元"></a>用于Bernoulli输出分布的sigmoid单元</h3><p>许多任务需要预测二值型变量y的值，此时最大似然的方法是定义y在x条件下的Bernoulli分布。</p><p>为了保证无论何时模型给出错误的答案，总能有一个较大的梯度，而不是梯度为0。因此sigmoid输出单元定义为：<br>$$<br>y’ = \sigma(w^Th+b)<br>$$<br>这里sigmoid输出单元有两个部分，一个是线性层，另一个则是使用sigmoid激活函数将z转换为概率。</p><h3 id="用于Multinoulli输出分布的softmax单元"><a href="#用于Multinoulli输出分布的softmax单元" class="headerlink" title="用于Multinoulli输出分布的softmax单元"></a>用于Multinoulli输出分布的softmax单元</h3><p>任何时候，当我们想要表达一个具有n个可能取值的离散型随机变量的分布时，我们都可以使用softmax函数。</p><p>其形式为：<br>$$<br>softmax(z)_i = \frac{exp(z_i)}{\sum_j exp(z_j)}<br>$$<br>softmax输出的综合为1，所以一个单元的值增加必然对应这其它单元值的减少。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;基于梯度的学习&quot;&gt;&lt;a href=&quot;#基于梯度的学习&quot; class=&quot;headerlink&quot; title=&quot;基于梯度的学习&quot;&gt;&lt;/a&gt;基于梯度的学习&lt;/h1&gt;&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概
-      
-    
-    </summary>
-    
-    
-      <category term="Deep Learning" scheme="http://yoursite.com/tags/Deep-Learning/"/>
     
   </entry>
   
