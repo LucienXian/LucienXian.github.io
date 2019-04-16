@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-15T03:22:18.863Z</updated>
+  <updated>2019-04-16T03:40:39.014Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>C++11 Lambda : Capturing local variables</title>
+    <link href="http://yoursite.com/2019/04/16/C-11-Lambda-Capturing-local-variables/"/>
+    <id>http://yoursite.com/2019/04/16/C-11-Lambda-Capturing-local-variables/</id>
+    <published>2019-04-16T03:40:10.000Z</published>
+    <updated>2019-04-16T03:40:39.014Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="C-11-Lambda-How-to-capture-local-variables-inside-Lambda"><a href="#C-11-Lambda-How-to-capture-local-variables-inside-Lambda" class="headerlink" title="C++11 Lambda : How to capture local variables inside Lambda ?"></a>C++11 Lambda : How to capture local variables inside Lambda ?</h1><p>本文将介绍如何在lambda中从外部域捕获变量，同样的，我们可以以值传递或引用传递的方式捕获变量，以下是语法：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Captured variables](paameters) &#123; function code &#125;</span><br></pre></td></tr></table></figure><h2 id="Capturing-Local-Variables-by-value-inside-Lambda-Function"><a href="#Capturing-Local-Variables-by-value-inside-Lambda-Function" class="headerlink" title="Capturing Local Variables by value inside Lambda Function"></a>Capturing Local Variables by value inside Lambda Function</h2><p>以下是以值传递捕获变量的方式：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> msg = <span class="string">"Hello"</span>;</span><br><span class="line"><span class="keyword">int</span> counter = <span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Defining Lambda function and</span></span><br><span class="line"><span class="comment">// Capturing Local variables by Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [msg, counter] () &#123;</span><br><span class="line">                          <span class="comment">//...</span></span><br><span class="line">                          &#125;;</span><br></pre></td></tr></table></figure><p>msg和counter都是const变量，只读不改。要想修改，可以加入关键字mutable：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> func = [msg, counter] () <span class="keyword">mutable</span> &#123; &#125;;</span><br></pre></td></tr></table></figure><h2 id="Capturing-Local-Variables-by-Reference-inside-Lambda"><a href="#Capturing-Local-Variables-by-Reference-inside-Lambda" class="headerlink" title="Capturing Local Variables by Reference inside Lambda"></a>Capturing Local Variables by Reference inside Lambda</h2><p>要实现引用传递，只需要加上前缀<strong>&amp;</strong>即可。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> msg = <span class="string">"Hello"</span>;</span><br><span class="line"><span class="keyword">int</span> counter = <span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Defining Lambda function and</span></span><br><span class="line"><span class="comment">// Capturing Local variables by Reference</span></span><br><span class="line"><span class="keyword">auto</span> func = [&amp;msg, &amp;counter] () &#123;</span><br><span class="line">                       <span class="comment">//...</span></span><br><span class="line">                       &#125;;</span><br></pre></td></tr></table></figure><p>这样在lambda中就可以通过修改该引用从而修改外部值。</p><h2 id="Capture-All-Local-Variables-from-outer-scope-by-Value"><a href="#Capture-All-Local-Variables-from-outer-scope-by-Value" class="headerlink" title="Capture All Local Variables from outer scope by Value"></a>Capture All Local Variables from outer scope by Value</h2><p>正如前面的文章提到过的，我们也可以把外部变量全部捕获，或值传递或引用传递，甚至可以混合使用：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Capturing all Local variables by Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [=] () &#123;</span><br><span class="line">                   <span class="comment">//...</span></span><br><span class="line">                   &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Capturing all Local variables by Reference</span></span><br><span class="line"><span class="keyword">auto</span> func = [&amp;] () &#123;</span><br><span class="line">                   <span class="comment">//...</span></span><br><span class="line">                   &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Capturing all Local variables by Reference and Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [=, &amp;counter] () <span class="keyword">mutable</span> &#123;&#125;;</span><br></pre></td></tr></table></figure><h3 id="Be-aware-of-capturing-local-variables-by-Reference-in-Lambda"><a href="#Be-aware-of-capturing-local-variables-by-Reference-in-Lambda" class="headerlink" title="Be-aware of capturing local variables by Reference in Lambda"></a>Be-aware of capturing local variables by Reference in Lambda</h3><p>如果在lambda中我们通过引用捕获局部变量，那么我们需要确保在访问或调用lambda函数时，所有引用捕获的局部变量仍然在作用域内。</p><p>如果该变量已经被回收或者从stack中移除，会导致undefined behavior。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;C-11-Lambda-How-to-capture-local-variables-inside-Lambda&quot;&gt;&lt;a href=&quot;#C-11-Lambda-How-to-capture-local-variables-inside-Lambda&quot; class=
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>C++11 Lambda Function</title>
@@ -452,29 +475,6 @@
     
     
       <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>隐藏单元——DeepLearning系列</title>
-    <link href="http://yoursite.com/2019/02/13/%E9%9A%90%E8%97%8F%E5%8D%95%E5%85%83%E2%80%94%E2%80%94DeepLearning%E7%B3%BB%E5%88%97/"/>
-    <id>http://yoursite.com/2019/02/13/隐藏单元——DeepLearning系列/</id>
-    <published>2019-02-13T09:38:24.000Z</published>
-    <updated>2019-02-13T09:38:50.347Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="隐藏单元"><a href="#隐藏单元" class="headerlink" title="隐藏单元"></a>隐藏单元</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>这是前馈神经网络的一个特有研究问题：如何选择隐藏单元的类型。</p><p>一般来说，整流线性单元是隐藏单元很好的一个默认选择。另外有一些隐藏单元并不是在所有的输入点上都是可微的，流入：$g(z)=max{0, z}$在z=0处是不可微的，这使得g对于基于梯度的学习算法无效。但由于神经网络使用的函数通常对左导数和右导数都有定义，在这种情况下，在z=0的左导数是0，右导数是1。神经网络训练的软件实现通常返回左导数或者右导数的其中一个。</p><p>除非有特别说明，大多数隐藏单元都可以描述为接收输入向量x，计算仿射变换$z = W^Tx+b$，然后使用一个逐元素的非线性函数$g(z)$。</p><h2 id="整流线性单元及其扩展"><a href="#整流线性单元及其扩展" class="headerlink" title="整流线性单元及其扩展"></a>整流线性单元及其扩展</h2><p>整流线性单元使用激活函数$g(z)=max{0, z}$。</p><p>在这种情况下，整流线性单元在其一半的定义域上输出为0，并且只要整流线性单元处于激活状态，它的导数都能保持比较大并一致。</p><p>整流线性单元通常作用于仿射变换之上：<br>$$<br>h = g(W^Tx+b)<br>$$<br>初始化的时候可以把b的所有元素设置为一个较小的正值，使得整流线性单元在初始时就能对大多数输入呈现激活状态。</p><p>至于扩展，都是基于当z&lt;0时使用了一个非零的斜率：$g(z, \alpha)_i=max(0, z_i) + \alpha_imin(0, z_i)$。</p><ul><li>绝对值整流（absolute value rectification）固定$\alpha_i=-1$，它用于图像中的对象识别，寻找在输入照明极性反转下不变的特征是有意义的；</li><li>渗透整流线性单元（Leakly ReLU）将固定$\alpha_i=0.01$之类的小值；</li><li>参数化整流线性单元（parametric ReLU）则是将其作为学习的参数；</li></ul><p>maxout单元进一步做了扩展，它将z划分为每组具有k个值的组，买个maxout单元则输出每组中的最大元素：<br>$$<br>g(z)_i = max z_j<br>$$<br>maxout 单元可以学习具有多达 k 段的分段线性的凸函数，在k足够大的情况下，maxout 单元可以以任意的精确度来近似任何凸函数。</p><h2 id="logistic-sigmoid与双曲正切函数"><a href="#logistic-sigmoid与双曲正切函数" class="headerlink" title="logistic sigmoid与双曲正切函数"></a>logistic sigmoid与双曲正切函数</h2><p>在引入整流线性单元之前,大多数神经网络使用 logistic sigmoid 激活函数：<br>$$<br>g(z) = \sigma(z)<br>$$<br>或者双曲正切激活函数：<br>$$<br>g(z) = tanh(z)<br>$$<br>其中,$tanh(z)=2\sigma(2z)-1$。</p><p>sigmoid 单元的广泛饱和性会使得基于梯度的学习变得非常困难。因为这个原因,现在不鼓励将它们用作前馈网络中的隐藏单元。而双曲正切激活函数通常要比 logistic sigmoid 函数表现更好。</p><p>而在一些不能使用分段激活函数的场景下，sigmoid的使用会更常见。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;隐藏单元&quot;&gt;&lt;a href=&quot;#隐藏单元&quot; class=&quot;headerlink&quot; title=&quot;隐藏单元&quot;&gt;&lt;/a&gt;隐藏单元&lt;/h1&gt;&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h
-      
-    
-    </summary>
-    
-    
-      <category term="DeepLearning" scheme="http://yoursite.com/tags/DeepLearning/"/>
     
   </entry>
   
