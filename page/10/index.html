@@ -265,6 +265,197 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/05/语法分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/05/语法分析/" itemprop="url">语法分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T15:20:27+08:00">
+                2018-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="语法分析"><a href="#语法分析" class="headerlink" title="语法分析"></a>语法分析</h1><blockquote>
+<p>语法(syntax)：组合token以形成phrases，clauses和sentences</p>
+</blockquote>
+<p>对于某些式子的表示，比如带有嵌套深度比较大的括号时，有限自动机并不能识别出括号配对的情况，这是因为状态数为N的有限自动机无法记忆嵌套深度大于N的括号。</p>
+<h2 id="上下文无关文法"><a href="#上下文无关文法" class="headerlink" title="上下文无关文法"></a>上下文无关文法</h2><p>上下文无关文法就是说这个文法中所有的产生式左边只有一个非终结符，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">S-&gt;aSb</span><br><span class="line">S-&gt;ab</span><br></pre></td></tr></table></figure>
+<p>这个文法的两个production的左边都只有一个非终结符，那么只需要找到符合production右边的字符串，就可以对其进行规约。</p>
+<p>然而</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aSb-&gt;aaSbb</span><br><span class="line">S-&gt;ab</span><br></pre></td></tr></table></figure>
+<p>这就是上下文相关文法，因为第一个production的左边不止一个终结符，所以在匹配的时候必须要确保S有正确的“上下文”。</p>
+<h3 id="推导"><a href="#推导" class="headerlink" title="推导"></a>推导</h3><p>为了证明某个文法的类型，我们必须要进行推导（derivation），即从开始符号出发，对其右部的每一个非终止符，用该非终止符production的任一个右部替代它。</p>
+<ul>
+<li>最左推导：总是扩展最左边的非终止符；</li>
+<li>最右推导：总是扩展最右边的非终止符；</li>
+</ul>
+<h3 id="语法分析树"><a href="#语法分析树" class="headerlink" title="语法分析树"></a>语法分析树</h3><p>parse tree就是将一个推导中的各个符号连接到从它推导出来的符号而形成的。不同的推导可以得到相同的parse tree。</p>
+<h3 id="二义性文法"><a href="#二义性文法" class="headerlink" title="二义性文法"></a>二义性文法</h3><p>如果一个文法能够推导出两颗不同的parse tree，则认为该文法具有二义性。这种情况下，编译器就无法利用parse tree去解析语义。以下就是一个二义性文法的例子：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3.png" alt="img"></p>
+<p>但是二义性的文法是可以通过某些转换来消除，一般来说引入一些新的非终止符，来提高某些表达式的优先级。</p>
+<h3 id="文件结束符"><a href="#文件结束符" class="headerlink" title="文件结束符"></a>文件结束符</h3><p>语法分析器会读入文件结束符号，一般来说我们使用<strong>$符号</strong>表示文件的结束。</p>
+<h2 id="预测分析"><a href="#预测分析" class="headerlink" title="预测分析"></a>预测分析</h2><p>使用一种叫做梯度下降(recursive descent)的简单算法可以对grammar进行分析，它只适用于每个子表达式的第一个终结符号能够为production提供足够的信息的情况。其中每个非终结符对应的，都有一个函数。</p>
+<h3 id="FIRST集合和FOLLOW集合"><a href="#FIRST集合和FOLLOW集合" class="headerlink" title="FIRST集合和FOLLOW集合"></a>FIRST集合和FOLLOW集合</h3><p>FIRST(S)是从S可以推导出的任意字符串中的开头终结符组成的集合，因此如果两个production有着相同的左部符号，但它们的右部有着重叠的FIRST集合，那么该文法不能使用预测分析。</p>
+<p>能产生空字符串的符号，称呼为<strong>nullable</strong>。</p>
+<p>记住下列结论：</p>
+<ul>
+<li>若X可以推导出空字符串，那么nullable(X)为真；</li>
+<li>FIRST(S)是从S可以推导出的任意字符串中的开头终结符组成的集合；</li>
+<li>FOLLOW(X)是可以直接跟随于X之后的终结符集合；</li>
+</ul>
+<h3 id="构造一个预测分析器"><a href="#构造一个预测分析器" class="headerlink" title="构造一个预测分析器"></a>构造一个预测分析器</h3><p>由于非终结符X的分析函数对X的每个产生式都有一个子句，因此该函数必须根据下一个输入来选择其中的一个子句。我们需要的所有信息可以用一个二维表来表示，该表以文法的非终结符X和终结符T作为索引。</p>
+<p>对于每个属于FIRST(X)的T，在表的X行T列填入该production X-&gt;y；如果y为nullable，那么对于每个属于FOLLOW(X)的T，在表的X行T列填入该production X-&gt;y。</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-6.png" alt="img"></p>
+<p>像上图这种情况，一个表项里有多个表达式，就会产生二义性的文法。若一个文法的预测分析表不含有多重定义的项，则称为LL(1)文法。</p>
+<blockquote>
+<p>LL(1): Left to right parse; Leftmost derivation; 1-symbol lookhead</p>
+</blockquote>
+<h3 id="消除左递归"><a href="#消除左递归" class="headerlink" title="消除左递归"></a>消除左递归</h3><p>看这样的文法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;E+T</span><br><span class="line">E-&gt;T</span><br></pre></td></tr></table></figure>
+<p>在这种情况下，将会导致LL(1)的分析表中出现了双重定义的登记项，因此任何属于FIRST(T)的tokens必然属于FIRST(E+T)，这就是左递归。</p>
+<p>为了消除左递归，我们可以这样重写：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;TE'</span><br><span class="line">E'-&gt;+TE'</span><br><span class="line">E'-&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="LR分析"><a href="#LR分析" class="headerlink" title="LR分析"></a>LR分析</h2><p>LL(k)的一个弱点就是，在我们仅仅看到右边的k个tokens时就需要做出预测。相比而言，LR(k)分析是一种更好的选择。</p>
+<blockquote>
+<p>LR(k): Left to right parse; Rightmost derivation; k-token lookhead</p>
+</blockquote>
+<p>来看一个典型的例子：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-7.png" alt="img"></p>
+<ul>
+<li>shift：将第一个token压进栈；</li>
+<li>reduce：选择文法规则：X-&gt;ABC，依次将C,B,A从栈中弹出来，将X压进栈；</li>
+</ul>
+<h3 id="LR分析引擎"><a href="#LR分析引擎" class="headerlink" title="LR分析引擎"></a>LR分析引擎</h3><p>LR分析器是通过DFA作用于栈，来实现reduce和shift操作的。转换操作主要有以下4种：</p>
+<ul>
+<li>sn: shift into state n</li>
+<li>gn: goto state n</li>
+<li>rk: reduce by rule k</li>
+<li>a: accept</li>
+</ul>
+<h3 id="LR-0-分析器"><a href="#LR-0-分析器" class="headerlink" title="LR(0)分析器"></a>LR(0)分析器</h3><blockquote>
+<p>LR(0)是一种只需要分析查看栈就可以进行分析的文法，它的shift、reduce操作不需要进行任何超前判断</p>
+</blockquote>
+<h3 id="SLR分析器"><a href="#SLR分析器" class="headerlink" title="SLR分析器"></a>SLR分析器</h3><p>如果用LR(0)去构造分析表：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-9.png" alt="img"></p>
+<p>在状态3的时候，遇到符号+，就会出现多重定义的项，分析器既需要shift到状态4，也需要对production2进行reduce。这是一个reduce-shift冲突。</p>
+<p>因此我们可以构造SLR分析器来解决这个问题。</p>
+<p>SLR的构造与LR(0)基本一样，除了它只在FOLLOW集指定的地方放置规约操作。</p>
+<h3 id="LR-1-项和LR-1-分析表"><a href="#LR-1-项和LR-1-分析表" class="headerlink" title="LR(1)项和LR(1)分析表"></a>LR(1)项和LR(1)分析表</h3><p>之所以使用LR(1)，是因为即便使用了SLR(0)，还是不能完美地解决所有的冲突。考虑αF.β，我们知道，F的follow集合包含字符串β的first集合。因此我们在SLR（0）中使用的follow集合不一定能正确的预测出产生式。</p>
+<p>因此，我们重新定义了项，它包含产生式，标记状态的点，超前查看符号集合。</p>
+<p>我们可以使用下面的算法计算一个状态中每一项的具体内容：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3-4-1.png" alt="img"></p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3-4-2.png.png" alt="img"></p>
+<h3 id="LALR-1-分析表"><a href="#LALR-1-分析表" class="headerlink" title="LALR(1)分析表"></a>LALR(1)分析表</h3><p>由于LR(1)的状态可能太多了，因此我们可以合并那些除了超前查看的符号集合外都相同的两个状态。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/04/词法分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1840,176 +2031,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/深度探索C-对象模型-七/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/01/深度探索C-对象模型-七/" itemprop="url">深度探索C++对象模型<七></七></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T09:41:50+08:00">
-                2018-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="The-Semantics-of-Data"><a href="#The-Semantics-of-Data" class="headerlink" title="The Semantics of Data"></a>The Semantics of Data</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一个类的大小主要受三个因素影响：</p>
-<ul>
-<li><p>语言本身带来的额外负担。比如如果是virtual base class，往往需要一个指针去指向某个virtual base class subobject；</p>
-</li>
-<li><p>编译器的特殊处理。比如有些编译器会为一个空类（继承自另外一个空类）添加1个byte，但有些编译器会做出优化；</p>
-</li>
-<li><p>alignment。对齐；</p>
-</li>
-</ul>
-<p>另外需要注意的是，nonstatic data members也是放在类对象中，即使是继承而来的nonstatic data members也是一样，但static data members则放在程序的一个global data segment中</p>
-<h2 id="Data-Member-Layout"><a href="#Data-Member-Layout" class="headerlink" title="Data Member Layout"></a>Data Member Layout</h2><p>非静态成员变量在类的对象中的排列顺序与其声明顺序是一致的。</p>
-<p>如果多个数据成员分布在不同的access session（public，private，protected）中，那么members的排列应该满足：较晚出现的成员应该在高地址，并且允许将多个access session连锁在一起，成为一个连续的区块，也就是你在一个session内声明8个变量，和在8个相同的session内声明8个变量对于内存布局是一样。</p>
-<h2 id="Data-Member的存取"><a href="#Data-Member的存取" class="headerlink" title="Data Member的存取"></a>Data Member的存取</h2><p>先抛出一个问题：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Point3d origin, *pt = &amp;origin;</span><br><span class="line">origin.x = <span class="number">0.0</span>;</span><br><span class="line">pt-&gt;x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure>
-<p>分别通过指针和对象去读取，会有什么不同呢？</p>
-<h3 id="Static-Data-Members"><a href="#Static-Data-Members" class="headerlink" title="Static Data Members"></a>Static Data Members</h3><p>如果是以这两种方式去读取静态成员，那么是一样的。因为都会转化成对唯一的实体进行直接操作，例如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//origin.chunkSize == 250;</span></span><br><span class="line">Point3d::chunkSize == <span class="number">250</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//pt-&gt;chunkSize == 250;</span></span><br><span class="line">Point3d::chunkSize == <span class="number">250</span>;</span><br></pre></td></tr></table></figure>
-<p>由于静态数据成员是放在全局数据区，如果有两个类声明同名的静态数据成员，编译器会为每一个static data member进行唯一编码。</p>
-<h3 id="Nonstatic-Data-Members"><a href="#Nonstatic-Data-Members" class="headerlink" title="Nonstatic Data Members"></a>Nonstatic Data Members</h3><p>这里需要注意的是，对一个非静态成员进行存取，编译器会通过把一个class object的起始地址加上data member的偏移量进行存取。</p>
-<p>这里，如果是通过对象去存取成员变量，成员变量的偏移量会在编译时就已经得知，效率较高；</p>
-<p>而如果一个类是派生类，其通过指针去存取它的成员变量，我们无法得知指针指向哪个class type，必须要等到运行时才确定下来，同时还要经历额外的间接导引才能找到那个数据成员。</p>
-<h2 id="继承与Data-Members"><a href="#继承与Data-Members" class="headerlink" title="继承与Data Members"></a>继承与Data Members</h2><p>考虑两个类Point2d, Point3d，如果一种组织方式是形成两个独立的类，另外一种的组织方式是形成继承链。那么会有声明不同。</p>
-<h3 id="Inheritance-without-Polymorphism"><a href="#Inheritance-without-Polymorphism" class="headerlink" title="Inheritance without Polymorphism"></a>Inheritance without Polymorphism</h3><p>假如我们考虑Point3d继承自Point2d，但其中没有virtual functions，也就没有了额外的空间负担（vptr）。</p>
-<p>但这种做法会带来的一个错误是，把一个class分解为多层，可能会带来的一个问题是抽象的结构会变得膨胀。例如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> val;</span><br><span class="line">    <span class="keyword">char</span> c1;</span><br><span class="line">    <span class="keyword">char</span> c2;</span><br><span class="line">    <span class="keyword">char</span> c3;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//分解成</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete1</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> c1;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete2</span>:</span> <span class="keyword">public</span> Concrete1 &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> c2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete1</span>:</span> <span class="keyword">public</span> Concrete3 &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> c3;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>32位的机器下，对于第一种不分解的情况，类的空间大小为8bytes，而第二种情况，Concrete3变成了16bytes，因为自定义的数据类型是在继承得来的subject的padding后面进行补全的。所以就浪费了更多的padding空间。</p>
-<p>另外一个容易出现的问题是，考虑这种情况：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Concrete2 *pc2;</span><br><span class="line">Concrete1 *pc1_1, *pc1_2;</span><br><span class="line">pc1_1 = pc2;<span class="comment">//另pc1_1指向Concrete2对象</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//结果就是pc1_2指向的对象的成员变量可能会产生异常值</span></span><br><span class="line">*pc1_2 = *pc1_1;</span><br></pre></td></tr></table></figure>
-<p>由于内存布局的不同，直接的复制操作执行的可能是复制一个一个的member，因此有可能会把原来的padding给覆盖掉。具体得看编译器如何实现，是把数据成员与concrete1的subject捆绑在一起，还是其它的实现。</p>
-<h3 id="Adding-Polymorphism"><a href="#Adding-Polymorphism" class="headerlink" title="Adding Polymorphism"></a>Adding Polymorphism</h3><p>如果继承链条（考虑一个point3d继承自point2d）中有虚函数，那么会带来如下的额外负担：</p>
-<ul>
-<li><p>point2d会有一个相关联的virtual table，存放这每一个virtual function的地址，则table的元素数目与virtual function的数目相同，另外可能还有一些slots，用以支持run time identification</p>
-</li>
-<li><p>为每一个class object提供一个vptr，在运行时能够找到virtual table的位置</p>
-</li>
-<li><p>扩充constructor，使得其能够初始化vptr</p>
-</li>
-<li><p>扩充destructor，能够摸消指向class相关的virtual table的vptr</p>
-</li>
-</ul>
-<p>关于vptr放在class object的位置有两种做法，一种是放在末端，为的是保留base class C struct的布局；另一种做法则是放在前端，带来的好处是不用在运行期测量出vptr的偏移量</p>
-<h3 id="Multiple-Inheritance"><a href="#Multiple-Inheritance" class="headerlink" title="Multiple Inheritance"></a>Multiple Inheritance</h3><p>对于多重继承，如果想要用父类的指针指向一个对象，那么在内存布局和指针的设置上会有更复杂的操作。</p>
-<p>假如是这样的继承状态</p>
-<p><img src="http://img.blog.csdn.net/20130510142105779" alt="img"></p>
-<p>其对象模型会有比较大的不同，与单一继承相比</p>
-<p><img src="http://img.blog.csdn.net/20130510142117279" alt="img"></p>
-<p>这是因为，如果只是将地址赋予第一个base class会比较简单，和单一继承一样。因为两者指向相同的地址；如果是赋予第二个或者后续的base class的话，就需要修改地址，加上偏移位置。</p>
-<h3 id="Virtual-Inheritance"><a href="#Virtual-Inheritance" class="headerlink" title="Virtual Inheritance"></a>Virtual Inheritance</h3><p>虚拟继承的目的就是为了解决如何在派生类里维护一份基类的实体。</p>
-<p>对于这样含有多个base class subject的类，会被分割为2个部分：不变局部和共享局部。由于共享局部拥有稳定的offset，可以直接存取；而对于共享局部，由于其位置会随着派生而变化，所以如何进行存取这部分的内容就成了一个难点。</p>
-<p>一般来说，会先安排好不变局部，再去建立共享局部。而且编译器会在每一个派生类对象中安插指针,指向virtual base class。</p>
-<p>这样就是通过派生类里面的指针去间接的索引共享部分的数据，但有所不同的是，有些编译器会优化使得存取时间和空间负担变得固定。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2058,7 +2079,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">197</span>
+                <span class="site-state-item-count">198</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

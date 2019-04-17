@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/17/C-11-Lambda-Capturing-Member-Variables/</loc>
+    
+    <lastmod>2019-04-17T02:35:20.825Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/16/C-11-Lambda-Capturing-local-variables/</loc>
     
     <lastmod>2019-04-16T03:40:39.014Z</lastmod>
