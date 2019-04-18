@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/</loc>
+    
+    <lastmod>2019-04-18T03:14:42.253Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/17/C-11-Lambda-Capturing-Member-Variables/</loc>
     
     <lastmod>2019-04-17T02:35:20.825Z</lastmod>

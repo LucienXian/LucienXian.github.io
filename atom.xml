@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-17T02:35:20.825Z</updated>
+  <updated>2019-04-18T03:14:42.253Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,22 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Multithreading Three Ways to Create Threads</title>
+    <link href="http://yoursite.com/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/"/>
+    <id>http://yoursite.com/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/</id>
+    <published>2019-04-18T03:14:15.000Z</published>
+    <updated>2019-04-18T03:14:42.253Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>C++11 Lambda: Capturing Member Variables</title>
@@ -452,29 +468,6 @@
     
     
       <category term="Deep Learning" scheme="http://yoursite.com/tags/Deep-Learning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Java通配符学习</title>
-    <link href="http://yoursite.com/2019/02/15/Java%E9%80%9A%E9%85%8D%E7%AC%A6%E5%AD%A6%E4%B9%A0/"/>
-    <id>http://yoursite.com/2019/02/15/Java通配符学习/</id>
-    <published>2019-02-15T15:10:05.000Z</published>
-    <updated>2019-02-15T15:55:17.990Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="Java通配符的使用"><a href="#Java通配符的使用" class="headerlink" title="Java通配符的使用"></a>Java通配符的使用</h1><h2 id="基本介绍"><a href="#基本介绍" class="headerlink" title="基本介绍"></a>基本介绍</h2><p>泛型是一种表示类或者方法行为对于未知类型的类型约束的方法，通配符在类型系统中有重要的作用，它们为一个泛型类所指定的类型集合提供了一个有用的类型范围。</p><h2 id="协变"><a href="#协变" class="headerlink" title="协变"></a>协变</h2><p>数组是协变的，因为Integer是Number的子类型，数组类型Integer[]是Number[]的子类型，因此在任何需要 Number[]值的地方都可以提供一个Integer[]值。泛型不是协变的，List\&lt;Integer>不是List\&lt;Number>的子类型。</p><p>因此这种代码无法通过编译：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;Fruit&gt; flist = <span class="keyword">new</span> ArrayList&lt;Apple&gt;();</span><br></pre></td></tr></table></figure><h2 id="使用通配符"><a href="#使用通配符" class="headerlink" title="使用通配符"></a>使用通配符</h2><p>我们知道上面那种语句是无法通过编译，通过它们之间存在父子类型的关系，如果我们需要建立这种向上转型的关系，就需要使用通配符了。</p><h3 id="上边界限定通配符"><a href="#上边界限定通配符" class="headerlink" title="上边界限定通配符"></a>上边界限定通配符</h3><p>利用 <code>&lt;? extends Fruit&gt;</code> 形式的通配符，可以实现泛型的向上转型：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenericsAndCovariance</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Wildcards allow covariance:</span></span><br><span class="line">        List&lt;? extends Fruit&gt; flist = <span class="keyword">new</span> ArrayList&lt;Apple&gt;();</span><br><span class="line">        <span class="comment">// Compile Error: can’t add any type of object:</span></span><br><span class="line">        <span class="comment">// flist.add(new Apple());</span></span><br><span class="line">        <span class="comment">// flist.add(new Fruit());</span></span><br><span class="line">        <span class="comment">// flist.add(new Object());</span></span><br><span class="line">        flist.add(<span class="keyword">null</span>); <span class="comment">// Legal but uninteresting</span></span><br><span class="line">        <span class="comment">// We know that it returns at least Fruit:</span></span><br><span class="line">        Fruit f = flist.get(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>在这种情况下，我们不知道这个 List 到底持有什么类型，因此也不可能安全的添加一个对象，唯一可以添加的是null。编译器会为这个问号类型起一个临时的代号，比如<strong>CAP#1</strong>。但是调用某个返回Fruit的方法就是安全的，因此不管实际类型是什么，肯定能够转型为Fruit。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CompilerIntelligence</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;? extends Fruit&gt; flist =</span><br><span class="line">        Arrays.asList(<span class="keyword">new</span> Apple());</span><br><span class="line">        Apple a = (Apple)flist.get(<span class="number">0</span>); <span class="comment">// No warning</span></span><br><span class="line">        flist.contains(<span class="keyword">new</span> Apple()); <span class="comment">// Argument is ‘Object’</span></span><br><span class="line">        flist.indexOf(<span class="keyword">new</span> Apple()); <span class="comment">// Argument is ‘Object’</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">//flist.add(new Apple());   无法编译</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="下边界限定通配符"><a href="#下边界限定通配符" class="headerlink" title="下边界限定通配符"></a>下边界限定通配符</h3><p>这是通配符的另一个方向，超类型的通配符：? super T，T是类型参数的下界。在这种情况下，写入是有效的，因为对象都可以被向上转型成合法的类型：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SuperTypeWildcards</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">writeTo</span><span class="params">(List&lt;? <span class="keyword">super</span> Apple&gt; apples)</span> </span>&#123;</span><br><span class="line">        apples.add(<span class="keyword">new</span> Apple());</span><br><span class="line">        apples.add(<span class="keyword">new</span> Jonathan());</span><br><span class="line">        <span class="comment">// apples.add(new Fruit()); // Error</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="无边界通配符"><a href="#无边界通配符" class="headerlink" title="无边界通配符"></a>无边界通配符</h3><p>还有一种通配符是无边界通配符，它的使用形式是一个单独的问号：List&lt;?&gt;，也就是没有任何限定。因为不知道是具体哪种类型，我们也无法向其中添加对象。</p><h2 id="类型参数与无边界通配符"><a href="#类型参数与无边界通配符" class="headerlink" title="类型参数与无边界通配符"></a>类型参数与无边界通配符</h2><p>List\<t>是泛型方法，List\&lt;?&gt;是限制通配符。一般来说，List\<t>一般有两种用：定义一个通用的泛型方法和限制方法的参数之间或参数和返回结果之间的关系。</t></t></p><p>比如这种情况就可以限制返回结果的类型与参数类型一致：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;T&gt; getList&lt;T param1,T param2&gt;</span><br></pre></td></tr></table></figure><p>而List\&lt;?&gt;一般就是在泛型起一个限制作用。</p><p>当对<strong>已经存在的泛型</strong>，我们不想给她一个具体的类型做为类型参数，我们可以给其一个不确定的类型作为参数。这个就是通配符的意义。</p><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://segmentfault.com/a/1190000005337789" target="_blank" rel="noopener">https://segmentfault.com/a/1190000005337789</a></p><p><a href="https://www.zhihu.com/question/31429113" target="_blank" rel="noopener">https://www.zhihu.com/question/31429113</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;Java通配符的使用&quot;&gt;&lt;a href=&quot;#Java通配符的使用&quot; class=&quot;headerlink&quot; title=&quot;Java通配符的使用&quot;&gt;&lt;/a&gt;Java通配符的使用&lt;/h1&gt;&lt;h2 id=&quot;基本介绍&quot;&gt;&lt;a href=&quot;#基本介绍&quot; class=&quot;head
-      
-    
-    </summary>
-    
-    
-      <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
     
   </entry>
   
