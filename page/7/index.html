@@ -265,6 +265,151 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/21/简单动态字符串/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/21/简单动态字符串/" itemprop="url">简单动态字符串</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-21T01:12:56+08:00">
+                2018-08-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h1><p>redis的字符串表示不是使用的像C语言那种以空字符结尾的字符数组，而是自己构建了一种简单动态字符串（simple dynamic string）——<strong>SDS</strong>。</p>
+<p>而一般来说，redis只会在字符串字面量被用在一些无需对字符串进行更改的地方使用C风格的字符串，比如打印日志。</p>
+<h2 id="SDS的定义"><a href="#SDS的定义" class="headerlink" title="SDS的定义"></a>SDS的定义</h2><p>sds定义在sds.h的sdshdr的结构体中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshds</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> len; <span class="comment">//记录buf数组中已经使用的字节数</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">free</span>; <span class="comment">//buf数组中未使用的字节数</span></span><br><span class="line">    <span class="keyword">char</span> buf[];<span class="comment">//与C字符串一样以空字符结尾的字符数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之所以在SDS中，使用了与C字符串类似的风格，是因为这样可以直接使用C字符串函数库里面的函数，比如要打印字符串，直接使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">"%s"</span>, s-&gt;buf);</span><br></pre></td></tr></table></figure>
+<h2 id="SDS与C字符串的区别"><a href="#SDS与C字符串的区别" class="headerlink" title="SDS与C字符串的区别"></a>SDS与C字符串的区别</h2><p>要了解两者之间的区别，首先要从结构体入手。</p>
+<h3 id="常数复杂度获取字符串的长度"><a href="#常数复杂度获取字符串的长度" class="headerlink" title="常数复杂度获取字符串的长度"></a>常数复杂度获取字符串的长度</h3><p>这个比较好理解，因为结构体本身带有长度域，而设置和更新SDS长度的工作又是由SDS的API执行时自动完成的，所以避免了影响redis的性能。</p>
+<p>对于C字符串来说，要获取字符串长度，只能逐个遍历，直到遇到了空字符。</p>
+<h3 id="杜绝缓冲区溢出"><a href="#杜绝缓冲区溢出" class="headerlink" title="杜绝缓冲区溢出"></a>杜绝缓冲区溢出</h3><p>这个也比较好理解。对于一些字符串拼接的操作，如果没有记录字符串长度，无法得知字符串剩余的内存，这样在拼接的时候就可能发生缓冲区溢出。</p>
+<p>而SDS的API在使用sdscat函数进行字符串拼接的时候，会先检查SDS的空间是否足够，不足的话，会使用某种分配策略扩展空间。</p>
+<h3 id="减少修改字符串带来内存重分配次数"><a href="#减少修改字符串带来内存重分配次数" class="headerlink" title="减少修改字符串带来内存重分配次数"></a>减少修改字符串带来内存重分配次数</h3><p>对于C字符串来说，每次增长或者缩短一个字符串，程序都需要对保存该字符串的数组进行一次重新分配内存的工作，一旦没有重新分配，就可能造成内存泄露或者产生缓冲区溢出。而且因为内存重分配涉及到了复杂的算法，并且有可能会执行系统调用，所以通常是比较耗时的操作。</p>
+<p>为了避免C字符串的这种缺陷，redis的SDS实现了空间预分配和惰性空间释放两种优化策略。</p>
+<ol>
+<li>空间预分配</li>
+</ol>
+<p>这个策略主要用于优化SDS的字符串增长操作，在进行空间扩展时，不仅仅会分配所需空间，还会为SDS分配额外的未使用空间；</p>
+<ul>
+<li>如果对SDS修改后，长度小于1MB，那么程序将分配和len属性同样大小的未使用空间。即如果SDS的len变成了13字节，那么整个buf的数组长度将会变成13+13+1=27个字节；</li>
+<li>如果对SDS修改后，长度大于1MB，那么程序将会分配1MB的未使用空间；</li>
+</ul>
+<ol start="2">
+<li>惰性空间释放</li>
+</ol>
+<p>该策略会使得SDS在缩短长度时，不会马上使用内存重分配来回收缩短后多出来的字节，而是使用free属性将这些字节数记录下来，并等待将来使用</p>
+<h3 id="二进制安全"><a href="#二进制安全" class="headerlink" title="二进制安全"></a>二进制安全</h3><p>相比C字符串在读到空字符，则认为是字符串结尾，redis的SDS则是用len属性来检验字符串是否结束。这种二进制安全的做法使得redis不仅可以保存文本格式，还可以保存任意格式的二进制数据</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Effective-Go学习/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1724,180 +1869,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/27/Linux内核学习——内存管理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/27/Linux内核学习——内存管理/" itemprop="url">Linux内核学习——内存管理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-27T23:46:48+08:00">
-                2018-07-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h1><p>内核的内存分配是比较复杂的，内核是不能休眠，另外内核也不好处理内存分配错误。</p>
-<h2 id="页"><a href="#页" class="headerlink" title="页"></a>页</h2><p>内核使用页作为内存管理的基本单位，这是因为内存管理单元（MMU，管理内存并把虚拟地址转换为物理地址的硬件设备）通常以页作为单位进行处理。大多数32位体系结构支持4kb的页，而64位体系结构则支持8kb的页。</p>
-<p>内核用以下结构表示物理页：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//部分域</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">page</span>&#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> flags; <span class="comment">//存放页的状态（脏页，锁定内存的页面）</span></span><br><span class="line">    <span class="keyword">atomic_t</span> _count; <span class="comment">//引用计数，没有引用时为-1</span></span><br><span class="line">    <span class="keyword">atomic_t</span> _mapcount;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">private</span>; <span class="comment">//作为私有数据</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> *<span class="title">mapping</span>;</span> <span class="comment">//由页缓存使用</span></span><br><span class="line">    <span class="keyword">pgofff_t</span> index;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">lru</span>;</span></span><br><span class="line">    <span class="keyword">void</span> *<span class="keyword">virtual</span>; <span class="comment">//页的虚拟地址</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h2 id="区"><a href="#区" class="headerlink" title="区"></a>区</h2><p>由于硬件的显示，位于不同物理地址的页可能不能执行一些特定的任务，内核需要把页分为不同的区进行管理。linux主要使用了四种区；</p>
-<ul>
-<li>ZONE_DMA——这里的页可以被特定硬件进行DMA操作（直接访问）</li>
-<li>ZONE_DNA32——与上面的类似，但只能被32位设备访问</li>
-<li>ZONE_NORMAL——正常映射的页</li>
-<li>ZONE_HIGNEM——这个区为“高端内存”所在区域，不能永久映射内核地址空间</li>
-</ul>
-<p>LINUX把系统的页分为不同区，形成了不同的内存池。但不是说取页就只能从特定的区域里取。例如有一些普通的内存既可以从ZONE_DMA分配，也可以从ZONE_NORMAL。</p>
-<h2 id="获得页"><a href="#获得页" class="headerlink" title="获得页"></a>获得页</h2><p>内核提供了一种请求内存的底层，有那么几种接口：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">struct page * <span class="title">alloc_pages</span><span class="params">(<span class="keyword">gfp_t</span> gfp_mask, <span class="keyword">unsigned</span> <span class="keyword">int</span> order)</span></span>;<span class="comment">//分配2^order个连续的物理页面，指针指向第一个page结构体</span></span><br></pre></td></tr></table></figure>
-<p>也可以获得填充为0的页，避免随机产生了垃圾信息或者敏感信息，保证安全：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="title">get_zeroed_page</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> gfp_mask)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>释放页面，释放页需要谨慎，因为传递了错误的struct page或者地址会导致系统，因为内核是完全相信自己的：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">free_pages</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> addr, <span class="keyword">unsigned</span> <span class="keyword">int</span> order)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">free_page</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> addr)</span></span>;</span><br></pre></td></tr></table></figure>
-<h2 id="kmalloc"><a href="#kmalloc" class="headerlink" title="kmalloc()"></a>kmalloc()</h2><p>kmalloc()函数与用户控件malloc()类似，都是以字节为单位进行分配，只是多了一个flags参数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/slab.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">kmalloc</span><span class="params">(<span class="keyword">size_t</span> size, <span class="keyword">gfp_t</span> flags)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>在返回指针之后，需要检查返回的是不是NULL，如果是，需要处理该错误。</p>
-<h3 id="gfp-mask标志"><a href="#gfp-mask标志" class="headerlink" title="gfp_mask标志"></a>gfp_mask标志</h3><p>这些分配器标志可以分为三类：行为修饰符、区修饰符以及类型</p>
-<h4 id="行为修饰符"><a href="#行为修饰符" class="headerlink" title="行为修饰符"></a>行为修饰符</h4><p>常见的行为修饰符，比如__GFP_WAIT（分配器可以睡眠），__GFP_HIGH（分配器可以访问紧急时间缓冲池），还有一些其它的修饰符。</p>
-<h4 id="区修饰符"><a href="#区修饰符" class="headerlink" title="区修饰符"></a>区修饰符</h4><p>区修饰符则是表示内存区应当从何处分配：</p>
-<ul>
-<li>__GFA_DMA：从ZONE_DMA分配；</li>
-<li>__GFA_DMA32：从ZONE_DMA32分配；</li>
-<li>__GFA_HIGNMEN：从ZONE_HIGNMEM或ZONE_NORMAL分配；</li>
-</ul>
-<h3 id="类型标识"><a href="#类型标识" class="headerlink" title="类型标识"></a>类型标识</h3><p>类型标识更像是结合上面两种修饰符来完成特定类型的处理。</p>
-<p>比如用于中断程序，不能睡眠时：GFP_ATOMIC；分配让分配器睡眠，交换、一些页到硬盘，可以用GFP_KERNEL。</p>
-<h3 id="kfree"><a href="#kfree" class="headerlink" title="kfree()"></a>kfree()</h3><p>释放由kmalloc()分配的内存块，kfree(NULL)是安全的。</p>
-<h2 id="vmalloc"><a href="#vmalloc" class="headerlink" title="vmalloc()"></a>vmalloc()</h2><p>vmalloc类似kmalloc，只不过kmalloc分配的是物理地址连续的内存，而vmalloc分配的是虚拟地址连续的内存。</p>
-<p>虽然一般只有硬件设备才需要物理地址连续的内存，但内核多数也是使用kmalloc进行分配，基于性能的考虑，vmalloc获得的页必须要逐个映射到虚拟地址，这会导致大量TLB抖动。当然，为了获取大内存，一般使用vmalloc</p>
-<h2 id="slab层"><a href="#slab层" class="headerlink" title="slab层"></a>slab层</h2><p>为了避免频繁地分配和回收，linux内核提供了slab分配器，作为通用数据结构缓存层。</p>
-<h3 id="slab层的设计"><a href="#slab层的设计" class="headerlink" title="slab层的设计"></a>slab层的设计</h3><p>slab层把不同的对象划分为不同的高速缓存组，因此可能一个高速缓存组存放着进程描述符，另一个高速缓存存放着索引结点。</p>
-<p>一般来说，每个高速缓存由若干个slab组成，而slab可能仅仅由一个页面组成，因此每个slab都包含一些对象成员。对于slab来说，只有三种状态：满、部分满或者空。在分配时，先从部分满的分配，再考虑空的slab，最后再考虑创建一个slab。</p>
-<p>每个高速缓存都使用kmem_cache结构表示，其中有三个链表：slabs_full，slabs_partial和slabs_empty。链表中含有以下的slab结构：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">slab</span> &#123;</span></span><br><span class="line">  	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> colouroff; <span class="comment">//slab着色偏移量</span></span><br><span class="line">    <span class="keyword">void</span> *s_mem; <span class="comment">//slab中第一个对象</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> inuse; <span class="comment">//slab中已分配的对象数</span></span><br><span class="line">    <span class="keyword">kmem_bufctl_t</span> <span class="built_in">free</span>; <span class="comment">//第一个空闲对象</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>slab分配器可以创建新的slab，这是通过函数__get_free_pages()实现的，分配的页大小为2的幂次方。</p>
-<h3 id="slab分配器的接口"><a href="#slab分配器的接口" class="headerlink" title="slab分配器的接口"></a>slab分配器的接口</h3><p>一个新的高速缓存通过函数kmem_cache_create()创建。需要指定高速缓存中每个元素的大小和第一个对象的偏移以保证对齐。</p>
-<h2 id="在栈上的静态分配"><a href="#在栈上的静态分配" class="headerlink" title="在栈上的静态分配"></a>在栈上的静态分配</h2><p>每个进程的内核栈大小依赖于体系结构，用户空间能够负担起非常大的栈，并且栈可以动态正增长。</p>
-<h3 id="单页内核栈"><a href="#单页内核栈" class="headerlink" title="单页内核栈"></a>单页内核栈</h3><p>在2.6系列的内核早期，可以设置一个单页内核栈，即进程的内核栈只有一页大小。一方面可以减少内存消耗，另一方面可以避免因为内存碎片的增多，难以寻找未分配的连续的页。</p>
-<h3 id="在栈上光明正大的工作"><a href="#在栈上光明正大的工作" class="headerlink" title="在栈上光明正大的工作"></a>在栈上光明正大的工作</h3><p>在栈上进行大量的静态分配是很危险的，因为会发送栈溢出，导致邻堆末端的东西被覆盖。因此尽量使用动态分配，让函数所有的局部变量所占空间之和不超过几百字节。</p>
-<h2 id="高端内存的映射"><a href="#高端内存的映射" class="headerlink" title="高端内存的映射"></a>高端内存的映射</h2><p>高端内存，就是不会永久映射到内核地址空间上的内存，在x86体系上，所有高于896MB的物理内存多是高端内存。</p>
-<h3 id="永久映射"><a href="#永久映射" class="headerlink" title="永久映射"></a>永久映射</h3><p>要映射一个给定的page结构到内核地址空间：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">kmap</span><span class="params">(struct page* page)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>这个函数在高端内存或者地段内存中都能使用</p>
-<h3 id="临时映射"><a href="#临时映射" class="headerlink" title="临时映射"></a>临时映射</h3><p>临时映射（原子映射）是为了创建一个映射而当前上下文又不能睡眠时提供的，内核可以原子地把高端内存中的一个页映射到某个保留的映射中。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">kmap_atomic</span><span class="params">(struct page *page, <span class="keyword">enum</span> km_type type)</span></span>;</span><br></pre></td></tr></table></figure>
-<h2 id="分配函数的选择"><a href="#分配函数的选择" class="headerlink" title="分配函数的选择"></a>分配函数的选择</h2><p>上面我们讲了多种分配函数，但如何选择呢？</p>
-<p>如果内核需要连续的物理内存，应该使用kmalloc；</p>
-<p>如果需要连续的虚拟内存，应该使用vmalloc，但性能相对于kmalloc会低一点；</p>
-<p>对于高端内存，可以使用alloc_pages，返回一个struct page的结构指针；如果要得到真正的指针，应该使用kmap()，将高端内存映射到内核逻辑地址；</p>
-<p>如果要频繁创建和撤销大的数据结构，slab高速缓存是一种更好的选择，slab层通过维持一个对象高速缓存，避免频繁地分配和释放内存，只需要根据需要从缓存中得到对象就可以了。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1946,7 +1917,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">199</span>
+                <span class="site-state-item-count">200</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

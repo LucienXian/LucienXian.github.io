@@ -265,6 +265,135 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/19/Joining-and-Detaching-Threads/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/19/Joining-and-Detaching-Threads/" itemprop="url">Joining and Detaching Threads</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-19T10:57:30+08:00">
+                2019-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="C-11-Multithreading-–-Part-2-Joining-and-Detaching-Threads"><a href="#C-11-Multithreading-–-Part-2-Joining-and-Detaching-Threads" class="headerlink" title="C++11 Multithreading – Part 2: Joining and Detaching Threads"></a>C++11 Multithreading – Part 2: Joining and Detaching Threads</h1><h2 id="Joining-Threads-with-std-thread-join"><a href="#Joining-Threads-with-std-thread-join" class="headerlink" title="Joining Threads with std::thread::join()"></a>Joining Threads with std::thread::join()</h2><p>一个线程启动后，另一个线程可以等待该线程完成。这个特别的需求可以用join来实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">th</span><span class="params">(funcPtr)</span></span>;</span><br><span class="line">th.join();</span><br></pre></td></tr></table></figure>
+<h2 id="Detaching-Threads-using-std-thread-detach"><a href="#Detaching-Threads-using-std-thread-detach" class="headerlink" title="Detaching Threads using std::thread::detach()"></a>Detaching Threads using std::thread::detach()</h2><p>被分离的线程也叫守护(daemon)/后台(background)线程，这个需求可以调用std::function来完成：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">th</span><span class="params">(funcPtr)</span></span>;</span><br><span class="line">th.detach();</span><br></pre></td></tr></table></figure>
+<h2 id="Be-careful-with-calling-detach-and-join-on-Thread-Handles"><a href="#Be-careful-with-calling-detach-and-join-on-Thread-Handles" class="headerlink" title="Be careful with calling detach() and join() on Thread Handles"></a>Be careful with calling detach() and join() on Thread Handles</h2><h3 id="Case-1-Never-call-join-or-detach-on-std-thread-object-with-no-associated-executing-thread-std-thread-threadObj-WorkerThread-threadObj-join-threadObj-join-It-will-cause-Program-to-Terminate"><a href="#Case-1-Never-call-join-or-detach-on-std-thread-object-with-no-associated-executing-thread-std-thread-threadObj-WorkerThread-threadObj-join-threadObj-join-It-will-cause-Program-to-Terminate" class="headerlink" title="Case 1: Never call join() or detach() on std::thread object with no associated executing thread std::thread threadObj( (WorkerThread()) ); threadObj.join(); threadObj.join(); // It will cause Program to Terminate"></a>Case 1: Never call join() or detach() on std::thread object with no associated executing thread std::thread threadObj( (WorkerThread()) ); threadObj.join(); threadObj.join(); // It will cause Program to Terminate</h3><p>比如在一个没有相关线程的线程上执行join或者detach都会导致程序终止：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">threadObj.join();</span><br><span class="line">threadObj.join(); <span class="comment">// It will cause Program to Terminate</span></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">threadObj.detach();</span><br><span class="line">threadObj.detach(); <span class="comment">// It will cause Program to Terminate</span></span><br></pre></td></tr></table></figure>
+<p>为了避免这个问题，每次调用join()或者detach()之前都应该检查线程状态：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line"><span class="keyword">if</span>(threadObj.joinable())</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Detaching Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj.detach();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(threadObj.joinable())    </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Detaching Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj.detach();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj2</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line"><span class="keyword">if</span>(threadObj2.joinable())</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Joining Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj2.join();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(threadObj2.joinable())    </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Joining Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj2.join();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Case-2-Never-forget-to-call-either-join-or-detach-on-a-std-thread-object-with-associated-executing-thread"><a href="#Case-2-Never-forget-to-call-either-join-or-detach-on-a-std-thread-object-with-associated-executing-thread" class="headerlink" title="Case 2 : Never forget to call either join or detach on a std::thread object with associated executing thread"></a><strong>Case 2 : Never forget to call either join or detach on a std::thread object with associated executing thread</strong></h3><p>如果一个线程还有相关联的在执行的线程，但却没有对此执行join()或者detach()，那么在destructor中会终止该程序。因为destructor会检查线程是否joinable。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WorkerThread</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">()</span>     </span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Worker Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">    <span class="comment">// Program will terminate as we have't called either join or detach with the std::thread object.</span></span><br><span class="line">    <span class="comment">// Hence std::thread's object destructor will terminate the program</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1494,158 +1623,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/06/特征选择与稀疏学习/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/06/特征选择与稀疏学习/" itemprop="url">特征选择与稀疏学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-06T22:20:06+08:00">
-                2019-04-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="特征选择与稀疏学习"><a href="#特征选择与稀疏学习" class="headerlink" title="特征选择与稀疏学习"></a>特征选择与稀疏学习</h1><h2 id="子集搜索与评价"><a href="#子集搜索与评价" class="headerlink" title="子集搜索与评价"></a>子集搜索与评价</h2><p>对一个学习任务来说，有些属性很关键，而从给定的特征集合中选择出相关特征子集的过程，就叫”特征选择”(feature selection)。</p>
-<p>除了无用特征，还有一类冗余特征，它的信息是从其它特征推断出来的。大部分时候这些特征是不起作用，但有时也会起到中间特征的作用，使得学习更加方便。</p>
-<p>提取特征的一个可行做法是先产生一个候选子集，评估好坏，再根据评估结果去产生下一个候选子集，依次迭代。</p>
-<ol>
-<li>子集搜索</li>
-</ol>
-<p>这第一个环节就是”子集搜索”，给定特征集合${a_1, a_2, …, a_d}$。对于前向搜索，对这个d个特征子集进行评价，假设${a_2}$最优，接着从剩下的d-1个特征选一个特征，假设此时两特征集合${a_2, a_4}$最优，并且由于${a_2}$效果更好，则选择${a_2, a_4}$。依次进行，直到最优的候选子集不如上一轮选定集合，则停止生成候选子集。而对于后向搜索，则是每次减去一个无关特征。</p>
-<p>这种贪心的策略可能会遇到这样一种情况，第三轮选了${a_2,a_4,a_5}$，而第四轮却可能是${a_2,a_4,a_6,a_8}$更好。这是不可避免的。</p>
-<ol start="2">
-<li>子集评价</li>
-</ol>
-<p>给定数据集D，假设D中第i类样本所占的比例为$p_i(i=1,2,..,|y|)$，另外对于属性子集A，假定根据其取值将D划分为V个子集:${D^1, D^2, ,,., D^V}$，每个子集中的样本在属性A上取值相同，则计算属性子集A的信息增益：<br>$$<br>Gain(A) = Ent(D) - \sum_{v=1}^V \frac{|D^v|}{|D|}Ent(D^v) \<br>Ent(D) = - \sum_{k=1}^{|y|} p_k log_2p_k<br>$$<br>Gain(A)越大，意味着特征子集A对数据集D的划分与样本标记信息对于D的真实划分，差异越小，则越有助于分类。</p>
-<p>常见的特征选择方法有：过滤式、包裹式、嵌入式</p>
-<h2 id="过滤式选择"><a href="#过滤式选择" class="headerlink" title="过滤式选择"></a>过滤式选择</h2><p>过滤式方法先对数据集进行特征选择——“过滤”，然后再训练学习器。Relief是一种过滤式特征选择方法，其设计了一个”相关统计量”来度量特征的重要性，该统计量是一个向量，每个分量对应一个初始特征，特征子集的重要性由子集中每个特征所对应的相关统计量分量之和所决定。</p>
-<p>Relief的关键是如何确定相关统计量。假设样本为${(x_1,y_1), (x_2, y_2),…, (x_m,y_m)}$。对于每个样本$x_i$，该算法先在$x_i$的同类样本中寻找最近邻$x_{i,nh}$，再从异样样本中寻找其最近邻$x_{i,nm}$。相关统计量对应属性j的分量为：<br>$$<br>\delta^j = \sum_i -diff(x_i^j, x_{i,nh}^j)^2 + \sum_{l\neq k}(x_i^j, x_{i,nm}^j)^2<br>$$<br>如果属性j为离散型，则$diff(x_a^j, x_b^j)^2$的值域为[0, 1]。若是连续型，则是$|x_a^j-x_b^j|$。</p>
-<p>由上式可以看出，若$x_i$与同类样本更近，则属性j对于区分同类与异类的样本是有益的。</p>
-<p>上述Relief算法是为二分类问题准备的，其扩展变形Relief-F则能够处理多分类问题：<br>$$<br>\delta^j = \sum_i -diff(x_i^j, x_{i,nh}^j)^2 + \sum_{l\neq k}(p_l \times (x_i^j, x_{i,nm}^j)^2)<br>$$<br>其中$p_l$为第l类样本在数据集D中所占的比例。</p>
-<h2 id="包裹式选择"><a href="#包裹式选择" class="headerlink" title="包裹式选择"></a>包裹式选择</h2><p>包裹式特征选择直接把最终将要使用的学习器性能最为特征子集的最终评价标准，因为是为了目的学习器选择特征子集，因此往往比过滤式选择性能更好。</p>
-<p>LVW是其中的代表，算法描述为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">输入： 数据集D</span><br><span class="line">			特征集A</span><br><span class="line">			学习算法O</span><br><span class="line">			停止条件控制参数T</span><br><span class="line">过程：</span><br><span class="line">1. E = inf</span><br><span class="line">2. d = |A|</span><br><span class="line">3. A* = A</span><br><span class="line">4. t = O</span><br><span class="line">5. while t &lt; T do</span><br><span class="line">		随机生成特征子集A&apos;</span><br><span class="line">		d&apos; = |A&apos;|</span><br><span class="line">		E&apos; = CrossValidation(O(D^A&apos;))</span><br><span class="line">		if (E&apos;&lt;E) or ((E&apos;=E)and(d&apos;&lt;d)) then</span><br><span class="line">			t = 0</span><br><span class="line">			E = E&apos;</span><br><span class="line">			d = d&apos;</span><br><span class="line">			A* = A&apos;</span><br><span class="line">		else</span><br><span class="line">			t = t+1</span><br><span class="line">		endif</span><br><span class="line">	endwhile</span><br><span class="line">输出A&apos;</span><br></pre></td></tr></table></figure>
-<p>由于特征搜索时使用了随机策略，因此每次特征子集评价都需要训练学习器，因此开销很大，我们设置停止条件控制参数。</p>
-<h2 id="嵌入式选择与L1正则化"><a href="#嵌入式选择与L1正则化" class="headerlink" title="嵌入式选择与L1正则化"></a>嵌入式选择与L1正则化</h2><p>嵌入式特征选择是将特征选择与学习器训练过程融合为一体，给定数据集$D = {(x_1,y_1),(x_2, y_2),…,(x_m,y_m)}$，考虑简单的线性回归模型，以平方差为损失函数：<br>$$<br>min_w \sum_{i=1}^m(y_i-w^Tx_i)^2<br>$$<br>为了避免过拟合，加入范数正则化：<br>$$<br>min_w \sum_{i=1}^m(y_i-w^Tx_i)^2 + \lambda||w||^2_2—-L_2范数 \<br>min_w \sum_{i=1}^m(y_i-w^Tx_i)^2 + \lambda||w||_1—-L_1范数<br>$$<br>L1范数相对于L2范数更容易带来稀疏解，即它求得的w具有更少的非零分量。假设x只有两个属性，同理解w也只有两个分量，因此我们画出等值线：</p>
-<p><img src="https://upload.wikimedia.org/wikipedia/en/f/fd/L1_and_L2_balls.jpg" alt="img"></p>
-<p>可以看到的是，由于上面w的解必须要在误差项与正则化项之间折中，因此即有图中的误差项等值线与正则化项等值线相交，采用L1范数时，相交点一般在坐标轴上，则w1或者w2为0。这意味着采用L1范数正则化的结果是得到了对应w的非零分量的特征。</p>
-<p>其特征选择过程与学习器训练融为一体，同时完成。</p>
-<h2 id="稀疏表示与字典学习"><a href="#稀疏表示与字典学习" class="headerlink" title="稀疏表示与字典学习"></a>稀疏表示与字典学习</h2><p>假设数据集D是一个矩阵，行对应每个样本，列则对应特征，特征选择考虑的是如何使得矩阵变得稀疏，即某些特征与学习任务无关，我们可以去掉这些咧从而提高学习速度。</p>
-<p>但考虑另一种稀疏性，即D对应的矩阵中存在很多零元素。但样本具有这样的稀疏表达形式时，学习任务会得到许多好处，例如线性支持向量机能使大多数问题变得线性可分，同时也不会带来存储上的负担。</p>
-<p>若提供的数据集是稠密的，我们需要学习出一个”字典”，从而使得稠密数据转化为”恰当稀疏”的数据。</p>
-<p>给定数据集${x_1,x_2,…,x_m}$，字典学习的最简单形式为：<br>$$<br>min_{B,\alpha_i} || x_i-B\alpha_i ||^2_2 + \lambda \sum_{i=1}^m || \alpha_i ||_1<br>$$<br>其中B为字典矩阵，$\alpha_i$则是样本$x_i$的稀疏表示。该式的第一项是希望$\alpha_i$能够尽可能重构样本，而第二项则是希望$\alpha_i$尽可能稀疏。</p>
-<h2 id="压缩感知"><a href="#压缩感知" class="headerlink" title="压缩感知"></a>压缩感知</h2><p>在现实任务中，我们常希望能够通过部分信息来恢复全部信息，假定有长度为m的离散信号x，采样后得到长度为n的信号y，其中n&lt;&lt;m：<br>$$<br>y = \phi x<br>$$<br>其中$\phi \in R^{n \times m}$表示对信号x的测量矩阵，而由于n&lt;&lt;m，因此上式是一个欠定方程。</p>
-<p>现在假设存在某个线性变换$\psi \in R^{n \times m}$，使得y表示为：<br>$$<br>y = \phi \psi s = As<br>$$<br>若能恢复出s，我们也可以最后恢复出x。虽然这个问题仍然是欠定的，但如果s具有稀疏性，我们就可以解决这个问题了。这里A的作用则类似于字典，能够将信号转换为稀疏表示。</p>
-<p>压缩感知分为”感知测量”和”重构恢复”两个阶段，前者关注如何对原始信号进行处理以获得稀疏样本表示，后者则是基于稀疏性从少量观察中恢复原信号。</p>
-<p>对于大小为nXm的矩阵A，若存在常数$\delta_k \in (0, 1)$使得对任意常量s和A的所有子矩阵$A_k \in R^{n\times k}$有：<br>$$<br>(1-\delta_k)||s||_2^2 \leq || A_ks ||_2^2 \leq (1+\delta_k)||s||_2^2<br>$$<br>则称A满足k限定等距性，此时可通过下面的优化问题从y中恢复出稀疏信号s：<br>$$<br>min_s || s ||_0 \<br>s.t. \ \ y = As<br>$$<br>但该式涉及到L0范数最小化，这是一个NP难的问题，但由于L1范数最小化在一定条件下与L0范数最小化问题同解，因此有：<br>$$<br>min_s || s ||_1 \<br>s.t. \ \ y = As<br>$$</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1694,7 +1671,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">199</span>
+                <span class="site-state-item-count">200</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
