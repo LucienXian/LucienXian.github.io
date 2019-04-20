@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/20/Passing-Arguments-to-Threads/</loc>
+    
+    <lastmod>2019-04-20T03:49:31.343Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/19/Joining-and-Detaching-Threads/</loc>
     
     <lastmod>2019-04-19T02:58:01.337Z</lastmod>
