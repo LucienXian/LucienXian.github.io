@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-20T03:49:31.343Z</updated>
+  <updated>2019-04-21T06:29:08.030Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Sharing Data &amp; Race Conditions</title>
+    <link href="http://yoursite.com/2019/04/21/Sharing-Data-Race-Conditions/"/>
+    <id>http://yoursite.com/2019/04/21/Sharing-Data-Race-Conditions/</id>
+    <published>2019-04-21T06:28:22.000Z</published>
+    <updated>2019-04-21T06:29:08.030Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Sharing-Data-amp-Race-Conditions"><a href="#Sharing-Data-amp-Race-Conditions" class="headerlink" title="Sharing Data &amp; Race Conditions"></a>Sharing Data &amp; Race Conditions</h1><p>多线程编程的一个经典问题就是<strong>Race Condition</strong>。</p><h2 id="What-is-a-Race-Condition"><a href="#What-is-a-Race-Condition" class="headerlink" title="What is a Race Condition?"></a>What is a Race Condition?</h2><p>race condition是多线程编程的一个经典bug，它指的是当多个线程并行执行某些操作时，它们访问公共的内存区域。此时有若干个线程回去修改这篇内存区域的的数据。</p><h2 id="A-Practical-example-of-Race-Condition"><a href="#A-Practical-example-of-Race-Condition" class="headerlink" title="A Practical example of Race Condition"></a>A Practical example of Race Condition</h2><p>假设有这样的一个钱包类，我们提供一个成员函数addMoney()：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Wallet</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> mMoney;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Wallet() :mMoney(<span class="number">0</span>)&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getMoney</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> mMoney; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addMoney</span><span class="params">(<span class="keyword">int</span> money)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">       <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; money; ++i)</span><br><span class="line">       &#123;</span><br><span class="line">          mMoney++;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>接着我们创建5个线程，共享这个钱包类的对象，并行地添加1000到哪步的money变量，预期结果钱包类的结果应该是5000。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">testMultithreadedWallet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Wallet walletObject;</span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::thread&gt; threads;</span><br><span class="line">   <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)&#123;</span><br><span class="line">        threads.push_back(<span class="built_in">std</span>::thread(&amp;Wallet::addMoney, &amp;walletObject, <span class="number">1000</span>));</span><br><span class="line">   &#125;</span><br><span class="line"> </span><br><span class="line">   <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threads.size() ; i++)</span><br><span class="line">   &#123;</span><br><span class="line">       threads.at(i).join();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> walletObject.getMoney();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">int</span> val = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; <span class="number">1000</span>; k++)</span><br><span class="line">  &#123;</span><br><span class="line">     <span class="keyword">if</span>((val = testMultithreadedWallet()) != <span class="number">5000</span>)</span><br><span class="line">     &#123;</span><br><span class="line">       <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Error at count = "</span>&lt;&lt;k&lt;&lt;<span class="string">" Money in Wallet = "</span>&lt;&lt;val &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">     &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>但由于并发时，mMoney++并不是原子操作，而是分为三个机器指令：</p><ul><li>从存储加载mMoney到寄存器；</li><li>递增寄存器的值；</li><li>把寄存器的值更新回存储；</li></ul><p>以下是出现的几种非预期结果：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Error at count = 14 Money in Wallet = 4000</span><br><span class="line">Error at count = 44 Money in Wallet = 4112</span><br><span class="line">Error at count = 52 Money in Wallet = 4387</span><br><span class="line">Error at count = 65 Money in Wallet = 4904</span><br><span class="line">Error at count = 81 Money in Wallet = 4907</span><br><span class="line">Error at count = 98 Money in Wallet = 4666</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Sharing-Data-amp-Race-Conditions&quot;&gt;&lt;a href=&quot;#Sharing-Data-amp-Race-Conditions&quot; class=&quot;headerlink&quot; title=&quot;Sharing Data &amp;amp; Race Cond
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>Passing Arguments to Threads</title>
@@ -451,29 +474,6 @@
     
     
       <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>深度学习中的正则化&lt;一&gt;——DeepLearning系列</title>
-    <link href="http://yoursite.com/2019/02/18/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E6%AD%A3%E5%88%99%E5%8C%96-%E4%B8%80-%E2%80%94%E2%80%94DeepLearning%E7%B3%BB%E5%88%97/"/>
-    <id>http://yoursite.com/2019/02/18/深度学习中的正则化-一-——DeepLearning系列/</id>
-    <published>2019-02-17T16:23:19.000Z</published>
-    <updated>2019-02-17T16:23:43.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="深度学习中的正则化-lt-一-gt"><a href="#深度学习中的正则化-lt-一-gt" class="headerlink" title="深度学习中的正则化&lt;一&gt;"></a>深度学习中的正则化&lt;一&gt;</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>深度学习的一个核心问题就是提高模型的泛化性，即不仅仅要在训练数据上表现好，还能在新输入上有更好的泛化，这些策略就是正则化。</p><p>首先来理解偏差和方差的含义：</p><ul><li>方差度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响。</li><li>偏差度量了学习算法的期望预测与真实结果的偏离程度，即刻画了学习算法本身的拟合能力</li></ul><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/var_bias_dl.png" alt="img"></p><p>在一些过拟合的场景下，正则化会以偏差的增加来换取方差的减少。</p><h2 id="参数范数惩罚"><a href="#参数范数惩罚" class="headerlink" title="参数范数惩罚"></a>参数范数惩罚</h2><p>许多正则化方法会对目标函数J增加一个参数范数惩罚$\Omega(\theta)$，限制模型的学习能力，目标函数变为：<br>$$<br>J’(\theta, X, y) = J(\theta, X, y) + \alpha \Omega(\theta)<br>$$<br>$\alpha$越大，对应的正则化惩罚就越大。当我们的训练算法最小化正则化后的目标函数J时，它会降低原始目标J关于<br>训练数据的误差并同时减小在某些衡量标准下参数θ(或参数子集)的规模。</p><p>一般情况下，在神经网络中我们只对权重做惩罚而不对偏置做惩罚。精确拟合偏置所需要的数据比拟合权重少，我们不对其进行正则化也不会导致太大的方差，而且正则化偏置参数可能会导致明显的欠拟合。</p><h3 id="L2参数正则化"><a href="#L2参数正则化" class="headerlink" title="L2参数正则化"></a>L2参数正则化</h3><p>$L^2$参数范数惩罚是最简单最常见的正则化方式，这个策略添加了一个正则项（权值向量w中各个元素的平方和），使得权重更加接近原点。这个目标函数就变成了：<br>$$<br>J’(w, X, y)=\frac{\alpha}{2}w^Tw+J(w, X, y)<br>$$<br>与之对应的梯度为：<br>$$<br>\nabla_wJ’(w, X, y) = \alpha w+\nabla_wJ(w, X, y)<br>$$<br>那么更新权重的方式也会发生变化：<br>$$<br>w = w-\epsilon(\alpha w+\nabla_wJ(w, X, y)) = (1-\epsilon \alpha)w-\epsilon \nabla_wJ(w, X, y)<br>$$<br>我们可以看到每步更新执行时都会先收缩权重向量。</p><p>我们进一步分析整个训练过程中会发生什么，令w<em>为未正则化的目标函数取得最小训练误差时的权重向量，那么近似的误差函数就是：<br>$$<br>J’(\theta) = J(w^</em>) + \frac{1}{2}(w-w^<em>)^TH(w-w^</em>)<br>$$<br>其中H是J在w<em>处计算的Hessian矩阵，当$J’$取得最小时，其梯度为：<br>$$<br>\nabla_wJ’(w) = H(w-w^</em>) = 0<br>$$<br>然后我们添加上权重衰减的梯度，其中w是此时的最优点：<br>$$<br>\alpha w+H(w-w^*) = 0<br>$$</p><p>$$<br>w = (H+\alpha I)^{-1}Hw^*<br>$$</p><p>可以看到当$\alpha$趋向于0的时候，正则化的解w会趋向$w^*$。那么当$\alpha$增加时，在显著减小目标函数方向上的参数会保留得相对完好，而在无助于目标函数减小的方向(对应 Hessian 矩阵较小的特征值)上改变参数不会显著增加梯度，这种不重要方向对应的分量会在训练过程中因正则化而衰减掉。</p><p>简单来说，L2正则化能让学习算法对与具有较高方差的输入x更加敏感，使得与输出目标的协方差较小的特征的权重收缩，</p><h3 id="L1参数正则化"><a href="#L1参数正则化" class="headerlink" title="L1参数正则化"></a>L1参数正则化</h3><p>L1正则化则是添加一个另外的正则化项（权值向量w中各个元素的绝对值之和）：<br>$$<br>J’(w, X, y)=\alpha||w||_1+J(w, X, y)<br>$$<br>对应的梯度为：<br>$$<br>\nabla_wJ’(w, X, y) = \alpha sign(w)+\nabla_wJ(w, X, y)<br>$$<br>其中sign(w)只是简单地取w各个元素的正负号，其中若w&gt;0，则sign(w)=1；若w&lt;0，则sign(w)=−1；若w=0，则sign(w)=0。</p><p>相比L2正则化，L1正则化会产生更加稀疏的解，这里的稀疏指的是最优值中的一些参数为0。由L1正则化导出的稀疏性质被广泛用于特征选择机制，从可用的特征子集中选择出有意义的特征。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;深度学习中的正则化-lt-一-gt&quot;&gt;&lt;a href=&quot;#深度学习中的正则化-lt-一-gt&quot; class=&quot;headerlink&quot; title=&quot;深度学习中的正则化&amp;lt;一&amp;gt;&quot;&gt;&lt;/a&gt;深度学习中的正则化&amp;lt;一&amp;gt;&lt;/h1&gt;&lt;h2 id=&quot;概述&quot;
-      
-    
-    </summary>
-    
-    
-      <category term="Deep Learning" scheme="http://yoursite.com/tags/Deep-Learning/"/>
     
   </entry>
   

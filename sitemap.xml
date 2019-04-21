@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/21/Sharing-Data-Race-Conditions/</loc>
+    
+    <lastmod>2019-04-21T06:29:08.030Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/20/Passing-Arguments-to-Threads/</loc>
     
     <lastmod>2019-04-20T03:49:31.343Z</lastmod>
