@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/22/Using-mutex-to-fix-Race-Conditions/</loc>
+    
+    <lastmod>2019-04-22T10:22:25.135Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/21/Sharing-Data-Race-Conditions/</loc>
     
     <lastmod>2019-04-21T06:29:08.030Z</lastmod>

@@ -265,6 +265,159 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/12/深度探索C-对象模型-三/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/12/深度探索C-对象模型-三/" itemprop="url">深度探索C++对象模型<三></三></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-12T23:08:10+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="The-Semantics-of-Constructors"><a href="#The-Semantics-of-Constructors" class="headerlink" title="The Semantics of Constructors"></a>The Semantics of Constructors</h1><h2 id="Default-Constructor的建构操作"><a href="#Default-Constructor的建构操作" class="headerlink" title="Default Constructor的建构操作"></a>Default Constructor的建构操作</h2><p><strong>默认构造函数会在需要的时候被编译器产生出来</strong>。这里的关键是：被谁需要，做什么事情。</p>
+<h2 id="被谁需要"><a href="#被谁需要" class="headerlink" title="被谁需要"></a>被谁需要</h2><p>当编译器需要的时候才会合成，但编译器不会为数据成员进行初始化，也就是不会在默认构造函数中进行初始化。考虑下面的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> &#123;</span><span class="keyword">public</span>: <span class="keyword">int</span> val; Foo *pnext; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo_bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Foo bar;</span><br><span class="line">    <span class="keyword">if</span> (bar.val||bar.pnext)<span class="comment">//...do someting</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意这样的情况下，编译器并没有对var和pnext进行初始化。</p>
+<h2 id="什么时候需要"><a href="#什么时候需要" class="headerlink" title="什么时候需要"></a>什么时候需要</h2><ul>
+<li>“带有默认构造函数的成员类对象”</li>
+</ul>
+<p>如果一个类没有构造函数，但它有一个成员对象，该成员对象拥有默认构造函数。那么编译器会为该类合成默认构造函数，但要到需要使用的时候才会合成。考虑如下的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>  </span></span><br><span class="line"><span class="class">&#123;</span>  </span><br><span class="line">    <span class="keyword">public</span>:  </span><br><span class="line">        Foo(); <span class="comment">//构造函数  </span></span><br><span class="line">        ...  </span><br><span class="line">&#125;;  </span><br><span class="line">  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bar</span>  </span></span><br><span class="line"><span class="class">&#123;</span>  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">    Foo foo; <span class="comment">//是一个member object, 而其class Foo 拥有default constructor.  </span></span><br><span class="line">    <span class="keyword">char</span> *str;  </span><br><span class="line">&#125;;  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo_bar</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">    Bar bar <span class="comment">//合成constructor  </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外，如果一个类内部含有多个拥有默认构造函数的对象，那么类会按照声明顺序调用对象的默认构造函数。</p>
+<p>如果类内已经有默认构造函数，那么编译器会对默认构造函数进行扩张，初始化类内成员对象。</p>
+<ul>
+<li>带有默认构造函数的基类</li>
+</ul>
+<p>如果一个没有任何构造函数的类派生自一个带有默认构造函数的基类，那么派生类中会合成一个默认构造函数，用来调用基类的构造函数。</p>
+<p>另外如果派生类中有其它构造函数（但没有默认构造函数），那么编译器会扩张所有的构造函数，来调用基类的默认构造函数。</p>
+<ul>
+<li>带有一个virtual function的class</li>
+</ul>
+<p>考虑这两种情况，会合成默认构造函数：</p>
+<ol>
+<li>class声明一个virtual function</li>
+<li>class派生自一个继承链，其中有一个以上的virtual base class</li>
+</ol>
+<p>这种情况是因为编译器需要为类生成virtual table和指向virtual table的指针。因此把这两个操作放在合成的构造函数中进行。</p>
+<ul>
+<li>带有一个virtual base class的class</li>
+</ul>
+<p>因为编译器必须要使得每个派生类的对象都能够拥有虚基类的偏移位置，所以也需要在合成的默认构造函数执行操作。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>常见的两个误解：</p>
+<ol>
+<li>一个类没有定义默认构造函数，就会合成。</li>
+<li>编译器合成的默认构造函数会为每个成员设定初始值。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/10/APUE-一/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1511,144 +1664,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/05/B-tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/05/B-tree/" itemprop="url">B+ tree</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T16:26:30+08:00">
-                2018-03-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="B-树"><a href="#B-树" class="headerlink" title="B+ 树"></a>B+ 树</h1><h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>在实际的数据库产品中，为了满足高效率的查找操作，我们需要实现某种索引来进行查找，索引又通常通过B+树或者B树去实现（一般不用红黑树）</p>
-<h2 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h2><p>考虑到索引文件一般也很大，不可能将它们全部存储在内存中，而是存储在磁盘上。又由于介质等原因的不同，磁盘的IO比主存的IO要慢很多。因此要想提高效率，必须要减少磁盘IO的次数。</p>
-<p>为了达到这个目的，系统在发生缺页中断时都会直接读入一个block（page的整数倍）。假设B+树的高度为h，又因为通常设计成一个节点的大小对应于一个block，所以要查找特定的记录，最多只需要h次IO即可。</p>
-<p>而红黑树的深度是远比B+树要高的，所以一般情况下都只会使用B+树</p>
-<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>一颗M阶B+树的定义</p>
-<ul>
-<li><p>根节点只有一个，子树有[2, m]</p>
-</li>
-<li><p>除了根节点之外的非叶子节点，包含的子树为[[m/2],m]</p>
-</li>
-<li><p>所有非根节点的key数目为[[m/2], m]</p>
-</li>
-<li><p>叶子节点都在同一层，叶子节点才含有key的信息，其它只是索引</p>
-</li>
-<li><p>所有非叶子节点的key等于其子数中最大或者最小的key</p>
-</li>
-</ul>
-<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>插入时判断其是否不满足定义，按需进行分解操作</p>
-<p>删除时判断其是否不满足定义，按需进行合并操作v</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1697,7 +1712,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">202</span>
+                <span class="site-state-item-count">203</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

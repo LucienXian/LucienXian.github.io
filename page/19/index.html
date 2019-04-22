@@ -265,6 +265,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/16/智能指针的学习——CPP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/16/智能指针的学习——CPP/" itemprop="url">智能指针的学习——CPP</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-16T19:49:00+08:00">
+                2017-11-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h1><p>之前的文章有说过：在C++里，动态内存的分配是通过一对运算符——<strong>new和delete</strong>完成的。但这样往往会造成内存泄漏或者是在还是指针指向内存的时候释放了内存。</p>
+<p>因此标准库提供了两种智能指针来管理对象——shared_ptr(允许多个指针指向同一个内存)、unique_ptr(指针独占对象)，另外标准库还提供了一个weak_ptr的伴随类，指向shared_ptr管理的对象。</p>
+<h2 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h2><p>shared_ptr的目标是：在指向的对象不再被使用的时候，即自动释放相关对象的内存。</p>
+<h3 id="计数器"><a href="#计数器" class="headerlink" title="计数器"></a>计数器</h3><p>智能指针内部有一个计数器，无论何时我们拷贝一个shared_ptr，计数器都会递增，它的作用就是记录着当前有多少个指针在引用着这个对象。</p>
+<p>当计数器为0时，智能指针会自动释放其管理的资源。</p>
+<blockquote>
+<p>当用一个shared_ptr去初始化另一个shared_ptr，作为参数传递进函数，以及作为函数返回值，引用计数都会递增；</p>
+<p>当给一个shared_ptr赋予新值，或者shared_ptr被销毁，如离开作用域，则引用计数递减。</p>
+</blockquote>
+<h3 id="销毁对象"><a href="#销毁对象" class="headerlink" title="销毁对象"></a>销毁对象</h3><p>当指向一个对象的shared_ptr被销毁时，shared_ptr类会自动递减所指向对象的引用计数，并检查是否为0，如果为0则去释放内存。</p>
+<h2 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h2><p>weak_ptr与shared_ptr最大的不同是weak_ptr在指向同一个对象时不能递增引用计数。</p>
+<p>它不可以控制所指向对象的生存周期，因为它指向的是一个由shared_ptr管理的对象。</p>
+<ul>
+<li>作用：防止shared_ptr的循环引用；<ul>
+<li>B持有指向A内成员的一个shared_ptr，A也持有指向B内成员的一个shared_ptr，此时A和B的生命周期互相由对方决定，事实上都无法从内存中销毁。 </li>
+</ul>
+</li>
+<li>作用获得this指针的shared_ptr，使得对象自身能够生产shared_ptr来管理自己；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/虚函数的学习-2-——CPP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1610,169 +1748,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/02/区块链学习-3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/02/区块链学习-3/" itemprop="url">区块链学习-3</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-02T12:08:59+08:00">
-                2017-11-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="共识算法"><a href="#共识算法" class="headerlink" title="共识算法"></a>共识算法</h1><p>共识（consensus）与昨天提到的一致性经常是放在一起讨论的，一致性指的是系统的结果状态，共识则是一个手段，过程，解决的是多个节点对某个proposal达成一致意见的过程。</p>
-<blockquote>
-<p>一般把出现故障但不伪造信息的情况成为“非拜占庭错误”；</p>
-<p>出现故障并且伪造信息进行恶意相应的称为“拜占庭错误”，同时对应结点，称为拜占庭节点；</p>
-</blockquote>
-<p><br></p>
-<h2 id="常见算法"><a href="#常见算法" class="headerlink" title="常见算法"></a>常见算法</h2><p><br></p>
-<h3 id="Paxos-算法-与-Raft算法"><a href="#Paxos-算法-与-Raft算法" class="headerlink" title="Paxos 算法 与 Raft算法"></a>Paxos 算法 与 Raft算法</h3><p>Paxos算法将节点分为了三个逻辑角色：</p>
-<ul>
-<li>proposer:提出一个题案，等待其它结点选择、批准，通常担任该角色的为客户端；每个编号都应该有一个ID，通常是递增ID；</li>
-<li>accepter: 负责对题案进行投票，是否接受该题案；</li>
-<li>learner:获取投票结果，但不参与投票，可以将投票结果传播到其他地方；</li>
-</ul>
-<p>基本过程：多个proposer争取到了提出提案的权利，得到权利的proposer发送提案给所有人，得到多数人确认通过的提案会成为最终批准的提案。</p>
-<p>为了保证accepter能够获知其它accepter也收到了自己的投票信息，验证自己的投票结果是否构成了大多数的意见，并且proposer能收到自己的投票，该算法得实现两个提交阶段：</p>
-<ul>
-<li>prepare：<ul>
-<li>有权利的proposer发送自己的提案到accepter；</li>
-<li>accepter保留着收到过的提案中最大的编号。如果收到了新的提案，而该提案比保留编号要大，则返回已接受的编号和提案内容，更新当前最大编号，意味着不接受小于当前最大编号的提案；</li>
-</ul>
-</li>
-<li>commit<ul>
-<li>proposer如果接受到多数的回复，则准备发出带有刚才提案ID的接收消息。如果收到的回复不带有新的提案，则说明锁定成功，可以发送自己的提案内容；如果收到了新的提案内容，则替换提案ID为接受的提案中最大的ID值；如果没有收到回复，则重发；</li>
-<li>accepter收到消息之后，发现该提案ID不小于已接受的最大提案ID，则接受该提案，并更新信息；</li>
-</ul>
-</li>
-<li>一旦多数accepter接受了共同的提案ID，则形成最终决议。</li>
-</ul>
-<p><br></p>
-<p>Raft算法也将服务器节点分为三种逻辑角色：</p>
-<ul>
-<li>Leader: 处理所有的客户端交互，一次只有一个leader；</li>
-<li>Follower: 刚开始集群中所有节点都是follower；</li>
-<li>Candidate: 能被宣称leader；</li>
-</ul>
-<p>基本过程：</p>
-<ol>
-<li>首先是选举。任何一个follower都能成为一个candidate，成为candidate后向其它的follower发起选举自己的请求，自己也可以投票给自己，一旦票数大于二分之一，则表示通过、达成一致，成为leader；选出leader后，leader需要定期向follower发送信息，表示自己的通知，如果在一定时间内follower没有收到信息，则认为leader宕机，重新选leader；</li>
-<li>以日志复制来表现raft算法，假设leader被选出后，此时客户端要求增加一个日志，leader会要求follower将该日志追加到自己的日志记录中去。多数的follower在追加日志成功后，会发出确认信息。然后，leader会通知所有的follower完成commit。</li>
-</ol>
-<blockquote>
-<p>如果在这个过程中，由于网络分区或者故障，leader只能访问部分follower，那么另外一部分的f大多数follower则会选出新的leader，与客户端交互。这个新的leader会按以上步骤通知大多数的follower。此时，如果网络恢复了，旧的leader会变成follower，此时旧的leader的更新都必须回滚，从新的leader处同步所有数据。</p>
-</blockquote>
-<p>其它一致性的保障可以参考：<a href="http://www.cnblogs.com/mindwind/p/5231986.html" target="_blank" rel="noopener">http://www.cnblogs.com/mindwind/p/5231986.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1821,7 +1796,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">202</span>
+                <span class="site-state-item-count">203</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
