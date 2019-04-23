@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-22T10:22:25.135Z</updated>
+  <updated>2019-04-23T06:13:59.111Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Need of Event Handling</title>
+    <link href="http://yoursite.com/2019/04/23/Need-of-Event-Handling/"/>
+    <id>http://yoursite.com/2019/04/23/Need-of-Event-Handling/</id>
+    <published>2019-04-23T06:13:17.000Z</published>
+    <updated>2019-04-23T06:13:59.111Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Need-of-Event-Handling"><a href="#Need-of-Event-Handling" class="headerlink" title="Need of Event Handling"></a>Need of Event Handling</h1><p>本文将集中讨论多线程环境下的事件处理机制。有时线程需要等待某事件发生，例如条件变量成为真或由另一个线程完成的任务。</p><p>举个例子，应用处理以下的任务：</p><ol><li>与服务器握手；</li><li>从文件读取数据；</li><li>处理读出来的数据；</li></ol><p>在上面的任务中，任务1是独立的，而任务3则依赖于任务2。因此我们可以将该应用拆分为2个线程去处理：</p><p><img src="https://thispointer.com//wp-content/uploads/2015/06/first.png" alt="img"></p><p>创建一个默认值为false的布尔全局变量。在线程2中将其值设置为true，并且线程1在循环中检查其值，一旦变为真，线程1将继续处理数据。但由于它是两个线程共享的全局变量，因此需要与互斥锁同步。</p><p><strong>不过这种方式有以下的缺点：</strong></p><p>线程需要持续争取锁，而这是为了检查全局变量，这种方式会消耗CPU使得线程1变慢。</p><p>比较好的方式是使用信号量来解决这个问题。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Need-of-Event-Handling&quot;&gt;&lt;a href=&quot;#Need-of-Event-Handling&quot; class=&quot;headerlink&quot; title=&quot;Need of Event Handling&quot;&gt;&lt;/a&gt;Need of Event Handli
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>Using mutex to fix Race Conditions</title>
@@ -444,30 +467,6 @@
       
       
         &lt;h1 id=&quot;The-Google-File-System&quot;&gt;&lt;a href=&quot;#The-Google-File-System&quot; class=&quot;headerlink&quot; title=&quot;The Google File System&quot;&gt;&lt;/a&gt;&lt;strong&gt;The Google F
-      
-    
-    </summary>
-    
-    
-      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MapReduce--MIT6.824</title>
-    <link href="http://yoursite.com/2019/02/27/MapReduce-MIT6-824/"/>
-    <id>http://yoursite.com/2019/02/27/MapReduce-MIT6-824/</id>
-    <published>2019-02-26T16:38:31.000Z</published>
-    <updated>2019-02-26T16:40:17.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h1><blockquote><p><a href="https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf" target="_blank" rel="noopener">论文《MapReduce: Simplified Data Processing on Large Clusters》</a></p></blockquote><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>MapReduce是谷歌提出的一种编程模型，主要目的是为了处理和生成大数据。通过定义map函数来处理key/value对，生成中间键值对，而reduce函数则是用来归并这些中间键值对。</p><p>以这种编程模式来实现的程序会自动在大的集群上并行执行。</p><h2 id="Programming-Model"><a href="#Programming-Model" class="headerlink" title="Programming Model"></a>Programming Model</h2><p>运算时键值对输入，产生另外的一系列键值对。Map函数是用户编写，输入键值对，产生键值对，将具有相同的中间key的值传到reduce函数。</p><p>reduce函数则是接收上面的中间键值对，将那些value合并起来。</p><h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>考虑计算文档单词数目的伪代码：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">map(String key, String value):</span><br><span class="line">    <span class="comment">// key: document name</span></span><br><span class="line">    <span class="comment">// value: document contents</span></span><br><span class="line">    <span class="keyword">for</span> each word w in value:</span><br><span class="line">    EmitIntermediate(w, <span class="string">"1"</span>);</span><br><span class="line"></span><br><span class="line">reduce(String key, Iterator values):</span><br><span class="line">    <span class="comment">// key: a word</span></span><br><span class="line">    <span class="comment">// values: a list of counts</span></span><br><span class="line">    <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> each v in values:</span><br><span class="line">    result += ParseInt(v);</span><br><span class="line">    Emit(AsString(result));</span><br></pre></td></tr></table></figure><h3 id="Types"><a href="#Types" class="headerlink" title="Types"></a>Types</h3><p>map和reduce函数都是有类型的：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map (k1, v1) --&gt; list(k2, v2)</span><br><span class="line">reduce(k2, list(v2))--&gt; list(v2)</span><br></pre></td></tr></table></figure><h3 id="More-Examples"><a href="#More-Examples" class="headerlink" title="More Examples"></a>More Examples</h3><p>一些应用了mapReduce的例子：</p><ul><li>Distributed Grep</li><li>Count of URL Access Frequency</li><li>Reverse Web-Link Graph</li><li>Term-Vector per Host</li><li>Inverted Index</li><li>Distributed Sort</li></ul><h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>论文介绍了谷歌内部的使用。</p><h3 id="Execution-Overview"><a href="#Execution-Overview" class="headerlink" title="Execution Overview"></a>Execution Overview</h3><ol><li>MapReduce库先将input分成M份(16MB-64MB)，然后启动集群上多个机器上的进程；</li><li>其中一个进程是master，其它都是worker；</li><li>分配了map任务的worker会读取那M份输入的一份，解析键值对，将其传到自定义的Map函数中，产生的中间键值对将会缓存起来；</li><li>缓存的内容会被周期性写入到磁盘上，这里磁盘被分成R个区域。写入后的位置信息将会反馈到maser，master再将位置信息传给reduce的worker；</li><li>reduce的worker将会调用RPC去读取缓存，并根据中间结果的key进行排序，使得相同key的键值对分到一个组；</li><li>reduce worker将会遍历键值对，然后将key和相关联的values传到自定义的reduce函数里；</li><li>当所有任务完成后，master将会从MapReduce中返回；</li></ol><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/MapReduceF1.png" alt="img"></p><h3 id="Master-Data-Structures"><a href="#Master-Data-Structures" class="headerlink" title="Master Data Structures"></a>Master Data Structures</h3><p>master保存着多种数据结构，比如worker的状态。</p><p>另外master还是map任务和reduce任务关于文件位置的沟通渠道。</p><h3 id="Fault-Tolerance"><a href="#Fault-Tolerance" class="headerlink" title="Fault Tolerance"></a>Fault Tolerance</h3><h4 id="Worker-Failure"><a href="#Worker-Failure" class="headerlink" title="Worker Failure"></a>Worker Failure</h4><p>master周期性地pingworker，如果没有响应，就认为worker失败了。在失败worker上完成的map任务会设置为idle状态，而还在失败worker上运行的map或者reduce任务都会被设置为idle状态。</p><p>完成的map任务此时还需要重新执行，因为中间结果被存在失败机器的磁盘上；而reduce任务不需要重新运行，因为它的输出存储在全局文件系统。另外，所有的reduce任务都应该知晓任务在重新执行，以便读取到正确磁盘上的中间结果。</p><h4 id="Master-Failure"><a href="#Master-Failure" class="headerlink" title="Master Failure"></a>Master Failure</h4><p>一般情况下，是将master的数据结构持久化。一旦master任务挂了，就从上次的checkpoint点重新起来。</p><h4 id="Semantics-in-the-Presence-of-Failures"><a href="#Semantics-in-the-Presence-of-Failures" class="headerlink" title="Semantics in the Presence of Failures"></a>Semantics in the Presence of Failures</h4><p>当用户的map和reduce函数是确定性的，那么MapReduce产生的结果也是唯一确定的，这是依赖于Map和Reduce任务的原子性提交实现的。</p><p>而对于非确定性的Map或者Reduce操作，单个reduce操作的输出对应于整个程序某次序列化输出的结果。</p><h3 id="Locality"><a href="#Locality" class="headerlink" title="Locality"></a>Locality</h3><p>由于在计算环境中，网络带宽是很重要的资源，所以谷歌文件系统将输入数据平分，存储到本地磁盘上，而且一般会进行3备份。在运行过程中，MapReduce操作会从本地读取。</p><h3 id="Task-Granularity"><a href="#Task-Granularity" class="headerlink" title="Task Granularity"></a>Task Granularity</h3><p>M和R的任务数量应该要比worker机器要多，这样使得worker可以执行多种任务，从而提高负载均衡，也可以在某个worker挂掉的时候快速恢复，因为它已经完成的大量map任务都可以重新分配给其它worker机器上执行。</p><p>因为master进行任务分配决策的复杂度是O(M+R)，并且需要在内存中使用O(M*R)大小的空间来保存之前所说的状态。</p><h3 id="Backup-Tasks"><a href="#Backup-Tasks" class="headerlink" title="Backup Tasks"></a>Backup Tasks</h3><p>因为某些机器磁盘的故障等原因，MapReduce任务会变得特别慢。这时MapReduce采用的机制就是：</p><ul><li>在整个计算快要结束时，将一些还在进行的任务进行backup，当backup任务或者源任务其中一个完成时，我们就任务整个计算完成了</li></ul><h2 id="Refinements"><a href="#Refinements" class="headerlink" title="Refinements"></a>Refinements</h2><h3 id="Partitioning-Function"><a href="#Partitioning-Function" class="headerlink" title="Partitioning Function"></a>Partitioning Function</h3><p>该函数的作用是将中间key结构划分为R部分，默认使用<strong>hash(key) mod R</strong>，但也可以根据需求自定义</p><h3 id="Ordering-Guarantees"><a href="#Ordering-Guarantees" class="headerlink" title="Ordering Guarantees"></a>Ordering Guarantees</h3><p>这个函数主要是对中间结果根据key进行排序</p><h3 id="Combiner-Funct"><a href="#Combiner-Funct" class="headerlink" title="Combiner Funct"></a>Combiner Funct</h3><p>该函数是在执行map任务的机器上操作的，将一些数据合并起来，然后写到中间结果去。</p><h3 id="Input-and-Output-Types"><a href="#Input-and-Output-Types" class="headerlink" title="Input and Output Types"></a>Input and Output Types</h3><p>Mapreduce支持三种文件格式：第一种是逐行读入，key是文件偏移，value是行内容；第二种是key/value读入；第三种是用户自定义reader，可以从文件、数据库或者内存中的数据结构读取。</p><h3 id="Side-effects"><a href="#Side-effects" class="headerlink" title="Side-effects"></a>Side-effects</h3><p>MapReduce允许用户生成额外的输出，但其原子性应该由应用本身来实现</p><h3 id="Skipping-Bad-Records"><a href="#Skipping-Bad-Records" class="headerlink" title="Skipping Bad Records"></a>Skipping Bad Records</h3><p>对于一些不好修复的bug，或者确定性的错误。worker通过一个信号处理器来捕获错误，然后在执行Map或者Reduce操作前，MapReduce会存储一个全局序列号，一旦发现了用户代码的错误，信号处理器就会发一个内含序列号的UDP包给master，如果master发现了特定记录有了多次的失败，就会指示该记录应该跳过，不再重试。</p><h3 id="Local-Execution"><a href="#Local-Execution" class="headerlink" title="Local Execution"></a>Local Execution</h3><p>因为分布式环境调试不方便，MapReduce提供在本机串行化执行MapReduce的接口，方便用户调试。</p><h3 id="Status-Information"><a href="#Status-Information" class="headerlink" title="Status Information"></a>Status Information</h3><p>master把内部的状态通过网页的方式展示出来</p><h3 id="Counters"><a href="#Counters" class="headerlink" title="Counters"></a>Counters</h3><p>MapReduce提供一个计数器来计算各种时间的发生频率。例如这样：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase = GetCounter(<span class="string">"uppercase"</span>);</span><br><span class="line"></span><br><span class="line">map(String name, String contents):</span><br><span class="line"><span class="keyword">for</span> each word w in contents:</span><br><span class="line"><span class="keyword">if</span> (IsCapitalized(w)):</span><br><span class="line">uppercase-&gt;Increment();</span><br><span class="line">EmitIntermediate(w, <span class="string">"1"</span>);</span><br></pre></td></tr></table></figure><p>计数器的值会周期性传达给master。当MapReduce操作完成时，count值会返回给用户程序，需要注意的是，重复执行的任务的count只会统计一次。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;MapReduce&quot;&gt;&lt;a href=&quot;#MapReduce&quot; class=&quot;headerlink&quot; title=&quot;MapReduce&quot;&gt;&lt;/a&gt;MapReduce&lt;/h1&gt;&lt;blockquote&gt;
-&lt;p&gt;&lt;a href=&quot;https://pdos.csail.m
       
     
     </summary>

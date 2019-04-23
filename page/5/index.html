@@ -265,6 +265,155 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/28/Visualizing-and-Understanding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/28/Visualizing-and-Understanding/" itemprop="url">Visualizing and Understanding</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-28T01:51:38+08:00">
+                2019-01-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Visualizing-and-Understanding"><a href="#Visualizing-and-Understanding" class="headerlink" title="Visualizing and Understanding"></a>Visualizing and Understanding</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>这是cs231N的一个章节，主要讲述的是CNN可视化理解。2014年ECCV上的paper：<strong>《Visualizing and Understanding Convolutional Networks》</strong>讲述了CNN每一层到底学习到了什么特征，即可视化CNN模型。这里的可视化指的是可视化CNN模型中的卷积核。</p>
+<h2 id="利用反卷积实现特征可视化"><a href="#利用反卷积实现特征可视化" class="headerlink" title="利用反卷积实现特征可视化"></a>利用反卷积实现特征可视化</h2><p>论文里通过反卷积的方法进行可视化，反卷积就是以各层得到的特征图作为输入，进行反池化、反激活、反卷积的过程。例如一个Alexnet的conv5的特征图，通过这个过程之后，就可以把一个13<em>13的特征图放大回到一个与原输入图片大小的图片(227\</em>227)。</p>
+<p><img src="http://kvfrans.com/content/images/2016/06/Screen-Shot-2016-06-15-at-10-32-01-AM.png" alt="img"></p>
+<h3 id="反池化"><a href="#反池化" class="headerlink" title="反池化"></a>反池化</h3><p>池化本身是一个不可逆的过程，但我们可以在池化过程中，将最大激活值的坐标位置记录下来。然后在反池化的时候，只把该位置的值激活，然后其它值置为0。这是一种近似的过程。</p>
+<h3 id="反激活"><a href="#反激活" class="headerlink" title="反激活"></a>反激活</h3><p>在Alexnet中，relu函数是为了保证每层输出的激活值都是正数，因此对于反向过程，我们需要保证每层的特征图为正值。因此也是直接采用relu函数即可。</p>
+<h3 id="反卷积"><a href="#反卷积" class="headerlink" title="反卷积"></a>反卷积</h3><p>对于反卷积，则是采用转置后的filter(参数一样，只不过把参数矩阵水平和垂直方向翻转了一下)进行卷积。</p>
+<h2 id="可视化结果"><a href="#可视化结果" class="headerlink" title="可视化结果"></a>可视化结果</h2><p>通过cnn学习之后，layer1和layer2学习到的特征基本是颜色、边缘等低层特征，越往上，学习到的特征将会变得更加完整，有辨别性。</p>
+<h3 id="Saliency-Maps"><a href="#Saliency-Maps" class="headerlink" title="Saliency Maps"></a>Saliency Maps</h3><p><strong>Saliency Maps</strong>关注的是当我们使用CNN去抓取图片特征或者理解图片的时候，我们神经网络真正关注的区域。而所有的Saliency Map都将一张图片中最核心表意区域勾画出来了。</p>
+<p>而计算原理，则是利用类别得分，即最后一层的梯度去计算哪一个像素对于分类的贡献最大，得到Saliency Maps。这里也可以看出像素层次的不同影响。</p>
+<p>同样，得到的图也可以用于图像分割。</p>
+<p><img src="https://analyticsindiamag.com/wp-content/uploads/2018/07/sal-1.jpg" alt="img"></p>
+<h3 id="Fooling-images"><a href="#Fooling-images" class="headerlink" title="Fooling images"></a>Fooling images</h3><p>fooling images的思想主要是在一个已经训练好的分类器的基础上，通过选择某一错误分类计算loss，然后更新梯度来更新图片pixel，从而使得分类器对图片错误分类。</p>
+<ul>
+<li>Start from an arbitrary image</li>
+<li>Pick an arbitrary class</li>
+<li>Modify the image to maximize the class</li>
+<li>Repeat until network is fooled</li>
+</ul>
+<h3 id="Class-visualization"><a href="#Class-visualization" class="headerlink" title="Class visualization"></a>Class visualization</h3><p>从随机噪音图像开始并且在目标类上执行梯度上升，我们可以生成这样一个图像，它被网络认为是目标类别。</p>
+<p>具体来说，假设$$I$$是一个图像，让$$y$$成为目标类别。假设$s_y(I)$是卷积网络初始分配给$I$的关于$y$的初始分数。最后我们生成一个图片$I^<em>$，其将在类别$y$上获得高的得分。<br>$$<br>I^</em> = \arg\max_I s_y(I) - R(I)<br>$$<br>R是一个regularizer，一般我们可以用L2正则器：<br>$$<br>R(I) = \lambda |I|_2^2<br>$$</p>
+<h2 id="pytorch知识点"><a href="#pytorch知识点" class="headerlink" title="pytorch知识点"></a>pytorch知识点</h2><blockquote>
+<p>a leaf Variable that requires grad has been used in an in-place operation</p>
+</blockquote>
+<p>这是<a href="https://discuss.pytorch.org/t/leaf-variable-was-used-in-an-inplace-operation/308" target="_blank" rel="noopener">因为</a></p>
+<p>A “leaf variable” is a variable you create directly, not as the result of some other operation.</p>
+<p>For example,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = torch.autograd.Variable(torch.Tensor([1, 2, 3, 4]))  # leaf variable</span><br><span class="line">y = x + 1  # not a leaf variable</span><br></pre></td></tr></table></figure>
+<p>An in-place operation is something which modifies the data of a variable. For example,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x += 1  # in-place</span><br><span class="line">y = x + 1 # not in place</span><br></pre></td></tr></table></figure>
+<p>PyTorch doesn’t allow in-place operations on variables you create directly (such as parameters of your model) because that usually isn’t correct. You can work around it by either using an operations that’s not in-place or by cloning the variable.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x2 = x.clone()  # clone the variable</span><br><span class="line">x2 += 1  # in-place operation</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/27/继承需要提供文档/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1507,183 +1656,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/22/Two-phase-Commit-protocol/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/22/Two-phase-Commit-protocol/" itemprop="url">Two-phase Commit protocol</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-22T21:05:08+08:00">
-                2018-12-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="2PC提交协议"><a href="#2PC提交协议" class="headerlink" title="2PC提交协议"></a>2PC提交协议</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><blockquote>
-<p>在分布式系统中，每个节点虽然可以知道自己的操作是否成功，但当一个事物跨越多个节点时，为了保证事务的ACID特性，系统需要引入一个协调者组件来管控所有节点的操作；</p>
-</blockquote>
-<p>2 Phase Commit（简称2PC）协议是在分布式事务中，用于在多个节点达成一致性的协议。</p>
-<h2 id="协议内容"><a href="#协议内容" class="headerlink" title="协议内容"></a>协议内容</h2><ul>
-<li><p>角色</p>
-<ul>
-<li>一个协调者(coordinator，事务管理器)和多个参与者(participant，资源管理器)</li>
-</ul>
-</li>
-<li><p>操作流程</p>
-<ul>
-<li>Prepare阶段：<ul>
-<li>协调者会向所有参与者发送prepare命令，然后开始等待参与者节点的响应；</li>
-<li>参与者会询问发起为止的所有实务操作，并将Undo和Redo信息持久化日志，此时会将事务在本地提交；</li>
-<li>向协调者应答commit同意或abort失败，协调者收到之后会将信息反馈到客户端；</li>
-</ul>
-</li>
-<li>commit阶段：在这个阶段，会根据不同的应答执行操作<ul>
-<li>成功：当所有参与者节点都应答”同意”；<ul>
-<li>协调者向所有参与者节点发出”正式commit”的请求；</li>
-<li>参与者节点本地完成操作，并释放在整个事务期间占用的资源；</li>
-<li>参与者节点向协调者节点应答“完成”；</li>
-<li>协调者收到完成之后，完成事务；</li>
-</ul>
-</li>
-<li>失败：存在参与节点在第一阶段响应“终止”，或者协调者等待超时<ul>
-<li>协调者向所有参与者节点发出“回滚操作”的请求；</li>
-<li>参与者节点本地利用之前写入的Undo日志执行回滚，并释放相关资源；</li>
-<li>参与者向协调者反馈“回滚完成”；</li>
-<li>协调者收到所有信息之后，取消事务；</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>两阶段完成之后，无论结果如何，协调者都必须要在此结束当前事务；</p>
-</li>
-</ul>
-<p><strong>流程如下</strong>：</p>
-<p>Coordinator</p>
-<p><img src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-coord.jpg" alt="img"></p>
-<p>Participant</p>
-<p><img src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-part.jpg" alt="img"></p>
-<h2 id="2PC的缺点"><a href="#2PC的缺点" class="headerlink" title="2PC的缺点"></a>2PC的缺点</h2><p>尽管2PC看起来能提供原子性的事务，但其也有局限：</p>
-<ol>
-<li>同步阻塞：这是2PC最大的缺点，在执行过程中，节点都处于阻塞状态，即节点之间都在等待对方的相应消息。一旦协调者宕机，整个事务进程将会被阻塞；而参与者崩溃，则可能会导致协调者无法收到消息，执行保守的回滚政策；另外就是，一旦协调者发出了commit消息之后宕机，而唯一接收到这消息的参与同时崩溃，即便重新选出了协调者，那么这条事务的状态也是不确定的；</li>
-<li>延迟：在prepare和commit两阶段，至少会产生两次RPC延迟，和三次持久化数据的延迟——prepare写日志+协调者状态持久化+commit写日志</li>
-</ol>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>相比2PC，3PC能解决一些单点故障和阻塞的问题，但都无法彻底解决分布式的一致性问题，只有Paxos算法才是完整的一致性算法</p>
-<blockquote>
-<p>there is only one consensus protocol, and that’s Paxos” – all other approaches are just broken versions of Paxos.                ——————Mike Burrows</p>
-</blockquote>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
-<li><a href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Two-phase_commit_protocol</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/22594180" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/22594180</a></li>
-<li><a href="https://www.hollischuang.com/archives/681" target="_blank" rel="noopener">https://www.hollischuang.com/archives/681</a></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1732,7 +1704,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">203</span>
+                <span class="site-state-item-count">204</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
