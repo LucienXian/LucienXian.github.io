@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/04/30/std-future-std-promise-and-Returning-values-from-Thread/</loc>
+    
+    <lastmod>2019-04-30T03:15:05.203Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/29/Condition-Variables-Explained/</loc>
     
     <lastmod>2019-04-29T07:26:35.230Z</lastmod>

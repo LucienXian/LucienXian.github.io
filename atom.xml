@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-04-29T07:26:35.230Z</updated>
+  <updated>2019-04-30T03:15:05.203Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>std::future , std::promise and Returning values from Thread</title>
+    <link href="http://yoursite.com/2019/04/30/std-future-std-promise-and-Returning-values-from-Thread/"/>
+    <id>http://yoursite.com/2019/04/30/std-future-std-promise-and-Returning-values-from-Thread/</id>
+    <published>2019-04-30T03:14:42.000Z</published>
+    <updated>2019-04-30T03:15:05.203Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="std-future-std-promise-and-Returning-values-from-Thread"><a href="#std-future-std-promise-and-Returning-values-from-Thread" class="headerlink" title="std::future, std::promise and Returning values from Thread"></a>std::future, std::promise and Returning values from Thread</h1><p>std::future对象常与异步一起使用。本文将主要关注使用std::future与std::promise。</p><p>一般情况下，我们希望一个线程能够返回一个结果。假设这样的一个场景，我们的应用创建一个线程去压缩文件夹，然后我们希望得到返回的zip包名和大小。</p><ol><li>老的方法：在多个线程之间通过指针共享数据</li></ol><p>往新的线程传递进指针，该线程将会设置其中的数据。然后在主线程中继续使用条件变量进行等待，当新线程设置数据并发出条件变量信号时，主线程将被唤醒并从该指针获取数据。</p><p>这种方法使用了一个条件变量、一个互斥锁和一个指针。但假如我们希望这个线程在不同的时间点返回三个不同的值，问题就变得复杂了。一个简单的方法是使用std::future。</p><ol start="2"><li>c++11的方法：使用std::future和std::promise</li></ol><p>std::future是一个类模版，对象存储的是future value——一个在内部存储中将在未来分配的值，提供了get()访问，但在这个未来值不可用时，调用get()将会阻塞。</p><p>std::promise也是一个类模版，它的对象承诺将来会设置值，每个对象都有一个关联的std::future对象。一个std::promise对象与关联的std::future对象共享数据。</p><h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><ol><li>首先在线程1创建std::promise对象，该对象将传到线程2以便设置值</li></ol><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::promise&lt;<span class="keyword">int</span>&gt; promiseObj;</span><br></pre></td></tr></table></figure><ol start="2"><li>在将promiseObj从线程1传递给线程2之前，可以先获得一个关联的future值</li></ol><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::future&lt;<span class="keyword">int</span>&gt; futureObj = promiseObj.get_future();</span><br></pre></td></tr></table></figure><ol start="3"><li>将promiseObj传递给线程2</li><li>线程1尝试去获取线程2设置的值</li></ol><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> val = futureObj.get();</span><br></pre></td></tr></table></figure><ol start="5"><li>在线程2设置值之前，线程1会阻塞住</li></ol><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">promiseObj.set_value(<span class="number">45</span>);</span><br></pre></td></tr></table></figure><p><img src="https://thispointer.com//wp-content/uploads/2015/06/promise.png" alt="img"></p><h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果在设置值之前销毁了std::promise对象，则关联的std::future对象调用get将会抛出异常。</p><p>如果希望线程在不同的时间点返回多个值，那么只需要在线程中传递多个std::promise对象。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;std-future-std-promise-and-Returning-values-from-Thread&quot;&gt;&lt;a href=&quot;#std-future-std-promise-and-Returning-values-from-Thread&quot; class=&quot;h
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>Condition Variables Explained</title>
@@ -444,29 +467,6 @@
       
       
         &lt;h1 id=&quot;In-Search-of-an-Understandable-Consensus-Algorithm-lt-一-gt&quot;&gt;&lt;a href=&quot;#In-Search-of-an-Understandable-Consensus-Algorithm-lt-一-gt&quot; cl
-      
-    
-    </summary>
-    
-    
-      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>The Design  for Practical System for FT Virtual Machines——MIT6.824</title>
-    <link href="http://yoursite.com/2019/03/24/The-Design-for-Practical-System-for-FT-Virtual-Machines%E2%80%94%E2%80%94MIT6-824/"/>
-    <id>http://yoursite.com/2019/03/24/The-Design-for-Practical-System-for-FT-Virtual-Machines——MIT6-824/</id>
-    <published>2019-03-24T03:16:13.000Z</published>
-    <updated>2019-03-24T03:16:47.292Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="The-Design-of-a-Practical-System-for-Practical-System-for-Fault-Tolerant-Virtual-Machines"><a href="#The-Design-of-a-Practical-System-for-Practical-System-for-Fault-Tolerant-Virtual-Machines" class="headerlink" title="The Design of a Practical System for Practical System for Fault-Tolerant Virtual Machines"></a>The Design of a Practical System for Practical System for Fault-Tolerant Virtual Machines</h1><h2 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h2><p>一个容错虚拟机分布式系统的设计</p><h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>对于分布式系统而言，有很多通用的容错方法：</p><ul><li>主备服务器：在主服务器挂掉了，由备份服务器接管工作。需要大量带宽在主备间传输状态；</li><li>状态机方法：让两台机器初始化为相同状态，然后接受相同的输入，使得两台机器保持同步。保持两台机器同步的额外信息数量远少于改变主服务器的状态量；然而可能存在一些不确定的操作（如读取时钟），因此必须同步这些不确定操作的结果；</li></ul><p>primary和backup之间传递deterministic operation + non-deterministic operation’s result；</p><h2 id="BASIC-FT-DESIGN"><a href="#BASIC-FT-DESIGN" class="headerlink" title="BASIC FT DESIGN"></a>BASIC FT DESIGN</h2><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/Basic_FT_Conf.png" alt="img"></p><p>上图展示了容错虚拟机的基本配置。primary VM和backup VM运行在不同的物理机上，并保持同步（backup会稍有迟延），并且它们使用共享磁盘空间。primary VM将接收到的输入通过Logging channel传送到backup VM。虽然两者都执行相同的输入，但只有primary VM会输出返回给client，因为backup VM会被hypervisor终止掉。backup会通过ack应答来保证没有数据丢失。primary VM和backup VM之间会通过 heartbeat 进行 fail 检测。</p><h3 id="Deterministic-Replay-Implementation"><a href="#Deterministic-Replay-Implementation" class="headerlink" title="Deterministic Replay Implementation"></a>Deterministic Replay Implementation</h3><p>正如上文提到过的，让两台机器处于相同的初始状态，然后以相同的顺序提供相同的输入，这样两台机器就能经历相同的状态序列并产生相同的输出。</p><p>但由于存在非确定性的事件(虚拟中断)或者操作(读取处理器时钟技术器)，这样会影响VM的状态。</p><p>这里的挑战在于：</p><ul><li>需要捕捉全部的输入和非确定性操作，以此保证backup是确定性；</li><li>需要将所有的输入和非确定性操作应用到backup中；</li><li>需要保证系统高效；</li></ul><p>设计方案：将所有的输入和非确定性操作记录到日志文件，并且对于非确定性操作，还必须要把相关的状态信息记录到日志文件中。</p><h3 id="FT-Protocol"><a href="#FT-Protocol" class="headerlink" title="FT Protocol"></a>FT Protocol</h3><p>FT协议是用于logging channel的协议</p><ul><li>输出要求：</li></ul><blockquote><p>如果primary宕机了，backup会接管它的工作，并且backup会执行与primary一致的输出</p></blockquote><ul><li>输出规则：</li></ul><blockquote><p>在backup VM收到并应答所有的日志之前，primary都不会把输出发送给外部</p></blockquote><p>并且，基于这个输出规则来说，primary VM不会停止执行，它只是延迟发送输出。</p><p>FT协议的流程如下图：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/FT_Protocol.png" alt="img"></p><p>但这里存在一个小问题，如果 primary 宕机了，backup 不能判断它是在发送了 output 之前还是之后宕机的，因此 backup 会再发送一次 output，但可以通过以下方式解决：</p><ul><li>诸如TCP等网络协议能够检查丢失或者重复的数据包；</li></ul><h3 id="Detecting-and-Responding-to-Failure"><a href="#Detecting-and-Responding-to-Failure" class="headerlink" title="Detecting and Responding to Failure"></a>Detecting and Responding to Failure</h3><p>如果是backup宕机，primary会停止发送日志。如果primary宕机，情况复杂一点，backup会接替它的工作，在执行完接收到的日志记录之后，成为primary真正对外输出。</p><p>存在一些方法检测宕机，比如通过UDP heartbeat来检测primary与backup之间是否正常通信。另外，还会监控logging channel的日志流量。</p><p>但这些方法仍然无法解决split-brain问题，即primary和backup同时宕机。为了解决这个问题，该设计使用了共享存储，提供了一个原子操作test-and-set，primary和backup无法同时在该区域操作。</p><h2 id="PRACTICAL-IMPLEMENTATION-OF-FT"><a href="#PRACTICAL-IMPLEMENTATION-OF-FT" class="headerlink" title="PRACTICAL IMPLEMENTATION OF FT"></a>PRACTICAL IMPLEMENTATION OF FT</h2><h3 id="Starting-and-Restarting-FT-VMs"><a href="#Starting-and-Restarting-FT-VMs" class="headerlink" title="Starting and Restarting FT VMs"></a>Starting and Restarting FT VMs</h3><p>在设计系统时，需要考虑如何启动/重启一个与primary状态一致的backup？</p><p>VMware VMotion能够使得一个运行中的VM从一个server迁移到另一个server，并且只需要很短的中断。这里做了一些改动，并不是进行迁移，而是在远程主机上克隆一个，并使得源VM进去logging mode，目标VM进入replay mode。</p><p>除此之外，由于VM都运行在同一个集群，访问同一个存储区域，因此在选择哪个server作为backup时，是由primary同志集群服务实现的。</p><h3 id="Managing-the-Logging-Channel"><a href="#Managing-the-Logging-Channel" class="headerlink" title="Managing the Logging Channel"></a>Managing the Logging Channel</h3><p>存在几种实现方法，管理logging channel的流量。</p><p>如下图所示，hypervisor维持了一个很大的log buffer，存着primary和backup的日志。primary往buffer写入日志，而backup则从中读取日志。这两者的操作类似于一个队列，backup遇到的空buffer，影响不大。但如果primary遇到满的buffer，会停止写入并停止对外输出。</p><p>因此我们需要一种机制来降低primary的速度，在logging channel增加额外的信息来通知primary，降低server上CPU的使用限制。</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/FT_Logging_Buffer_Channel.png" alt="img"></p><h3 id="Operation-on-FT-VMs"><a href="#Operation-on-FT-VMs" class="headerlink" title="Operation on FT VMs"></a>Operation on FT VMs</h3><p>另一个需要关注的实际问题是如何应对primary的多种控制操作。一般来说，大多VM操作只会在primary初始化，然后将必要的信息发送给backup。唯一一个在primary和backup独立的操作是VMotion，请注意，VMware FT确保两个VM都不会移动到另一个VM所在的服务器，因为这种情况不再提供容错功能。</p><p>对于primary来说，VMotion会导致backup与primary断开连接，然后重连。</p><p>对于backup来说，由于backup同时还在重放primary的操作和完成IO（VMotion需要停顿IO），所以VMotion会比较复杂。VMware的方法是当backup VM位于VMotion的最终切换点时，它通过日志记录通道请求primary VM暂时停顿其所有IO。 然后，backup VM的IO将在单个执行点自然停顿，因为它重放primary VM执行静止操作。</p><h3 id="Implementation-Issues-for-Disk-IOs"><a href="#Implementation-Issues-for-Disk-IOs" class="headerlink" title="Implementation Issues for Disk IOs"></a>Implementation Issues for Disk IOs</h3><ul><li>磁盘操作是非阻塞的、可以并行操作，这样会导致non-determinism；</li></ul><p>解决方法：检测IO races，并强制这些操作串行</p><ul><li>磁盘操作很可能与其它应用或者OS在访问同一块内存时产生竞争，因为磁盘操作是通过DMA实现的，会导致non-determinism；</li></ul><p>解决方法；设置页保护，但修改MMU的页保护代价太高了。因此这里是用了bounce buffer的设计，这是一块与访问内存等大的buffer。读操作将内存读入buffer，待IO完成了再写回内存；写操作则是将内容写入buffer，稍后写入磁盘。</p><ul><li>当backup接管失效的primary，成为新的primary后，无法确定磁盘IO是否已经完成；</li></ul><p>解决方法：发送一个error，表明所有IO都失败了，然后重新执行磁盘IO操作，无论是否已经成功</p><h3 id="Implementation-Issues-for-Network-IO"><a href="#Implementation-Issues-for-Network-IO" class="headerlink" title="Implementation Issues for Network IO"></a>Implementation Issues for Network IO</h3><p>系统设计了关于网络的性能优化。</p><p>由于这些优化很多都基于异步的执行，而这些操作可能回导致non-determinism，因此一个重要的问题是如何禁止这些异步的网络优化。</p><p>我们采取两个办法来提高VM的网络性能：</p><ul><li>实现集群优化，减少VM的traps和中断；</li><li>降低发送packets的延迟，减少发送日志消息和等待ack的时间，方法是避免线程切换；</li></ul><h2 id="DESIGN-ALTERNATIVES"><a href="#DESIGN-ALTERNATIVES" class="headerlink" title="DESIGN ALTERNATIVES"></a>DESIGN ALTERNATIVES</h2><h3 id="Shared-vs-Non-shared-Disk"><a href="#Shared-vs-Non-shared-Disk" class="headerlink" title="Shared vs Non-shared Disk"></a>Shared vs Non-shared Disk</h3><p>存在一个可替代的设计方法，那就是primary和backup拥有独立的虚拟磁盘(non-shared)，保证磁盘内容的同步，这样disk就变成了VM内部的状态。如下图：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/FT_Non_Shared_Disk_conf.png" alt="img"></p><p>这种设计的一大缺点就是为了保证容错，必须要确保虚拟磁盘以某些方法同步。在面对split-brain问题时，需要使用一个第三方服务器（primary和backup都能访问的）</p><h3 id="Executing-Disk-Reads-on-the-Backup-VM"><a href="#Executing-Disk-Reads-on-the-Backup-VM" class="headerlink" title="Executing Disk Reads on the Backup VM"></a>Executing Disk Reads on the Backup VM</h3><p>在我们的设计中，磁盘的读入不是直接输入backup的，而是通过logging channel获取相关读取信息的。</p><p>这种设计方案可以减少logging channel的流量，但面临更多的小问题：</p><ul><li>因为backup要执行读取，这样会降低backup VM的执行速度；</li><li>要处理好失败的磁盘读取操作，如果backup失败，primary成功，需要重试；如果反过来，primary需要通过logging channel告知backup不需要做备份；</li><li>在shared disk的情况下，如果primary在读完磁盘之后想马上执行写入到相同位置，则必须要等待backup也读取完毕；</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;The-Design-of-a-Practical-System-for-Practical-System-for-Fault-Tolerant-Virtual-Machines&quot;&gt;&lt;a href=&quot;#The-Design-of-a-Practical-Syste
       
     
     </summary>

@@ -265,6 +265,155 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/Effective-cpp-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/20/Effective-cpp-2/" itemprop="url">[Effective cpp]-#2</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-20T22:46:04+08:00">
+                2017-11-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="prefers-const-enums-and-inlines-to-defines"><a href="#prefers-const-enums-and-inlines-to-defines" class="headerlink" title="prefers const, enums, and inlines to #defines"></a>prefers const, enums, and inlines to #defines</h1><p>这条规则的本质是利用编译器去替换预处理器。</p>
+<p>比如在代码中，ASPECT_RATIO可能会被编译器忽略，因为编译器在处理源码之前预处理器以及把这个标记移走，而该记号无法被记载进symbol table。所以如果遇到编译错误时，我们可能只看到1.653而无法看到ASPECT_RATIO，特别是假如改行代码是别人写的，你就更加难以发现错误了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ASPECT_RATIO 1.653</span></span><br></pre></td></tr></table></figure>
+<h2 id="const"><a href="#const" class="headerlink" title="const"></a>const</h2><ul>
+<li>这时我们可以使用const取代，由于const是语言常量，因此该标记肯定会被编译器看到；</li>
+<li>另外，我们不能用#define创建一个类内常量，而const可以；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span>&#123;</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> Num = <span class="number">5</span>;<span class="comment">//也可以只是声明const int Num; 在另一个文件内定义int MyClass:Num = 5;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="enum"><a href="#enum" class="headerlink" title="enum"></a>enum</h2><ul>
+<li>假如编译不允许在类内使用static整数型常量，此时可以用<strong>the enum hack</strong>的做法；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span>&#123;</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="keyword">enum</span> &#123;Num = <span class="number">5</span>&#125;;</span><br><span class="line">  	<span class="keyword">int</span> scores[Num];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>只有const声明的变量不可以取地址，而enum可以取地址；</li>
+</ul>
+<h2 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h2><ul>
+<li>这是为了取代宏定义一个函数的操作；</li>
+<li>例如：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CALL(a, b) f((a) &gt; (b) ? (a) : (b))</span></span><br><span class="line"><span class="keyword">int</span> a = <span class="number">5</span>, b = <span class="number">0</span>;</span><br><span class="line">CALL(++a, b);<span class="comment">//a累加了两次</span></span><br><span class="line">CALL(++a, b+<span class="number">10</span>);<span class="comment">//a累加了一次</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>由于宏定义是直接替换，所以为了避免不必要的麻烦，我们必须为每个变量添加符号；</li>
+<li>另外这里的用法还有一个大麻烦，由于替换的原因，这里a在比较时竟然与b有关；</li>
+<li>因此我们可以用模板来代替：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;typaname T&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(<span class="keyword">const</span> T&amp; a, <span class="keyword">const</span> T&amp; b)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  f(a &gt; b ? a : b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>对于单纯变量，最好用const或者enum取代#define</li>
+<li>对于函数宏，可以用inline函数代替</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/Effective-cpp-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1543,146 +1692,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/13/volatile限定符——CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/13/volatile限定符——CPP/" itemprop="url">volatile限定符——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-13T09:57:48+08:00">
-                2017-11-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="volatile-限定符"><a href="#volatile-限定符" class="headerlink" title="volatile 限定符"></a>volatile 限定符</h1><h2 id="为什么使用volatile"><a href="#为什么使用volatile" class="headerlink" title="为什么使用volatile"></a>为什么使用volatile</h2><p>根据CPP之父的说法：</p>
-<blockquote>
-<p>A volatile specifier is a hint to a compiler that an object may change its value in ways not specified by the language so that aggressive optimizations must be avoided.</p>
-</blockquote>
-<p>直接处理硬件的程序往往会包含这样的数据元素，这些元素可能会被程序之外的过程控制，因此对象的值很有可能会被程序之外修改，这时应该把对象声明为<strong>volatile</strong>。</p>
-<p>声明为volatile的变量在编译器访问它时，编译器就不再对它做任何优化，从而提供稳定的地址访问。例如，系统总是会重新从内存中读取该数据，即便在它前面的指令中已经都读取过数据并存储在寄存器中。</p>
-<p>一般来说，volatile用在以下几个方面：</p>
-<ul>
-<li>中断服务程序中修改的的供其它程序检测的变量需要加volatile；</li>
-<li>多任务环境下多任务共同分享的标志需要加volatile；</li>
-<li>存储器映射的硬件寄存器需要加volatile（因为每次的读写意义不同）；</li>
-</ul>
-<p>通常情况下，是在多线程共享变量时，一个线程改变变量，使得该变量对其它线程visible。也可以避免当两个线程用到同一个变量时，一个线程使用寄存器中的变量，一个线程使用内存中的变量；</p>
-<h2 id="volatile指针"><a href="#volatile指针" class="headerlink" title="volatile指针"></a>volatile指针</h2><p>volatile与const之间没有什么影响，一个变量可以既是volatile的也是const。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> v; <span class="comment">// v是一个volatile的int</span></span><br><span class="line"><span class="keyword">int</span> *<span class="keyword">volatile</span> vip; <span class="comment">// vip是一个volatile指针，指向int</span></span><br><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span>* ivp; <span class="comment">// ivp是一个指针，它指向volatile int</span></span><br><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> *<span class="keyword">volatile</span> vivp; <span class="comment">//vivp是一个volatile指针，指向volatile int</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>同const，只能将一个volatile的对象赋予一个指向volatile的指针。</p>
-</blockquote>
-<h2 id="拷贝构造"><a href="#拷贝构造" class="headerlink" title="拷贝构造"></a>拷贝构造</h2><p>与const不同，我们不能使用合成的拷贝/移动构造函数以及赋值运算符来初始化一个volatile对象。因为合成的成员接受的实参是一个非volatile的常量引用，我们不能将一个非volatile引用绑定到volatile对象上。</p>
-<p>因此我们必须自定义拷贝或者赋值操作：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	Foo(<span class="keyword">const</span> <span class="keyword">volatile</span> Foo&amp;);</span><br><span class="line">  	Foo&amp; <span class="keyword">operator</span>=(<span class="keyword">volatile</span> <span class="keyword">const</span> Foo&amp;);<span class="comment">//将一个volatile对象赋值给非volatile对象</span></span><br><span class="line">  	Foo&amp; <span class="keyword">operator</span>=(<span class="keyword">volatile</span> <span class="keyword">const</span> Foo&amp;) <span class="keyword">volatile</span>;<span class="comment">//将一个volatile对象赋值给volatile对象</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1731,7 +1740,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">206</span>
+                <span class="site-state-item-count">207</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
