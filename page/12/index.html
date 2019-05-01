@@ -265,6 +265,176 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/深度探索C-对象模型-七/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/深度探索C-对象模型-七/" itemprop="url">深度探索C++对象模型<七></七></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T09:41:50+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="The-Semantics-of-Data"><a href="#The-Semantics-of-Data" class="headerlink" title="The Semantics of Data"></a>The Semantics of Data</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一个类的大小主要受三个因素影响：</p>
+<ul>
+<li><p>语言本身带来的额外负担。比如如果是virtual base class，往往需要一个指针去指向某个virtual base class subobject；</p>
+</li>
+<li><p>编译器的特殊处理。比如有些编译器会为一个空类（继承自另外一个空类）添加1个byte，但有些编译器会做出优化；</p>
+</li>
+<li><p>alignment。对齐；</p>
+</li>
+</ul>
+<p>另外需要注意的是，nonstatic data members也是放在类对象中，即使是继承而来的nonstatic data members也是一样，但static data members则放在程序的一个global data segment中</p>
+<h2 id="Data-Member-Layout"><a href="#Data-Member-Layout" class="headerlink" title="Data Member Layout"></a>Data Member Layout</h2><p>非静态成员变量在类的对象中的排列顺序与其声明顺序是一致的。</p>
+<p>如果多个数据成员分布在不同的access session（public，private，protected）中，那么members的排列应该满足：较晚出现的成员应该在高地址，并且允许将多个access session连锁在一起，成为一个连续的区块，也就是你在一个session内声明8个变量，和在8个相同的session内声明8个变量对于内存布局是一样。</p>
+<h2 id="Data-Member的存取"><a href="#Data-Member的存取" class="headerlink" title="Data Member的存取"></a>Data Member的存取</h2><p>先抛出一个问题：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Point3d origin, *pt = &amp;origin;</span><br><span class="line">origin.x = <span class="number">0.0</span>;</span><br><span class="line">pt-&gt;x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure>
+<p>分别通过指针和对象去读取，会有什么不同呢？</p>
+<h3 id="Static-Data-Members"><a href="#Static-Data-Members" class="headerlink" title="Static Data Members"></a>Static Data Members</h3><p>如果是以这两种方式去读取静态成员，那么是一样的。因为都会转化成对唯一的实体进行直接操作，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//origin.chunkSize == 250;</span></span><br><span class="line">Point3d::chunkSize == <span class="number">250</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//pt-&gt;chunkSize == 250;</span></span><br><span class="line">Point3d::chunkSize == <span class="number">250</span>;</span><br></pre></td></tr></table></figure>
+<p>由于静态数据成员是放在全局数据区，如果有两个类声明同名的静态数据成员，编译器会为每一个static data member进行唯一编码。</p>
+<h3 id="Nonstatic-Data-Members"><a href="#Nonstatic-Data-Members" class="headerlink" title="Nonstatic Data Members"></a>Nonstatic Data Members</h3><p>这里需要注意的是，对一个非静态成员进行存取，编译器会通过把一个class object的起始地址加上data member的偏移量进行存取。</p>
+<p>这里，如果是通过对象去存取成员变量，成员变量的偏移量会在编译时就已经得知，效率较高；</p>
+<p>而如果一个类是派生类，其通过指针去存取它的成员变量，我们无法得知指针指向哪个class type，必须要等到运行时才确定下来，同时还要经历额外的间接导引才能找到那个数据成员。</p>
+<h2 id="继承与Data-Members"><a href="#继承与Data-Members" class="headerlink" title="继承与Data Members"></a>继承与Data Members</h2><p>考虑两个类Point2d, Point3d，如果一种组织方式是形成两个独立的类，另外一种的组织方式是形成继承链。那么会有声明不同。</p>
+<h3 id="Inheritance-without-Polymorphism"><a href="#Inheritance-without-Polymorphism" class="headerlink" title="Inheritance without Polymorphism"></a>Inheritance without Polymorphism</h3><p>假如我们考虑Point3d继承自Point2d，但其中没有virtual functions，也就没有了额外的空间负担（vptr）。</p>
+<p>但这种做法会带来的一个错误是，把一个class分解为多层，可能会带来的一个问题是抽象的结构会变得膨胀。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> val;</span><br><span class="line">    <span class="keyword">char</span> c1;</span><br><span class="line">    <span class="keyword">char</span> c2;</span><br><span class="line">    <span class="keyword">char</span> c3;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//分解成</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete1</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> c1;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete2</span>:</span> <span class="keyword">public</span> Concrete1 &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> c2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete1</span>:</span> <span class="keyword">public</span> Concrete3 &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> c3;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>32位的机器下，对于第一种不分解的情况，类的空间大小为8bytes，而第二种情况，Concrete3变成了16bytes，因为自定义的数据类型是在继承得来的subject的padding后面进行补全的。所以就浪费了更多的padding空间。</p>
+<p>另外一个容易出现的问题是，考虑这种情况：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Concrete2 *pc2;</span><br><span class="line">Concrete1 *pc1_1, *pc1_2;</span><br><span class="line">pc1_1 = pc2;<span class="comment">//另pc1_1指向Concrete2对象</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//结果就是pc1_2指向的对象的成员变量可能会产生异常值</span></span><br><span class="line">*pc1_2 = *pc1_1;</span><br></pre></td></tr></table></figure>
+<p>由于内存布局的不同，直接的复制操作执行的可能是复制一个一个的member，因此有可能会把原来的padding给覆盖掉。具体得看编译器如何实现，是把数据成员与concrete1的subject捆绑在一起，还是其它的实现。</p>
+<h3 id="Adding-Polymorphism"><a href="#Adding-Polymorphism" class="headerlink" title="Adding Polymorphism"></a>Adding Polymorphism</h3><p>如果继承链条（考虑一个point3d继承自point2d）中有虚函数，那么会带来如下的额外负担：</p>
+<ul>
+<li><p>point2d会有一个相关联的virtual table，存放这每一个virtual function的地址，则table的元素数目与virtual function的数目相同，另外可能还有一些slots，用以支持run time identification</p>
+</li>
+<li><p>为每一个class object提供一个vptr，在运行时能够找到virtual table的位置</p>
+</li>
+<li><p>扩充constructor，使得其能够初始化vptr</p>
+</li>
+<li><p>扩充destructor，能够摸消指向class相关的virtual table的vptr</p>
+</li>
+</ul>
+<p>关于vptr放在class object的位置有两种做法，一种是放在末端，为的是保留base class C struct的布局；另一种做法则是放在前端，带来的好处是不用在运行期测量出vptr的偏移量</p>
+<h3 id="Multiple-Inheritance"><a href="#Multiple-Inheritance" class="headerlink" title="Multiple Inheritance"></a>Multiple Inheritance</h3><p>对于多重继承，如果想要用父类的指针指向一个对象，那么在内存布局和指针的设置上会有更复杂的操作。</p>
+<p>假如是这样的继承状态</p>
+<p><img src="http://img.blog.csdn.net/20130510142105779" alt="img"></p>
+<p>其对象模型会有比较大的不同，与单一继承相比</p>
+<p><img src="http://img.blog.csdn.net/20130510142117279" alt="img"></p>
+<p>这是因为，如果只是将地址赋予第一个base class会比较简单，和单一继承一样。因为两者指向相同的地址；如果是赋予第二个或者后续的base class的话，就需要修改地址，加上偏移位置。</p>
+<h3 id="Virtual-Inheritance"><a href="#Virtual-Inheritance" class="headerlink" title="Virtual Inheritance"></a>Virtual Inheritance</h3><p>虚拟继承的目的就是为了解决如何在派生类里维护一份基类的实体。</p>
+<p>对于这样含有多个base class subject的类，会被分割为2个部分：不变局部和共享局部。由于共享局部拥有稳定的offset，可以直接存取；而对于共享局部，由于其位置会随着派生而变化，所以如何进行存取这部分的内容就成了一个难点。</p>
+<p>一般来说，会先安排好不变局部，再去建立共享局部。而且编译器会在每一个派生类对象中安插指针,指向virtual base class。</p>
+<p>这样就是通过派生类里面的指针去间接的索引共享部分的数据，但有所不同的是，有些编译器会优化使得存取时间和空间负担变得固定。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/25/Unix网络编程——chap8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1783,153 +1953,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/13/深度探索C-对象模型-四/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/13/深度探索C-对象模型-四/" itemprop="url">深度探索C++对象模型<四></四></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-13T21:42:08+08:00">
-                2018-03-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#copy constructor 的建构操作</p>
-<p>在以下的三种情况下，会以一个对象的内容去初始化另外一个对象：</p>
-<ul>
-<li>明确的初始化操作，如 X xx = x;</li>
-<li>对象被当做函数参数传入函数中；</li>
-<li>函数返回一个对象时；</li>
-</ul>
-<p>形式：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="keyword">const</span> X&amp; x);</span><br><span class="line"><span class="comment">//可以是多参数模式，但第二个参数及其之后的参数都要以默认值提供</span></span><br><span class="line">Y::Y(<span class="keyword">const</span> Y&amp; y, <span class="keyword">int</span> x = <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="Default-Memberwise-Initialization"><a href="#Default-Memberwise-Initialization" class="headerlink" title="Default Memberwise Initialization"></a>Default Memberwise Initialization</h2><p>如果一个类没有显式的定义拷贝构造函数，那么在发送以其它对象进行初始化就会进行所谓的<strong>default memberwise initialization</strong>行为。也就是把内部的数据成员的值一个一个地拷贝都被初始化的类对象中，如果其中有其他类的对象成员，那么就会递归地对该类进行<strong>default memberwise initialization</strong>。</p>
-<p>而所谓的memberwise initialization分为两种：Bitwise Copy and Copy Constructor。</p>
-<h2 id="Bitwise-Copy-Semantics"><a href="#Bitwise-Copy-Semantics" class="headerlink" title="Bitwise Copy Semantics"></a>Bitwise Copy Semantics</h2><p>在C++中，默认进行的就是Bitwise Copy。例如这种情况只包含原生的数据成员，就是进行Bitwise Copy：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Class Word &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Word(<span class="keyword">const</span> <span class="keyword">char</span>* );</span><br><span class="line">    ~Word()&#123;<span class="keyword">delete</span> []str;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> cnt;</span><br><span class="line">    <span class="keyword">char</span> *str;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>但这种情况下，会出现的问题就是：由于只是单纯地拷贝指针的值，在进行拷贝之后，会出现两个对象的内部的指针指向了同一块内存。如果某个对象被销毁了，那么指针所指向的内存也回收了。这样另外一个对象的指针就变成了野指针。</p>
-<h2 id="不要Bitwise-Copy-Semantics"><a href="#不要Bitwise-Copy-Semantics" class="headerlink" title="不要Bitwise Copy Semantics"></a>不要Bitwise Copy Semantics</h2><p>在以下的情况下，一个类不表现出Bitwise Copy Semantics：</p>
-<ul>
-<li>当class内含一个member object，而后者的class声明有一个copy constructor时（不论是用户自己定义的，还是编译器生成的）</li>
-<li>当class继承自一个base class而后者存在一个copy constructor时（再次强调，不论是显示声明或编译器合成）</li>
-<li>当class声明了一个或多个virtual functions时</li>
-<li>当class派生自一个继承串链时，其中有一个或多个virtual base classes时</li>
-</ul>
-<p>前两种操作，必须把成员对象或者基类对象的拷贝构造代码插入到合成的拷贝构造函数中；</p>
-<p>至于后面两种情况</p>
-<h2 id="重新设定virtual-table的指针"><a href="#重新设定virtual-table的指针" class="headerlink" title="重新设定virtual table的指针"></a>重新设定virtual table的指针</h2><p>由于如果类中有虚函数，那么需要为该类增加一个虚表，并且为该类的每个对象增加一个指针，指向虚表。</p>
-<p>这就是为什么编译器需要合成一个拷贝构造函数，主要目的就是为了为新的对象增加一个指针。</p>
-<p>这样可以避免了这种情况，子啊这种情况中，base内含的指针应该是指向基类的虚表，如果是Bitwise Copy，那就变成派生类的虚表了</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base base = derived;</span><br></pre></td></tr></table></figure>
-<h2 id="virtual-base-class-subject"><a href="#virtual-base-class-subject" class="headerlink" title="virtual base class subject"></a>virtual base class subject</h2><p>这种情况跟上面的差不多，也是为了保证virtual base class subobject的位置在编译器被确定下来，而合成拷贝构造函数。这种情况一般也是发送在用派生类对象去初始化基类，因为这样如果没有合成拷贝构造函数，将会难以确定virtual base class subobject的位置。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1978,7 +2001,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">207</span>
+                <span class="site-state-item-count">208</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/05/01/std-async-Tutorial-Example/</loc>
+    
+    <lastmod>2019-05-01T06:12:30.845Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/04/30/std-future-std-promise-and-Returning-values-from-Thread/</loc>
     
     <lastmod>2019-04-30T03:15:05.203Z</lastmod>
