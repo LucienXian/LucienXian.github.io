@@ -265,6 +265,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/03/String-vs-StringBuilder-vs-StringBuffer-in-Java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/03/String-vs-StringBuilder-vs-StringBuffer-in-Java/" itemprop="url">String vs StringBuilder vs StringBuffer in Java</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-03T00:03:19+08:00">
+                2019-02-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#String vs StringBuilder vs StringBuffer</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>String类使用final关键字字符数组来保存字符串，private final char value[]，所以String对象是不可变的。而StringBuilder 与 StringBuffer 都继承自 AbstractStringBuilder 类，而AbstractStringBuilder源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractStringBuilder</span> <span class="keyword">implements</span> <span class="title">Appendable</span>, <span class="title">CharSequence</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span>[] value;</span><br><span class="line">    <span class="keyword">int</span> count;</span><br><span class="line">    AbstractStringBuilder() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    AbstractStringBuilder(<span class="keyword">int</span> capacity) &#123;</span><br><span class="line">        value = <span class="keyword">new</span> <span class="keyword">char</span>[capacity];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h2><p>在字符串最常用的操作中，比如字符串的拼接。StringBuffer和StringBuilder要远比String类的操作更快。接下来以String和Stringbuffer的比较为例。</p>
+<p>String类的拼接操作一般为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String str = <span class="keyword">new</span> String (<span class="string">"Stanford  "</span>);</span><br><span class="line">str += <span class="string">"Lost!!"</span>;</span><br></pre></td></tr></table></figure>
+<p>我们来看看字节码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">0 new #7 &lt;Class java.lang.String&gt;</span><br><span class="line"><span class="number">3</span> dup </span><br><span class="line">4 ldc #2 &lt;String "Stanford "&gt;</span><br><span class="line">6 invokespecial #12 &lt;Method java.lang.String(java.lang.String)&gt;</span><br><span class="line"><span class="number">9</span> astore_1</span><br><span class="line">10 new #8 &lt;Class java.lang.StringBuffer&gt;</span><br><span class="line"><span class="number">13</span> dup</span><br><span class="line"><span class="number">14</span> aload_1</span><br><span class="line">15 invokestatic #23 &lt;Method java.lang.String valueOf(java.lang.Object)&gt;</span><br><span class="line">18 invokespecial #13 &lt;Method java.lang.StringBuffer(java.lang.String)&gt;</span><br><span class="line">21 ldc #1 &lt;String "Lost!!"&gt;</span><br><span class="line">23 invokevirtual #15 &lt;Method java.lang.StringBuffer append(java.lang.String)&gt;</span><br><span class="line">26 invokevirtual #22 &lt;Method java.lang.String toString()&gt;</span><br><span class="line"><span class="number">29</span> astore_1</span><br></pre></td></tr></table></figure>
+<p>其中0到9是执行String类的初始化，而后面则是拼接操作的字节码，可以看到生成的字节码中创建了一个StringBuffer对象，并且调用了append方法。最后再调用toString()方法转换回String对象。整个过程的操作比较昂贵。</p>
+<p>而如果我们使用StringBuffer进行拼接操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">StringBuffer str = <span class="keyword">new</span> StringBuffer (<span class="string">"Stanford "</span>);</span><br><span class="line">str.append(<span class="string">"Lost!!"</span>);</span><br></pre></td></tr></table></figure>
+<p>至于该操作的字节码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">0 new #8 &lt;Class java.lang.StringBuffer&gt;</span><br><span class="line"><span class="number">3</span> dup</span><br><span class="line">4 ldc #2 &lt;String "Stanford "&gt;</span><br><span class="line">6 invokespecial #13 &lt;Method java.lang.StringBuffer(java.lang.String)&gt;</span><br><span class="line"><span class="number">9</span> astore_1</span><br><span class="line"><span class="number">10</span> aload_1 </span><br><span class="line">11 ldc #1 &lt;String "Lost!!"&gt;</span><br><span class="line">13 invokevirtual #15 &lt;Method java.lang.StringBuffer append(java.lang.String)&gt;</span><br><span class="line"><span class="number">16</span> pop</span><br></pre></td></tr></table></figure>
+<h2 id="线程安全性"><a href="#线程安全性" class="headerlink" title="线程安全性"></a>线程安全性</h2><p>由于String对象是不可变的，因此常量为线程安全的。而StringBuffer 对方法加了同步锁或者对调用的方法加了同步锁，所以是线程安全的。StringBuilder 并没有对方法进行加同步锁，所以是非线程安全的。 </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>操作少量的数据，使用String；</li>
+<li>单线程操作字符串，大量数据，使用StringBuilder；</li>
+<li>多线程操作字符串，大量数据，使用StringBuilder；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/01/垃圾回收器与内存分配策略/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1599,142 +1737,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/谨慎地覆盖clone/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/26/谨慎地覆盖clone/" itemprop="url">谨慎地覆盖clone</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:40:53+08:00">
-                2019-01-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="谨慎地覆盖clone"><a href="#谨慎地覆盖clone" class="headerlink" title="谨慎地覆盖clone"></a>谨慎地覆盖clone</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Cloneable接口没有任何方法，它表明object允许被clone。这个接口的作用是改变clone方法的行为，使得Object中的clone方法返回对象的逐域拷贝，否则CloneNotSupportedException异常。</p>
-<p>Object的clone方法是protected的。</p>
-<h2 id="约定"><a href="#约定" class="headerlink" title="约定"></a>约定</h2><p>如果实现Cloneable接口是要对某个类起作用，那该类和它的所有超类都必须满足：无需调用构造器就可以创建对象。并且这个拷贝应该满足：</p>
-<p>x.clone() != x 为true</p>
-<p>x.clone().getClass() == x.getClass() 为true</p>
-<p>x.clone().equals(x) 为true</p>
-<p>实际上，良好的clone方法可以调用构造器创建对象，之后再去复制内部数据。</p>
-<h2 id="super-clone"><a href="#super-clone" class="headerlink" title="super.clone()"></a>super.clone()</h2><p>假设超类提供了良好的clone方法，那么从super.clone()中得到的对象可能会接近于最终返回的对象，也可能相距甚远。如果每个域包含一个基本类型的值，或者包含一个指向不可变对象的引用，那么返回对象就可能是符合要求的。</p>
-<p>例如</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> PhoneNumber <span class="title">clone</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (PhoneNumber) <span class="keyword">super</span>.clone();</span><br><span class="line">    &#125; <span class="keyword">catch</span>(CloneNotSupportedException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>注意，clone方法返回的是PhoneNumber，永远不要让那个客户去做类库能替用户完成的事情。</p>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果对象中包含的域引用了可变的对象，那这种clone实现可能导致灾难性后果。因为修改原始的实例可能会破坏克隆对象的约束条件。</p>
-<p>复杂对象的克隆，需要先调用super.clone，再把结果对象中的所有域设置为空白状态，然后调用higher level去重新设置对象状态。</p>
-<p>跟构造器一样，clone不应该调用一个被覆盖的方法，因为该方法可能先执行，导致克隆对象和原始对象不一致。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>所有实现了Cloneable接口的类都应该用一个公有的方法去覆盖clone：先调用super.clone，然后修正需要的域，这意味着需要拷贝任何包含内部深层结构的可变对象。</p>
-<p>另一个实现对象拷贝的方法是提供一个拷贝构造器或者拷贝工厂。</p>
-<p>对于一个专门用于继承而设计的类，如果未能提供行为良好的protected的clone方法，那么它的子类就不可能实现Cloneable接口。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1783,7 +1785,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">208</span>
+                <span class="site-state-item-count">209</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
