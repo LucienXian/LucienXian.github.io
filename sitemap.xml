@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/05/03/Rvalue-in-C/</loc>
+    
+    <lastmod>2019-05-03T03:28:47.814Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/05/02/packaged-task-Example-and-Tutorial/</loc>
     
     <lastmod>2019-05-02T10:33:58.136Z</lastmod>

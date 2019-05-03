@@ -265,6 +265,142 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/03/Rvalue-in-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/03/Rvalue-in-C/" itemprop="url">Rvalue in C++</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-03T11:28:31+08:00">
+                2019-05-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Rvalue-in-C"><a href="#Rvalue-in-C" class="headerlink" title="Rvalue in C++"></a>Rvalue in C++</h1><h2 id="lvalue-vs-rvalue"><a href="#lvalue-vs-rvalue" class="headerlink" title="lvalue vs rvalue"></a>lvalue vs rvalue</h2><p>在C中，判断是左值还是右值比较容易，赋值运算符的左边就是左值，右边就是右值。但在C++中不能这样一概而论。</p>
+<h3 id="What-is-lvalue"><a href="#What-is-lvalue" class="headerlink" title="What is lvalue"></a>What is lvalue</h3><p>左值意味着其地址是可以访问的，即我们可以使用&amp;运算符去访问地址。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> *ptr = &amp;x;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> *ptr2 = &amp;(x+<span class="number">1</span>); <span class="comment">//Compiler Error</span></span><br></pre></td></tr></table></figure>
+<p>因为(x+1)在这个表达式之后不能再生效，因此这不是左值而是一个右值。</p>
+<h3 id="What-is-rvalue"><a href="#What-is-rvalue" class="headerlink" title="What is rvalue"></a>What is rvalue</h3><p>非左值即为右值，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *ptr = &amp;(<span class="number">1</span>); <span class="comment">//Compiler Error, 1 is rvalue</span></span><br><span class="line"><span class="keyword">int</span> *ptr2 = &amp;(x+<span class="number">1</span>); <span class="comment">//Compiler Error, x+1 is rvalue</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getData</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> *ptr = &amp;getData(); <span class="comment">//Compiler Error</span></span><br></pre></td></tr></table></figure>
+<p>getData()是一个右值，在赋值之后这个临时值就失效了，里面的data是拷贝出来的，因此我们不能取其地址。</p>
+<h2 id="Is-rvalue-immutable-in-C"><a href="#Is-rvalue-immutable-in-C" class="headerlink" title="Is rvalue immutable in C++"></a>Is rvalue immutable in C++</h2><p>虽然我们不能获取右值的地址，但我们能根据右值的数据类型去修改其。</p>
+<h3 id="rvalues-of-builtin-data-type-is-Immutable"><a href="#rvalues-of-builtin-data-type-is-Immutable" class="headerlink" title="rvalues of builtin data type is Immutable"></a>rvalues of builtin data type is Immutable</h3><p>我们无法修改内置的数据类型，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(x+<span class="number">7</span>) = <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line">getData() = <span class="number">9</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Both Compile Error</span></span><br></pre></td></tr></table></figure>
+<h3 id="rvalue-of-User-Defined-data-type-is-not-Immutable"><a href="#rvalue-of-User-Defined-data-type-is-not-Immutable" class="headerlink" title="rvalue of User Defined data type is not Immutable"></a>rvalue of User Defined data type is not Immutable</h3><p>如果右值是用户定义的数据类型，我们可以在同一个表达式中使用成员函数去修改右值：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line">		<span class="keyword">int</span> mAge;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Person() &#123;</span><br><span class="line">      	mAge = <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">incrementAge</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      	mAge = mAge + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="function">Person <span class="title">getPerson</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Person();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">getPerson().incrementAge(); <span class="comment">// persist in single expression</span></span><br></pre></td></tr></table></figure>
+<h2 id="What-is-rvalue-reference-in-C-11"><a href="#What-is-rvalue-reference-in-C-11" class="headerlink" title="What is rvalue reference in C++11"></a>What is rvalue reference in C++11</h2><h3 id="lvalue-references"><a href="#lvalue-references" class="headerlink" title="lvalue references"></a>lvalue references</h3><p>在C++11以前只有引用，即指向现存变量的别名。</p>
+<p>c++11将原来的引用变成了左值引用，只能引用左值：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp; lvalueRef = x; <span class="comment">// lvalueRef is a lvalue reference</span></span><br><span class="line"><span class="keyword">int</span> &amp; lvalueRef2 = (x+<span class="number">1</span>); <span class="comment">// compile error</span></span><br></pre></td></tr></table></figure>
+<h3 id="rvalue-Reference"><a href="#rvalue-Reference" class="headerlink" title="rvalue Reference"></a>rvalue Reference</h3><p>右值引用是C++11引入的新特性：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> &amp;&amp; rvalueRef = (x+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> &amp; lvalueRef3 = getData(); <span class="comment">// compile error</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp; lvalueRef3 = getData(); <span class="comment">// OK but its const</span></span><br><span class="line"><span class="keyword">int</span> &amp;&amp; rvalueRef2 = getData();</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/02/packaged-task-Example-and-Tutorial/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1482,135 +1618,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/19/Joining-and-Detaching-Threads/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/19/Joining-and-Detaching-Threads/" itemprop="url">Joining and Detaching Threads</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-19T10:57:30+08:00">
-                2019-04-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="C-11-Multithreading-–-Part-2-Joining-and-Detaching-Threads"><a href="#C-11-Multithreading-–-Part-2-Joining-and-Detaching-Threads" class="headerlink" title="C++11 Multithreading – Part 2: Joining and Detaching Threads"></a>C++11 Multithreading – Part 2: Joining and Detaching Threads</h1><h2 id="Joining-Threads-with-std-thread-join"><a href="#Joining-Threads-with-std-thread-join" class="headerlink" title="Joining Threads with std::thread::join()"></a>Joining Threads with std::thread::join()</h2><p>一个线程启动后，另一个线程可以等待该线程完成。这个特别的需求可以用join来实现：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">th</span><span class="params">(funcPtr)</span></span>;</span><br><span class="line">th.join();</span><br></pre></td></tr></table></figure>
-<h2 id="Detaching-Threads-using-std-thread-detach"><a href="#Detaching-Threads-using-std-thread-detach" class="headerlink" title="Detaching Threads using std::thread::detach()"></a>Detaching Threads using std::thread::detach()</h2><p>被分离的线程也叫守护(daemon)/后台(background)线程，这个需求可以调用std::function来完成：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">th</span><span class="params">(funcPtr)</span></span>;</span><br><span class="line">th.detach();</span><br></pre></td></tr></table></figure>
-<h2 id="Be-careful-with-calling-detach-and-join-on-Thread-Handles"><a href="#Be-careful-with-calling-detach-and-join-on-Thread-Handles" class="headerlink" title="Be careful with calling detach() and join() on Thread Handles"></a>Be careful with calling detach() and join() on Thread Handles</h2><h3 id="Case-1-Never-call-join-or-detach-on-std-thread-object-with-no-associated-executing-thread-std-thread-threadObj-WorkerThread-threadObj-join-threadObj-join-It-will-cause-Program-to-Terminate"><a href="#Case-1-Never-call-join-or-detach-on-std-thread-object-with-no-associated-executing-thread-std-thread-threadObj-WorkerThread-threadObj-join-threadObj-join-It-will-cause-Program-to-Terminate" class="headerlink" title="Case 1: Never call join() or detach() on std::thread object with no associated executing thread std::thread threadObj( (WorkerThread()) ); threadObj.join(); threadObj.join(); // It will cause Program to Terminate"></a>Case 1: Never call join() or detach() on std::thread object with no associated executing thread std::thread threadObj( (WorkerThread()) ); threadObj.join(); threadObj.join(); // It will cause Program to Terminate</h3><p>比如在一个没有相关线程的线程上执行join或者detach都会导致程序终止：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">threadObj.join();</span><br><span class="line">threadObj.join(); <span class="comment">// It will cause Program to Terminate</span></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">threadObj.detach();</span><br><span class="line">threadObj.detach(); <span class="comment">// It will cause Program to Terminate</span></span><br></pre></td></tr></table></figure>
-<p>为了避免这个问题，每次调用join()或者detach()之前都应该检查线程状态：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line"><span class="keyword">if</span>(threadObj.joinable())</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Detaching Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj.detach();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(threadObj.joinable())    </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Detaching Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj.detach();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj2</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line"><span class="keyword">if</span>(threadObj2.joinable())</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Joining Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj2.join();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(threadObj2.joinable())    </span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Joining Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    threadObj2.join();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="Case-2-Never-forget-to-call-either-join-or-detach-on-a-std-thread-object-with-associated-executing-thread"><a href="#Case-2-Never-forget-to-call-either-join-or-detach-on-a-std-thread-object-with-associated-executing-thread" class="headerlink" title="Case 2 : Never forget to call either join or detach on a std::thread object with associated executing thread"></a><strong>Case 2 : Never forget to call either join or detach on a std::thread object with associated executing thread</strong></h3><p>如果一个线程还有相关联的在执行的线程，但却没有对此执行join()或者detach()，那么在destructor中会终止该程序。因为destructor会检查线程是否joinable。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WorkerThread</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">()</span>     </span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Worker Thread "</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">    <span class="comment">// Program will terminate as we have't called either join or detach with the std::thread object.</span></span><br><span class="line">    <span class="comment">// Hence std::thread's object destructor will terminate the program</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1659,7 +1666,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">209</span>
+                <span class="site-state-item-count">210</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -265,6 +265,135 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/03/DESIGN-INTERFACES-FOR-POSTERITY/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/03/DESIGN-INTERFACES-FOR-POSTERITY/" itemprop="url">DESIGN INTERFACES FOR POSTERITY</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-03T17:04:33+08:00">
+                2019-02-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="DESIGN-INTERFACES-FOR-POSTERITY"><a href="#DESIGN-INTERFACES-FOR-POSTERITY" class="headerlink" title="DESIGN INTERFACES FOR POSTERITY"></a>DESIGN INTERFACES FOR POSTERITY</h1><p>##概述</p>
+<p>在Java8之前，要想往接口添加方法，就必须要破坏现有接口的实现类。在Java时，添加了默认方法构造，使得可以在不破坏现有接口实现类的情况下，可以将方法加入现有接口。</p>
+<h2 id="风险"><a href="#风险" class="headerlink" title="风险"></a>风险</h2><p>虽然Java加入默认方法使得我们可以往现有接口里添加方法，但这并不保证这些方法会在现有的接口实现类里工作。而在Java8之前，这些接口实现类都是基于默认接口不会添加任何新方法的情况下编写的。</p>
+<p>在Java8里，很多新的默认方法被加入到核心的集合接口里，以便促进lambda表达式的使用。</p>
+<blockquote>
+<p>The Java libraries’ default methods are high-quality general-purpose implementations, and in most cases, they work fine. But <strong>it is not always possible to write a default method that maintains all invariants of every conceivable implementation.</strong></p>
+</blockquote>
+<p>例如，考虑removeIf方法的情况，这个方法在Java 8里被添加进集合接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Default method added to the Collection interface in Java 8</span></span><br><span class="line"><span class="function"><span class="keyword">default</span> <span class="keyword">boolean</span> <span class="title">removeIf</span><span class="params">(Predicate&lt;? <span class="keyword">super</span> E&gt; filter)</span> </span>&#123;</span><br><span class="line">    Objects.requireNonNull(filter);</span><br><span class="line">    <span class="keyword">boolean</span> result = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (Iterator&lt;E&gt; it = iterator(); it.hasNext(); ) &#123;</span><br><span class="line">        <span class="keyword">if</span> (filter.test(it.next())) &#123;</span><br><span class="line">            it.remove();</span><br><span class="line">            result = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>虽然这已经是该方法最好的通用实现了，但遗憾的是，它在现实中的一些集合框架里是无法工作的。例如，考虑org.apache.commons.collections4.collection.SynchronizedCollection。这个来自Apache公共库的类，并未覆盖removeIf方法。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/03/String-vs-StringBuilder-vs-StringBuffer-in-Java/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1606,137 +1735,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/使可变性最小化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/26/使可变性最小化/" itemprop="url">使可变性最小化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:41:26+08:00">
-                2019-01-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="使可变性最小化"><a href="#使可变性最小化" class="headerlink" title="使可变性最小化"></a>使可变性最小化</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>不可变类是其实例不能被修改的类，并且实例中包含的所有信息都必须在创建实例的时候提供，在整个对象生命周期中固定不变。</p>
-<h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><p>为了使类不可变，要遵守：</p>
-<ul>
-<li>不要提供任何会修改对象状态的方法；</li>
-<li>保证类不会被扩展；</li>
-<li>使所有的域都是final的；</li>
-<li>使所有的域都变成私有的；</li>
-<li>确保对于任何可变组件的互斥访问；</li>
-</ul>
-<p>由于不可变对象本质上是线程安全的，所以它们并不要求同步，这是获得线程安全最容易的方法；</p>
-<p>另外，不可变对象可以被自由地共享，甚至共享其内部信息；</p>
-<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>不可变类最大的缺点，对于每个不同的值都需要一个单独的对象。对于大型对象的情形，创建这种对象的代价可能很高。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1785,7 +1783,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">209</span>
+                <span class="site-state-item-count">210</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
