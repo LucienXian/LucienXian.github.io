@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-05-03T03:28:47.814Z</updated>
+  <updated>2019-05-04T03:28:08.800Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Move Contsructor &amp; rvalue References</title>
+    <link href="http://yoursite.com/2019/05/04/Move-Contsructor-rvalue-References/"/>
+    <id>http://yoursite.com/2019/05/04/Move-Contsructor-rvalue-References/</id>
+    <published>2019-05-04T03:27:42.000Z</published>
+    <updated>2019-05-04T03:28:08.800Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Move-Contsructor-amp-rvalue-References"><a href="#Move-Contsructor-amp-rvalue-References" class="headerlink" title="Move Contsructor &amp; rvalue References"></a>Move Contsructor &amp; rvalue References</h1><h2 id="Problem-of-Temporary-Objects"><a href="#Problem-of-Temporary-Objects" class="headerlink" title="Problem of Temporary Objects"></a>Problem of Temporary Objects</h2><p>这篇文章的主要目的是研究如何使用move语义去降低内存中临时对象的负载。每次从函数中返回一个对象时，都会有一个临时对象被创建出来，然后进行拷贝。最终我们将会创建出两个对象，但实质上我们只需要一个。</p><p>举个例子，我们有一个容器类：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Container</span> &#123;</span></span><br><span class="line"><span class="keyword">int</span> * m_Data;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Container() &#123;</span><br><span class="line">        <span class="comment">//Allocate an array of 20 int on heap</span></span><br><span class="line">        m_Data = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];</span><br><span class="line"></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Constructor: Allocation 20 int"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ~Container() &#123;</span><br><span class="line">        <span class="keyword">if</span> (m_Data) &#123;</span><br><span class="line">          <span class="keyword">delete</span>[] m_Data;</span><br><span class="line">          m_Data = <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    Container(<span class="keyword">const</span> Container &amp; obj) &#123;</span><br><span class="line">        <span class="comment">//Allocate an array of 20 int on heap</span></span><br><span class="line">        m_Data = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Copy the data from passed object</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">20</span>; i++)</span><br><span class="line">          m_Data[i] = obj.m_Data[i];</span><br><span class="line"></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Copy Constructor: Allocation 20 int"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>这个类中，我们每次创建一个容器对象，其默认构造器都会分配一个20个int大的数组在堆上。同理，容器类的靠背构造器也会做类似的工作，首先是分配数组，然后将传递进的数组内容拷贝到新创建出数组里。</p><p>一般来说，我们使用工厂类来创建对象：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Container <span class="title">getContainer</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Container obj;</span><br><span class="line">    <span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>假设我们创建一个容器类型的vector，每次插入一个由getContainer()返回的对象：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Create a vector of Container Type</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Container&gt; vecOfContainers;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Add object returned by function into the vector</span></span><br><span class="line">    vecOfContainers.push_back(getContainer());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>vector里的一个对象，实际上背后我们为此创建了两个对象。</p><ul><li>一个是在getContainer()使用Container类的默认函数创建出来的；</li><li>一个是在加入vector中使用Container类的拷贝构造函数创建出来的；</li></ul><p>这样每一个对象，都会带来两次在heap上创建数组。</p><h2 id="Solving-Problem-of-Temporary-Objects-using-rvalue-references-amp-Move-Constructor"><a href="#Solving-Problem-of-Temporary-Objects-using-rvalue-references-amp-Move-Constructor" class="headerlink" title="Solving Problem of Temporary Objects using rvalue references &amp; Move Constructor"></a>Solving Problem of Temporary Objects using rvalue references &amp; Move Constructor</h2><p>getContainer()函数实际上是一个右值，所以可以被右值引用指向。因此为了实现这个目的，我们可以重载一个新的构造器，即move构造器：</p><h2 id="Move-Constructor"><a href="#Move-Constructor" class="headerlink" title="Move Constructor"></a>Move Constructor</h2><p>Move构造函数将右值引用作为参数，并重载该函数。在move构造函数中，我们只是将传递对象的成员变量move到新对象的成员变量中，而不是分配新内存。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Container(Container &amp;&amp; obj)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Just copy the pointer</span></span><br><span class="line">    m_Data = obj.m_Data;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set the passed object's member to NULL</span></span><br><span class="line">    obj.m_Data = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Move Constructor"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>在移动构造函数中，我们只是复制了指针，即成员变量m_Data指向了堆上的相同内存，然后将传递进的对象的m_Data设置为NULL。所以我们并没有在该构造函数中分配新的内存，而是转移了内存的控制。</p><p>现在再将getContainer()返回的对象push到数组中，由于getContainer()是一个右值，因此会调用container类的move构造器，此时只会创建一个整数数组。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Move-Contsructor-amp-rvalue-References&quot;&gt;&lt;a href=&quot;#Move-Contsructor-amp-rvalue-References&quot; class=&quot;headerlink&quot; title=&quot;Move Contsructor
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>Rvalue in C++</title>
@@ -450,29 +473,6 @@
     
     
       <category term="C++" scheme="http://yoursite.com/tags/C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>In Search of an Understandable Consensus Algorithm&lt;二&gt;——MIT6.824</title>
-    <link href="http://yoursite.com/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%BA%8C-%E2%80%94%E2%80%94MIT6-824/"/>
-    <id>http://yoursite.com/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-二-——MIT6-824/</id>
-    <published>2019-04-08T12:51:24.000Z</published>
-    <updated>2019-04-08T12:52:40.231Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt"><a href="#In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt" class="headerlink" title="In Search of an Understandable Consensus Algorithm&lt;二&gt;"></a>In Search of an Understandable Consensus Algorithm&lt;二&gt;</h1><h2 id="Cluster-membership-changes"><a href="#Cluster-membership-changes" class="headerlink" title="Cluster membership changes"></a>Cluster membership changes</h2><p>上一篇<a href="http://www.lucienxian.top/2019/03/27/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%B8%80-%E2%80%94%E2%80%94MIT6-824/" target="_blank" rel="noopener">博文</a>中，我们都假设集群配置是固定的。但在实践中往往需要更改配置，可能需要更换服务器或者更改备份配置。为了使配置变更机制更加安全，在过渡期间不存在任意一个时间点会存在两个leader，但任何从旧配置切换到新配置的方法都是不够安全的，在切换期间可能会存在分裂成两个集群，如图：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_two_disjoint_majorities.png" alt="img"></p><p>为了确保安全，配置更改可以使用两阶段的方法。在raft中，集群首先切换到过渡配置，即为<strong>joint consensus</strong>。一旦commit了joint consensus，系统就会切换到新配置。</p><ul><li>日志会被复制到两种配置中的所有服务器；</li><li>两种配置中的任何服务器就可以成为leader；</li><li>选举等协议需要新旧两种配置的大多数票；</li></ul><p>我们使用复制的日志中特殊条目来存储和传送集群配置，下图就是配置更改过程：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_Timeline_Conf_change.png" alt="img"></p><p>当leader收到请求，从Cold配置更改为Cnew时，它会将联合共识即$C_{old, new}$存储为日志。如果leader crash了，新的leader会在$C_{old}$和$C_{old, new}$中选择。</p><p>更改配置后还有三个问题需要解决；</p><ul><li>新服务器可能一开始不会存储任何日志；raft的解决方法是在更改配置之前引入一个额外的阶段，在该阶段新的服务器以非投票成员的身份加入集群，leader会将日志复制到它们，但不参与投票；</li><li>集群leader可能并不属于新配置；在这种情况下，leader在提交了日志$C_{new}$之后就会返回到follower阶段；</li><li>删除的服务器可能会破坏集群；这些服务器不再接受心跳，因此会超时用新的term发送RequestVote RPC请求选举，并且重复这个过程。为了避免这个问题，服务器会在当前leader存在时，忽略掉RequestVote RPC，不会更新term或者授予票数；</li></ul><h2 id="Log-compaction"><a href="#Log-compaction" class="headerlink" title="Log compaction"></a>Log compaction</h2><p>日志会在服务器运行期间无限增长，如果我们不及时丢弃过期的日志，那么对着日志的增长，它会占据更多的内存空间并需要更多时间来重新执行日志。</p><p>snapshot是最简单的压缩方法，下图就是raft的快照方式：</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_snapshot.png" alt="img"></p><p>每个服务器独立获取快照，快照内容仅仅覆盖了已提交的条目。快照除了包括状态集信息之外，还包含了少量的元数据信息，如上图就包含了最近索引和term。包含了这些信息，可以帮助支持快照后第一个日志条目的AppendEntries一致性检查。</p><p>虽然服务器独立生成快照，但一般情况下，如果有一个落后非常多的follower或者新的服务器加入集群，leader会通过InstallSnapshot RPC往其它服务器发送快照。</p><p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_InstallSnapshot_RPC.png" alt="img"></p><p>如果snapshot中包含了follower未包含的日志新内容，该follower会丢弃整个日志，并用snapshot替代。如果接收者收到的snapshot是当前日志的前缀部分，则该快照后面的条目保留，其余删除。</p><p>如果是由leader生成snapshot再转发到各个follower，这种做法会浪费网络带宽并降低生成快照的速度。另外还有两个问题会影响性能：</p><ul><li>服务器必须决定何时进行快照。一个简单的策略是在日志达到固定大小（以字节为单位）时拍摄快照，此大小设置为远大于快照的预期大小，则用于快照的磁盘带宽开销将很小</li><li>写快照可能需要很长时间，我们不希望这会延迟正常操作。解决方案是写时拷贝</li></ul><h2 id="Client-interaction"><a href="#Client-interaction" class="headerlink" title="Client interaction"></a>Client interaction</h2><p>本节主要描述raft客户端与raft的交互。</p><p>raft将所有的客户端请求发送到leader，如果客户端联系的不是leader，那么服务器会拒绝这一请求，并提供最新的leader地址。</p><p>我们对Raft的目标是实现可线性化的语义（即每个操作似乎在其调用和响应之间的某个时刻只执行一次）。但如果leader在提交日志条目之后但在响应客户端之前发生了冲突，则客户端将使用新的leader重试该命令，从而变成了二次执行。解决方案是客户端为每个命令分配唯一的序列号，如果它收到一个序列号已经执行的命令，它会立即响应而不重新执行请求。</p><p>只读操作可能会因为leader的重新选举而返回过时的数据，raft需要在不使用日志的情况下确保自己不返回过期的数据，这里采取两个措施：</p><ul><li>首先，leader必须拥有关于提交的日志的最新信息。虽然leader拥有所有提交了的日志，但leader不知道这是什么，Raft通过让每个leader在其任期开始时将空白的无操作日志条目输入到日志中来处理此问题。</li><li>其次，leader必须在处理只读请求之前检查它是否已被废除；这个可以通过与大多数集群交换心跳来解决；</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt&quot;&gt;&lt;a href=&quot;#In-Search-of-an-Understandable-Consensus-Algorithm-lt-二-gt&quot; cl
-      
-    
-    </summary>
-    
-    
-      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     
   </entry>
   
