@@ -265,6 +265,158 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/10/C-11-‘delete’-keyword-and-deleted-functions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/10/C-11-‘delete’-keyword-and-deleted-functions/" itemprop="url">C++11 ‘delete’ keyword and deleted functions</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-10T19:54:47+08:00">
+                2019-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="C-11-C-14-‘delete’-keyword-and-deleted-functions"><a href="#C-11-C-14-‘delete’-keyword-and-deleted-functions" class="headerlink" title="C++11 / C++14 : ‘delete’ keyword and deleted functions"></a>C++11 / C++14 : ‘delete’ keyword and deleted functions</h1><p>本文将介绍C++11的一个新特性——delete，通过将delete应用到函数来限制其调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>= <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
+<p>它通常用在以下的地方：</p>
+<ul>
+<li>delete编译器生成的函数，如拷贝构造函数、赋值运算符、移动拷贝函数、移动赋值运算符和默认构造函数；</li>
+<li>delete成员函数，以避免数据丢失；</li>
+<li>delete类的new运算符，以限制堆的对象创建；</li>
+<li>delete特定的模版特化；</li>
+</ul>
+<h2 id="Deleting-Copy-Constructor-and-Assignment-Operator"><a href="#Deleting-Copy-Constructor-and-Assignment-Operator" class="headerlink" title="Deleting Copy Constructor and Assignment Operator"></a>Deleting Copy Constructor and Assignment Operator</h2><p>假设存在这样的一个类，拷贝构造函数和赋值运算符都被delete了：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"> </span><br><span class="line">	<span class="keyword">int</span> id;</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	User(<span class="keyword">int</span> userId, <span class="built_in">std</span>::<span class="built_in">string</span> userName) : id(userId), name(userName)</span><br><span class="line">	&#123;&#125;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Copy Constructor is deleted</span></span><br><span class="line">	User(<span class="keyword">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line">	<span class="comment">// Assignment operator is deleted</span></span><br><span class="line">	User &amp; <span class="keyword">operator</span> = (<span class="keyword">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;id &lt;&lt; <span class="string">" ::: "</span>&lt;&lt;name&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如果调用这赋值运算符：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">User obj = userObj;</span><br></pre></td></tr></table></figure>
+<p>编译时报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:30:10: error: call to deleted constructor of 'User'</span><br><span class="line">    User obj = userObj;</span><br><span class="line">         ^     ~~~~~~~</span><br><span class="line">delete.cpp:15:2: note: 'User' has been explicitly marked deleted here</span><br><span class="line">        User(const User &amp; obj) = delete;</span><br><span class="line">        ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
+<h2 id="Deleting-member-functions-to-prevent-data-loss-conversions"><a href="#Deleting-member-functions-to-prevent-data-loss-conversions" class="headerlink" title="Deleting member functions to prevent data loss conversions"></a>Deleting member functions to prevent data loss conversions</h2><p>由于类型的隐式转换，有可能会在调用函数时传递了错误的参数，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">User(<span class="keyword">int</span> userId, <span class="built_in">std</span>::<span class="built_in">string</span> userName) : id(userId), name(userName)&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 这样调用会被cast</span></span><br><span class="line"><span class="function">User <span class="title">obj4</span><span class="params">(<span class="number">5.5</span>, <span class="string">"Riti"</span>)</span></span>;</span><br><span class="line"> </span><br><span class="line"><span class="function">User <span class="title">obj5</span><span class="params">(<span class="string">'a'</span>, <span class="string">"Riti"</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>通过利用delete来避免类型转换：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent narrowing conversion</span></span><br><span class="line">User(<span class="keyword">double</span> userId, <span class="built_in">std</span>::<span class="built_in">string</span> userName) = <span class="keyword">delete</span> ;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent invalid type conversion</span></span><br><span class="line">User(<span class="keyword">char</span> userId, <span class="built_in">std</span>::<span class="built_in">string</span> userName) = <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
+<p>报错如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">elete.cpp:32:10: error: call to deleted constructor of 'User'</span><br><span class="line">    User userObj1(5.5, "John");</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:14:5: note: 'User' has been explicitly marked deleted here</span><br><span class="line">    User(double userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">delete.cpp:33:10: error: call to deleted constructor of 'User'</span><br><span class="line">    User userObj2('a', "John");</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:15:5: note: 'User' has been explicitly marked deleted here</span><br><span class="line">    User(char userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">2 errors generated.</span><br></pre></td></tr></table></figure>
+<h2 id="Restrict-Object-creation-on-Heap-by-deleting-new-operator-for-class"><a href="#Restrict-Object-creation-on-Heap-by-deleting-new-operator-for-class" class="headerlink" title="Restrict Object creation on Heap by deleting new operator for class"></a>Restrict Object creation on Heap by deleting new operator for class</h2><p>我们也可以限制new运算符的使用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> * <span class="keyword">operator</span> <span class="title">new</span> <span class="params">(<span class="keyword">size_t</span>)</span> </span>= <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line">User * ptr = <span class="keyword">new</span> User(<span class="number">1</span>, <span class="string">"Riti"</span>);</span><br></pre></td></tr></table></figure>
+<p>报错如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:34:17: error: call to deleted function 'operator new'</span><br><span class="line">    User *ptr = new User(1, "Rziti");</span><br><span class="line">                ^</span><br><span class="line">delete.cpp:17:12: note: candidate function has been explicitly deleted</span><br><span class="line">    void * operator new (size_t) = delete;</span><br><span class="line">           ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
+<h2 id="Delete-specific-template-specialisation"><a href="#Delete-specific-template-specialisation" class="headerlink" title="Delete specific template specialisation"></a>Delete specific template specialisation</h2><p>使用delete关键字，我们可以限制模板类或函数的某些模板特化。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ComplexNumber</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	T x;</span><br><span class="line">	T y;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	ComplexNumber(T a, T b) : x(a) , y(b)</span><br><span class="line">	&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;x &lt;&lt; <span class="string">" + i"</span>&lt;&lt;y&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">        <span class="comment">// Deleted template specialisation </span></span><br><span class="line">	ComplexNumber(<span class="keyword">char</span> a, <span class="keyword">char</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="comment">// Deleted template specialisation  </span></span><br><span class="line">	ComplexNumber(<span class="keyword">double</span> a, <span class="keyword">double</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>原来该模版类可以接收char参数和double参数，通过delete，我们可以限制其特化。</p>
+<h2 id="Different-between-deleted-function-and-private-functions"><a href="#Different-between-deleted-function-and-private-functions" class="headerlink" title="Different between deleted function and private functions"></a>Different between deleted function and private functions</h2><p>相比private成员函数，delete有两个优点：</p>
+<ul>
+<li>避免被其它成员函数调用；</li>
+<li>delete函数在name lookup中，如果函数delete了，那么它就不会根据该类型去查找其它匹配函数；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-二-——MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1940,142 +2092,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/18/深度学习中的正则化-一-——DeepLearning系列/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/18/深度学习中的正则化-一-——DeepLearning系列/" itemprop="url">深度学习中的正则化<一>——DeepLearning系列</一></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-18T00:23:19+08:00">
-                2019-02-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="深度学习中的正则化-lt-一-gt"><a href="#深度学习中的正则化-lt-一-gt" class="headerlink" title="深度学习中的正则化&lt;一&gt;"></a>深度学习中的正则化&lt;一&gt;</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>深度学习的一个核心问题就是提高模型的泛化性，即不仅仅要在训练数据上表现好，还能在新输入上有更好的泛化，这些策略就是正则化。</p>
-<p>首先来理解偏差和方差的含义：</p>
-<ul>
-<li>方差度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响。</li>
-<li>偏差度量了学习算法的期望预测与真实结果的偏离程度，即刻画了学习算法本身的拟合能力</li>
-</ul>
-<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/var_bias_dl.png" alt="img"></p>
-<p>在一些过拟合的场景下，正则化会以偏差的增加来换取方差的减少。</p>
-<h2 id="参数范数惩罚"><a href="#参数范数惩罚" class="headerlink" title="参数范数惩罚"></a>参数范数惩罚</h2><p>许多正则化方法会对目标函数J增加一个参数范数惩罚$\Omega(\theta)$，限制模型的学习能力，目标函数变为：<br>$$<br>J’(\theta, X, y) = J(\theta, X, y) + \alpha \Omega(\theta)<br>$$<br>$\alpha$越大，对应的正则化惩罚就越大。当我们的训练算法最小化正则化后的目标函数J时，它会降低原始目标J关于<br>训练数据的误差并同时减小在某些衡量标准下参数θ(或参数子集)的规模。</p>
-<p>一般情况下，在神经网络中我们只对权重做惩罚而不对偏置做惩罚。精确拟合偏置所需要的数据比拟合权重少，我们不对其进行正则化也不会导致太大的方差，而且正则化偏置参数可能会导致明显的欠拟合。</p>
-<h3 id="L2参数正则化"><a href="#L2参数正则化" class="headerlink" title="L2参数正则化"></a>L2参数正则化</h3><p>$L^2$参数范数惩罚是最简单最常见的正则化方式，这个策略添加了一个正则项（权值向量w中各个元素的平方和），使得权重更加接近原点。这个目标函数就变成了：<br>$$<br>J’(w, X, y)=\frac{\alpha}{2}w^Tw+J(w, X, y)<br>$$<br>与之对应的梯度为：<br>$$<br>\nabla_wJ’(w, X, y) = \alpha w+\nabla_wJ(w, X, y)<br>$$<br>那么更新权重的方式也会发生变化：<br>$$<br>w = w-\epsilon(\alpha w+\nabla_wJ(w, X, y)) = (1-\epsilon \alpha)w-\epsilon \nabla_wJ(w, X, y)<br>$$<br>我们可以看到每步更新执行时都会先收缩权重向量。</p>
-<p>我们进一步分析整个训练过程中会发生什么，令w<em>为未正则化的目标函数取得最小训练误差时的权重向量，那么近似的误差函数就是：<br>$$<br>J’(\theta) = J(w^</em>) + \frac{1}{2}(w-w^<em>)^TH(w-w^</em>)<br>$$<br>其中H是J在w<em>处计算的Hessian矩阵，当$J’$取得最小时，其梯度为：<br>$$<br>\nabla_wJ’(w) = H(w-w^</em>) = 0<br>$$<br>然后我们添加上权重衰减的梯度，其中w是此时的最优点：<br>$$<br>\alpha w+H(w-w^*) = 0<br>$$</p>
-<p>$$<br>w = (H+\alpha I)^{-1}Hw^*<br>$$</p>
-<p>可以看到当$\alpha$趋向于0的时候，正则化的解w会趋向$w^*$。那么当$\alpha$增加时，在显著减小目标函数方向上的参数会保留得相对完好，而在无助于目标函数减小的方向(对应 Hessian 矩阵较小的特征值)上改变参数不会显著增加梯度，这种不重要方向对应的分量会在训练过程中因正则化而衰减掉。</p>
-<p>简单来说，L2正则化能让学习算法对与具有较高方差的输入x更加敏感，使得与输出目标的协方差较小的特征的权重收缩，</p>
-<h3 id="L1参数正则化"><a href="#L1参数正则化" class="headerlink" title="L1参数正则化"></a>L1参数正则化</h3><p>L1正则化则是添加一个另外的正则化项（权值向量w中各个元素的绝对值之和）：<br>$$<br>J’(w, X, y)=\alpha||w||_1+J(w, X, y)<br>$$<br>对应的梯度为：<br>$$<br>\nabla_wJ’(w, X, y) = \alpha sign(w)+\nabla_wJ(w, X, y)<br>$$<br>其中sign(w)只是简单地取w各个元素的正负号，其中若w&gt;0，则sign(w)=1；若w&lt;0，则sign(w)=−1；若w=0，则sign(w)=0。</p>
-<p>相比L2正则化，L1正则化会产生更加稀疏的解，这里的稀疏指的是最优值中的一些参数为0。由L1正则化导出的稀疏性质被广泛用于特征选择机制，从可用的特征子集中选择出有意义的特征。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2124,7 +2140,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">211</span>
+                <span class="site-state-item-count">212</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
