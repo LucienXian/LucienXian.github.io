@@ -265,6 +265,196 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/16/深度探索C-对象模型-九/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/16/深度探索C-对象模型-九/" itemprop="url">深度探索C++对象模型<九></九></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-16T11:58:40+08:00">
+                2018-07-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Member的各种调用方式"><a href="#Member的各种调用方式" class="headerlink" title="Member的各种调用方式"></a>Member的各种调用方式</h1><h2 id="Nonstatic-Member-Functions"><a href="#Nonstatic-Member-Functions" class="headerlink" title="Nonstatic Member Functions"></a>Nonstatic Member Functions</h2><p>由于C++的一个设计标准就是使得nonstatic member function要有和一般的nonmember function有相同的效率；</p>
+<p>这就带来了一个变化，就是编译器内部会将nonstatic member function转换为等价的nonmember function实体；</p>
+<p>转化步骤：</p>
+<ul>
+<li>改写函数的原型，安插一个新的参数，即this指针；</li>
+<li>将每一个对nontatic data member的存取操作改写为通过this指针的操作；</li>
+<li>将member function改写成一个外部函数，修改函数名称；</li>
+</ul>
+<p>例如一个这样的函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Point3d Point3d::normalize() <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="keyword">float</span> mag = magnitude();</span><br><span class="line">    Point3d normal;</span><br><span class="line">    normal.x = x/mag;</span><br><span class="line">    normal.y = y/mag;</span><br><span class="line">    normal.z = z/mag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将可能会改写成：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">normalize_7Point3dFv</span><span class="params">(<span class="keyword">register</span> <span class="keyword">const</span> Point3d *<span class="keyword">const</span> <span class="keyword">this</span>, Point3d &amp;__result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="keyword">float</span> mag = <span class="keyword">this</span>-&gt;magnitude();</span><br><span class="line">    __result.Point3d::Point3d(<span class="keyword">this</span>-&gt;x/mag, <span class="keyword">this</span>-&gt;y/mag, <span class="keyword">this</span>-&gt;z/mag);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
+<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name mangling的原因。</p>
+<h2 id="Virtual-member-functions"><a href="#Virtual-member-functions" class="headerlink" title="Virtual member functions"></a>Virtual member functions</h2><p>如果normalize()是一个虚函数，那么以下调用会转化为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;normalize();</span><br><span class="line">(*ptr-&gt;vptr[<span class="number">1</span>])(ptr);</span><br></pre></td></tr></table></figure>
+<p>1就是virtual function slot的索引值，关联到normalize()函数。</p>
+<p>而如果里面的magnitude()函数也是虚函数，那么由于normalize会先调用，决定了object的类型，所以编译器会使用更加明确的调用方式，而不是(*ptr-&gt;vptr[2])(ptr);例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">register</span> <span class="keyword">float</span> mag = Point3d::magnitude();</span><br></pre></td></tr></table></figure>
+<h2 id="Static-Member-Functions"><a href="#Static-Member-Functions" class="headerlink" title="Static Member Functions"></a>Static Member Functions</h2><p>如果normalize是一个静态函数，那么这两种调用会变为:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">obj.normalize();</span><br><span class="line">prt-&gt;normalize();</span><br><span class="line"><span class="comment">//会转为</span></span><br><span class="line">normalize_7Point3dSFv();</span><br></pre></td></tr></table></figure>
+<p>由于static member function没有this指针，所以：</p>
+<ul>
+<li>不能直接存取其中class的nonstatic members；</li>
+<li>不能被声明为const, volatile或者virtual；</li>
+<li>不需要经由对象调用（但是如果static member是一个private，就很可能要依赖于对象）；</li>
+</ul>
+<p>如果要取一个static member function的地址，那么其类型会是：unsigned int (*)();</p>
+<h1 id="Virtual-Member-Functions"><a href="#Virtual-Member-Functions" class="headerlink" title="Virtual Member Functions"></a>Virtual Member Functions</h1><p>为了支持virtual function机制，必须要有某种策略能够在运行期进行类型判断。考虑这样的一个调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z()</span><br></pre></td></tr></table></figure>
+<p>这样的一个调用需要两个信息：</p>
+<ul>
+<li>指针指向的对象的地址；</li>
+<li>对象类型的某种编码或者某种结构的地址；</li>
+</ul>
+<p>为了提高效率，不支持多态的类是不需要这些额外的信息的。因此我们可以通过类中是否含有virtual functions判断是否支持多台。</p>
+<p>那么virtual function是如何被构建的呢？每一个类都会有一个virtual table，而每一个table内含其对应的类对象所有虚函数的地址，每一个虚函数都会被指派一个索引值。而每个类对象都会被编译器安插一个指针，指向该virtual table。</p>
+<p>一个类继承基类的时候：</p>
+<ul>
+<li>继承所有的虚函数实体，将这些函数实体的地址拷贝到派生类的虚函数表的slot中；</li>
+<li>填写自定义的虚函数地址到slot中；</li>
+<li>新加的虚函数，新加一个slot；</li>
+</ul>
+<h2 id="多重继承下的virtual-function"><a href="#多重继承下的virtual-function" class="headerlink" title="多重继承下的virtual function"></a>多重继承下的virtual function</h2><p>考虑这样的继承关系：</p>
+<blockquote>
+<p>derived :  base1, base2</p>
+</blockquote>
+<p>这种多重继承的关键在于base2 subobject的身上：假如为派生对象指派一个base2的指针：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base2 *pbase2 = <span class="keyword">new</span> Derived;</span><br></pre></td></tr></table></figure>
+<p>那么在编译器需要调整指针的指向，使其指向base2 subobject的位置。不然是无法通过指针调用。</p>
+<h1 id="指向member-function的指针"><a href="#指向member-function的指针" class="headerlink" title="指向member function的指针"></a>指向member function的指针</h1><p>前面我们提到过，取一个nonstatic data menber的地址，如果该函数是nonvirtual的，则得到的是它在内存中的地址，但是这个地址也是依赖于对象地址的。</p>
+<p>事实上，一个member function的指针，如果不用于virtual function这些情况的话，它的效率并不会比使用一个nonmember function的指针更高</p>
+<h2 id="支持指向virtual-member-functions的指针"><a href="#支持指向virtual-member-functions的指针" class="headerlink" title="支持指向virtual member functions的指针"></a>支持指向virtual member functions的指针</h2><p>考虑这样的一个程序片段：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> (Point::*pmf)() = &amp;Point::z;</span><br><span class="line">Point *ptr = <span class="keyword">new</span> Point3d;</span><br></pre></td></tr></table></figure>
+<p>那么无论是通过prt去调用，还是通过pmf的间接调用，虚拟机制都是有效的：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br><span class="line">(ptr-&gt;*pmf)();</span><br></pre></td></tr></table></figure>
+<p>上一节提到过，对一个nonstatic member function取地址，得到的是该函数在内存中的地址，然而对于一个virtual function来说，其地址在编译器是位置的，因此如果对这样的函数取地址，返回的将会是一个索引值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">    	<span class="keyword">virtual</span> ~Point();</span><br><span class="line">    	<span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="comment">//...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>进行各种取地址操作：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&amp;Point::~Point; <span class="comment">//1</span></span><br><span class="line">&amp;Point::x();<span class="comment">//返回的是这两个函数在内存中的地址</span></span><br><span class="line">&amp;Point::y();</span><br><span class="line">&amp;Point::z();<span class="comment">//2</span></span><br></pre></td></tr></table></figure>
+<h2 id="多重继承下，指向member-function的指针"><a href="#多重继承下，指向member-function的指针" class="headerlink" title="多重继承下，指向member function的指针"></a>多重继承下，指向member function的指针</h2><p>为了让指向member functions的指针能够支持多重继承和虚拟继承，c++设计了这样一个结构：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">mptr</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> delta;<span class="comment">//this指针的offset值</span></span><br><span class="line">    <span class="keyword">int</span> index;<span class="comment">//virtual table的索引</span></span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        ptrtofunc faddr;<span class="comment">//nonvirtual member function地址</span></span><br><span class="line">        <span class="keyword">int</span> v_offset;<span class="comment">//virtual base class的vptr的位置</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="Inline-Functions"><a href="#Inline-Functions" class="headerlink" title="Inline Functions"></a>Inline Functions</h2><p>一个inline函数，在被编译器处理的过程中，有两个阶段：</p>
+<ul>
+<li>分析函数定义，判断函数的<strong>intrinsic inlien ability</strong>。如果函数因其复杂性，或者内部的构建问题，被判断为不可inline，那么它会被转为一个static函数，然后在被编译的模块中产生相应的函数定义；</li>
+<li>真正的inline函数扩展是在调用的那一点上，这会产生参数的求值操作和临时性的对象管理。</li>
+</ul>
+<h3 id="formal-arguments"><a href="#formal-arguments" class="headerlink" title="formal arguments"></a>formal arguments</h3><p>在inline函数扩展期间，每一个形参都被实参所代替，但如果参数有副作用，就不能简单地替换，因为这可能会导致实参多次求值。为了避免这个问题，通常会引进临时对象。举个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">int</span> <span class="title">min</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> j)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> i &lt; j ? i : j;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">int</span> <span class="title">bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> minval;</span><br><span class="line">    <span class="keyword">int</span> val1 = <span class="number">1024</span>;</span><br><span class="line">    <span class="keyword">int</span> val2 = <span class="number">2048</span>;</span><br><span class="line">    <span class="comment">/* 1 */</span> minval = min(val1, val2);</span><br><span class="line">    <span class="comment">/* 2 */</span> minval = min(<span class="number">1024</span>, <span class="number">2048</span>);</span><br><span class="line">    <span class="comment">/* 3 */</span> minval = min(foo(), bar()+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> minval;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//第一个 参数直接替换</span></span><br><span class="line">minval = val1 &lt; val2 ? val1 : val2;</span><br><span class="line"><span class="comment">//第二个 直接使用常量</span></span><br><span class="line">minval = <span class="number">1024</span>;</span><br><span class="line"><span class="comment">//第三个 引入临时对象</span></span><br><span class="line"><span class="keyword">int</span> t1, t2;</span><br><span class="line">minval = (t1 = foo()), (t2 = bar()+<span class="number">1</span>), t1&lt;t2 ? t1 : t2;</span><br></pre></td></tr></table></figure>
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>如果inline函数有局部变量，为了避免命名冲突，inline函数的每一个局部变量都必须被封装在函数调用的一个scope中，拥有独一无二的名称。</p>
+<p>inline函数是#define的一个安全替代品，避免了宏中出现副作用参数的问题。但如果一个inline函数被调用多次，也会产生大量的扩展码。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/15/Linux内核学习——系统调用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1676,149 +1866,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/27/活跃分析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/27/活跃分析/" itemprop="url">活跃分析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-27T14:20:42+08:00">
-                2018-05-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="活跃分析"><a href="#活跃分析" class="headerlink" title="活跃分析"></a>活跃分析</h1><p>liveness analysis：编译器在分析程序的中间表示时，需要确定哪些临时变量同时被使用。如果一个变量的值将来还需要使用，那么这变量就是live的。</p>
-<p>为了对程序进行分析，我们可以看这样的控制流图：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/compiler10_1.png" alt="img"></p>
-<p>因此可以得出：a的活跃范围是[1-&gt;2, 4-&gt;5-&gt;2]，b的活跃范围是[2-&gt;3,3-&gt;4]，至于变量c，在进入这段程序时就是活跃的，它有可能是一个形参。如果c是局部变量，活跃分析就可以发现它未初始化，从而给出warning。</p>
-<h2 id="数据流方程的解"><a href="#数据流方程的解" class="headerlink" title="数据流方程的解"></a>数据流方程的解</h2><p>活跃性：一个变量在一条边上的活跃是指，如果存在一条从这条边指向该变量的一个use的有向路径，并且路径不经过该变量的任何def。</p>
-<h3 id="活跃性计算"><a href="#活跃性计算" class="headerlink" title="活跃性计算"></a>活跃性计算</h3><p>入口和出口活跃信息：</p>
-<ul>
-<li>如果一个变量属于use[n]，那么它在结点n是入口活跃的；</li>
-<li>如果一个变量在结点n是入口活跃，那么它在所有属于pred[n]的结点m中都是出口活跃的；</li>
-<li>如果一个变量在结点n是出口活跃的，而且不属于def[n]，那么该变量在结点n是入口活跃的；</li>
-</ul>
-<p>为了加快迭代速度，我们可以沿着箭头的反方向追踪</p>
-<h3 id="集合的表现"><a href="#集合的表现" class="headerlink" title="集合的表现"></a>集合的表现</h3><p>表示数据流方程的集合至少有两种较好的方法：位数组或有序变量表。</p>
-<p>集合稀疏的可以用有序表；集合密集的话，应该用位数组。</p>
-<h3 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h3><p>实际的算法运行时间在$O(N)-O(N^2)$之间</p>
-<h3 id="最小不动点"><a href="#最小不动点" class="headerlink" title="最小不动点"></a>最小不动点</h3><p>数据流方程的任何一个解都只是保守的近似解，它提供的是报收信息，虽然不够准确可以得到非最优的方程，但绝不会是错误的程序。</p>
-<h3 id="静态活跃性与动态活跃性"><a href="#静态活跃性与动态活跃性" class="headerlink" title="静态活跃性与动态活跃性"></a>静态活跃性与动态活跃性</h3><p>动态活跃：如果程序的某个执行从结点n到a的一个使用之间没有经过a的任何定义，那么变量a在结点n是动态活跃；</p>
-<p>静态活跃：如果存在一条从n到a的某个使用的控制流路径，且此路径上没有a的任何定义，则是静态活跃的；</p>
-<h3 id="冲突图"><a href="#冲突图" class="headerlink" title="冲突图"></a>冲突图</h3><p>阻止将变量a和b分配到同一个寄存器的条件就叫冲突（interference）。冲突可以用无向图表示，图中的结点表示变量，每条边连接相冲突的两个变量。</p>
-<p>添加冲突边的方法：</p>
-<ul>
-<li>对于任何对变量a定义的非传送指令，以及在该指令处是出口活跃的变量$b_1,…,b_j$，添加冲突边$(a, b_1),…,(a, b_n)$；</li>
-<li>对于传送指令a&lt;-c，如果变量$b_1,…,b_j$在该指令处是出口活跃的，为每一个不同于c的$b_i$添加冲突边$(a, b_1),…,(a, b_j)$</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1867,7 +1914,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">212</span>
+                <span class="site-state-item-count">213</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

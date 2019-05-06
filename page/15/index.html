@@ -265,6 +265,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/05/B-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/05/B-tree/" itemprop="url">B+ tree</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T16:26:30+08:00">
+                2018-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="B-树"><a href="#B-树" class="headerlink" title="B+ 树"></a>B+ 树</h1><h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>在实际的数据库产品中，为了满足高效率的查找操作，我们需要实现某种索引来进行查找，索引又通常通过B+树或者B树去实现（一般不用红黑树）</p>
+<h2 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h2><p>考虑到索引文件一般也很大，不可能将它们全部存储在内存中，而是存储在磁盘上。又由于介质等原因的不同，磁盘的IO比主存的IO要慢很多。因此要想提高效率，必须要减少磁盘IO的次数。</p>
+<p>为了达到这个目的，系统在发生缺页中断时都会直接读入一个block（page的整数倍）。假设B+树的高度为h，又因为通常设计成一个节点的大小对应于一个block，所以要查找特定的记录，最多只需要h次IO即可。</p>
+<p>而红黑树的深度是远比B+树要高的，所以一般情况下都只会使用B+树</p>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>一颗M阶B+树的定义</p>
+<ul>
+<li><p>根节点只有一个，子树有[2, m]</p>
+</li>
+<li><p>除了根节点之外的非叶子节点，包含的子树为[[m/2],m]</p>
+</li>
+<li><p>所有非根节点的key数目为[[m/2], m]</p>
+</li>
+<li><p>叶子节点都在同一层，叶子节点才含有key的信息，其它只是索引</p>
+</li>
+<li><p>所有非叶子节点的key等于其子数中最大或者最小的key</p>
+</li>
+</ul>
+<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>插入时判断其是否不满足定义，按需进行分解操作</p>
+<p>删除时判断其是否不满足定义，按需进行合并操作v</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/04/C-内存分配方式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1467,136 +1605,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-28/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/11/Effective-cpp-28/" itemprop="url">Effective-cpp-#28</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T02:07:48+08:00">
-                2018-02-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Avoid-returning-“handles”-to-object-internals"><a href="#Avoid-returning-“handles”-to-object-internals" class="headerlink" title="Avoid returning “handles” to object internals"></a>Avoid returning “handles” to object internals</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>先来看一个例子：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span>...&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">RectData</span>&#123;</span></span><br><span class="line">    Point ulhc;</span><br><span class="line">    Point lrhc;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rectangle</span>&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::trl::<span class="built_in">shared_ptr</span>&lt;RectData&gt; pData;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function">Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>使用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">const</span> Rectangle <span class="title">rec</span><span class="params">(point1, point2)</span></span>;</span><br><span class="line">rec.upperLeft().setX(<span class="number">50</span>);</span><br></pre></td></tr></table></figure></p>
-<p>其实，这样使用编译器是不会报错的，但其出现了矛盾的情况，原因是我们在该函数后面指定了const，则希望rec是不变的。但我们可以看到，由于我们返回的是一个引用，则可以通过引用去修改对象内部的成员。<br><br><br>同理，返回指针或者迭代器这些<strong>handles</strong>，也会出现这种情况。<br><br></p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>为了解决这个问题，我们可以这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rectangle</span>&#123;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">const</span> Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">const</span> Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>通过这种做法，用户可以读取对象的points，但不能修改它们。</p>
-<p>但这种用法同样会有一些问题，那就是有可能会出现<strong>dangling handles</strong>。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GUIObj</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="function"><span class="keyword">const</span> Rectangle <span class="title">boudingBox</span><span class="params">(<span class="keyword">const</span> GUIObj&amp; obj)</span></span>;</span><br><span class="line"></span><br><span class="line">GUIObj* obj;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">const</span> Point* p = &amp;(boudingBox(*p).upperLeft());</span><br></pre></td></tr></table></figure></p>
-<p>这里的问题是，由于这里够早的是一个临时Rectangle对象，也就是说，当这个语句结束时候临时对象就会被销毁，那么p所指向的Point也会被析构。也就是会发生<strong>dangling handles</strong>。</p>
-<p>这是因为<strong>返回一个handle代表对象内部成员</strong>的话，不管这个handle是指针还是引用，也不管是不是const，这里的关键是一旦这个handle传出去了，你就得承受一个风险——handle可能会比其所指向的对象有着更长的声明周期。</p>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>避免返回任何handles指向对象的内部。另外，还要使得const成员函数的行为像个const，并且尽量避免发生<em>dangling handles</em>。</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1645,7 +1653,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">212</span>
+                <span class="site-state-item-count">213</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

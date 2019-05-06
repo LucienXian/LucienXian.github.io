@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/05/06/Using-Paxos-to-Build-a-Scalable-Consistent-and-Highly-Available-Datastore/</loc>
+    
+    <lastmod>2019-05-06T05:23:08.972Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/05/05/std-initializer-list/</loc>
     
     <lastmod>2019-05-05T03:50:15.681Z</lastmod>
