@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="C++,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="C++11: std::tuplesstd::tuple Tutorial &amp;amp; Exampleswhat is std::tuple and why do we need itstd::tuple是一种可以将固定大小的异构值绑定在一起的类型。在创建元组对象时，我们需要将元素的类型指定为模版参数。 Creating a std::tuple object首先是要include进头文件： 1#">
+<meta name="keywords" content="C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++11: std::tuples">
+<meta property="og:url" content="http://yoursite.com/2019/05/08/C-11-std-tuples/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="C++11: std::tuplesstd::tuple Tutorial &amp;amp; Exampleswhat is std::tuple and why do we need itstd::tuple是一种可以将固定大小的异构值绑定在一起的类型。在创建元组对象时，我们需要将元素的类型指定为模版参数。 Creating a std::tuple object首先是要include进头文件： 1#">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-05-08T03:33:35.839Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++11: std::tuples">
+<meta name="twitter:description" content="C++11: std::tuplesstd::tuple Tutorial &amp;amp; Exampleswhat is std::tuple and why do we need itstd::tuple是一种可以将固定大小的异构值绑定在一起的类型。在创建元组对象时，我们需要将元素的类型指定为模版参数。 Creating a std::tuple object首先是要include进头文件： 1#">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/08/C-11-std-tuples/">
+
+
+
+
+
+  <title>C++11: std::tuples | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/08/C-11-std-tuples/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C++11: std::tuples</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-08T11:32:54+08:00">
+                2019-05-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="C-11-std-tuples"><a href="#C-11-std-tuples" class="headerlink" title="C++11: std::tuples"></a>C++11: std::tuples</h1><h2 id="std-tuple-Tutorial-amp-Examples"><a href="#std-tuple-Tutorial-amp-Examples" class="headerlink" title="std::tuple Tutorial &amp; Examples"></a>std::tuple Tutorial &amp; Examples</h2><h3 id="what-is-std-tuple-and-why-do-we-need-it"><a href="#what-is-std-tuple-and-why-do-we-need-it" class="headerlink" title="what is std::tuple and why do we need it"></a>what is std::tuple and why do we need it</h3><p>std::tuple是一种可以将固定大小的异构值绑定在一起的类型。在创建元组对象时，我们需要将元素的类型指定为模版参数。</p>
+<h3 id="Creating-a-std-tuple-object"><a href="#Creating-a-std-tuple-object" class="headerlink" title="Creating a std::tuple object"></a>Creating a std::tuple object</h3><p>首先是要include进头文件：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;tuple&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>我们可以声明一个包含了int, double和string类型的tuple，实际上这种做法可以帮助我们从一个函数中返回多种值，避免创建不必要structure。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::tuple&lt;<span class="keyword">int</span>, <span class="keyword">double</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt; result(<span class="number">7</span>, <span class="number">9.8</span>, <span class="string">"text"</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="Getting-elements-from-a-std-tuple"><a href="#Getting-elements-from-a-std-tuple" class="headerlink" title="Getting elements from a std::tuple"></a>Getting elements from a std::tuple</h3><p>我们可以使用std::get函数获得隐藏在tuple对象中的元素，方法是将索引值指定为模版参数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> iVal = <span class="built_in">std</span>::get&lt;<span class="number">0</span>&gt;(result);</span><br></pre></td></tr></table></figure>
+<h3 id="Getting-Out-Of-Range-value-from-tuple"><a href="#Getting-Out-Of-Range-value-from-tuple" class="headerlink" title="Getting Out Of Range value from tuple"></a>Getting Out Of Range value from tuple</h3><p>从tuple中获取索引大于元素数量的tuple元素会引起编译错误：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> iVal2 = <span class="built_in">std</span>::get&lt;<span class="number">4</span>&gt;(result); <span class="comment">// Compile error</span></span><br></pre></td></tr></table></figure>
+<h3 id="Wrong-type-cast-while-getting-value-from-tuple"><a href="#Wrong-type-cast-while-getting-value-from-tuple" class="headerlink" title="Wrong type cast while getting value from tuple"></a>Wrong type cast while getting value from tuple</h3><p>接收类型与tuple里面元素不符合也会导致编译错误：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> strVal2 = <span class="built_in">std</span>::get&lt;<span class="number">0</span>&gt;(result); <span class="comment">// Compile error</span></span><br></pre></td></tr></table></figure>
+<h3 id="Getting-value-from-tuple-by-dynamic-index"><a href="#Getting-value-from-tuple-by-dynamic-index" class="headerlink" title="Getting value from tuple by dynamic index"></a>Getting value from tuple by dynamic index</h3><p>提供给std::get的模版参数必须是编译期常量，否则会引起编译错误：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">double</span> dVal2 = <span class="built_in">std</span>::get&lt;x&gt;(result); <span class="comment">// Compile error</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="comment">// Get second double value from tuple</span></span><br><span class="line"><span class="keyword">double</span> dVal3 = <span class="built_in">std</span>::get&lt;i&gt;(result);</span><br></pre></td></tr></table></figure>
+<h2 id="make-tuple-Tutorial-amp-Example"><a href="#make-tuple-Tutorial-amp-Example" class="headerlink" title="make_tuple Tutorial &amp; Example"></a>make_tuple Tutorial &amp; Example</h2><h3 id="Initializing-a-std-tuple"><a href="#Initializing-a-std-tuple" class="headerlink" title="Initializing a std::tuple"></a>Initializing a std::tuple</h3><p>我们可以通过传递参数到构造器的方式来初始化std::tuple：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::tuple&lt;<span class="keyword">int</span>, <span class="keyword">double</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt; result1 &#123; <span class="number">22</span>, <span class="number">19.28</span>, <span class="string">"text"</span> &#125;;</span><br></pre></td></tr></table></figure>
+<p>但tuple无法自动去推断类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> result &#123; <span class="number">22</span>, <span class="number">19.28</span>, <span class="string">"text"</span> &#125;; <span class="comment">// Compile error</span></span><br><span class="line"><span class="comment">// error: unable to deduce ‘std::initializer_list&lt;_Tp&gt;’ from ‘&#123;22, 1.9280000000000001e+1, "text"&#125;’</span></span><br></pre></td></tr></table></figure>
+<p>于是C++11提供了std::make_tuple来解决这个问题：</p>
+<h3 id="std-make-tuple"><a href="#std-make-tuple" class="headerlink" title="std::make_tuple"></a>std::make_tuple</h3><p>std::make_tuple可以通过自动推断元素的类型来创建std::tuple对象：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> result2 = <span class="built_in">std</span>::make_tuple( <span class="number">7</span>, <span class="number">9.8</span>, <span class="string">"text"</span> );</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/06/Using-Paxos-to-Build-a-Scalable-Consistent-and-Highly-Available-Datastore/" rel="next" title="Using Paxos to Build a Scalable, Consistent, and Highly Available Datastore">
+                <i class="fa fa-chevron-left"></i> Using Paxos to Build a Scalable, Consistent, and Highly Available Datastore
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">214</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-11-std-tuples"><span class="nav-number">1.</span> <span class="nav-text">C++11: std::tuples</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#std-tuple-Tutorial-amp-Examples"><span class="nav-number">1.1.</span> <span class="nav-text">std::tuple Tutorial &amp; Examples</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-std-tuple-and-why-do-we-need-it"><span class="nav-number">1.1.1.</span> <span class="nav-text">what is std::tuple and why do we need it</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Creating-a-std-tuple-object"><span class="nav-number">1.1.2.</span> <span class="nav-text">Creating a std::tuple object</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Getting-elements-from-a-std-tuple"><span class="nav-number">1.1.3.</span> <span class="nav-text">Getting elements from a std::tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Getting-Out-Of-Range-value-from-tuple"><span class="nav-number">1.1.4.</span> <span class="nav-text">Getting Out Of Range value from tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Wrong-type-cast-while-getting-value-from-tuple"><span class="nav-number">1.1.5.</span> <span class="nav-text">Wrong type cast while getting value from tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Getting-value-from-tuple-by-dynamic-index"><span class="nav-number">1.1.6.</span> <span class="nav-text">Getting value from tuple by dynamic index</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#make-tuple-Tutorial-amp-Example"><span class="nav-number">1.2.</span> <span class="nav-text">make_tuple Tutorial &amp; Example</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Initializing-a-std-tuple"><span class="nav-number">1.2.1.</span> <span class="nav-text">Initializing a std::tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#std-make-tuple"><span class="nav-number">1.2.2.</span> <span class="nav-text">std::make_tuple</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

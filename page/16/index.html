@@ -265,6 +265,150 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-29/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-29/" itemprop="url">Effective-cpp-#29</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T19:55:38+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Strive-for-exception-safe-code"><a href="#Strive-for-exception-safe-code" class="headerlink" title="Strive for exception-safe code"></a>Strive for exception-safe code</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>我们常说的<strong>异常安全</strong>需要满足两个条件：</p>
+<ul>
+<li>不泄露任何资源</li>
+<li>不允许数据被破坏</li>
+</ul>
+<p>考虑这样一段代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> PrettyMenu::changeBackground(<span class="built_in">std</span>::istream&amp; imgSrc)</span><br><span class="line">&#123;</span><br><span class="line">    lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">delete</span> bgImage;</span><br><span class="line">    ++imageChanges;</span><br><span class="line">    bgImage = <span class="keyword">new</span> Image(imgSrc);</span><br><span class="line">    unlock(&amp;mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码的问题就是，一旦“new Image(imgSrc)”出现了异常，那么unlock就不能执行了，互斥器就永远锁住了，则泄露了资源；另外就是这样bgImage会指向一个被删除的对象，而imageChanges被破坏了</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>解决方法其实很简单，则使用之前提及过的条例：以对象去接管资源：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> PrettyMenu::changeBackground(<span class="built_in">std</span>::istream&amp; imgSrc)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function">Lock <span class="title">m1</span><span class="params">(&amp;mutex)</span></span>;</span><br><span class="line">    <span class="keyword">delete</span> bgImage;</span><br><span class="line">    ++imageChanges;</span><br><span class="line">    bgImage = <span class="keyword">new</span> Image(imgSrc);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一般来说，一个异常安全函数（Exception-safe function）必须提供以下的三个保证之一：</p>
+<ul>
+<li><p>基本承诺：如果异常被抛出了，那么程序的成员应该要保持有效的状态，则没有数据被破坏了。以上面的函数为例，我们可以修改程序，在函数抛出异常时，bgImage指向一个默认的对象；</p>
+</li>
+<li><p>强烈保证：保证程序只有两个状态：异常抛出，状态改变；否则就回到程序调用函数之前的状态；</p>
+</li>
+<li><p>nothrow保证：承诺永远不会抛出异常；</p>
+</li>
+</ul>
+<p><br><br>另外一个保证异常安全的方法是——<strong>copy&amp;swap</strong>，则为你希望修改的对象构造一个副本，然后在那个副本上做一切修改，若有任何修改操作发生异常，那么原对象不受影响。待修改成功后，在交换指针。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>异常安全函数即使发生异常也不会泄露资源或者允许任何数据结构被破坏；</li>
+<li>强烈保证可以通过copy&amp;swap实现出来；</li>
+<li>函数提供的“异常安全保证”通常最高只等于所调用的各个函数“异常安全保证”的最弱者；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-28/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1633,165 +1777,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux系统调用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/10/linux系统调用/" itemprop="url">linux系统调用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:09+08:00">
-                2018-01-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="linux系统调用"><a href="#linux系统调用" class="headerlink" title="linux系统调用"></a>linux系统调用</h1><h2 id="WHY"><a href="#WHY" class="headerlink" title="WHY"></a>WHY</h2><ul>
-<li>系统调用时内核向用户进程服务的唯一方式；</li>
-<li>通过系统调用，用户程序从用户态切换到核心态，从而访问内核资源</li>
-<li>好处：<ul>
-<li>安全，避免访问内核资源</li>
-<li>抽象：使得编程更加方便</li>
-<li>统一：接口统一，便于移植</li>
-</ul>
-</li>
-</ul>
-<h2 id="x86的运行模式、地址空间与上下文"><a href="#x86的运行模式、地址空间与上下文" class="headerlink" title="x86的运行模式、地址空间与上下文"></a>x86的运行模式、地址空间与上下文</h2><ul>
-<li>linux使用了两个运行模式<ul>
-<li>特权级0：内核模式</li>
-<li>特权级3：用户模式</li>
-</ul>
-</li>
-<li>地址空间<ul>
-<li>用户空间</li>
-<li>内核空间：3G~4G</li>
-</ul>
-</li>
-<li>上下文<ul>
-<li>用户级上下文：代码、数据、用户栈、共享存储区</li>
-<li>系统级上下文：PCB（task_struct）、MMU、内核栈</li>
-<li>存储器上下文：各种存储器、栈指针</li>
-</ul>
-</li>
-</ul>
-<h2 id="系统调用、API库和C库"><a href="#系统调用、API库和C库" class="headerlink" title="系统调用、API库和C库"></a>系统调用、API库和C库</h2><ul>
-<li>API是一组函数定义，遵循POSIX标准，说明了如何获取一个特定服务；</li>
-<li>系统调用则是通过软中断向内核发出请求，每个系统调用对应于一个内核函数，系统调用被使用时，会切换到内核态去找内核函数执行；</li>
-<li>C库函数中包含了部分系统调用，实现了linux主要的API；</li>
-<li>操作系统命令则比API更高一层，包含了一个或多个API</li>
-</ul>
-<h2 id="系统调用处理过程"><a href="#系统调用处理过程" class="headerlink" title="系统调用处理过程"></a>系统调用处理过程</h2><ul>
-<li>应用程序调用C库函数</li>
-<li>通过软中断int 0x80进入内核，中断程序将参数，一般是系统调用号放在寄存器eax上传到内核</li>
-<li>调用system_call函数，保存系统调用号和所有需要的寄存器到栈中；保存PCB的地址；检查系统调用号；有效则根据系统调用号表去调用内核函数（特定的服务程序）</li>
-<li>转入ret_from_sys_call例程，返回</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1840,7 +1825,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">213</span>
+                <span class="site-state-item-count">214</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

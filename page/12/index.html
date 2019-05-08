@@ -265,6 +265,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/TCP套接字选项介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/13/TCP套接字选项介绍/" itemprop="url">TCP套接字选项介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T21:48:04+08:00">
+                2018-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="通用套接字选项"><a href="#通用套接字选项" class="headerlink" title="通用套接字选项"></a>通用套接字选项</h1><p>其实应该是通用套接字选项，标题写错了，就不改了，仅仅作为自己学习使用，如有错误，不负责任</p>
+<p>因为之前面试有问到，但自己不大熟悉，就学习记录一下，主要参考UNP这本书</p>
+<h2 id="SO-DEBUG套接字选项"><a href="#SO-DEBUG套接字选项" class="headerlink" title="SO_DEBUG套接字选项"></a>SO_DEBUG套接字选项</h2><p>这是一个仅仅由TCP支持的选项，开启该选项之后，内核将为TCP在该套接字上的所有分组保留详细的追踪信息，保存在内核的环形缓冲区。</p>
+<h2 id="SO-ERROR套接字选项"><a href="#SO-ERROR套接字选项" class="headerlink" title="SO_ERROR套接字选项"></a>SO_ERROR套接字选项</h2><p>当一个套接字发送错误时，内核会将套接字的名为so_error的变量设为标准Unix Exxx值的一个，称为待处理的错误。一般会以以下两种方式之一立即通知进程这个错误。</p>
+<ol>
+<li><p>进程阻塞在对该套接字的select调用上，那么无论是检查可读条件还是可写条件，select均返回并设置其中一个或所有两个条件；</p>
+</li>
+<li><p>如果进程使用信号驱动式IO模型，那就给进程产生一个SIGIO信号；</p>
+</li>
+</ol>
+<h2 id="SO-KEEPALIVE套接字选项"><a href="#SO-KEEPALIVE套接字选项" class="headerlink" title="SO_KEEPALIVE套接字选项"></a>SO_KEEPALIVE套接字选项</h2><p>套接字设置该选项后，如果在2小时内在该套接字上都没有数据交换，TCP会自动给对端发送一个保持存活探测分节。这是一个对端必须响应的TCP分节，会导致以下三种情况：</p>
+<ul>
+<li><p>对端以期望的ACK响应；</p>
+</li>
+<li><p>对端以RST响应，告知本端TCP，对端已崩溃且已经重新启动；</p>
+</li>
+<li><p>对端对保持存活探测分节没有任何响应；</p>
+</li>
+</ul>
+<h2 id="SO-LINGER"><a href="#SO-LINGER" class="headerlink" title="SO_LINGER"></a>SO_LINGER</h2><p>本选项指定close函数堆面向连接的协议如何操作。默认操作是close立即返回，但是如果有数据残留在套接字发送缓冲区中，系统会试着将数据发送给对端。</p>
+<p>本选项主要是在内核空间和用户进程之间传递以下的结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">linger</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> l_onoff;</span><br><span class="line">    <span class="keyword">int</span> l_lingger;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>因此设置该选项时就会出现三种情况：</p>
+<ol>
+<li><p>l_onoff为0，关闭本选项，忽略l_lnlinger。即默认操作，close立即返回；</p>
+</li>
+<li><p>l_onoff 非0，l_linger为0，这时调用close，会丢弃发送缓冲区的数据，并发送一个RST给对端，跳过TIME_WAIT的状态。当然这也会带来一个问题是，创建该连接的另一个化身时，有可能会导致刚刚被终止连接的旧分节被重复传递到新的化身上；</p>
+</li>
+<li><p>两个都为非0时，调用close后，套接字发送缓存区如果还有残留数据，那么进程会进入睡眠，直到所有数据都已经发送完并且被对方确认或延滞时间到（如果是这种情况会返回EWOULDBLOCK错误）；</p>
+</li>
+</ol>
+<h2 id="SO-RECTIMEO和SO-SNDTIMEO套接字选项"><a href="#SO-RECTIMEO和SO-SNDTIMEO套接字选项" class="headerlink" title="SO_RECTIMEO和SO_SNDTIMEO套接字选项"></a>SO_RECTIMEO和SO_SNDTIMEO套接字选项</h2><p>这两个选项允许我们给套接字的接收和发送设置一个超时值。</p>
+<h1 id="TCP套接字选项"><a href="#TCP套接字选项" class="headerlink" title="TCP套接字选项"></a>TCP套接字选项</h1><p>TCP有两个套接字选项：</p>
+<h2 id="TCP-MAXSEG套接字选项"><a href="#TCP-MAXSEG套接字选项" class="headerlink" title="TCP_MAXSEG套接字选项"></a>TCP_MAXSEG套接字选项</h2><p>本选项允许我们获得或者设置TCP连接的最大分节大小。</p>
+<h2 id="TCP-NODELAY套接字选项"><a href="#TCP-NODELAY套接字选项" class="headerlink" title="TCP_NODELAY套接字选项"></a>TCP_NODELAY套接字选项</h2><p>设置了该选项后会禁止TCP的Nagle算法。</p>
+<blockquote>
+<p>Nagle算法：目的是减少广域网上小分组的数目。如果连接上有未被确认的小包（即小于MSS），那么下一个包会被缓存下来，直到上一个包得到确认或者缓存的包的大小达到最大值。</p>
+</blockquote>
+<p>有两种情况不适用Nagle算法，一是其服务器不在相反方向产生数据以便携带ACK；二则是客户端是使用若干个小片数据向服务器发送单个逻辑请求的客户。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/Synchronization-mechanism/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1770,159 +1928,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/20/Unix网络编程——chap7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/20/Unix网络编程——chap7/" itemprop="url">Unix网络编程——chap7</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-20T11:03:05+08:00">
-                2018-03-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="套接字选项"><a href="#套接字选项" class="headerlink" title="套接字选项"></a>套接字选项</h1><h2 id="getsockopt和setsockopt函数"><a href="#getsockopt和setsockopt函数" class="headerlink" title="getsockopt和setsockopt函数"></a>getsockopt和setsockopt函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getsockopt</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">int</span> level, <span class="keyword">int</span> optname, <span class="keyword">void</span> *optval, <span class="keyword">socklen_t</span> *optlen)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">setsockopt</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">int</span> level, <span class="keyword">int</span> optname, <span class="keyword">const</span> <span class="keyword">void</span> *optval, <span class="keyword">socklen_t</span> oplen)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>getsockopt从<em>optval获取目前的选项设置值，setsockopt则是从</em>optval获得选项待设置的新值</p>
-<h2 id="常用套接字选项"><a href="#常用套接字选项" class="headerlink" title="常用套接字选项"></a>常用套接字选项</h2><h3 id="SO-KEEPALIVE"><a href="#SO-KEEPALIVE" class="headerlink" title="SO_KEEPALIVE"></a>SO_KEEPALIVE</h3><p>在设置keep-alive选项之后，如果套接字的任何一方向上都没有数据交换，TCP会自动向对端发送一个自动探测的分节，这是一个对端必须响应的分节。它会导致以下三种情况：</p>
-<ul>
-<li>对端响应期望的ACK;</li>
-<li>对端以RST响应，表明对端已经崩溃且重启，套接字的错误被设置为ECONNRESET，套接字关闭；</li>
-<li>对端没有响应；TCP将会发送8个探测分节，两两相隔75s，如果还是没有响应，则关闭；</li>
-</ul>
-<h3 id="SO-RCVBUF和SO-SNDBUF"><a href="#SO-RCVBUF和SO-SNDBUF" class="headerlink" title="SO_RCVBUF和SO_SNDBUF"></a>SO_RCVBUF和SO_SNDBUF</h3><p>每个套接字都会有一个发送缓冲区和接收缓冲区，这两个套接字选项就是用来改变缓冲区的默认大小。</p>
-<p>由于TCP的窗口规模是在建立连接时，通过SYN分节与对端交换得到的。所以对于客户，必须在调用connect之前调用；对于服务端，必须在listen之前调用。</p>
-<h3 id="SO-REUSEADDR"><a href="#SO-REUSEADDR" class="headerlink" title="SO_REUSEADDR"></a>SO_REUSEADDR</h3><p>这个套接字选项有4个不同的作用：</p>
-<ol>
-<li>设置这个选项允许启动一个监听服务器并捆绑其众所周知的端口，即便以前建立的用作该端口作为本地端口的连接仍然存在。</li>
-</ol>
-<p>考虑这样的条件</p>
-<ul>
-<li>启动监听服务器；</li>
-<li>连接请求到达，派生一个子进程提供服务；</li>
-<li>监听服务器终止，但子进程仍然在服务着；</li>
-<li>重启监听服务器；</li>
-</ul>
-<p>因为如果不设置该选项，那重启监听服务器时将不能捆绑之前那个端口。</p>
-<ol start="2">
-<li><p>允许在同一个端口上启动同一个服务器的多个实例。</p>
-</li>
-<li><p>允许单个进程捆绑同一个端口到多个套接字上，只要每次捆绑指定不同的地址即可。这种情况发生希望在一个多目的主机的若干个本地地址上服务连接的TCP服务器进程上。</p>
-</li>
-<li><p>完全重复的捆绑，包括IP地址和端口，一般用于支持UDP。</p>
-</li>
-</ol>
-<h2 id="fcntl函数"><a href="#fcntl函数" class="headerlink" title="fcntl函数"></a>fcntl函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fcntl</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> cmd, ...<span class="comment">/*int arg*/</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>这个函数的目的是执行各种描述符的控制操作，如设置非阻塞式I/O，信号驱动式I/O等等。</p>
-<p>开启阻塞式I/O：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> flags;</span><br><span class="line"><span class="keyword">if</span>((flags=fcntl(fd, F_GETFL, <span class="number">0</span>)) &lt; <span class="number">0</span>)</span><br><span class="line">    err_sys(<span class="string">"F_GETEL error"</span>);</span><br><span class="line">flag |= O_NONBLOCK;</span><br><span class="line"><span class="keyword">if</span> (fcntl(fd, F_SETEL, flags) &lt; <span class="number">0</span>)</span><br><span class="line">    err_sys(<span class="string">"F_SETEL error"</span>);</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1971,7 +1976,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">213</span>
+                <span class="site-state-item-count">214</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
