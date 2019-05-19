@@ -265,6 +265,137 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/11/将源文件限制为单个顶级类/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/11/将源文件限制为单个顶级类/" itemprop="url">将源文件限制为单个顶级类</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-11T17:19:53+08:00">
+                2019-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="将源文件限制为单个顶级类"><a href="#将源文件限制为单个顶级类" class="headerlink" title="将源文件限制为单个顶级类"></a>将源文件限制为单个顶级类</h1><p>虽然Java编译器能让你在一个源文件里定义多个顶级类，但这种操作风险比较大，因为使用哪个定义将会受到源文件传递给编译器的顺序的影响。</p>
+<p>举个例子，考虑下面这个源文件，它只包含了一个Main类，这个类指向了另外两个顶级类（Utensil和Dessert）的成员：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(Utensil.NAME + Dessert.NAME); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设在一个叫Utensil.java的源文件里：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Utensil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"pan"</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dessert</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"cake"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然主程序会打印：pancake。</p>
+<p>但如果存在另一个叫Dessert.java的源文件里定义了两个相同的类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Two classes defined in one file. Don't ever do this!</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Utensil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"pot"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dessert</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"pie"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这个情况，如果编译时使用的命令为<strong>javac Main.java Dessert.java</strong>，会编译失败，因为编译器发现了重复定义。</p>
+<p>如果你用命令<strong>“javac Main.java”</strong>或<strong>“javac Main.java Utensil.java”</strong>来编译程序，它的行为将与你写Dessert.java文件之前的行为一样，打印出“pancake”。</p>
+<p>但如果用命令<strong>“javac Dessert.java Main.java”</strong>来编译程序，它将会打印出“potpie”。</p>
+<p>这种依赖于编译顺序的代码风格不是我们想要的，因此解决方法就是，永远不要将多个顶级类或者接口放到一个源文件里。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/09/优先考虑静态成员类/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1545,138 +1676,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/28/Neural-Style-Transfer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/28/Neural-Style-Transfer/" itemprop="url">Neural Style Transfer</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-28T15:13:59+08:00">
-                2019-01-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Neural-Style-Transfer"><a href="#Neural-Style-Transfer" class="headerlink" title="Neural Style Transfer"></a>Neural Style Transfer</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>计算机视觉新流行的一种算法：Neural Style Transfer。卷积神经网络的出现带来的对图像特征，特别是抽象特征的提取，使得风格和内容的分离成为了可能。</p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>首先来看看架构图：</p>
-<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/neuralStyleTransfer1.png" alt="img"></p>
-<p>从架构图可以看到，input有三个：$y_s$风格图片，$y_c$内容图片，还有一个生成图片。在更新过程中，CNN网络参数被更新，输出图片也会被更新。</p>
-<p>至于损失函数，则为：<br>$$<br>J(G) = \alpha J_{content} + \beta J_{style}<br>$$<br>alpha和beta的主要作用是平衡风格和内容的博弈。</p>
-<p>具体的内容损失函数的计算：<br>$$<br>J_{content} = || a^{[l][c]} - a^{[l][g]} || ^ 2<br>$$<br>在CNN的某一层，我们拿到内容图和输出图的feature map，计算其损失函数（相近度），损失函数越低越好。</p>
-<p>难点在于风格的损失函数，我们怎么定义风格呢？所谓风格，应该是在某一层feature map，所有channels之间的correlation。我们用一个gram matrix来描述一张图片所有的channels之间的correlation相关性。</p>
-<p>而gram matrix则是，假设某个feature map有多个channels，两两channels之间某个长宽位置固定的点相乘，然后计算所有位置相乘之后求和。最后就可以得到一个矩阵。我们就用这个矩阵来表示style。</p>
-<p>我们对输出图和style图都取gram matrix，然后计算：<br>$$<br>J_{style} = || M^{[l][s]} - &lt;^{[l][g]} || ^ 2<br>$$<br>虽然我们可以只取一层求损失函数，但为了使得风格更加饱满，我们可以在每一层都计算损失函数，最后求和：<br>$$<br>J_style(S, G) = \sum_{\lambda} \lambda^{t} J^{t}(S, G)<br>$$</p>
-<h2 id="Problme"><a href="#Problme" class="headerlink" title="Problme"></a>Problme</h2><ul>
-<li>风格迁移可能需要很多forward和backward的传到，速度非常慢；</li>
-</ul>
-<p>解决方法是，另外训练一个神经网络来执行风格迁移。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1725,7 +1724,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">214</span>
+                <span class="site-state-item-count">215</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
