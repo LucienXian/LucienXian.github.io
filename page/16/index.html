@@ -265,6 +265,143 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-31/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-31/" itemprop="url">Effective-cpp-#31</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T22:32:21+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Minimize-compilation-dependencies-between-files"><a href="#Minimize-compilation-dependencies-between-files" class="headerlink" title="Minimize compilation dependencies between files"></a>Minimize compilation dependencies between files</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>这个问题主要是在多文件的程序中，如果某个class实现文件做了些许的修改，当你重新build/make这个项目时，可能所有相关依赖的文件都重新编译和链接了。这个就是“接口和实现没有很好分离的一大弊端”。</p>
+<p>考虑这样一个程序：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//可能包含的头文件</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"date.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"address.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> theName;</span><br><span class="line">    Date theBirthDate;</span><br><span class="line">    Address theAddress;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的问题是：在private中的那几个变量定义，我们需要找到Date和Address的具体定义，也就是说一旦这个文件依赖的头文件发生了变化，那么Person class也要重新编译。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>当然，我们可以分离声明和定义，比如在刚刚那个文件中声明:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Date</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Address</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> theName;</span><br><span class="line">    Date theBirthDate;</span><br><span class="line">    Address theAddress;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//另外的文件</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x;</span><br><span class="line">    <span class="function">Person <span class="title">p</span><span class="params">(params)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但这里的问题是，对于前置声明，编译器必须提前知道对象的大小，这样才能在stack中分配足够大的空间。</p>
+<p>借鉴Java的经验，我们用一个指针去指向需要的对象。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;//一般来说，标准库组件不用前置声明</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PersonImpl</span>;</span> <span class="comment">//Person实现类的前置声明</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Date</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Address</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::trl::<span class="built_in">shared_ptr</span>&lt;PersonImpl&gt; pImpl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种设计就叫做——<strong>pointer to implementation</strong>。至此，Person的客户端就与其他class包括Person的实现细节分离了，也就是其他类的修改不会影响到Person客户端重新编译。</p>
+<h3 id="制作一个handle-class"><a href="#制作一个handle-class" class="headerlink" title="制作一个handle class"></a>制作一个handle class</h3><p>通常来说，我们应该为声明式和定义式提供不同的头文件，这样就不用每次都前置声明其他的class。</p>
+<p>制作一个handle class的方法有两种，第一种已经在前面提及过了，至于第二种就是构造一个抽象类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Person();</span><br><span class="line">    <span class="keyword">virtual</span> <span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">name</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">virtual</span> <span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">birthDate</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">virtual</span> <span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">address</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">std</span>::trl::<span class="built_in">shared_ptr</span>&lt;Person&gt; </span><br><span class="line">        create(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name,</span><br><span class="line">               <span class="keyword">const</span> Date&amp; birthday,</span><br><span class="line">               <span class="keyword">const</span> Address&amp; addr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然，由于这是abstract class，我们需要一个concrete class来定义所有的函数。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>为了保证编译依赖最小化，我们应该依赖于声明而不是定义。这里有两个实现手段——handle class和interface class；</li>
+<li>程序库头文件应该以“完整的并且是仅有声明”的形式存在；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-30/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1502,216 +1639,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux内存管理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/10/linux内存管理/" itemprop="url">linux内存管理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:45+08:00">
-                2018-01-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="linux内存管理"><a href="#linux内存管理" class="headerlink" title="linux内存管理"></a>linux内存管理</h1><h2 id="虚拟内存空间的管理"><a href="#虚拟内存空间的管理" class="headerlink" title="虚拟内存空间的管理"></a>虚拟内存空间的管理</h2><ul>
-<li>linux操作系统采用的是<strong>请求式分页虚拟内存管理</strong></li>
-<li>每个进程有独立的4GB的虚拟内存空间</li>
-</ul>
-<blockquote>
-<p>IA32体系结构具有两种内存管理模式：</p>
-<p>实模式</p>
-<p>保护模式</p>
-</blockquote>
-<ul>
-<li>逻辑地址到物理地址的转换：<ul>
-<li>逻辑地址——&gt;线性地址（虚拟地址）——&gt;物理地址</li>
-</ul>
-</li>
-<li>内核空间到物理内存的映射<ul>
-<li>内核空间由所有进程共享，存放着内核代码和数据</li>
-<li>内核空间映射到物理内存总是从最低地址开始，建立线性关系</li>
-<li>系统启动时，内核映像被装载到物理地址1MB开始的地方</li>
-</ul>
-</li>
-</ul>
-<h3 id="进程用户空间"><a href="#进程用户空间" class="headerlink" title="进程用户空间"></a>进程用户空间</h3><p>linux把进程的用户空间划分成一个个区间。</p>
-<ul>
-<li>一个进程的用户进程空间由mm_struct结构描述（对进行的整个用户空间进行描述，memory descriptor）</li>
-<li>vm_area_struct结构是虚存空间的一个连续区域，所有的该结构体组成一个单链表，在这个区域里的信息具有相同的操作和访问特性。vm_mm指针指向mm_struct结构体；vm_strart和vm_end是虚拟区域的开始和终止地址</li>
-</ul>
-<p>创建进程用户空间</p>
-<ul>
-<li>通过fork()系统调用，在创建新进程的同时，也为该进程创建完整的用户空间</li>
-<li>新进程的用户空间——copy_mm()，通过写时复制技术创建的</li>
-</ul>
-<h2 id="linux的分页内存管理机制"><a href="#linux的分页内存管理机制" class="headerlink" title="linux的分页内存管理机制"></a>linux的分页内存管理机制</h2><p>linux总是假定处理器支持三级页表结构（对于IA32，把PGD和PMD合二为一）：</p>
-<ul>
-<li>页目录PGD</li>
-<li>页中间目录PMD</li>
-<li>页表PTE</li>
-</ul>
-<blockquote>
-<p>内核2.6.11之后采用四级页表模型</p>
-</blockquote>
-<ul>
-<li>线性地址到物理地址映射（以IA32为例）<ul>
-<li>页目录：高10位</li>
-<li>页表：中间10位</li>
-<li>偏移：低12位，用来表示在一个页帧中的偏移</li>
-<li>每个进程都有一个页目录。由寄存器CR3指向该页目录的基地址</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>缺页异常：<ul>
-<li>编程错误</li>
-<li>操作系统故意引发的异常</li>
-<li>缺页异常的处理程序是do_page_fault()函数：该函数有两个参数：一个是发送异常地址；一个是错误码；</li>
-<li>do_page_fault()执行过程：从CR2得到发送异常的线性地址；使用LRU去换页，为每个页面设置一个age，年纪越大，越容易被换</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>交换机制：当物理内存小于一个固定的极限时，就会执行换出操作</li>
-</ul>
-<h2 id="物理内存的管理"><a href="#物理内存的管理" class="headerlink" title="物理内存的管理"></a>物理内存的管理</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>页帧：物理内存是以页帧为基本单位的，IA32为4kb</p>
-<p>结点：访问速度相同的一个内存区域，与处理器相关联</p>
-<p>zone：根据用途不同，将不同结点的物理内存分成不同的zone</p>
-<blockquote>
-<p>linux对于zone曹勇buddy system管理</p>
-</blockquote>
-<h3 id="page结构"><a href="#page结构" class="headerlink" title="page结构"></a>page结构</h3><p>页帧是由page结构体表示的。</p>
-<h3 id="物理内存的分配和回收"><a href="#物理内存的分配和回收" class="headerlink" title="物理内存的分配和回收"></a>物理内存的分配和回收</h3><ul>
-<li>buddy分配</li>
-</ul>
-<p>物理内存采用的是buddy分配算法，最小的分配单位是页帧，目的是分配一组连续的物理页帧。</p>
-<p>buddy：两组连续的页帧，满足——大小相同；物理地址连续；第2个页块后面的页帧必须是2n的倍数。</p>
-<p>buddy算法把内存中的所有页帧按照2^n划分，分成1，2，4，8.。。。。1024一共11种页块，每个页块组用一个双向循环链表进行管理，也就是一共有11个链表</p>
-<blockquote>
-<p>比如free_area[0]指向1页帧块的链表</p>
-<p>比如free_area[2]指向4页帧块的链表</p>
-</blockquote>
-<ul>
-<li>内存回收<ul>
-<li>回收时需要检查与该页帧相邻的空闲页块，若存在则需要合成一个连续的空闲区，按buddy算法重新分组</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>slab分配器<ul>
-<li>为了解决buddy算法以页帧为基本分配单位可能造成的内部碎片</li>
-<li>基本思想：为经常使用的小对象建立缓冲，小对象的申请和释放由slab分配器管理，不与buddy系统打交道</li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1760,7 +1687,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">215</span>
+                <span class="site-state-item-count">216</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

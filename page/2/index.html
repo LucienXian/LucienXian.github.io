@@ -265,6 +265,143 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/29/Condition-Variables-Explained/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/29/Condition-Variables-Explained/" itemprop="url">Condition Variables Explained</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-29T15:25:51+08:00">
+                2019-04-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Condition-Variables-Explained"><a href="#Condition-Variables-Explained" class="headerlink" title="Condition Variables Explained"></a>Condition Variables Explained</h1><h2 id="Condition-Variables"><a href="#Condition-Variables" class="headerlink" title="Condition Variables"></a>Condition Variables</h2><p>条件变量是一种用于在若干个线程之间发送信号的事件，一个或者多个线程可以等待其他线程发出信号。条件变量在C++11的头文件是：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;condition_variable&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>条件变量往往与锁一起工作。</p>
+<p><strong>How things actually work with condition variable,</strong></p>
+<ul>
+<li>线程1调用条件变量的wait，改变量在内部获取互斥锁并检查是否满足所需条件；</li>
+<li>如果不满足。则释放锁并等待条件变量发出信号，此时现场阻塞。条件变量的wait函数以原子的方式提供这两个操作；</li>
+<li>如果条件满足，线程2会向条件变量发出信号；</li>
+<li>一旦条件变量发出信号，正在等待它的线程1恢复，获取互斥锁，并检查是否实际满足与条件变量相关的条件，或者它是否是上级调用。如果有多个线程在等待，那么notify_one()将只解除阻塞一个线程；</li>
+<li>如果它是一个上级调用，那么它再次调用wait()函数；</li>
+</ul>
+<p><strong>Main member functions for std::condition_variable are</strong></p>
+<h3 id="Wait"><a href="#Wait" class="headerlink" title="Wait()"></a>Wait()</h3><p>该函数使得当前线程阻塞，直到条件变量发出信号或者发生虚假唤醒。</p>
+<p>其以原子方式释放附属的的互斥锁，阻塞当前线程，并将其添加到等待当前条件变量对象的线程列表中。当某个线程在相同的条件变量对象上调用notify_one()或notify_all()时，该线程将被解除阻塞。 </p>
+<p>回调作为参数传递给该函数，回调将被调用以检查它是否属于虚假调用或真的满足条件。</p>
+<p>当线程解锁时，wait()函数重新获取互斥锁并检查是否满足实际条件。如果不满足条件，则再次以原子方式释放附加的互斥锁，阻塞当前线程，并将其添加到等待当前条件变量对象的线程列表中。</p>
+<h3 id="notify-one"><a href="#notify-one" class="headerlink" title="notify_one()"></a>notify_one()</h3><p>如果存在线程正在等待相同的条件变量对象，则notify_one将解除其中一个等待线程的阻塞。</p>
+<h3 id="notify-all"><a href="#notify-all" class="headerlink" title="notify_all()"></a>notify_all()</h3><p>如果存在线程正在等待相同的条件变量对象，则notify_all将解除阻塞所有等待的线程。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/24/《Joint-3D-Face-Reconstruction-and-Dense-Alignment-with-Position-Map-Regression-Network》阅读/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1438,139 +1575,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/15/C-11-Lambda-Function/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/15/C-11-Lambda-Function/" itemprop="url">C++11 Lambda Function</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-15T11:21:50+08:00">
-                2019-04-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="C-11-Lambda-Function"><a href="#C-11-Lambda-Function" class="headerlink" title="C++11 Lambda Function"></a>C++11 Lambda Function</h1><h2 id="What-is-a-Lambda-Function"><a href="#What-is-a-Lambda-Function" class="headerlink" title="What is a Lambda Function?"></a>What is a Lambda Function?</h2><p>lambda函数是C++中的一种匿名函数，通常用作回调使用，像普通的函数那样，也需要传递参数和返回结果。但区别就是，lambda函数没有名字，因此主要用来创建那些短小的函数。</p>
-<h2 id="Need-of-Lambda-functions"><a href="#Need-of-Lambda-functions" class="headerlink" title="Need of Lambda functions"></a>Need of Lambda functions</h2><p>假设以下使用std::for_each算法的函数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">(<span class="keyword">int</span> a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;a&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::for_each(arr, arr + <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>), &amp;display);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在上面的例子中，我们创建了一个单独函数，但使用lambda函数，我们可以避免这种开销。</p>
-<h2 id="Rise-of-Lambda-functions"><a href="#Rise-of-Lambda-functions" class="headerlink" title="Rise of Lambda functions"></a>Rise of Lambda functions</h2><p> lambda函数是一种匿名函数，它没有任何名称，但您可以传递参数并从中返回结果。如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[](<span class="keyword">int</span> x) &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>[]用来传递外部域的元素；</li>
-<li>(int x)则是传递进来的参数；</li>
-</ul>
-<p>利用lambda函数改写：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::for_each(arr, arr + <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>), [](<span class="keyword">int</span> x) &#123;</span><br><span class="line">            <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">" "</span>;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="How-to-pass-outer-scope-elements-inside-lambda-functions"><a href="#How-to-pass-outer-scope-elements-inside-lambda-functions" class="headerlink" title="How to pass outer scope elements inside lambda functions"></a>How to pass outer scope elements inside lambda functions</h2><h3 id="case-1-使用"><a href="#case-1-使用" class="headerlink" title="case 1: 使用[=]"></a>case 1: 使用[=]</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[=](<span class="keyword">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by value</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="case-1-使用-amp"><a href="#case-1-使用-amp" class="headerlink" title="case 1: 使用[&amp;]"></a>case 1: 使用[&amp;]</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[&amp;](<span class="keyword">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by reference</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1619,7 +1623,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">215</span>
+                <span class="site-state-item-count">216</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
