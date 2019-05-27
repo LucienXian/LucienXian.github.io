@@ -265,6 +265,132 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/在公有类中使用访问方法而非公有域/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/在公有类中使用访问方法而非公有域/" itemprop="url">在公有类中使用访问方法而非公有域</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:39:22+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="在公有类中使用访问方法而非公有域"><a href="#在公有类中使用访问方法而非公有域" class="headerlink" title="在公有类中使用访问方法而非公有域"></a>在公有类中使用访问方法而非公有域</h1><p>不提供封装的类，如果不改变API，就无法改变它的数据表示法，也无法强加任何约束条件；</p>
+<p>例如这种：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">double</span> x;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">double</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果类是包级私有的，或者是私有的嵌套类，直接暴露它的数据域并没有本质的错误</p>
+</blockquote>
+<p>Java的平台类库中有几个类违反了“公有类不应该直接暴露数据域”的告诫，比如java.awt包中的Point和Dimension类。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/考虑实现Comparable接口/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1545,148 +1671,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/覆盖equals时请遵守通用约定/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/16/覆盖equals时请遵守通用约定/" itemprop="url">覆盖equals时请遵守通用约定</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:08:43+08:00">
-                2018-12-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="覆盖equals时请遵守通用约定"><a href="#覆盖equals时请遵守通用约定" class="headerlink" title="覆盖equals时请遵守通用约定"></a>覆盖equals时请遵守通用约定</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>覆盖equals方法可能会导致严重的错误。</p>
-<h2 id="满足下列条件不覆盖equals"><a href="#满足下列条件不覆盖equals" class="headerlink" title="满足下列条件不覆盖equals"></a>满足下列条件不覆盖equals</h2><ul>
-<li>类的每个实例本质上是唯一的；</li>
-<li>不关心类是否提供了“逻辑相等”的测试功能；</li>
-<li>超类覆盖了equals，该方法对于子类也合适；</li>
-<li>类是私有或者包级别私有的；</li>
-</ul>
-<h2 id="实现equals方法"><a href="#实现equals方法" class="headerlink" title="实现equals方法"></a>实现equals方法</h2><p>当类具备自身特有的逻辑相等概念时，并且超类还没覆盖equals以实现期望方式时，我们应该重载equals；</p>
-<p>在覆盖equals时，应该满足以下约定：</p>
-<ul>
-<li>自反性：x.equals(x)为true；</li>
-<li>对称性：x.equals(y)为true时，y.equals(x)也为true；</li>
-<li>传递性：x.equals(y), y.equals(z)为true，x.equals(z)也为true；</li>
-<li>一致性：如果两个对象相等，那么它们就必需始终保持相等，除非对象被修改了；</li>
-<li>非空性：任何对象都不等于null；</li>
-</ul>
-<p>实现高质量equals：</p>
-<ol>
-<li>使用==操作符检查“参数是否为对象的引用”；</li>
-<li>使用instanceof检查“参数是否为正确的类型”，类或者类实现的接口；</li>
-<li>把参数转换成正确的类型，要使用instanceof测试；</li>
-<li>对类中的关键域要，检查参数中的域是否与对应的域对应；</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1735,7 +1719,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">216</span>
+                <span class="site-state-item-count">217</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

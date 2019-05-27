@@ -265,6 +265,231 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/04/词法分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/04/词法分析/" itemprop="url">词法分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-04T21:55:23+08:00">
+                2018-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="词法分析"><a href="#词法分析" class="headerlink" title="词法分析"></a>词法分析</h1><blockquote>
+<p>lexical analysis：将输入分解成一个个独立的符号，即tokens</p>
+</blockquote>
+<h2 id="词法单词"><a href="#词法单词" class="headerlink" title="词法单词"></a>词法单词</h2><p>token是由字符组成的序列，例如在常见的程序设计语言都有这样的一些单词类型：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ID</td>
+<td style="text-align:center">foo n14 last</td>
+</tr>
+<tr>
+<td style="text-align:center">NUM</td>
+<td style="text-align:center">11 2 34</td>
+</tr>
+<tr>
+<td style="text-align:center">IF</td>
+<td style="text-align:center">if</td>
+</tr>
+<tr>
+<td style="text-align:center">COMMA</td>
+<td style="text-align:center">,</td>
+</tr>
+<tr>
+<td style="text-align:center">LPAREN</td>
+<td style="text-align:center">（</td>
+</tr>
+</tbody>
+</table>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>由于我们在谈论某种语言时，需要为其中的字符串赋予特别的意义，因此我们可以用正则表达式去表示。</p>
+<p>正则表达式的表达符号：</p>
+<table>
+<thead>
+<tr>
+<th>表示</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>一个表示字符串本身的原始字符</td>
+</tr>
+<tr>
+<td>ε</td>
+<td>空字符串</td>
+</tr>
+<tr>
+<td>M\</td>
+<td>N</td>
+<td>可选，alternation，M和N之间选择</td>
+</tr>
+<tr>
+<td>M*N</td>
+<td>联结，concentration，M后面跟着N，也可以写成MN</td>
+</tr>
+<tr>
+<td>M*</td>
+<td>重复，0次或者以上</td>
+</tr>
+<tr>
+<td>M+</td>
+<td>重复，1次或以上</td>
+</tr>
+<tr>
+<td>M?</td>
+<td>选择M出现0次或者1次</td>
+</tr>
+<tr>
+<td>[a-zA-Z]</td>
+<td>字符集合</td>
+</tr>
+<tr>
+<td>.</td>
+<td>表示除了换行符外的所有字符</td>
+</tr>
+<tr>
+<td>“xxxx”</td>
+<td>引号内的字符串本身文字字符串本身</td>
+</tr>
+</tbody>
+</table>
+<p>但是，考虑这样一个字符串<strong>if8</strong>，到底是认为其为一个标识符，还是两个tokens：if和8呢？为了消除二义性，我们可以试用一下两个规则：</p>
+<ul>
+<li>Longest match：对于输入的字符串，取可以与任意正则表达式规则匹配的字符串中最长的那一个作为下一个token；</li>
+<li>Rule priority：给正则表达式赋予某些优先权，选择优先级高的；</li>
+</ul>
+<h2 id="有限自动机"><a href="#有限自动机" class="headerlink" title="有限自动机"></a>有限自动机</h2><p>虽然用正则表达式已经可以很好地指明词法规则，但我们还需要一种能用计算机程序来实现的的形式化方法。这就是有限自动机<strong>(DFA)</strong>所做的事情。有限自动机包含了有限状态的集合和一些从一个状态到另一个状态的边。</p>
+<p>在DFA中，不会有从同一个状态出发的两条边却包含了相同的符号。若对n个字符的字符串，进行了n次的转换之后，如果自动机到达了一个终态，则选择接收该字符串。如果没有到达终态，或者找不到与输入字符匹配的边，则拒绝接收字符串。</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-3.png" alt="img"></p>
+<h3 id="识别最长的匹配"><a href="#识别最长的匹配" class="headerlink" title="识别最长的匹配"></a>识别最长的匹配</h3><p>为了识别一个字符串是否会被接收，词法分析器往往会选择最长的匹配，作为合法的token。因此需要两个变量来记住自动机最近一次处于final states的时机。</p>
+<h2 id="非确定有限自动机"><a href="#非确定有限自动机" class="headerlink" title="非确定有限自动机"></a>非确定有限自动机</h2><p>与确定有限自动机不同，非确定有限自动机<strong>(NFA)</strong>需要做出选择，对从一个状态出发的<strong>多条标有相同符号</strong>的边进行选择。</p>
+<h3 id="将正则表达式转换为NFA"><a href="#将正则表达式转换为NFA" class="headerlink" title="将正则表达式转换为NFA"></a>将正则表达式转换为NFA</h3><p>有了NFA之后，我们可以很容易地将正则表达式转化为NFA，一个正则表达式要么是一个简单的primitive，要么是由多个较小的表达式组合而成。如图：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-6.png" alt="img"></p>
+<h3 id="将NFA转换为DFA"><a href="#将NFA转换为DFA" class="headerlink" title="将NFA转换为DFA"></a>将NFA转换为DFA</h3><p>先来看NFA的模拟算法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d&lt;-closure(&#123;s1&#125;)</span><br><span class="line"><span class="keyword">for</span> i&lt;<span class="number">-1</span> to k</span><br><span class="line">	d &lt;- DFAedge(d, ci)</span><br></pre></td></tr></table></figure>
+<p>首先构造s1的eplison闭包，然后从该闭包的状态集合出发，吃进符号c，到达一个新的状态集合。</p>
+<p>看一个例子：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-7.png" alt="img"></p>
+<p>以字符串in为例子，先计算出eplison闭包，即求得状态集合为{1,4,9,14}；接着要根据字符i来进行状态转换，从状态1可到状态2，4可以到5，9无处可去，14可以到15，因此得到状态集合{2,5,15}，但是我们还要计算一次闭包，因此得到最终状态集合为{2,5,6,8,15}；同理，根据字符n进行转换。</p>
+<p>这样的自动机还不是最理想的，我们还可以构造最小的自动机。我们只会在这种情况下称两个状态是等价的，如果一个开始于s1的自动机接收字符串a，当且仅当一个开始s2的自动机接收字符串a。这样我们就可以使得所有进入s2的边指向s1，并删除s2。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/25/DecisionTree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1785,161 +2010,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/25/Unix网络编程——chap8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/25/Unix网络编程——chap8/" itemprop="url">Unix网络编程——chap8</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T13:05:23+08:00">
-                2018-03-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#基本UDP套接字编程</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>与TCP不一样，UDP是无连接不可靠的数据报协议。在有些应用程序上会用到UDP，比如DNS, NFS, SNMP。</p>
-<p>由于UDP不等待连接，所以客户端只管调用sendto函数，而服务端也只管调用recvfrom函数。</p>
-<h2 id="recvfrom和sendto函数"><a href="#recvfrom和sendto函数" class="headerlink" title="recvfrom和sendto函数"></a>recvfrom和sendto函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ssize_t</span> recvfrom(<span class="keyword">int</span> sockfd, <span class="keyword">void</span> *buff, <span class="keyword">size_t</span> nbytes, <span class="keyword">int</span> flags, struct sockaddr *from, <span class="keyword">socklen_t</span> *addrlen);</span><br><span class="line"></span><br><span class="line"><span class="keyword">ssize_t</span> sendto(<span class="keyword">int</span> sockfd, <span class="keyword">const</span> <span class="keyword">void</span> *buff, <span class="keyword">size_t</span> nbytes, <span class="keyword">int</span> flags, <span class="keyword">const</span> struct sockaddr *to, <span class="keyword">socklen_t</span> addrlen);</span><br></pre></td></tr></table></figure>
-<p>在UDP的情况下，写一个长度为0的数据报是可行的，那样会形成一个包含一个IP首部和一个8字节的UDP首部而没有数据的IP数据报。这也意味着，与TCP不同的是，UDP中recvfrom返回0是可以接受的。</p>
-<h2 id="验证接收到的响应"><a href="#验证接收到的响应" class="headerlink" title="验证接收到的响应"></a>验证接收到的响应</h2><p>由于recvfrom中最后两个参数是关于数据来源的地址等信息，如果设置为0则意味着我们忽略了该信息，但这样会带来的一个问题是，这就意味着任何一个端都可以给该客户端发送信息。</p>
-<p>因此往往，我们需要验证接收到的响应</p>
-<h2 id="服务器未运行"><a href="#服务器未运行" class="headerlink" title="服务器未运行"></a>服务器未运行</h2><p>考虑这样的情况，在服务端没有启动的情况下，启用客户端：</p>
-<p>这种情况下，会返回一个ICMP的错误，并且是异步的。为什么要异步，因为如果一个客户端连续向三个服务端发送数据报，但其中一个对端的服务端没有开启，这种情况下，UDP还能继续工作。</p>
-<p>但也要考虑到的<strong>一个问题</strong>是，这样我们如何区分是哪个服务端没有开启，但errno只有一个，不能区分是哪个IP地址和目的端口号。因此会有这样的规则，仅仅在进程将其UDP套接字连接到恰恰一个对端的的时候，这些异步错误才会返回进程。</p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>客户端在使用sendto时必须指定服务器的ip地址和端口号，但自身的ip地址和端口号则可以由内核自动选择，当然客户端也可以使用bind来指定它们。另外在内核指定的情况下，端口号是固定不变的，而ip地址则可能随着发送数据报的改变而改变。</p>
-<p><strong>如果我们使用了bind，但内核决定从另外一个数据链路发出，那么ip数据包仍然包含我们使用bind指定的ip地址，但是实际发送的链路ip地址即便不一样也无所谓。</strong></p>
-<h2 id="UDP的connect函数"><a href="#UDP的connect函数" class="headerlink" title="UDP的connect函数"></a>UDP的connect函数</h2><p>之前我们提到过，除非UDP的套接字已连接，否则异步错误是不会返回到UDP的套接字的。</p>
-<p>我们可以在UDP的套接字上使用connect，但与TCP不同的是，这里没有三次握手的过程，只是检测是否存在立即可以感知的错误，记录对端的IP地址和端口号，并返回调用进程。</p>
-<p>对于使用了connect的UDP套接字，接受和发送数据不能再使用sendto和recvfrom，而是read、write等。一个以连接的套接字仅仅与一个IP地址交换数据报。</p>
-<h2 id="给一个UDP套接字多次使用connect"><a href="#给一个UDP套接字多次使用connect" class="headerlink" title="给一个UDP套接字多次使用connect"></a>给一个UDP套接字多次使用connect</h2><p>这样做有两个目的：</p>
-<ul>
-<li>指定新的IP地址和端口号;</li>
-<li>断开连接，通过把套接字地址结构的的地址族成员设置为AF_UNSPEC即可；</li>
-</ul>
-<h2 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h2><p>在一个未连接的套接字上调用sendto，会进行以下的步骤：</p>
-<ul>
-<li>连接套接字；</li>
-<li>输出第一个数据报；</li>
-<li>断开套接字连接；</li>
-<li>连接套接字；</li>
-<li>输出第二个数据报；</li>
-<li>断开套接字连接；</li>
-</ul>
-<p>而如果使用了connect之后再调用两次write：</p>
-<ul>
-<li>连接套接字；</li>
-<li>输出第一个数据报；</li>
-<li>输出第二个数据报；</li>
-</ul>
-<h2 id="UDP套接字接收缓冲区"><a href="#UDP套接字接收缓冲区" class="headerlink" title="UDP套接字接收缓冲区"></a>UDP套接字接收缓冲区</h2><p>由UDP给某个特定的套接字排队的UDP数据报数目受限于该套接字接收缓冲区的大小。如果我们要改变其缓冲区大小，可以使用SO_RCVBUF进行修改；</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1988,7 +2058,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">216</span>
+                <span class="site-state-item-count">217</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

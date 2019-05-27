@@ -265,6 +265,148 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/覆盖equals时请遵守通用约定/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/16/覆盖equals时请遵守通用约定/" itemprop="url">覆盖equals时请遵守通用约定</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:08:43+08:00">
+                2018-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="覆盖equals时请遵守通用约定"><a href="#覆盖equals时请遵守通用约定" class="headerlink" title="覆盖equals时请遵守通用约定"></a>覆盖equals时请遵守通用约定</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>覆盖equals方法可能会导致严重的错误。</p>
+<h2 id="满足下列条件不覆盖equals"><a href="#满足下列条件不覆盖equals" class="headerlink" title="满足下列条件不覆盖equals"></a>满足下列条件不覆盖equals</h2><ul>
+<li>类的每个实例本质上是唯一的；</li>
+<li>不关心类是否提供了“逻辑相等”的测试功能；</li>
+<li>超类覆盖了equals，该方法对于子类也合适；</li>
+<li>类是私有或者包级别私有的；</li>
+</ul>
+<h2 id="实现equals方法"><a href="#实现equals方法" class="headerlink" title="实现equals方法"></a>实现equals方法</h2><p>当类具备自身特有的逻辑相等概念时，并且超类还没覆盖equals以实现期望方式时，我们应该重载equals；</p>
+<p>在覆盖equals时，应该满足以下约定：</p>
+<ul>
+<li>自反性：x.equals(x)为true；</li>
+<li>对称性：x.equals(y)为true时，y.equals(x)也为true；</li>
+<li>传递性：x.equals(y), y.equals(z)为true，x.equals(z)也为true；</li>
+<li>一致性：如果两个对象相等，那么它们就必需始终保持相等，除非对象被修改了；</li>
+<li>非空性：任何对象都不等于null；</li>
+</ul>
+<p>实现高质量equals：</p>
+<ol>
+<li>使用==操作符检查“参数是否为对象的引用”；</li>
+<li>使用instanceof检查“参数是否为正确的类型”，类或者类实现的接口；</li>
+<li>把参数转换成正确的类型，要使用instanceof测试；</li>
+<li>对类中的关键域要，检查参数中的域是否与对应的域对应；</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/覆盖equals时总要覆盖hashcode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1633,160 +1775,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Pylint学习/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/19/Pylint学习/" itemprop="url">Pylint学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:13:23+08:00">
-                2018-08-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Pylint学习"><a href="#Pylint学习" class="headerlink" title="Pylint学习"></a>Pylint学习</h1><h2 id="Install-Pylint"><a href="#Install-Pylint" class="headerlink" title="Install Pylint"></a>Install Pylint</h2><p>用virtualenv安装pylint：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install virtualenv</span><br><span class="line"><span class="meta">#</span>超时的话可以这样试一下</span><br><span class="line">pip --default-timeout=100 install virtualenv</span><br></pre></td></tr></table></figure>
-<p>创建一个虚拟环境：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">virtualenv --no-site-packages venv</span><br><span class="line">source venv/bin/activate</span><br></pre></td></tr></table></figure>
-<h2 id="Invoking-pylint"><a href="#Invoking-pylint" class="headerlink" title="Invoking pylint"></a>Invoking pylint</h2><p>pylint可以在命令行使用，具体用法为：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint [options] modules_or_packages</span><br></pre></td></tr></table></figure>
-<p>从上面的用法可以得知，我们应该提供pylint要检查的python包或者模块的名称。而Pylint不会导入这些包，而是利用Python internals去进行定位。因此我们需要关注<a href="https://docs.python.org/2/using/cmdline.html#envvar-PYTHONPATH" target="_blank" rel="noopener">PYTHONPATH</a>，防止它去检查已安装的模块版本，而不是开发版本。</p>
-<p>如果传给pylint一个单文件，例如这样：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint mymodules.py</span><br></pre></td></tr></table></figure>
-<p>就要保证当前的工作目录为一个package（即目录下有__init__.py）。</p>
-<p>另外，也可以在其它的python程序中调用pylint，比如：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pylint <span class="keyword">import</span> epylint <span class="keyword">as</span> lint</span><br><span class="line">(pylint_stdout, pylint_stderr) = lint.py_run(<span class="string">'hello.py'</span>, return_std=<span class="literal">True</span>)</span><br><span class="line"><span class="keyword">print</span> pylint_stdout.getvalue()</span><br><span class="line"><span class="keyword">print</span> pylint_stderr.getvalue()</span><br></pre></td></tr></table></figure>
-<h2 id="command-line-options"><a href="#command-line-options" class="headerlink" title="command line options"></a>command line options</h2><p>先来看两个基本的选项：</p>
-<table>
-<thead>
-<tr>
-<th>–version</th>
-<th>show program’s version number and exit</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>-h, –help</td>
-<td>show help about the command line options</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(venv) ➜  py pylint --version</span><br><span class="line">No config file found, using default configuration</span><br><span class="line">pylint 1.9.3,</span><br><span class="line">astroid 1.6.5</span><br><span class="line">Python 2.7.10 (default, Jul 15 2017, 17:16:57)</span><br><span class="line">[GCC 4.2.1 Compatible Apple LLVM 9.0.0 (clang-900.0.31)]</span><br></pre></td></tr></table></figure>
-<p>接下来介绍一个message control的命令后选项：<strong>–disable</strong>和<strong>–enable</strong>，如果我们只是希望启动某些checker，可以先用–disable = all然后使用–enable = \<symbol>，其中\<symbol>是逗号分隔的检查器名称和消息符号列表。这样的使用方式对于仅仅希望启动少数的checkers非常有用。</symbol></symbol></p>
-<p>举个例子，假如你只想启动相似性检查，可以增加选项：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">–-disable=all –-enable=similarities</span><br></pre></td></tr></table></figure>
-<p>pylint提供的symbol，可以参考：<a href="https://docs.pylint.org/en/1.6.0/features.html#messages-control-options" target="_blank" rel="noopener">https://docs.pylint.org/en/1.6.0/features.html#messages-control-options</a></p>
-<h2 id="Parallel-execution"><a href="#Parallel-execution" class="headerlink" title="Parallel execution"></a>Parallel execution</h2><p>如果主机的CPU数量超过1个，可以使用<strong>-j</strong>选项加速pylint的运行，比如：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint -j 4 mymodule1.py mymodule2.py mymodule3.py mymodule4.py</span><br></pre></td></tr></table></figure>
-<p>这样就会产生4个子进程，其中每个提供的模块将被并行检查。checkers发现的问题不会立即显示。 完成检查模块后才会立即显示它们。当提供的参数为0时，将会使用主机上所有CPU的数量。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1835,7 +1823,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">216</span>
+                <span class="site-state-item-count">217</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
