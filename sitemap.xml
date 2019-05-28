@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/05/28/weak-ptr-unique-ptr/</loc>
+    
+    <lastmod>2019-05-28T03:09:19.460Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/05/27/shared-ptr-in-C-11/</loc>
     
     <lastmod>2019-05-27T12:13:23.298Z</lastmod>

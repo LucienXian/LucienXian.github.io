@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-05-27T12:13:23.298Z</updated>
+  <updated>2019-05-28T03:09:19.460Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>weak_ptr&amp;unique_ptr</title>
+    <link href="http://yoursite.com/2019/05/28/weak-ptr-unique-ptr/"/>
+    <id>http://yoursite.com/2019/05/28/weak-ptr-unique-ptr/</id>
+    <published>2019-05-28T03:07:57.000Z</published>
+    <updated>2019-05-28T03:09:19.460Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="weak-ptr-amp-unique-ptr"><a href="#weak-ptr-amp-unique-ptr" class="headerlink" title="weak_ptr&amp;unique_ptr"></a>weak_ptr&amp;unique_ptr</h1><h2 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h2><blockquote><p>shared_ptr, Binary trees and the problem of Cyclic References</p></blockquote><p>shared_ptr最大的优点是在不再使用的时候，能够自动释放相关的内存，但也存在缺点，就是循环引用——如果两个对象使用shared_ptr相互引用，在对象超出作用域时，就没办法删除内存。</p><p>这是因为由于相互引用，引用计数永远不会为0。</p><h3 id="Now-How-to-fix-this-problem"><a href="#Now-How-to-fix-this-problem" class="headerlink" title="Now How to fix this problem?"></a>Now How to fix this problem?</h3><p>答案就是使用weak_ptr，weak_ptr能够分享对象，但不会拥有这个对象，它是通过shared_ptr进行创建：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; ptr = <span class="built_in">std</span>::make_shared&lt;<span class="keyword">int</span>&gt;(<span class="number">4</span>);</span><br><span class="line"><span class="built_in">std</span>::weak_ptr&lt;<span class="keyword">int</span>&gt; weakPtr(ptr);</span><br></pre></td></tr></table></figure><p>对于weak_ptr对象，我们无法直接使用操作符*和-&gt;去访问相关的内存，因此我们只能通过weak_ptr对像去创建shared_ptr，方法是调用lock函数。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; ptr = <span class="built_in">std</span>::make_shared&lt;<span class="keyword">int</span>&gt;(<span class="number">4</span>);</span><br><span class="line">    <span class="built_in">std</span>::weak_ptr&lt;<span class="keyword">int</span>&gt; weakPtr(ptr);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; ptr_2 =  weakPtr.lock();</span><br><span class="line">    <span class="keyword">if</span>(ptr_2)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;(*ptr_2)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Reference Count :: "</span>&lt;&lt;ptr_2.use_count()&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;   </span><br><span class="line">    <span class="keyword">if</span>(weakPtr.expired() == <span class="literal">false</span>)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Not expired yet"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>如果shared_ptr已经被删除，lock()函数返回空的shared_ptr。</p><h2 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h2><p>unique_ptr是c++11提供的智能指针实现之一，用于防止内存泄漏。unique_ptr对象包装了一个原始指针，并负责其生命周期。当该对象被破坏时，然后在其析构函数中删除关联的原始指针。</p><p>它跟shared_ptr的用法类似，也能使用原生指针的一些操作符。但不同的是归属权，unique_ptr对象始终是关联的原始指针的唯一所有者。 我们无法复制unique_ptr对象，它只能移动。也因为如吃，其析构函数中不需要任何引用计数，可以直接删除相关的指针。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create a unique_ptr object through raw pointer</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr2(<span class="keyword">new</span> Task(<span class="number">55</span>));</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr3 = taskPtr2; <span class="comment">// Compile error</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line">taskPtr = taskPtr2; <span class="comment">//compile error</span></span><br></pre></td></tr></table></figure><p>在unique_ptr类中，拷贝构造函数和赋值构造函数都已经被删除了。</p><h3 id="Transfering-the-ownership-of-unique-ptr-object"><a href="#Transfering-the-ownership-of-unique-ptr-object" class="headerlink" title="Transfering the ownership of unique_ptr object"></a>Transfering the ownership of unique_ptr object</h3><p>虽然不能拷贝一个unique_ptr对象，但我们可以move它们，即传递拥有权。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr2(<span class="keyword">new</span> Task(<span class="number">55</span>));</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr4 = <span class="built_in">std</span>::move(taskPtr2);</span><br></pre></td></tr></table></figure><h3 id="Releasing-the-associated-raw-pointer"><a href="#Releasing-the-associated-raw-pointer" class="headerlink" title="Releasing the associated raw pointer"></a>Releasing the associated raw pointer</h3><p>对unique_ptr对象调用release()函数可以释放相关原始指针的拥有权，即返还一个原始指针。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr5(<span class="keyword">new</span> Task(<span class="number">55</span>));</span><br><span class="line">Task * ptr = taskPtr5.release();</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;weak-ptr-amp-unique-ptr&quot;&gt;&lt;a href=&quot;#weak-ptr-amp-unique-ptr&quot; class=&quot;headerlink&quot; title=&quot;weak_ptr&amp;amp;unique_ptr&quot;&gt;&lt;/a&gt;weak_ptr&amp;amp;uniq
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>shared_ptr in C++11</title>
@@ -444,29 +467,6 @@
       
       
         &lt;h1 id=&quot;C-11-Multithreading-–-Part-1-Three-Different-ways-to-Create-Threads&quot;&gt;&lt;a href=&quot;#C-11-Multithreading-–-Part-1-Three-Different-ways-to-
-      
-    
-    </summary>
-    
-    
-      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>C++11 Lambda: Capturing Member Variables</title>
-    <link href="http://yoursite.com/2019/04/17/C-11-Lambda-Capturing-Member-Variables/"/>
-    <id>http://yoursite.com/2019/04/17/C-11-Lambda-Capturing-Member-Variables/</id>
-    <published>2019-04-17T02:34:04.000Z</published>
-    <updated>2019-04-17T02:35:20.825Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="C-11-Lambda-Capturing-Member-Variables"><a href="#C-11-Lambda-Capturing-Member-Variables" class="headerlink" title="C++11 Lambda : Capturing Member Variables"></a>C++11 Lambda : Capturing Member Variables</h1><p>本文将介绍如下从外部域捕获成员变量，假设有一个OddCounter类，在其成员函数中使用lambda函数，并需要捕获成员变量：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OddCounter</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="comment">// tracks the count of odd numbers encountered</span></span><br><span class="line"><span class="keyword">int</span> mCounter = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="keyword">return</span> mCounter;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; vec)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="comment">// Capturing member variable by value will not work</span></span><br><span class="line">                <span class="comment">// Will result in Compile Error</span></span><br><span class="line"><span class="built_in">std</span>::for_each(vec.begin(), vec.end(), [mCounter](<span class="keyword">int</span> element)&#123;</span><br><span class="line"><span class="keyword">if</span>(element % <span class="number">2</span>)</span><br><span class="line">mCounter++; <span class="comment">// Accessing member variable from outer scope</span></span><br><span class="line">&#125;);</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>这种做法无论是将成员变量传值还是传引用都会出现编译错误。</p><h2 id="Capturing-Member-variables-inside-Lambda-Function"><a href="#Capturing-Member-variables-inside-Lambda-Function" class="headerlink" title="Capturing Member variables inside Lambda Function"></a>Capturing Member variables inside Lambda Function</h2><p>理想的做法是传递this指针的值，这样就可以访问外部成员变量了。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::for_each(vec.begin(), vec.end(), [<span class="keyword">this</span>](<span class="keyword">int</span> element)&#123;</span><br><span class="line"><span class="comment">//....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;C-11-Lambda-Capturing-Member-Variables&quot;&gt;&lt;a href=&quot;#C-11-Lambda-Capturing-Member-Variables&quot; class=&quot;headerlink&quot; title=&quot;C++11 Lambda : C
       
     
     </summary>

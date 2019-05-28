@@ -265,6 +265,143 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/22/Linux内核学习——内核同步介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/22/Linux内核学习——内核同步介绍/" itemprop="url">Linux内核学习——内核同步介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-22T23:24:06+08:00">
+                2018-07-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="内核同步介绍"><a href="#内核同步介绍" class="headerlink" title="内核同步介绍"></a>内核同步介绍</h1><h2 id="临界区和竞争条件"><a href="#临界区和竞争条件" class="headerlink" title="临界区和竞争条件"></a>临界区和竞争条件</h2><p>临界区：访问和操作共享数据的代码段。</p>
+<p>对于单个变量的操作，处理器提供了指令来原子地读变量，修改变量和返回变量。</p>
+<h2 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h2><h3 id="造成并发执行的原因"><a href="#造成并发执行的原因" class="headerlink" title="造成并发执行的原因"></a>造成并发执行的原因</h3><p>用户空间之所以需要同步，是因为用户程序会被调度程序抢占和重新调度。内核造成并发执行的原因：</p>
+<ul>
+<li>中断</li>
+<li>软中断和tasklet</li>
+<li>内核抢占</li>
+<li>睡眠以及用户空间的同步</li>
+<li>对称多处理</li>
+</ul>
+<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>最简单的死锁例子是自死锁：一个执行线程试图去获得一个自己已经持有的锁。一些简单的规则可以帮助避免死锁：</p>
+<ul>
+<li>按顺序加锁；</li>
+<li>防止发送饥饿；</li>
+<li>不重复请求同一个锁；</li>
+</ul>
+<h2 id="争用和扩展性"><a href="#争用和扩展性" class="headerlink" title="争用和扩展性"></a>争用和扩展性</h2><p>锁的争用是指当锁正被使用时，有其它线程试图获得该锁。</p>
+<p>加锁的粒度用来描述加锁保护的数据规模，当锁争用很严重时，加锁太粗会降低可扩展性；当争用不明显时，加锁过细又会加大系统开销。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/21/Linux内核学习——下半部与推后执行的工作/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1862,153 +1999,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/09/Linux内核学习——进程/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/09/Linux内核学习——进程/" itemprop="url">Linux内核学习——进程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-09T13:26:47+08:00">
-                2018-07-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a>进程管理</h1><h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>进程是处于执行器的程序和资源总称。而线程是进程中活动的对象，拥有独立的pc（程序计数器），进程栈和一组寄存器集。内核调度的对象是线程，而不是进程。</p>
-<p>进程提供了虚拟机制——虚拟处理器和虚拟内存。这使得进程虽然可能是在共享一个处理器，但看起来像是拥有独立的内存地址和处理器。</p>
-<p>在Linux中，进程通过fork创建一个新的进程，而fork又是clone()系统调用的结果。fork()系统调用从内核返回两次，一次回到父进程，一次回到子进程。然后可以调用exec()这组函数载入新的程序，创建新的地址空间，执行程序。</p>
-<p>程序可以通过exit()系统调用退出，释放掉该进行所占有的资源。</p>
-<p>父进程可以通过wait()查询子进程是否终结，终结的进程处于僵死状态，直到父进程调用wait()相关的系统调用。</p>
-<h2 id="进程描述符及任务结构"><a href="#进程描述符及任务结构" class="headerlink" title="进程描述符及任务结构"></a>进程描述符及任务结构</h2><p>内核把进程的列表存放在task list的双向循环链表中，链表中每个结点类型为task_struct，该结构比较大，包含了一个进程所有信息。打个比方：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">// ...  </span></span><br><span class="line">    <span class="keyword">void</span> *<span class="built_in">stack</span>;    <span class="comment">//  指向内核栈的指针  </span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h3 id="分配进程描述符"><a href="#分配进程描述符" class="headerlink" title="分配进程描述符"></a>分配进程描述符</h3><p>使用slab分配器动态生成task_struct，并且在堆栈的低地址区创建一个新的结构<strong>struct thread_info</strong>，该结构用来存放特定体系结构的汇编代码段需要访问的那部分进程的数据，这是因为Linux内核是支持不同体系的。然后在thread_info中嵌入指向task_struct的指针。</p>
-<h3 id="进程描述符的存放"><a href="#进程描述符的存放" class="headerlink" title="进程描述符的存放"></a>进程描述符的存放</h3><p>内核通过一个唯一的进程描述符来标识每个进程——PID，最大值默认设置为32768，也就是允许同时存在进程的最大数目。</p>
-<p>有些体系结构会把当前的task_struct放在特定寄存器里，有些体系结构则是通过thread_info，然后计算偏移间接查找task_struct，比如x86</p>
-<h3 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h3><p>系统进程必然属于以下五种状态之中：</p>
-<ul>
-<li>TASK_RUNNING：该状态的进程可以在CPU上运行，或正在执行，或是在运行队列中等待执行，合并了常见操作系统书中——running和ready的两种状态</li>
-<li>TASK_INTERRUPTIPLE：该进程被阻塞，正在等待某些条件达成，比如等待socket的连接，某些信号的接收</li>
-<li>TASK_UNINTERRUPTIPLE：在该状态下，即便是接收到某些信号（比如kill ），该进程也不会被中断。这种状态用的比较少，一般用在不想被干扰的进程。比如内核的某些处理流程是不应该被中断，或者在进行硬件操作的时候，一旦进程被中断，就可能造成设备不可控</li>
-<li>__TASK_TRACED：被其它进程跟踪的进程，例如调用ptrace或者gdb进行调试的时候</li>
-<li>__TASK_STOPPED：进程停止执行，这种情况发送在接收到SIGSTOP,SIGTSTP,SIGTTIN,SIGTTOU等信号的时候</li>
-</ul>
-<h3 id="设置当前进程状态"><a href="#设置当前进程状态" class="headerlink" title="设置当前进程状态"></a>设置当前进程状态</h3><p>使用该函数：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;linux/sched.h&gt;</span></span></span><br><span class="line">set_task_state(task, state);</span><br></pre></td></tr></table></figure>
-<h3 id="进程家族树"><a href="#进程家族树" class="headerlink" title="进程家族树"></a>进程家族树</h3><p>Unix的进程之间存在着继承关系，所有进程都是PID为1的init进程的后代</p>
-<h2 id="进程创建"><a href="#进程创建" class="headerlink" title="进程创建"></a>进程创建</h2><p>进程创建主要是先在新的地址空间里创建进程，然后读入可执行文件。一般可以将这些步骤分解到fork()和exec()两个函数去做。</p>
-<h3 id="写时拷贝"><a href="#写时拷贝" class="headerlink" title="写时拷贝"></a>写时拷贝</h3><p>为了提高效率，内核在创建进程的时候采用的是<strong>写时拷贝</strong>，这种方法共享父进程的数据，在没有发生写入的时候，是不会复制数据，拥有新的拷贝。</p>
-<h2 id="线程在Linux中的实现"><a href="#线程在Linux中的实现" class="headerlink" title="线程在Linux中的实现"></a>线程在Linux中的实现</h2><p>其实在Linux中是没有线程这一概念的，Linux把所有线程当做进程来实现，所以每个线程都会有自己的task_struct，只是线程之间会共享某些资源。</p>
-<h3 id="线程创建"><a href="#线程创建" class="headerlink" title="线程创建"></a>线程创建</h3><p>线程的创建和进程类似，只是在线程创建的时候提供某些标识参数，以确保它们共享某些资源。</p>
-<h3 id="内核线程"><a href="#内核线程" class="headerlink" title="内核线程"></a>内核线程</h3><p>内核线程可以用来执行某些内核在后台的工作，内核线程是没有独立的地址空间的，它只在内核空间运行，不会被切换到用户空间。</p>
-<h2 id="进程终结"><a href="#进程终结" class="headerlink" title="进程终结"></a>进程终结</h2><p>进程的终结可能是显式调用exit系统调用，也可能是从程序主函数返回。然后进程会调用do_exit()去释放相关资源，进程进入EXIT_ZOMBIE状态，该状态的目的就是向父进程提供信息，由父进程检索或者通知内核后，释放进程的剩余内存，归还给系统。</p>
-<p>如果子进程处于zombie状态，但是父进程已经退出了，会给子进程在当然的线程组中找一个线程作为父亲，或者使用init进程作为父亲。一旦找到了新的父进程，就不会有zombie进程占用内存的问题了，init进程会例行调用wait()来检查子进程，清除zombie进程。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2057,7 +2047,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">217</span>
+                <span class="site-state-item-count">218</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
