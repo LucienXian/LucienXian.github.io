@@ -265,6 +265,178 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/24/Linux内核学习——内核同步方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/24/Linux内核学习——内核同步方法/" itemprop="url">Linux内核学习——内核同步方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-24T21:32:58+08:00">
+                2018-07-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="内核同步方法"><a href="#内核同步方法" class="headerlink" title="内核同步方法"></a>内核同步方法</h1><h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>原子操作的意义在于要么就完整地执行所有的指令，要么就都不执行。在内核中提供了两组原子操作的接口——<strong>原子整数和原子位</strong>。</p>
+<h3 id="原子整数操作"><a href="#原子整数操作" class="headerlink" title="原子整数操作"></a>原子整数操作</h3><p>原子整数操作提供了一种新的数据类型，以避免原子操作函数与非原子操作函数使用相同的函数，同时也能屏蔽不同体系结构之间的差异：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">int</span> counter;</span><br><span class="line">&#125; <span class="keyword">atomic_t</span>;</span><br></pre></td></tr></table></figure>
+<p>在<strong>&lt;asm/atomic.h&gt;</strong>中提供了一系列原子整数操作的接口：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">atomic_t</span> v;</span><br><span class="line"><span class="keyword">atomic_t</span> u = ATOMIC_INIT(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">atomic_set(&amp;v, <span class="number">4</span>); <span class="comment">//v=4</span></span><br><span class="line">atomic_add(<span class="number">2</span>, &amp;v); <span class="comment">//v = v+4</span></span><br><span class="line">atomic_inc(&amp;v); <span class="comment">//v = v+1</span></span><br></pre></td></tr></table></figure>
+<p>原子整数操作最常见的应用就是计数器，例如可以在c++的智能指针中增加原子整数作为计数器。能用原子操作就尽量不用锁机制，增加效率。</p>
+<h3 id="64位原子操作"><a href="#64位原子操作" class="headerlink" title="64位原子操作"></a>64位原子操作</h3><p>随着64位系统的发展，内核开发者也引入了64位的atomic64_t。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">long</span> counter;</span><br><span class="line">&#125; <span class="keyword">atomic64_t</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="原子位操作"><a href="#原子位操作" class="headerlink" title="原子位操作"></a>原子位操作</h3><p>与原子整数操作不同，原子位操作是在普通的内存地址上进行操作，因此原子位操作没有特定的类型，针对的只是普通指针类型。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> word = <span class="number">0</span>;</span><br><span class="line">set_bit(<span class="number">0</span>, &amp;word);<span class="comment">//设置第0位</span></span><br><span class="line">set_bit(<span class="number">1</span>, &amp;word);<span class="comment">//设置第1位</span></span><br></pre></td></tr></table></figure>
+<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>临界区的情况可能非常复杂，不能像上面那样只是简单声明原子变量就可以保证同步，因此就引入更为复杂的同步方法——锁。</p>
+<p>Linux内核中最常见的锁是自旋锁（spin lock）——这种锁最多只能被一个可执行线程持有。一个可争用的自旋锁会使得请求线程busy wait，不断消耗处理器的时间。当然有方法可以让线程先行睡眠，待锁可用时再唤醒。但考虑到上下文切换的消耗，如果持有锁的时间比较短，自旋锁是一个比较好的选择。</p>
+<p>如果持有自旋锁的时间小于两次上下文切换，那么可以选用自旋锁。</p>
+<h3 id="自旋锁方法"><a href="#自旋锁方法" class="headerlink" title="自旋锁方法"></a>自旋锁方法</h3><p>自旋锁的实现是和体系结构相关的，代码往往通过汇编来实现。基本的使用形式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DEFINE_SPINLOCK(mr_lock);</span><br><span class="line">spin_lock(&amp;mr_lock);</span><br><span class="line"><span class="comment">/*临界区*/</span></span><br><span class="line">spin_unlock(&amp;my_lock);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>自旋锁不可递归，如果一个线程试图去获取一个自己已经拥有的自旋锁，就会陷入死锁</p>
+</blockquote>
+<h3 id="其它针对自旋锁的操作"><a href="#其它针对自旋锁的操作" class="headerlink" title="其它针对自旋锁的操作"></a>其它针对自旋锁的操作</h3><p>可以使用<strong>spin_lock_init()</strong>来初始化动态创建的自旋锁（此时返回一个指向spinlock_t类型的指针）。spin_try_lock()会试图获取某个特定的自旋锁，而spin_is_locked()方法则只是判断特定锁是否被占用。</p>
+<h3 id="自旋锁和下半部"><a href="#自旋锁和下半部" class="headerlink" title="自旋锁和下半部"></a>自旋锁和下半部</h3><p>与下半部配合使用时，我们在获取锁的时候需要禁止所有下半部的执行，因为下半部可以抢占进程上下文中的代码，此时可以使用方法——<strong>spin_lock_bh()</strong>。</p>
+<h2 id="读－写自旋锁"><a href="#读－写自旋锁" class="headerlink" title="读－写自旋锁"></a>读－写自旋锁</h2><p>由于锁的用途可以明确分为读取和写入两个场景，因此提供了读－写自旋锁进行保护。一个或者多个任务可以并发地拥有读者锁，但写者锁只能被一个写任务拥有。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">DEFINE_SPINLOCK(mr_rwlock);</span><br><span class="line">read_lock(&amp;mr_rwlock);</span><br><span class="line"><span class="comment">/*临界区，只读*/</span></span><br><span class="line">read_unlock(&amp;mr_rwlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*写者分支*/</span></span><br><span class="line">write_lock(&amp;mr_rwlock);</span><br><span class="line"><span class="comment">/*临界区*/</span></span><br><span class="line">write_unlock(&amp;mr_rwlock);</span><br></pre></td></tr></table></figure>
+<p>注意这样的一种死锁情况，写者锁不断自旋，等待读者锁释放</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">read_lock(&amp;mr_lock);</span><br><span class="line">write_lock(&amp;mr_lock);</span><br></pre></td></tr></table></figure>
+<h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>linux中的信号量实际上是一种睡眠锁，则任务试图获得一个不可用的信号量时，就会进入一个等待队列，然后处于休眠状态，此时处理器就可以释放。与自旋锁不同，信号量在等待锁时会睡眠，所以信号量适用于锁被长时间占有的情况。如果占有锁时间较短，那么维护队列，切换上下文的开销就不值得了。另外，在占有信号量时，不能同时占用自旋锁，因为拥有自旋锁时不允许睡眠。</p>
+<h3 id="计数信号量和二值信号量"><a href="#计数信号量和二值信号量" class="headerlink" title="计数信号量和二值信号量"></a>计数信号量和二值信号量</h3><p>信号量可以允许持有计数器，如果一个时刻只允许一个锁持有者，那就是二值信号量，如果计数可以大于1，那就是计数信号量。</p>
+<p>由于引入了计数机制，因此信号量支持两个原子操作P()和V()。一个将信号量计数减一来请求一个信号量，另一个则是讲信号加一来释放信号量。</p>
+<h3 id="创建和初始化信号量"><a href="#创建和初始化信号量" class="headerlink" title="创建和初始化信号量"></a>创建和初始化信号量</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> <span class="title">name</span>;</span></span><br><span class="line">sema_init(&amp;name, count);</span><br><span class="line"><span class="comment">//动态创建信号量</span></span><br><span class="line">init_MUTEX(sem);</span><br></pre></td></tr></table></figure>
+<h3 id="使用信号量"><a href="#使用信号量" class="headerlink" title="使用信号量"></a>使用信号量</h3><p>函数down_interruptible()会试图获取指定信号量，如果信号量不可用，它会将进程置成TASK_INTERRUPTLE状态，进入睡眠。</p>
+<h2 id="读－写信号量"><a href="#读－写信号量" class="headerlink" title="读－写信号量"></a>读－写信号量</h2><p>读写信号量与读写自旋锁差别不大，但是读写信号量相比读写自旋锁多一种特有的操作——<strong>downgrade_write()</strong>，这个函数可以动态地将获取的写锁转换为读锁。</p>
+<h2 id="互斥体"><a href="#互斥体" class="headerlink" title="互斥体"></a>互斥体</h2><p>互斥体(mutex)是指任何可以睡眠的强制互斥锁，就像计数是1的信号量。互斥体在内核中对应的数据结构为mutex：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//静态创建</span></span><br><span class="line">DEFINE_MUTEX(name);</span><br><span class="line"><span class="comment">//动态</span></span><br><span class="line">mutex_init(&amp;mutex);</span><br><span class="line"><span class="comment">//加锁、解锁</span></span><br><span class="line">mutex_lock(&amp;mutex);</span><br><span class="line">mutex_unlock(&amp;mutex);</span><br></pre></td></tr></table></figure>
+<p>相比信号量，mutex的限制更多：</p>
+<ul>
+<li>只有一个任务可以拥有mutex；</li>
+<li>给mutex上锁的任务必须负责解锁；</li>
+<li>不能递归地上锁和解锁；</li>
+<li>mutex不能在中断或者下半部使用；</li>
+<li>mutex只能通过官方API管理；</li>
+</ul>
+<blockquote>
+<p>尽量使用mutex，除非mutex的限制影响了你；除非是低开销的加锁、或者短期锁定，又或者需要在中断上下文加锁，某人都用mutex；</p>
+</blockquote>
+<h2 id="顺序锁"><a href="#顺序锁" class="headerlink" title="顺序锁"></a>顺序锁</h2><p>在2.6版本内核中引进了一种新型锁，顺序锁(seq)，通过一个序列计数器，在有数据写入的时候，就会得到一个锁，并且序列值增加。在读取数据之前和之后，会比较序列号，相同才证明数据没有被修改。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> seq;</span><br><span class="line"><span class="keyword">do</span>&#123;</span><br><span class="line">    seq = read_seqbegin(&amp;mr_seq_lock);</span><br><span class="line">&#125;<span class="keyword">while</span> (read_seqretry(&amp;mr_seq_lock, seq));</span><br></pre></td></tr></table></figure>
+<p>seq锁对于写者更有利，如果有写者，那么读数据就会不断进入循环。</p>
+<h2 id="禁止抢占"><a href="#禁止抢占" class="headerlink" title="禁止抢占"></a>禁止抢占</h2><p>由于内核是抢占性的，内核中的进程在任何时刻都可能停下了，另一个进程运行，这就可能出现临界区有两个进程。自旋锁可以避免这个问题，但某些情况不需要自旋锁，可以通过禁止抢占来实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">preempt_disable();</span><br><span class="line"><span class="comment">/*抢占被禁止...*/</span></span><br><span class="line">preempt_enable();</span><br></pre></td></tr></table></figure>
+<h2 id="顺序和屏障"><a href="#顺序和屏障" class="headerlink" title="顺序和屏障"></a>顺序和屏障</h2><p>当处理多处理器之间的同步问题时，我们可能需要在代码中指定读内存和写内存的指令，这种确保顺序的指令就叫屏障(barriers)。</p>
+<ul>
+<li>rmb()提供了读内存屏障，它确保跨越rmb()的载入动作不会发送重排；</li>
+<li>wmb()提供的是写内存屏障；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/22/Linux内核学习——内核同步介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1853,152 +2025,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/09/SGI-STL中的copy算法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/09/SGI-STL中的copy算法/" itemprop="url">SGI STL中的copy算法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-09T18:56:28+08:00">
-                2018-07-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="SGI-STL中的copy算法"><a href="#SGI-STL中的copy算法" class="headerlink" title="SGI STL中的copy算法"></a>SGI STL中的copy算法</h1><p>在stl中，copy是一个调用非常频繁的函数，而这些操作又涉及到了各种的内存操作——运用assignment operator或者copy constructor。为了提高效率，对于拥有trivial assignment operator的元素类型，可以使用直接的内存复制（例如C库函数——memmove或者memcpy）。</p>
-<p>copy算法脉络：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_2.png" alt="img"></p>
-<p>在这里有一个需要注意的问题，就是由于copy算啊是将输入区间内的元素复制到输出区间中，因此当输入区间与输出区间重叠的时候很有可能出现问题。</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_3.png" alt="img"></p>
-<p>这里出现问题的原因是由于deque的迭代器不是原生指针，如果使用的是vector，迭代器是原生指针，调用copy算法后会以memmove执行实际的复制操作，这样整块内存进行复制就不会出错。</p>
-<blockquote>
-<p>但是这个在我的机器上运行是正确的</p>
-<p>gcc version 5.4.0</p>
-</blockquote>
-<p><a href="https://github.com/LucienXian/stl_algorithms/blob/master/algobase/my_copy_overlap.cpp" target="_blank" rel="noopener">my_copy_overlap.cpp</a></p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iterator&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;deque&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> v[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">9</span>;i++)</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; v[i] &lt;&lt; <span class="string">" "</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        copy(ia+<span class="number">2</span>, ia+<span class="number">7</span>,ia);<span class="comment">//输出区间的终点与输入区间重叠，copy正常</span></span><br><span class="line">        print(ia); <span class="comment">//2 3 4 5 6 5 6 7 8</span></span><br><span class="line">    &#125;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt; id(ia, ia+<span class="number">9</span>);</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt;::iterator first = id.begin();</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt;::iterator last = id.end();</span><br><span class="line">        ++++first; <span class="comment">//advance 2</span></span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; *first &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        ----last; <span class="comment">//advance -2</span></span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; *last &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt;::iterator res = id.begin();</span><br><span class="line">        copy(first, last, res);</span><br><span class="line">        copy(id.begin(), id.end(), ostream_iterator&lt;<span class="keyword">int</span>&gt;(<span class="built_in">cout</span>, <span class="string">" "</span>));<span class="comment">//2 3 4 5 6 5 6 7 8</span></span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt; id(ia, ia+<span class="number">9</span>);</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt;::iterator first = id.begin();</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt;::iterator last = id.end();</span><br><span class="line">        ++++first; <span class="comment">//advance 2</span></span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; *first &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        ----last; <span class="comment">//advance -2</span></span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; *last &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt;::iterator res = id.begin();</span><br><span class="line">        res = res+<span class="number">4</span>;</span><br><span class="line">        copy(first, last, res);</span><br><span class="line">        copy(id.begin(), id.end(), ostream_iterator&lt;<span class="keyword">int</span>&gt;(<span class="built_in">cout</span>, <span class="string">" "</span>));<span class="comment">//0 1 2 3 2 3 4 5 6</span></span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>我们还是回到SGI的STL吧，以下是唯一的对外接口：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">InputIterator</span>, <span class="title">class</span> <span class="title">OutputIterator</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">inline</span> <span class="title">OutputIterator</span> <span class="title">copy</span>(<span class="title">InputIterator</span> <span class="title">first</span>, <span class="title">InputIterator</span> <span class="title">last</span>, <span class="title">OutputIterator</span> <span class="title">result</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">return</span> __copy_dispatch&lt;InputIterator, OutputIterator&gt;()(first, last, result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外，会有两个重载函数，针对原始指针——const char<em>和const wchar_t</em>，进行内存直接拷贝操作：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">char</span>* <span class="title">copy</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* first, <span class="keyword">const</span> <span class="keyword">char</span>* last, <span class="keyword">char</span>* result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    memmove(result, first, last-first);</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> wchar_t* <span class="title">copy</span><span class="params">(<span class="keyword">const</span> <span class="keyword">wchar_t</span>* first, <span class="keyword">const</span> <span class="keyword">wchar_t</span>* last, <span class="keyword">wchar_t</span>* result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    memmove(result, first, <span class="keyword">sizeof</span>(<span class="keyword">wchar_t</span>)*(last-first));</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>接下来，我们看一下copy()函数中调用的__copy_dispatch()：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">InputIterator</span>, <span class="title">class</span> <span class="title">OutputIterator</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">strcut</span> __<span class="title">copy_dispatch</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="function">OutputIterator <span class="title">operator</span><span class="params">()</span><span class="params">(InputIterator first, InputIterator last, OutputIterator result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> __copy(first, last, result, iterator_category(first));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//另外，提供两个偏特化版本，针对的是T*指针类型</span></span><br><span class="line"><span class="comment">//这里的目的是在参数为原生指针的前提下，判断指针所指对象是否拥有trivial assignment operator，如果是，则直接使用memmove进行内存拷贝，否则，需要调用assignment operator进行复制</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">strcut</span> __<span class="title">copy_dispatch</span>&lt;T*, T*&gt;</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="function">T* <span class="title">operator</span><span class="params">()</span><span class="params">(T* first, T* last, T* result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">typedef</span> <span class="keyword">typename</span> __type_traits&lt;T&gt;::has_trivial_assignment_operator t;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">__copy_t</span>(first, last, result, t());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">strcut</span> __<span class="title">copy_dispatch</span>&lt;const T*, T*&gt;</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="function">T* <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> T* first, <span class="keyword">const</span> T* last, T* result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">typedef</span> <span class="keyword">typename</span> __type_traits&lt;T&gt;::has_trivial_assignment_operator t;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">__copy_t</span>(first, last, result, t());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>先来看看泛化版本的<strong>__copy_dispatch调用的</strong> 函数<strong>__copy</strong>，该函数针对不同类型的迭代器使用的循环条件不同：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">InputIterator</span>, <span class="title">class</span> <span class="title">OutputIterator</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">inline</span> <span class="title">OutputIterator</span> __<span class="title">copy</span>(<span class="title">InputIterator</span> <span class="title">first</span>, <span class="title">InputIterator</span> <span class="title">last</span>, <span class="title">OutputIterator</span> <span class="title">result</span>, <span class="title">input_iterator_tag</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">for</span> (; first!=last; ++result, ++first)</span><br><span class="line">        *result = *first;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">RandomAccessIterator</span>, <span class="title">class</span> <span class="title">OutputIterator</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">inline</span> <span class="title">OutputIterator</span> __<span class="title">copy</span>(<span class="title">RandomAccessIterator</span> <span class="title">first</span>, <span class="title">RandomAccessIterator</span> <span class="title">last</span>, <span class="title">OutputIterator</span> <span class="title">result</span>, <span class="title">random_access_iterator_tag</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">//抽出这个函数，是因为接下来也有被使用的地方</span></span><br><span class="line">    <span class="keyword">return</span> __copy_d(first, last, result, distance_type(first));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>接下来是__copy_d的实现：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">RandomAccessIterator</span>, <span class="title">class</span> <span class="title">OutputIterator</span>, <span class="title">class</span> <span class="title">Distance</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">inline</span> <span class="title">OutputIterator</span> __<span class="title">copy_d</span>(<span class="title">RandomAccessIterator</span> <span class="title">first</span>, <span class="title">RandomAccessIterator</span> <span class="title">last</span>, <span class="title">OutputIterator</span> <span class="title">result</span>, <span class="title">Distance</span>*)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">for</span> (Distance n = last-first; n&gt;<span class="number">0</span>; --n, ++result, ++first)</span><br><span class="line">        *result = *first;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>回到__copy_dispatch的偏特化版本中，这个函数里面调用 __copy_t()</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">inline</span> <span class="title">T</span>* __<span class="title">copy_t</span>(<span class="title">const</span> <span class="title">T</span>* <span class="title">first</span>, <span class="title">const</span> <span class="title">T</span>* <span class="title">last</span>, <span class="title">T</span>* <span class="title">result</span>, __<span class="title">true_type</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    memmove(result, first, <span class="keyword">sizeof</span>(T)*(last-first));</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">inline</span> <span class="title">T</span>* __<span class="title">copy_t</span>(<span class="title">const</span> <span class="title">T</span>* <span class="title">first</span>, <span class="title">const</span> <span class="title">T</span>* <span class="title">last</span>, <span class="title">T</span>* <span class="title">result</span>, __<span class="title">false_type</span>)</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">//原生指针是一种RandomAccessIterator，所以交给了__copy_d</span></span><br><span class="line">    <span class="keyword">return</span> __copy_d(first, last, result, (<span class="keyword">ptrdiff_t</span>*)<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>即便自定义的class C具备trivial operator=，它仍然可能被判断__false_type，这是因为&lt;type_triais.h&gt;中只针对某些类型做了记录。</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2047,7 +2073,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">218</span>
+                <span class="site-state-item-count">219</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

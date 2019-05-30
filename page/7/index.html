@@ -265,6 +265,142 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/谨慎地覆盖clone/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/谨慎地覆盖clone/" itemprop="url">谨慎地覆盖clone</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:40:53+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="谨慎地覆盖clone"><a href="#谨慎地覆盖clone" class="headerlink" title="谨慎地覆盖clone"></a>谨慎地覆盖clone</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Cloneable接口没有任何方法，它表明object允许被clone。这个接口的作用是改变clone方法的行为，使得Object中的clone方法返回对象的逐域拷贝，否则CloneNotSupportedException异常。</p>
+<p>Object的clone方法是protected的。</p>
+<h2 id="约定"><a href="#约定" class="headerlink" title="约定"></a>约定</h2><p>如果实现Cloneable接口是要对某个类起作用，那该类和它的所有超类都必须满足：无需调用构造器就可以创建对象。并且这个拷贝应该满足：</p>
+<p>x.clone() != x 为true</p>
+<p>x.clone().getClass() == x.getClass() 为true</p>
+<p>x.clone().equals(x) 为true</p>
+<p>实际上，良好的clone方法可以调用构造器创建对象，之后再去复制内部数据。</p>
+<h2 id="super-clone"><a href="#super-clone" class="headerlink" title="super.clone()"></a>super.clone()</h2><p>假设超类提供了良好的clone方法，那么从super.clone()中得到的对象可能会接近于最终返回的对象，也可能相距甚远。如果每个域包含一个基本类型的值，或者包含一个指向不可变对象的引用，那么返回对象就可能是符合要求的。</p>
+<p>例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> PhoneNumber <span class="title">clone</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (PhoneNumber) <span class="keyword">super</span>.clone();</span><br><span class="line">    &#125; <span class="keyword">catch</span>(CloneNotSupportedException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意，clone方法返回的是PhoneNumber，永远不要让那个客户去做类库能替用户完成的事情。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果对象中包含的域引用了可变的对象，那这种clone实现可能导致灾难性后果。因为修改原始的实例可能会破坏克隆对象的约束条件。</p>
+<p>复杂对象的克隆，需要先调用super.clone，再把结果对象中的所有域设置为空白状态，然后调用higher level去重新设置对象状态。</p>
+<p>跟构造器一样，clone不应该调用一个被覆盖的方法，因为该方法可能先执行，导致克隆对象和原始对象不一致。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>所有实现了Cloneable接口的类都应该用一个公有的方法去覆盖clone：先调用super.clone，然后修正需要的域，这意味着需要拷贝任何包含内部深层结构的可变对象。</p>
+<p>另一个实现对象拷贝的方法是提供一个拷贝构造器或者拷贝工厂。</p>
+<p>对于一个专门用于继承而设计的类，如果未能提供行为良好的protected的clone方法，那么它的子类就不可能实现Cloneable接口。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/使类和成员的可访问性最小/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1540,152 +1676,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/考虑用静态工厂方法代替构造器/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/16/考虑用静态工厂方法代替构造器/" itemprop="url">考虑用静态工厂方法代替构造器</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:10:02+08:00">
-                2018-12-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="考虑用静态工厂方法代替构造器"><a href="#考虑用静态工厂方法代替构造器" class="headerlink" title="考虑用静态工厂方法代替构造器"></a>考虑用静态工厂方法代替构造器</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>提供一个公有的静态工厂方法，返回类的一个实例</p>
-<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Boolean <span class="title">valueOf</span><span class="params">(<span class="keyword">boolean</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> b ? Boolean.True : Boolean.False;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h2><ol>
-<li>拥有显式的名称；</li>
-</ol>
-<p>用户可以清楚地知道自己需要那个构造函数构造的对象，例如<strong>BigInteger(int, int, Random)</strong>返回的是素数，但使用静态工厂方法<strong>BigInteger.probablePrime</strong>会更加明显。</p>
-<ol start="2">
-<li>不必每次调用的时候都创建一个新对象</li>
-</ol>
-<p>静态工厂方法可以使用预先构建好的实例，或者将其缓存起来，重复利用。对象受控于静态工厂方法，可以确保它是一个单例。例如Boolean.valueOf这个方法从不创建新的实例。</p>
-<ol start="3">
-<li>可以返回原类型的任何子类型对象</li>
-</ol>
-<p>这种灵活性带来的好处是，API可以返回对象，同时又不会使对象的类变成公有的，而且这个类还可以随着每次调用而发生变化。</p>
-<ol start="4">
-<li>在创建参数化类型实例的时候，代码将变得更加简洁</li>
-</ol>
-<p>这里主要指的是类型推导。例如，原先的使用可能是：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, List&lt;String&gt;&gt; map = <span class="keyword">new</span> HashMap&lt;String, List&lt;String&gt;&gt;();</span><br></pre></td></tr></table></figure>
-<p>但假如我们有这样一个静态方法：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;K, V&gt; <span class="function">HashMap&lt;K, V&gt; <span class="title">newInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> HashMap&lt;K, V&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这样，我们就可以代替上述啰嗦的使用方式：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, List&lt;String&gt;&gt; map = HashMap.newInstance();</span><br></pre></td></tr></table></figure>
-<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ol>
-<li>类如果不含公有或者protected的构造函数，就不能被子类化。</li>
-<li>与其他的静态方法没有任何区别。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1734,7 +1724,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">218</span>
+                <span class="site-state-item-count">219</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

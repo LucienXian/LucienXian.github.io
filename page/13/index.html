@@ -265,6 +265,153 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/深度探索C-对象模型-八/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/深度探索C-对象模型-八/" itemprop="url">深度探索C++对象模型<八></八></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T09:41:56+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Member的各种调用方式"><a href="#Member的各种调用方式" class="headerlink" title="Member的各种调用方式"></a>Member的各种调用方式</h1><h2 id="Nonstatic-Member-Functions"><a href="#Nonstatic-Member-Functions" class="headerlink" title="Nonstatic Member Functions"></a>Nonstatic Member Functions</h2><p>由于C++的一个设计标准就是使得nonstatic member function要有和一般的nonmember function有相同的效率；</p>
+<p>这就带来了一个变化，就是编译器内部会将nonstatic member function转换为等价的nonmember function实体；</p>
+<p>转化步骤：</p>
+<ul>
+<li>改写函数的原型，安插一个新的参数，即this指针；</li>
+<li>将每一个对nontatic data member的存取操作改写为通过this指针的操作；</li>
+<li>将member function改写成一个外部函数，修改函数名称；</li>
+</ul>
+<p>例如一个这样的函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Point3d Point3d::normalize() <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="keyword">float</span> mag = magnitude();</span><br><span class="line">    Point3d normal;</span><br><span class="line">    normal.x = x/mag;</span><br><span class="line">    normal.y = y/mag;</span><br><span class="line">    normal.z = z/mag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将可能会改写成：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">normalize_7Point3dFv</span><span class="params">(<span class="keyword">register</span> <span class="keyword">const</span> Point3d *<span class="keyword">const</span> <span class="keyword">this</span>, Point3d &amp;__result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="keyword">float</span> mag = <span class="keyword">this</span>-&gt;magnitude();</span><br><span class="line">    __result.Point3d::Point3d(<span class="keyword">this</span>-&gt;x/mag, <span class="keyword">this</span>-&gt;y/mag, <span class="keyword">this</span>-&gt;z/mag);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
+<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name mangling的原因。</p>
+<h2 id="Virtual-member-functions"><a href="#Virtual-member-functions" class="headerlink" title="Virtual member functions"></a>Virtual member functions</h2><p>如果normalize()是一个虚函数，那么以下调用会转化为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;normalize();</span><br><span class="line">(*ptr-&gt;vptr[<span class="number">1</span>])(ptr);</span><br></pre></td></tr></table></figure>
+<p>1就是virtual function slot的索引值，关联到normalize()函数。</p>
+<p>而如果里面的magnitude()函数也是虚函数，那么由于normalize会先调用，决定了object的类型，所以编译器会使用更加明确的调用方式，而不是(*ptr-&gt;vptr[2])(ptr);例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">register</span> <span class="keyword">float</span> mag = Point3d::magnitude();</span><br></pre></td></tr></table></figure>
+<h2 id="Static-Member-Functions"><a href="#Static-Member-Functions" class="headerlink" title="Static Member Functions"></a>Static Member Functions</h2><p>如果normalize是一个静态函数，那么这两种调用会变为:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">obj.normalize();</span><br><span class="line">prt-&gt;normalize();</span><br><span class="line"><span class="comment">//会转为</span></span><br><span class="line">normalize_7Point3dSFv();</span><br></pre></td></tr></table></figure>
+<p>由于static member function没有this指针，所以：</p>
+<ul>
+<li>不能直接存取其中class的nonstatic members；</li>
+<li>不能被声明为const, volatile或者virtual；</li>
+<li>不需要经由对象调用（但是如果static member是一个private，就很可能要依赖于对象）；</li>
+</ul>
+<p>如果要取一个static member function的地址，那么其类型会是：unsigned int (*)();</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/深度探索C-对象模型-七/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1817,142 +1964,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/15/stl-hashtable/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/15/stl-hashtable/" itemprop="url">stl--hashtable</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T11:10:38+08:00">
-                2018-03-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Hashtable"><a href="#Hashtable" class="headerlink" title="Hashtable"></a>Hashtable</h1><h2 id="三种解决冲突的方法"><a href="#三种解决冲突的方法" class="headerlink" title="三种解决冲突的方法"></a>三种解决冲突的方法</h2><ul>
-<li><p>线性探测：当hash之后遇到冲突了，就在下一个位置进行寻找。问题是会遇到聚集。</p>
-</li>
-<li><p>二次探测：原先遇到冲突，在寻找下一个空位时是按照这样的顺序：H+1,H+2…H+n;而二次探测则是：H+1^2,H+2^2…H+n^2。</p>
-</li>
-<li><p>开链：在每个槽中维持一个链表，hash到同一个槽时就插入链表中。SGI的stl就是用这种方式。但hashtable维持的链不是stl的list，而是自行维护的__hashtable_node</p>
-</li>
-</ul>
-<h2 id="hashtable的迭代器"><a href="#hashtable的迭代器" class="headerlink" title="hashtable的迭代器"></a>hashtable的迭代器</h2><p>迭代器的前进操作是从当前节点出发，前进一个位置，如果目前节点恰好是list的尾端，就进入下一个buckets内。注意，hashtable没有后退操作。</p>
-<h2 id="hashtable的数据结构"><a href="#hashtable的数据结构" class="headerlink" title="hashtable的数据结构"></a>hashtable的数据结构</h2><p>默认使用std::alloc。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Value</span>, <span class="title">class</span> <span class="title">Key</span>, <span class="title">class</span> <span class="title">HashFun</span>, </span></span><br><span class="line"><span class="class">            <span class="title">class</span> <span class="title">ExtractKey</span>, <span class="title">class</span> <span class="title">EqualKey</span>, <span class="title">class</span> <span class="title">Alloc</span> = <span class="title">alloc</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">hashtable</span>&#123;</span>&#125;</span><br></pre></td></tr></table></figure>
-<p>虽然使用开链法不需要指定table的大小为质数，但SGI stl还是使用了质数。做法就是提供一个函数用以查询最接近于某数n,但大于某数n的质数。</p>
-<h2 id="hashtable的构造与内存管理"><a href="#hashtable的构造与内存管理" class="headerlink" title="hashtable的构造与内存管理"></a>hashtable的构造与内存管理</h2><p>由这一段代码可知，加入我们需要50个节点，它会返回53个节点（质数）：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">initialize_buckets</span><span class="params">(size_type n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">const</span> size_type n_buckets = next_size(n);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>进行插入操作时，会判断是否需要重建（resize）：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">...::resize(size_type num_elementsz_hint)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//比较新老的size</span></span><br><span class="line">    <span class="keyword">const</span> size_type old_n = buckets.size();</span><br><span class="line">    <span class="keyword">if</span> (num_elementsz_hint &gt; old_n) &#123; <span class="comment">//如果新的size比较大</span></span><br><span class="line">        <span class="keyword">const</span> size_type n = next_size(num_elementsz_hint);</span><br><span class="line">        <span class="keyword">if</span> (n &gt; old_n) &#123;</span><br><span class="line">            <span class="built_in">vector</span>&lt;node*, A&gt; tmp(n, (node*) <span class="number">0</span>);</span><br><span class="line">            <span class="comment">//处理每一个旧的buckets</span></span><br><span class="line">            <span class="comment">//首先是获取bucket的起始节点</span></span><br><span class="line">            <span class="comment">//迭代地将每个节点插在tmp（也就是新的buckets）的起始位置</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="hashfunction"><a href="#hashfunction" class="headerlink" title="hashfunction"></a>hashfunction</h2><p>在使用hashfunction时，SGI将其封装成bkt_num()，再由它来调用hash function。通常来说，stl只对char,long,int,short等进行处理。如果要处理其它类型的，必须要提供hashfunction，比如hash<string></string></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2001,7 +2012,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">218</span>
+                <span class="site-state-item-count">219</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

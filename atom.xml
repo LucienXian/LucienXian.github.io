@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-05-28T03:09:19.460Z</updated>
+  <updated>2019-05-30T05:10:08.192Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>std::array</title>
+    <link href="http://yoursite.com/2019/05/30/std-array/"/>
+    <id>http://yoursite.com/2019/05/30/std-array/</id>
+    <published>2019-05-30T05:09:44.000Z</published>
+    <updated>2019-05-30T05:10:08.192Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h1><p>std::array是在c++11中引入的，对原来C语言的数组的一个包装器，具有额外的优点。这是一种具有恒定大小元素的顺序容器。</p><p>其模版为：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt; <span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">size_t</span> <span class="title">N</span> &gt; </span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">array</span>;</span></span><br></pre></td></tr></table></figure><p>T为元素类型，N为数组元素的个数。</p><p>头文件为：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;array&gt;</span></span></span><br></pre></td></tr></table></figure><h2 id="Defining-and-Initializing-an-std-array-lt-gt-object"><a href="#Defining-and-Initializing-an-std-array-lt-gt-object" class="headerlink" title="Defining and Initializing an std::array&lt;&gt; object"></a>Defining and Initializing an std::array&lt;&gt; object</h2><p>举两个例子：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, 200&gt; arr1;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, 10&gt; arr3 = &#123; <span class="number">34</span>, <span class="number">45</span> &#125;;<span class="comment">//Init: 34 , 45 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,</span></span><br></pre></td></tr></table></figure><p>std::array还提供了一个方法可以一次性对所有的元素设置相同的值。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, 10&gt; arr4;</span><br><span class="line"><span class="comment">// Fill all elements in array with same value</span></span><br><span class="line">arr4.fill(<span class="number">4</span>);</span><br></pre></td></tr></table></figure><h2 id="How-to-get-the-size-of-std-array"><a href="#How-to-get-the-size-of-std-array" class="headerlink" title="How to get the size of std::array"></a>How to get the size of std::array</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr.size();</span><br></pre></td></tr></table></figure><h2 id="How-to-access-elements-in-std-array"><a href="#How-to-access-elements-in-std-array" class="headerlink" title="How to access elements in std::array"></a>How to access elements in std::array</h2><ul><li><strong>operator []</strong>：访问超出范围的元素时会引起undefined behaviour；</li></ul><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = arr[<span class="number">2</span>];</span><br></pre></td></tr></table></figure><ul><li><strong>at()</strong>：访问超出范围的元素时会抛出<strong>out_of_range</strong>异常；</li></ul><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = arr.at(<span class="number">2</span>);</span><br></pre></td></tr></table></figure><ul><li><strong>std::tuple’s get&lt;&gt;()</strong>：访问超出范围的元素时会编译错误；</li></ul><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="built_in">std</span>::get&lt;<span class="number">2</span>&gt;(arr);</span><br></pre></td></tr></table></figure><h2 id="How-to-Iterate-over-a-std-array-lt-gt-object"><a href="#How-to-Iterate-over-a-std-array-lt-gt-object" class="headerlink" title="How to Iterate over a std::array&lt;&gt; object"></a>How to Iterate over a std::array&lt;&gt; object</h2><p>对array的遍历，存在四种方法：</p><ul><li>使用基于范围的迭代循环；</li><li>使用循环；</li><li>使用迭代器；</li><li>使用for_each；</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;std-array&quot;&gt;&lt;a href=&quot;#std-array&quot; class=&quot;headerlink&quot; title=&quot;std::array&quot;&gt;&lt;/a&gt;std::array&lt;/h1&gt;&lt;p&gt;std::array是在c++11中引入的，对原来C语言的数组的一个包装器，具有
+      
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
+    
+  </entry>
   
   <entry>
     <title>weak_ptr&amp;unique_ptr</title>
@@ -444,29 +467,6 @@
       
       
         &lt;h1 id=&quot;C-11-Multithreading-–-Part-2-Joining-and-Detaching-Threads&quot;&gt;&lt;a href=&quot;#C-11-Multithreading-–-Part-2-Joining-and-Detaching-Threads&quot; cl
-      
-    
-    </summary>
-    
-    
-      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Multithreading Three Ways to Create Threads</title>
-    <link href="http://yoursite.com/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/"/>
-    <id>http://yoursite.com/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/</id>
-    <published>2019-04-18T03:14:15.000Z</published>
-    <updated>2019-04-18T03:19:23.327Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="C-11-Multithreading-–-Part-1-Three-Different-ways-to-Create-Threads"><a href="#C-11-Multithreading-–-Part-1-Three-Different-ways-to-Create-Threads" class="headerlink" title="C++11 Multithreading – Part 1 : Three Different ways to Create Threads"></a>C++11 Multithreading – Part 1 : Three Different ways to Create Threads</h1><h2 id="Thread-Creation-in-C-11"><a href="#Thread-Creation-in-C-11" class="headerlink" title="Thread Creation in C++11"></a>Thread Creation in C++11</h2><p>每个C++应用中都存在一个默认的主线程——main()函数。在C++11中，我们可以通过创建std::thread的对象类创建额外的线程。头文件为：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br></pre></td></tr></table></figure><h2 id="What-std-thread-accepts-in-constructor"><a href="#What-std-thread-accepts-in-constructor" class="headerlink" title="What std::thread accepts in constructor ?"></a>What std::thread accepts in constructor ?</h2><p>我们可以为std::thread对象附上一个callback，在线程开始时执行，这些callbacks可以是：</p><ol><li>Function Pointer</li><li>Function Objects</li><li>Lambda functions</li></ol><p>调用方式如下：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">theObj</span><span class="params">(&lt;CALLBACK&gt;)</span></span></span><br></pre></td></tr></table></figure><p>新的线程会在对象创建出来之后开始运行，并且会并行地执行传递进来的回调。此外，任何线程都可以通过调用该线程对象上的join()函数来等待另一个线程退出。</p><p>让我们来看看三种不同的回调机制：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thread_function</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">(thread_function)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DisplayThread</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">(DisplayThread())</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">([]&#123;...&#125;)</span></span>;</span><br></pre></td></tr></table></figure><h2 id="Differentiating-between-threads"><a href="#Differentiating-between-threads" class="headerlink" title="Differentiating between threads"></a>Differentiating between threads</h2><p>每个std::thread对象都有一个关联的ID。</p><p>以下成员函数给出了关联的线程对象ID：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::thread::get_id()</span><br></pre></td></tr></table></figure><p>要得到当前线程的ID，可以通过：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::this_thread::get_id()</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;C-11-Multithreading-–-Part-1-Three-Different-ways-to-Create-Threads&quot;&gt;&lt;a href=&quot;#C-11-Multithreading-–-Part-1-Three-Different-ways-to-
       
     
     </summary>
