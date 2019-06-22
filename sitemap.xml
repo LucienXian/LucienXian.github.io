@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/06/22/ZooKeeper-Wait-free-coordination-for-Internet-scale-systems%E2%80%94%E2%80%94MIT6-824/</loc>
+    
+    <lastmod>2019-06-22T05:04:14.472Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/06/02/Variadic-templates-in-C/</loc>
     
     <lastmod>2019-06-02T03:52:00.415Z</lastmod>

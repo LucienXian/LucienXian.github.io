@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="分布式,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="ZooKeeper 《ZooKeeper: Wait-free coordination for Internet-scale systems》  AbstractZooKeeper是一种用于协调分布式应用程序进程的服务，旨在提供一个简单而高性能的内核，用于在客户端中构建更复杂的进程协调原语。 ZooKeeper接口支持高性能服务实现。除了属性wait-free之外，ZooKeeper还为每个客户">
+<meta name="keywords" content="分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZooKeeper: Wait-free coordination for Internet-scale systems——MIT6.824">
+<meta property="og:url" content="http://yoursite.com/2019/06/22/ZooKeeper-Wait-free-coordination-for-Internet-scale-systems——MIT6-824/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="ZooKeeper 《ZooKeeper: Wait-free coordination for Internet-scale systems》  AbstractZooKeeper是一种用于协调分布式应用程序进程的服务，旨在提供一个简单而高性能的内核，用于在客户端中构建更复杂的进程协调原语。 ZooKeeper接口支持高性能服务实现。除了属性wait-free之外，ZooKeeper还为每个客户">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/zookeeper_fig1.png">
+<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/ZooKeeper_fig4.png">
+<meta property="og:updated_time" content="2019-06-22T05:04:14.472Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZooKeeper: Wait-free coordination for Internet-scale systems——MIT6.824">
+<meta name="twitter:description" content="ZooKeeper 《ZooKeeper: Wait-free coordination for Internet-scale systems》  AbstractZooKeeper是一种用于协调分布式应用程序进程的服务，旨在提供一个简单而高性能的内核，用于在客户端中构建更复杂的进程协调原语。 ZooKeeper接口支持高性能服务实现。除了属性wait-free之外，ZooKeeper还为每个客户">
+<meta name="twitter:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/zookeeper_fig1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/06/22/ZooKeeper-Wait-free-coordination-for-Internet-scale-systems——MIT6-824/">
+
+
+
+
+
+  <title>ZooKeeper: Wait-free coordination for Internet-scale systems——MIT6.824 | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/22/ZooKeeper-Wait-free-coordination-for-Internet-scale-systems——MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ZooKeeper: Wait-free coordination for Internet-scale systems——MIT6.824</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-22T13:03:50+08:00">
+                2019-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h1><blockquote>
+<p>《ZooKeeper: Wait-free coordination for Internet-scale systems》</p>
+</blockquote>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>ZooKeeper是一种用于协调分布式应用程序进程的服务，旨在提供一个简单而高性能的内核，用于在客户端中构建更复杂的进程协调原语。</p>
+<p>ZooKeeper接口支持高性能服务实现。除了属性wait-free之外，ZooKeeper还为每个客户端提供FIFO请求执行保证，并为所有更改ZooKeeper状态的请求提供线性化。</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>大规模的分布式应用需要多种不同形式的协调，配置就是其中最基本的配置形式之一。配置只是系统过程的操作参数列表，而更复杂的系统具有动态配置参数。</p>
+<p>在设计ZooKeeper的API时，我们并不会使用阻塞原语。如果处理请求取决于响应和其他客户端的故障检测，则服务本身的实现变得更加复杂。因此，Zookeeper实现了一个API，它可以处理像文件系统一样分层组织的简单无等待数据对象。</p>
+<p>ZooKeeper服务包含一组服务器，这些服务器使用复制来实现高可用和高性能。其高性能使包含大量进程的应用程序能够使用此类协调内核来管理协调的所有方面。我们能够使用简单的流水线架构来实现ZooKeeper，这使我们可以获得数千个未完成的请求，同时仍然保持低延迟。</p>
+<p>为了保证更新操作满足线性化，系统实现了一种基于领导的原子广播协议，称为Zab。在客户端缓存数据是提高读取性能的重要技术，ZooKeeper使用监视机制使客户端能够缓存数据，而无需直接管理客户端缓存。</p>
+<p>本文的主要贡献是：协调内核。其提出了一种无等待协调服务，具有普通的的一致性保证，可用于分布式系统。</p>
+<h2 id="The-ZooKeeper-service"><a href="#The-ZooKeeper-service" class="headerlink" title="The ZooKeeper service"></a>The ZooKeeper service</h2><p>ZooKeeper客户端库通过客户端API向ZooKeeper提交请求，在本节中，我们首先提供ZooKeeper服务的高级视图。 然后讨论客户端用于与ZooKeeper交互的API。</p>
+<h3 id="Service-overview"><a href="#Service-overview" class="headerlink" title="Service overview"></a>Service overview</h3><p>ZooKeeper为其客户端提供了一组数据节点（znode）的抽象，这些节点根据分层名称空间进行组织，而这些层次中的znode是客户端通过ZooKeeper API操作的数据对象。分层名称空间通常用于文件系统。 它是组织数据对象的理想方式。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/zookeeper_fig1.png" alt="img"></p>
+<p>客户端能创建两种ZooKeeper节点：持久节点和临时节点。</p>
+<p>在创建新的znode时，客户端可以设置顺序标志。使用顺序标志设置所创建的节点具有一个单调递增计数器值。如果n是新的znode而p是父znode，则n的序列值永远不会小于在p下创建的任何其他顺序znode的名称中的值。</p>
+<p>ZooKeeper实现了watches，允许客户在不需要轮询的情况下及时收到变更通知。当客户端发出设置了监视标志的读取操作时，操作将正常完成，除非在返回的信息发生更改时服务器通知了客户端。watches是与会话相关的一次性触发器：一旦触发或会话结束，它们就会被注销。</p>
+<p>例如，如果客户端在”/foo”更改两次之前发出getData(“/foo”，true)，则客户端将获得一个监视事件，告知客户端”/foo”的数据已更改。</p>
+<h4 id="Data-model"><a href="#Data-model" class="headerlink" title="Data model"></a>Data model</h4><p>ZooKeeper的数据模型本质上是一个文件系统，它具有简单的API，完整的数据读写和带有分层key的键值表。与文件系统中的文件不同，znode不是为通用数据存储而设计的。相反，znodes是映射到客户端应用程序的抽象，通常对应于用于协调目的的元数据。以上图为例，我们有两个子树，一个用于应用程序1(/app1)，另一个用于应用程序2(/app2)。应用程序1的子树实现了一个简单的组成员协议：每个客户端进程$p_i$在/app1下创建一个znode $p_i$，只要进程正在运行，它就会持续存在。</p>
+<p>尽管znode尚未设计用于通用数据存储，但ZooKeeper确实允许客户端存储一些可用于元数据或分布式计算中所配置的信息。</p>
+<h4 id="Sessions"><a href="#Sessions" class="headerlink" title="Sessions"></a>Sessions</h4><p>客户端连接到ZooKeeper之后会启动一个session，session具有一个超时机制，如果客户端在其session中没有收到该超时机制的相关内容，ZooKeeper会认为客户端有故障。当客户端显式关闭session handler或ZooKeeper检测到客户端出现故障时，session结束。</p>
+<h3 id="Client-API"><a href="#Client-API" class="headerlink" title="Client API"></a>Client API</h3><p><strong>create(path, data, flags)</strong>：创建一个相关路径的znode；</p>
+<p><strong>delete(path, version)</strong>：删除一个相关版本的节点；</p>
+<p><strong>exists(path, watch)</strong>：判断相关路径的znode是否存在，watch标记强制客户端设置监视；</p>
+<p><strong>getData(path, watch)</strong>：返回数据和元数据（例如版本信息）；</p>
+<p><strong>setData(path, data, version)</strong>：写入数据data[]；</p>
+<p><strong>getChildren(path, watch)</strong>：返回一系列子节点；</p>
+<p><strong>sync(path)</strong>：使得client当前连接着的ZooKeeper服务器，和ZooKeeper的Leader节点同步（sync）一下数据。</p>
+<p>所有方法都具有同步和异步版本。每种更新方法都采用预期的版本号，这样可以实现条件更新。如果znode的实际版本号与预期版本号不匹配，则更新将失败并显示版本错误。如果版本号为-1，则不执行版本检查。</p>
+<h3 id="ZooKeeper-guarantees"><a href="#ZooKeeper-guarantees" class="headerlink" title="ZooKeeper guarantees"></a>ZooKeeper guarantees</h3><p>ZooKeeper有两个基本的顺序保证：</p>
+<ul>
+<li>Linearizable writes：更新ZooKeeper状态的所有请求都是可序列化的，并且与优先级有关；</li>
+<li>FIFO client order：来自给定客户端的所有请求都按客户端发送的顺序执行。</li>
+</ul>
+<p>我们这里所说的线性化是异步线性化，允许客户端有多个未完成的操作，因此我们可以确保同一个客户端的未完成操作的特定顺序或者确保其FIFO的顺序。</p>
+<p>要知道这两个顺序保证如何相互影响，我们考虑以下的方案：多个进程的系统选择leader来命令工作进程的过程，此时新的leader修改更改大量的配置参数，并在完成后通知其它进程。这种场景有两个要求：</p>
+<ul>
+<li>当新leader开始进行更改时，我们不希望其他进程开始使用正在更改的配置；</li>
+<li>如果新配置文件在配置完全更新之前消失，我们不希望进程使用此部分配置；</li>
+</ul>
+<p>分布式锁对于第一个要求有帮助，但无法解决第二个要求的问题。对于第二个要求，在使用ZooKeeper时，新leader可以讲路径指定为reader znode，其它进程仅在该znode存在时才可以使用该配置。新的leader通过删除ready，更改各种配置znode并创建ready来进行配置更改。所有的更改都以pipelined的方式异步发出。由于顺序保证，如果进程看到就绪的znode，它还必须看到新leader的所有配置更改。如果新的leader在创建就绪znode之前死亡，则其他进程知道配置尚未最终确定会不去使用它。</p>
+<p>上述方案仍然存在一个问题：如果进程在新leader开始进行update之前看到ready，然后在update正在进行时开始读取配置，会发生什么。此问题通过通知的排序保证得以解决，如果读取ready znode的进程请求通知该znode的更改，它将在它可以读取任何新配置之前看到通知客户端更改的notifications。</p>
+<p>ZooKeeper还提供了类似flush原语属性， sync使服务器在处理读取之前应用所有挂起的写入请求，而不会产生完全写入的开销，保证客户端在在重新读取配置之前发出写入来看到最新的信息。</p>
+<p>ZooKeeper还具有以下两种活动性和持久性保证：如果大多数ZooKeeper服务器处于活动状态并且可以进行通信，则可以使用该服务；如果ZooKeeper服务成功响应变更请求，只要规定数量的服务器最终能够恢复，该变更就会在任何数量的故障中持续存在。</p>
+<h3 id="Examples-of-primitives"><a href="#Examples-of-primitives" class="headerlink" title="Examples of primitives"></a>Examples of primitives</h3><p>本章主要讲述了如何使用ZooKeeper API实现更加强大的原语。</p>
+<h4 id="Configuration-Management"><a href="#Configuration-Management" class="headerlink" title="Configuration Management"></a>Configuration Management</h4><p>ZooKeeper可用于在分布式应用程序中实现动态配置。一般，配置存储在znode $z_c$中，进程以$z_c$的完整路径名启动。启动的进程通过读取$z_c$来获取其配置，并设置watch标记为true。如果配置更新了，则会通知进程去读取新配置，并再次设置watch标记为true。</p>
+<h4 id="Rendezvous"><a href="#Rendezvous" class="headerlink" title="Rendezvous"></a>Rendezvous</h4><p>在分布式系统中，最终的系统配置并不总是有足够清晰的先验情景。例如，客户端可能希望启动主进程和多个工作进程，但启动进程由调度器完成，因此客户端不会提前知道提供给worker的地址和端口等可以连接到主服务器的进程信息。我们可以使用endezvous znode $z_r$处理这种情况。它是客户端创建的节点，客户端传递该节点的完整路径名作为主进程和工作进程的启动参数。这样，master启动时，就会在$z_r$中填充信息，而worker则可以读取其中的信息。</p>
+<h4 id="Group-Membership"><a href="#Group-Membership" class="headerlink" title="Group Membership"></a>Group Membership</h4><p>我们可以使用临时节点来实现组成员资格，具体来说，就是使用临时节点能够查看创建节点的会话状态。首先指定一个znode $z_g$来表示该组，当该组的成员启动时，会在$z_g$下创建一个临时的子znode。因此只需要通过列举$z_g$的后代，进程就可以获取改组信息。如果进程想要监视组成员身份的更改，则进程可以将监视标志设置为true，并在收到更改通知时刷新组信息 </p>
+<h4 id="Simple-Locks"><a href="#Simple-Locks" class="headerlink" title="Simple Locks"></a>Simple Locks</h4><p>ZooKeeper不是一个带锁的服务，使用ZooKeeper的应用通常使用同步原语来满足其需求。这里我们展示如何使用ZooKeeper实现锁，这样可以实现各种同步原语。</p>
+<p>最简单的锁使用<strong>lock files</strong>，锁由znode表示，为了获取锁，客户端尝试着使用EPHEMERAL标记去创建指定的znode。如果创建成功，客户端则拥有锁。否则，客户端可以读取znode，并设置监视标志，以便在当前leader挂掉时收到通知。客户端在死亡或显式删除znode时释放锁，等待锁定的其他客户端在观察到被删除的znode后再次尝试获取锁定。</p>
+<p>这种锁定协议存在两个问题：一是受到羊群效应(Herd Effect)的影响；二则是只实现了独占锁定。</p>
+<p><strong>Simple Locks without Herd Effect</strong>：我们定义了znode $z_l$来实现这样的锁，我们对所有请求锁的客户端进行排序，并且每个客户端按请求到达的顺序获得锁定。因此，希望获得锁定的客户执行以下操作：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Lock</span><br><span class="line"><span class="number">1</span> n = create(l + “/lock-”, EPHEMERAL|SEQUENTIAL) </span><br><span class="line"><span class="number">2</span> C = getChildren(l, <span class="literal">false</span>)</span><br><span class="line"><span class="number">3</span> <span class="keyword">if</span> n is lowest znode in C, <span class="built_in">exit</span></span><br><span class="line"><span class="number">4</span> p = znode in C ordered just before n</span><br><span class="line"><span class="number">5</span> <span class="keyword">if</span> exists(p, <span class="literal">true</span>) wait <span class="keyword">for</span> watch event </span><br><span class="line"><span class="number">6</span> <span class="keyword">goto</span> <span class="number">2</span></span><br><span class="line">Unlock</span><br><span class="line"><span class="number">1</span> <span class="keyword">delete</span>(n)</span><br></pre></td></tr></table></figure>
+<p>客户端创建节点，序号最小的获取锁。客户端只监控比自己小的那个节点。最小节点完成任务，发出通知，并释放。客户端获取通知后，获取所有节点，如果自己的序号最小，则获取锁，如果不是，监控比自己小的那个节点，依此类推。其它进程都只watch比它顺序小的进程对应的结点。</p>
+<p>释放锁就像删除表示锁请求的znode n一样简单。通过在创建时使用EPHEMERAL标志，崩溃的进程将自动清除任何锁请求或释放它们可能具有的任何锁。</p>
+<p><strong>Read/Write Locks</strong>：为了实现读/写锁，我们稍微更改了锁过程，并具有单独的读锁定和写锁定过程。 解锁程序与全局锁情况相同。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Write Lock</span><br><span class="line"><span class="number">1</span> n = create(l + “/write-”, EPHEMERAL|SEQUENTIAL) </span><br><span class="line"><span class="number">2</span> C = getChildren(l, <span class="literal">false</span>)</span><br><span class="line"><span class="number">3</span> <span class="keyword">if</span> n is lowest znode in C, <span class="built_in">exit</span></span><br><span class="line"><span class="number">4</span> p = znode in C ordered just before n</span><br><span class="line"><span class="number">5</span> <span class="keyword">if</span> exists(p, <span class="literal">true</span>) wait <span class="keyword">for</span> event </span><br><span class="line"><span class="number">6</span> <span class="keyword">goto</span> <span class="number">2</span></span><br><span class="line">Read Lock</span><br><span class="line"><span class="number">1</span> n = create(l + “/read-”, EPHEMERAL|SEQUENTIAL)</span><br><span class="line"><span class="number">2</span> C = getChildren(l, <span class="literal">false</span>)</span><br><span class="line"><span class="number">3</span> <span class="keyword">if</span> no write znodes lower than n in C, <span class="built_in">exit</span></span><br><span class="line"><span class="number">4</span> p = write znode in C ordered just before n</span><br><span class="line"><span class="number">5</span> <span class="keyword">if</span> exists(p, <span class="literal">true</span>) wait <span class="keyword">for</span> event</span><br><span class="line"><span class="number">6</span> <span class="keyword">goto</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<p>每个进程都在ZooKeeper上创建一个临时的顺序结点，最小的一个或多个结点为当前的持锁者，多个是因为多个读操作可以并发。需要写锁的进程，监视比它顺序小的进程；对于需要读锁的进程，监视比它小的最后一个写进程对应的结点。当前结点释放锁后，所有Watch该结点的进程都会被通知到，他们成为新的持锁者。</p>
+<p><strong>Double Barrier</strong>：Double Barrier可以用来同步一个任务的开始和结束，当有足够多的进程进入barrier之后，才开始执行任务。当所有的进程都执行完各自的任务后，屏障才撤销。而ZooKeeper的实现过程：</p>
+<p>我们用一个znode b代表barrier。进入barrier，客户端监视ready节点，通过判断该结点是否存在来决定是否启动任务。每个进程在进入时会创建一个znode作为b的子节点，并在它准备离开时取消该节点。当b的子znode的数量超过barrier阈值时，进程可以进入屏障，客户端收到ready节点创建的通知。当所有进程都移除了其子节点时，就可以认为任务结束，离开barrier。</p>
+<h2 id="ZooKeeper-Implementation"><a href="#ZooKeeper-Implementation" class="headerlink" title="ZooKeeper Implementation"></a>ZooKeeper Implementation</h2><p>ZooKeeper通过在组成服务的每个服务器备份ZooKeeper数据来提供高可用性。下图展示了其高级组建，收到写请求，服务器会通过请求处理器做执行准备，然后使用相关原子广播的实现协议，最后再提交对ZooKeeper数据库的修改，完全复制到整体的所有服务器。在读请求的情况下，服务器只读取本地数据库的状态并生成对请求的响应。每个ZooKeeper服务器都为客户端服务。客户端只连接一台服务器来提交请求。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/ZooKeeper_fig4.png" alt="img"></p>
+<p>备份数据库是包含了整个数据树的内存数据库，默认情况下，树中的每个znode最多存储1MB的数据。对于可恢复性，我们有效地将更新日志记录到磁盘，并且在将应用程序应用于内存数据库之前强制写入磁盘介质。</p>
+<h3 id="Request-Processor"><a href="#Request-Processor" class="headerlink" title="Request Processor"></a>Request Processor</h3><p>与客户端发送的请求不同，transactions是幂等的。 当leader收到写入请求时，它会计算应用写入时系统的状态，并将其转换为捕获新状态的事务。因为可能存在尚未应用于数据库的事务，所以对于未来的状态，我们必须对其进行计算。例如，客户端执行setData()，如果该请求中的版本号与正在更新的znode的未来版本号相匹配，那么该服务生成一个setDataTXN，包含新数据，新版本号和更新时间戳。如果发生错误，例如版本号不匹配或要更新的znode不存在，则生成errorTXN。</p>
+<h3 id="Atomic-Broadcast"><a href="#Atomic-Broadcast" class="headerlink" title="Atomic Broadcast"></a>Atomic Broadcast</h3><p>更新ZooKeeper状态的所有请求都会被转发到leader，再由leader执行请求并通过原子广播协议Zab广播到各个服务器。接收客户端请求的服务器会在转发相应的状态改变时响应客户端。而Zab则是使用默认的多数仲裁来commit，使用2f+1服务器时，我们可以容忍f故障。</p>
+<p>另外，Zab提供了比常规原子广播更强的顺序保证，Zab保证leader的广播变更按照发送的顺序进行，并且前leader的所有变更都会在广播自己的变更之前传递给已建立的领导者。</p>
+<p>我们使用TCP进行传输，因此网络可以保留消息顺序，这样我们就可以简化实现。</p>
+<p>在正常操作期间，Zab按顺序提供所有消息，但是由于Zab不会持续记录每条消息的ID，因此Zab可能会在恢复期间重新发送消息。但因为ZooKeeper是幂等交易，所以只要按顺序交付，就可以接受多次交易。实际上，ZooKeeper要求Zab至少重新传递在上一个快照开始后传递的所有消息。</p>
+<h3 id="Replicated-Database"><a href="#Replicated-Database" class="headerlink" title="Replicated Database"></a>Replicated Database</h3><p>每个副本都有一个ZooKeeper状态的内存副本，当ZooKeeper服务器从崩溃中恢复时，其需要恢复到此状态。因此ZooKeeper会使用定期快照，仅需要从快照开始后重新传递消息即可恢复。ZooKeeper快照为模糊快照，因为没有锁定ZooKeeper状态来拍摄快照；而是对树进行深度优先扫描，原子地读取每个znode的数据和元数据并将它们写入磁盘。由于生成模糊快照的过程中可能存在额外的状态更改，但因为状态更改是幂等的，只要我们按顺序应用状态更改，就不会影响最终的结果。</p>
+<h3 id="Client-Server-Interactions"><a href="#Client-Server-Interactions" class="headerlink" title="Client-Server Interactions"></a>Client-Server Interactions</h3><p>当服务器处理写入请求时，它还会发送并清除与该更新相关的任何监视通知。</p>
+<p>读请求在每个服务器本地处理。每个读请求都使用zxid进行处理和标记，该zxid与服务器看到的最后一个事务相对应，并定义了与写请求相关的部分读请求顺序。通过在本地处理读取，我们获得了出色的读取性能。但其也存在缺点——不保证读取操作的优先顺序，即可能返回过时值。关于这个，ZooKeeper提供了Sync原语，确保follower和leader是同步的。在读取操作后，客户端调用Sync，使得同步请求添加到一个leader与该服务之间队列末尾，待leader提交了所有决议，再返回响应。</p>
+<p>ZooKeeper服务器按FIFO顺序处理来自客户端的请求。响应包括zxid。如果客户端连接到新服务器，则该新服务器通过检查客户端的最后一个zxid与其最后一个zxid，如果客户端具有比服务器更新的视图，则服务器不会重新建立与客户端的会话，直到服务器已经赶上了其zxid。</p>
+<p>为了检测客户端会话失败，ZooKeeper使用超时机制。如果没有其他服务器在会话超时内从客户端会话中收到任何内容，则leader确定其中存在故障。如果客户端无法对服务器发送请求或者心跳信息（低活动期）则它将连接到其他ZooKeeper服务器以重新建立其会话。为了防止session超时，ZooKeeper客户端在session空闲了s/3 ms后发送心跳，如果没有再2s /3 ms从服务器收到响应，则切换到新服务器。其中s是会话超时时间。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/02/Variadic-templates-in-C/" rel="next" title="Variadic templates in C++">
+                <i class="fa fa-chevron-left"></i> Variadic templates in C++
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">221</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ZooKeeper"><span class="nav-number">1.</span> <span class="nav-text">ZooKeeper</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#The-ZooKeeper-service"><span class="nav-number">1.3.</span> <span class="nav-text">The ZooKeeper service</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Service-overview"><span class="nav-number">1.3.1.</span> <span class="nav-text">Service overview</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Data-model"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">Data model</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Sessions"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">Sessions</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Client-API"><span class="nav-number">1.3.2.</span> <span class="nav-text">Client API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ZooKeeper-guarantees"><span class="nav-number">1.3.3.</span> <span class="nav-text">ZooKeeper guarantees</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Examples-of-primitives"><span class="nav-number">1.3.4.</span> <span class="nav-text">Examples of primitives</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Configuration-Management"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">Configuration Management</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Rendezvous"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">Rendezvous</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Group-Membership"><span class="nav-number">1.3.4.3.</span> <span class="nav-text">Group Membership</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Simple-Locks"><span class="nav-number">1.3.4.4.</span> <span class="nav-text">Simple Locks</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ZooKeeper-Implementation"><span class="nav-number">1.4.</span> <span class="nav-text">ZooKeeper Implementation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Request-Processor"><span class="nav-number">1.4.1.</span> <span class="nav-text">Request Processor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Atomic-Broadcast"><span class="nav-number">1.4.2.</span> <span class="nav-text">Atomic Broadcast</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Replicated-Database"><span class="nav-number">1.4.3.</span> <span class="nav-text">Replicated Database</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Client-Server-Interactions"><span class="nav-number">1.4.4.</span> <span class="nav-text">Client-Server Interactions</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
