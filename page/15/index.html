@@ -265,6 +265,174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/12/lexical-analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/12/lexical-analysis/" itemprop="url">lexical analysis</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-12T23:10:25+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="lexical-analysis"><a href="#lexical-analysis" class="headerlink" title="lexical analysis"></a>lexical analysis</h1><h2 id="goals"><a href="#goals" class="headerlink" title="goals"></a>goals</h2><p>converts from phsical description of a program into sequence of tokens.<br>(token: one logical piece of the source file)</p>
+<ul>
+<li>Each token associated with a lexeme</li>
+<li>have opitional attributes</li>
+</ul>
+<h2 id="choosing-good-tokens"><a href="#choosing-good-tokens" class="headerlink" title="choosing good tokens"></a>choosing good tokens</h2><p>依赖于不同的语言：</p>
+<p>选择关键词；<br>将lexeme分成不同组的id，如数字，字符串等；<br>丢弃无用的信息，如空格，注释等；</p>
+<h2 id="扫描的困难"><a href="#扫描的困难" class="headerlink" title="扫描的困难"></a>扫描的困难</h2><ul>
+<li>如何判断哪一个的lexeme对应于tokens</li>
+<li>有多种扫描方式来堆输入扫描，如何取舍</li>
+<li>如何高效获得想要的</li>
+</ul>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>定义：用来捕捉某些语言的一系列描述</p>
+<p>符号ε用来匹配空字符串，符号a用来匹配a；</p>
+<p>符合型：</p>
+<ul>
+<li>如果R1和R2是正则表达式，那么R1R2就表示R1R2的级联；</li>
+<li>如果R1和R2是正则表达式，那么R1|R2就表示R1和R2任意取一个；</li>
+<li>如果R是正则表达式，那么R*就表示R的闭包；</li>
+</ul>
+<h3 id="实现正则表达式"><a href="#实现正则表达式" class="headerlink" title="实现正则表达式"></a>实现正则表达式</h3><p>正则表达式能通过有限自动机来实现。</p>
+<p>而有限自动机有两种：<br>NFA(nondeterministic finite automa)<br>DFA(deterministic finite automa)</p>
+<p>以图表示的话，圆圈表示状态，箭头表示转移，双圆圈表示结束:<br><img src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg" alt="img"></p>
+<p>如果一个状态有多个transitions，那么多条transitions都要进行。</p>
+<p>Epsilon transition: 不消耗任何输入,但会进行transitions。<br><img src="https://i.stack.imgur.com/XHuWu.png" alt="img"></p>
+<h3 id="Simulating-an-NFA"><a href="#Simulating-an-NFA" class="headerlink" title="Simulating an NFA"></a>Simulating an NFA</h3><ol>
+<li>有限初始化，追踪开始状态和所有可以通过ε转移到达的状态；</li>
+<li>对于输入的每一个字符</li>
+</ol>
+<ul>
+<li>维持一个集合表示下一个状态，初始为空</li>
+<li>对于每一个当前状态，跟踪针对输入字符可以到达的状态,并添加进集合中</li>
+</ul>
+<ol start="3">
+<li>添加可以新状态集合中通过ε的状态</li>
+</ol>
+<h3 id="解决匹配冲突"><a href="#解决匹配冲突" class="headerlink" title="解决匹配冲突"></a>解决匹配冲突</h3><p>通常情况下选择最长match.</p>
+<p>具体做法是，将所有正则表达式转化为NFA，然后合并成一个状态机，扫描输入，记录上一个已知的匹配。选择更高优先级的。</p>
+<h3 id="DFA"><a href="#DFA" class="headerlink" title="DFA"></a>DFA</h3><p>与NFA不同，DFA的每一个状态只有一个与某个字符相关的转移，并且没有ε transitions</p>
+<p><img src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg" alt="img"></p>
+<ul>
+<li>Make the DFA simulate the NFA</li>
+</ul>
+<p>(q0是开始状态)</p>
+<p>Step 1: Initially Q’ = ɸ.</p>
+<p>Step 2: Add q0 to Q’.</p>
+<p>Step 3: For each state in Q’, find the possible set of states for each input symbol using transition function of NFA. If this set of states is not in Q’, add it to Q’.</p>
+<p>Step 4: Final state of DFA will be all states with contain F (final states of NFA)</p>
+<p>参考资料：<a href="https://www.geeksforgeeks.org/theory-of-computation-conversion-from-nfa-to-dfa/" target="_blank" rel="noopener">https://www.geeksforgeeks.org/theory-of-computation-conversion-from-nfa-to-dfa/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/12/Compilers-Introduction/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1525,140 +1693,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/06/STL学习之路-一/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/06/STL学习之路-一/" itemprop="url">STL学习之路<一></一></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-06T23:18:18+08:00">
-                2018-03-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念理解"><a href="#概念理解" class="headerlink" title="概念理解"></a>概念理解</h1><ul>
-<li>容器算法迭代器的关系</li>
-</ul>
-<p>每个容器都有自己专属的迭代器，而算法则是通过迭代器来操作容器中的元素</p>
-<p>容器通过模板实现，能够装下各种类型的元素</p>
-<p>迭代是一种只能指针，通过*来解引用</p>
-<ul>
-<li>迭代器种类</li>
-</ul>
-<p>5种：输入、输出、前向、双向、随机访问</p>
-<ul>
-<li>适配器种类</li>
-</ul>
-<p>3种：容器适配器（例如stack，queue和priority_queue都是给予其它容器实现的）；迭代器适配器；函数适配器</p>
-<h1 id="sort算法"><a href="#sort算法" class="headerlink" title="sort算法"></a>sort算法</h1><p>数据量大的时候选用快排，分段递归排序，一旦分段小于某个数据量之后采用的是插入排序。如果递归层次过深，又会转而调用堆排序。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1707,7 +1741,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">224</span>
+                <span class="site-state-item-count">225</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

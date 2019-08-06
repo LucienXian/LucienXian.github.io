@@ -265,6 +265,221 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/Clustering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/19/Clustering/" itemprop="url">Clustering.md</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T21:23:25+08:00">
+                2018-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="聚类"><a href="#聚类" class="headerlink" title="聚类"></a>聚类</h1><h2 id="聚类任务"><a href="#聚类任务" class="headerlink" title="聚类任务"></a>聚类任务</h2><p>在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。</p>
+<p>假设有样本集D = {x1,x2…xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l=1,2,…,k}。</p>
+<p>作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。</p>
+<h2 id="性能度量"><a href="#性能度量" class="headerlink" title="性能度量"></a>性能度量</h2><p>性能的度量主要是为了评估聚类结果的好坏，一般来说我们使用两种方法：</p>
+<ol>
+<li>将聚类结果与某个“参考模板”进行比较，也就是使用外部指标。</li>
+</ol>
+<p>假设λ与λ<em>分别表示C和C</em>对应的簇标记向量，我们将样本两两配对考虑。</p>
+<p><img src="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png" alt="img"></p>
+<blockquote>
+<p>其中集合SS包含了在C中属于相同簇，且在C<em>也属于相同簇的样本对；<br>集合SD则是包含了在C中属于相同簇，但在C</em>中不属于相同簇的样本对；<br>如此类推。。。。</p>
+</blockquote>
+<p>由于每个样本对(xi,xj)只能出现在一个集合中，因此有<strong>a+b+c+d=C(m,2)=m(m-1)/2</strong>。</p>
+<p>最后导出以下的外部度量指标：</p>
+<ul>
+<li>Jaccard系数: JC = a/(a+b+c)</li>
+<li>FM指数：FMI = &radic;(a/a+b)*(a/a+c)</li>
+<li>Rand指数：RI = 2(a+b)/(m*(m-1))</li>
+</ul>
+<p>上述指标都在[0, 1]之间，值越大越好</p>
+<ol start="2">
+<li>直接考虑聚类结果，不参考任何的模型</li>
+</ol>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-9.png" alt="img"></p>
+<blockquote>
+<p>其中dist(.,.)用来计算两个样本之间的距离；diam(C)表示簇C内样本间的最远距离；dmin(Ci,Cj)对应于簇Ci与Cj最近样本的距离；dcen(Ci,Cj)表示簇Ci与簇Cj中心点间的距离</p>
+</blockquote>
+<p>一般用以下的指标去评估聚类性能:</p>
+<ul>
+<li>DB指数：</li>
+</ul>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-10.png" alt="img"></p>
+<ul>
+<li>Dunn指数：</li>
+</ul>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-11.png" alt="img"></p>
+<p>显然，DBI越小越好，表示簇内距离小，簇间距离大；而DI则相反，越大越好，表示簇间距离大，簇内距离小</p>
+<h2 id="距离计算"><a href="#距离计算" class="headerlink" title="距离计算"></a>距离计算</h2><p>一般来说，我们希望函数dist(.,.)，也就是距离度量，满足以下的一些基本性质：</p>
+<ul>
+<li>非负性：dist(xi,xj)&gt;=0</li>
+<li>同一性：dist(xi,xj)=0，当且仅当xi=xj</li>
+<li>对称性：dist(xi,xj)=dist(xj,xi)</li>
+<li>直递性：dist(xi,xj)&lt;=dist(xj,xk)+dist(xk,xj)</li>
+</ul>
+<p>在讨论距离计算时，属性是否有序很关键，例如定义域为{1,2,3}的属性，能直接在属性值上计算距离，这种就称为有序属性；而对于定义域为{飞机，火车，轮船}这些，称为无序属性</p>
+<h3 id="有序属性"><a href="#有序属性" class="headerlink" title="有序属性"></a>有序属性</h3><p>给定样本xi=(xi1,xi2,…,xin)与xj=(xj1,xj2,…,xjn)，最常用的就是<strong>Minkowski distance</strong></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png" alt="img"></p>
+<p>当p=2，也叫欧式距离</p>
+<h3 id="无序属性"><a href="#无序属性" class="headerlink" title="无序属性"></a>无序属性</h3><p>首先来看几个假设：m(u,a)表示在属性u取值为a的样本数，m(u,a,i)则是表示第i个样本簇在属性u取值为a的样本数。于是得到以下的公式(VDN)来计算距离。</p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png" alt="img"></p>
+<p>另外，还可以结合Minkowski distance和VDM，保证处理混合属性</p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png" alt="img"></p>
+<p>但对于无序属性，有可能会出现直递性失效，以“人”，“马”，“人马”为例，“人”和“马”都与“人马”很接近，但“人”与“马”差距很大，这种就叫做<strong>非度量距离</strong>。</p>
+<h2 id="原型聚类"><a href="#原型聚类" class="headerlink" title="原型聚类"></a>原型聚类</h2><p>prototype-based clustering，此类算法假设聚类结构能够基于一组原型刻画</p>
+<h3 id="k-means-算法"><a href="#k-means-算法" class="headerlink" title="k-means 算法"></a>k-means 算法</h3><p>对于一个样本集和目标簇数，我们希望最小化以下的误差，其中ui就是簇Ci的均值向量。</p>
+<p><img src="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png" alt="img"></p>
+<p>算法思想比较简单：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 随机选择k个样本作为初始的均值向量</span><br><span class="line"><span class="number">2.</span> 进入循环</span><br><span class="line"><span class="number">3.</span> 计算每个样本与各个均值向量的距离，将样本划分到距离最小的均值向量所代表的簇中</span><br><span class="line"><span class="number">4.</span> 根据划分的聚类，计算新的均值中心</span><br><span class="line"><span class="number">5.</span> 如果均值向量没有变化，则退出循环</span><br></pre></td></tr></table></figure>
+<h3 id="学习向量量化"><a href="#学习向量量化" class="headerlink" title="学习向量量化"></a>学习向量量化</h3><p><strong>Learning Vector Quantization</strong>是针对带有标记的数据样本的。对于这种情况，我们可以根据簇数选择一组n维向量（维度与样本一致）</p>
+<p>具体算法为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先初始化一组原型向量</span><br><span class="line"><span class="number">2.</span> 从样本集中随机抽取样本(xi,yi)</span><br><span class="line"><span class="number">3.</span> 找出与样本距离最近的一个原型向量</span><br><span class="line"><span class="number">4.</span> 比较两者类别是否一致</span><br><span class="line"><span class="number">5.</span> 一致则通过公式逼近，否则则使其离得更远</span><br><span class="line"><span class="number">6.</span> 直到迭代次数最大或者原型向量不怎么更新为止</span><br><span class="line">==========================================</span><br><span class="line"><span class="number">7.</span> 得到原型向量之后，再对样本进行相应的分类</span><br></pre></td></tr></table></figure>
+<p>这里的关键是如何更新原型向量：</p>
+<ul>
+<li>如果类型一致：新的向量 p = pi + u(xj-pi);</li>
+<li>如果类型不一致： p = pi - u(xj-pi);</li>
+</ul>
+<p>这里的u是学习率，范围为[0,1]。之所以满足逼近或者离得更远：</p>
+<blockquote>
+<p>|p-xj| = |pi+u(xj-pi)-xj| = (1-u)|pi-xj|</p>
+</blockquote>
+<p>由此可见，这种情况下p会在更新之后逼近xj</p>
+<h3 id="高斯混合聚类"><a href="#高斯混合聚类" class="headerlink" title="高斯混合聚类"></a>高斯混合聚类</h3><p>高斯混合聚类采用的是概率模型来表达聚类原型，我们定义高斯混合分布公式为：</p>
+<p><img src="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png" alt="img"></p>
+<p>该分布为k个高斯分布的叠加，其中ai为相应的混合系数,且权重和为1。</p>
+<p>算法步骤为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 初始化混合高斯分布的三个模型参数：ai，ui(平均值)，协方差矩阵</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> repeat：</span><br><span class="line"><span class="number">3.</span> 将样本投射到高斯分布中,计算其在各个高斯分布下的概率</span><br><span class="line"><span class="number">4.</span> 针对每一个高斯分布，计算每一个样本在该分布下的概率，即计算其对该分布的贡献。根据该贡献，重新去计算上面三个模型参数</span><br><span class="line"><span class="number">5.</span> 直到参数收敛，或者迭代次数达到最大</span><br></pre></td></tr></table></figure>
+<p>至于如何求解这三个参数，可以参考EM算法：<a href="https://blog.csdn.net/u011974639/article/details/78302024" target="_blank" rel="noopener">https://blog.csdn.net/u011974639/article/details/78302024</a></p>
+<p>简单概括，就是两步：</p>
+<ul>
+<li>先根据上一轮的参数来计算每个样本属于每个高斯分布的后验概率；</li>
+<li>再根据后验概率去更新参数；</li>
+</ul>
+<h2 id="密度聚类"><a href="#密度聚类" class="headerlink" title="密度聚类"></a>密度聚类</h2><p>这个算法假设聚类结构能够通过样本分布的紧密程度来确定，先来确定几个概念：</p>
+<ul>
+<li>邻域：对于样本集中的xj，邻域包含了样本集中与xj距离不大于某个值的样本</li>
+<li>核心对象：若xj的邻域包含了至少MinPts个样本，则xj就是一个核心对象</li>
+<li>密度直达：若xj位于xi的领域中，则xj由xj密度直达</li>
+<li>密度可达：若存在样本序列p1,…,pn，其中p1=xi，pn=xj，且pi+1可由pi密度直达，则称xj可由xi密度可达</li>
+</ul>
+<p>具体算法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先根据邻域参数选出所有的核心对象；</span><br><span class="line"><span class="number">2.</span> 从任意一个核心对象出发，找出其密度可达的样本生成聚类簇，并将簇中的核心对象从第一步找到的核心对象集合中删除；</span><br><span class="line"><span class="number">3.</span> 紧接着从更新后的核心对象集合中随机选取一个核心对象，重复第二步；</span><br></pre></td></tr></table></figure>
+<h2 id="层次聚类"><a href="#层次聚类" class="headerlink" title="层次聚类"></a>层次聚类</h2><p>层次聚类可以采用“自底向上”或者“自顶向下”的策略，在这里我们介绍AGNES的策略，这是一种自底向上的聚合策略。</p>
+<p>它首先将每个样本看成一个初始聚类簇，然后在每次算法运行时找出距离最近的两个聚类簇进行合并，因此这里的关键就是计算两个聚类簇之间的距离，显然最小距离由两个簇的最近样本决定，最大距离由两个簇的最远样本决定，至于平均距离则是由两个簇的所有样本共同决定。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/TCP套接字选项介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1708,226 +1923,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/20/Implementation-of-Lexical-Analysis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/20/Implementation-of-Lexical-Analysis/" itemprop="url">Implementation of Lexical Analysis</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-20T13:09:12+08:00">
-                2018-03-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Implementation-of-Lexical-Analysis"><a href="#Implementation-of-Lexical-Analysis" class="headerlink" title="Implementation of Lexical Analysis"></a>Implementation of Lexical Analysis</h1><h2 id="Regular-languages"><a href="#Regular-languages" class="headerlink" title="Regular languages"></a>Regular languages</h2><ul>
-<li>Epsilon: a simple string namely the empty string</li>
-<li>Union: A+B == {a|a属于A} U {b|b属于B}</li>
-<li>Concatenation: AB = {ab|a属于A ^ b属于B}</li>
-<li>Iteration: A* = A…A(0次或多次)</li>
-</ul>
-<p>正则表达式可能有多个表示方式</p>
-<h2 id="Formal-languages"><a href="#Formal-languages" class="headerlink" title="Formal languages"></a>Formal languages</h2><p>alphabet 表示一系列的字符，adcii码</p>
-<p>meaning function L : maps syntax to semantics，将表达式映射到字符串的集合。比如：</p>
-<p>L(epison) = {“”}<br>L(‘c’) = {“c”}<br>L(A+B) = L(A) U L(B)</p>
-<p>Reason for meaning function：有时候一个semantics可以用多个syntax表示，可能是多对一的映射关系。用于不会有一对多的关系。</p>
-<h2 id="lexical-specification"><a href="#lexical-specification" class="headerlink" title="lexical specification"></a>lexical specification</h2><ul>
-<li>letter = [a-zA-Z] </li>
-<li>keyword = ‘if’+’else’+..</li>
-<li>digit = ‘0’+’1’+’2’+’3’+’4’+’5’+’6’+’7’+’8’+’9’</li>
-<li>Integer = digit digit* = digit+</li>
-<li>Identifier = letter(letter+digit)*</li>
-<li>whitespace(blanks/newlines/tabs) = (‘ ‘+’\n’+’\t’)+</li>
-</ul>
-<p>考虑如何匹配一个邮箱地址：<a href="mailto:anyone@cs.stanford.edu" target="_blank" rel="noopener">anyone@cs.stanford.edu</a>(考虑前面只由字母组成)</p>
-<ul>
-<li>得到这样的正则表达式：letter+ ‘@’ letter+ ‘.’ letter+ ‘.’ letter+</li>
-</ul>
-<p>注意:</p>
-<ul>
-<li>union = A|B = A+B</li>
-<li>option: A+ ε = A?</li>
-<li>range: ‘a’+’b’+…+’z’ = [a-z]</li>
-<li>Excluded range: complement of [a-z] = [^a-z] </li>
-</ul>
-<p>正则表达式可以描述很多语言，是一种语言的说明。</p>
-<p>如何进行正则表达式的匹配</p>
-<ol>
-<li>Write a rexp for the lexemes of each token</li>
-</ol>
-<ul>
-<li>number = digit*</li>
-<li>keyword = ‘if’+’else’+..</li>
-<li>Identifier = letter(letter+digit)*</li>
-<li>OpenPar = ‘(‘</li>
-</ul>
-<ol start="2">
-<li>Construct R</li>
-</ol>
-<p>R = keyword + Identifier + Number + …</p>
-<ol start="3">
-<li>Let input be X1..Xn</li>
-</ol>
-<p>For i&lt;=i&lt;=n check x1..xi 属于L(R)</p>
-<ol start="4">
-<li><p>if success, x1..xi属于L(Ri)</p>
-</li>
-<li><p>remove x1…xi</p>
-</li>
-</ol>
-<p>Question:</p>
-<ul>
-<li>How much input is used?</li>
-</ul>
-<p>最长匹配原则，如果有两个字符串都符合正则表达式的话。</p>
-<ul>
-<li>which token is used?</li>
-</ul>
-<p>x1..xi 属于L(R); R = R1+R2…Rn。</p>
-<p>如果有x1…xi属于L(Ri),也有x1…xi属于L(Rj),那么采用priority choose。例如if应该是keyword，不是identifier。</p>
-<h2 id="Finite-Automa"><a href="#Finite-Automa" class="headerlink" title="Finite Automa"></a>Finite Automa</h2><ul>
-<li>Regular expressions = specification</li>
-<li>Finite automata = implementation</li>
-</ul>
-<p>consists of:</p>
-<ul>
-<li>input alphabet</li>
-<li>a set of states</li>
-<li>a start state</li>
-<li><p>a set of accepting states</p>
-</li>
-<li><p>a set of transitions:</p>
-</li>
-</ul>
-<p>from state1, inpute a, go to state2; </p>
-<p>如果输入完之后还处于接收状态，就接收；</p>
-<p>否则，就拒绝：处于结束状态（terminate states，no transitions）；遇到错误匹配</p>
-<h2 id="Regular-Expressions-to-NFAS"><a href="#Regular-Expressions-to-NFAS" class="headerlink" title="Regular Expressions to NFAS"></a>Regular Expressions to NFAS</h2><p>Lexical Specification-&gt;<br>Regular expressions-&gt;<br>NFA-&gt;<br>DFA-&gt;<br>Table-driven Implementation of DFA</p>
-<p>对于NFA，每个notation的图表示与正则表达式相对应，比如正则表达式的epsilon就与开始状态，接收一个epsilon，到达的结束状态的图表示相对应。比如AB，就是状态A接收一个epsilon到达状态B。</p>
-<p>我觉得在这种情况下，AB中的A或者B用状态机来表示比较恰当。假如A是一个组合状态，就递归进去解析，直到得到最终的单元的notation。</p>
-<h2 id="NFA-to-DFA"><a href="#NFA-to-DFA" class="headerlink" title="NFA to DFA"></a>NFA to DFA</h2><p>假如在NFA中，由B分别经过epsilon可以到达B和C，那么可以说：</p>
-<p>epsilon-closure(B) = {B, C, D}，就是仅仅经过epsilon，迭代可以到达的状态</p>
-<p>对于NFA来说，在不同的时间NFA可能处于多个状态，a(X) = {y|x属于X and x-&gt;(a)y}表示a应用于X后到达Y</p>
-<ul>
-<li>定义DFA</li>
-</ul>
-<p>states: subset of S(all states in NFA)</p>
-<p>start: epsilon-closure(s)</p>
-<p>final: {X|x与NFA中final states的交集不等于空集的集合},也就是到达的状态中包含了NFA中的final states，就意味着这是DFA中的final states</p>
-<p>transitions: X-&gt;(a)Y, if y == epsilon-closure(a(X))</p>
-<h2 id="implementing-finite-automata"><a href="#implementing-finite-automata" class="headerlink" title="implementing finite automata"></a>implementing finite automata</h2><p>由DFA组织一个表，有多少种状态就多少行，有多少种输入就多少列，表示出每种状态在不同输入的情况下到达的状态。</p>
-<p>所以，匹配流程如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">i = <span class="number">0</span></span><br><span class="line">state = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span>(input[i]) &#123;</span><br><span class="line">    state = A[state, input[i++]]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>DFA: faster, less compact</p>
-<p>NFA: slower, more compact</p>
-<h1 id="提醒"><a href="#提醒" class="headerlink" title="提醒"></a>提醒</h1><p>本章内容仅本人所理解，不供参考</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1976,7 +1971,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">224</span>
+                <span class="site-state-item-count">225</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
