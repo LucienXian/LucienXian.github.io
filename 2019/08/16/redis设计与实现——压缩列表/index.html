@@ -96,19 +96,19 @@
 
 
 
-<meta name="description" content="redis设计与实现——压缩列表ziplist压缩列表是列表键（另一个是链表）和哈希键（另一个是字典）的底层实现之一。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。 另外，当一个哈希键只包含少量键值对，并且每个key和value要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示哈希键。 压缩列表的构">
+<meta name="description" content="redis设计与实现——压缩列表ziplist压缩列表是有序集合键（另一个是跳表）和哈希键（另一个是字典）的底层实现之一（在3.2之后不再是list的底层实现，被quicklist取代了）。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。 另外，当一个哈希键只包含少量键值对，并且每个key和value要么是小整数值，要么是">
 <meta name="keywords" content="Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="redis设计与实现——压缩列表">
 <meta property="og:url" content="http://yoursite.com/2019/08/16/redis设计与实现——压缩列表/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="redis设计与实现——压缩列表ziplist压缩列表是列表键（另一个是链表）和哈希键（另一个是字典）的底层实现之一。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。 另外，当一个哈希键只包含少量键值对，并且每个key和value要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示哈希键。 压缩列表的构">
+<meta property="og:description" content="redis设计与实现——压缩列表ziplist压缩列表是有序集合键（另一个是跳表）和哈希键（另一个是字典）的底层实现之一（在3.2之后不再是list的底层实现，被quicklist取代了）。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。 另外，当一个哈希键只包含少量键值对，并且每个key和value要么是小整数值，要么是">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://puui.qpic.cn/fans_admin/0/3_1680187318_1565448186148/0">
-<meta property="og:updated_time" content="2019-08-15T17:26:02.713Z">
+<meta property="og:updated_time" content="2019-08-15T17:48:02.601Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redis设计与实现——压缩列表">
-<meta name="twitter:description" content="redis设计与实现——压缩列表ziplist压缩列表是列表键（另一个是链表）和哈希键（另一个是字典）的底层实现之一。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。 另外，当一个哈希键只包含少量键值对，并且每个key和value要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示哈希键。 压缩列表的构">
+<meta name="twitter:description" content="redis设计与实现——压缩列表ziplist压缩列表是有序集合键（另一个是跳表）和哈希键（另一个是字典）的底层实现之一（在3.2之后不再是list的底层实现，被quicklist取代了）。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。 另外，当一个哈希键只包含少量键值对，并且每个key和value要么是小整数值，要么是">
 <meta name="twitter:image" content="https://puui.qpic.cn/fans_admin/0/3_1680187318_1565448186148/0">
 
 
@@ -334,7 +334,7 @@
       
 
       
-        <h1 id="redis设计与实现——压缩列表"><a href="#redis设计与实现——压缩列表" class="headerlink" title="redis设计与实现——压缩列表"></a>redis设计与实现——压缩列表</h1><p>ziplist压缩列表是列表键（另一个是链表）和哈希键（另一个是字典）的底层实现之一。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。</p>
+        <h1 id="redis设计与实现——压缩列表"><a href="#redis设计与实现——压缩列表" class="headerlink" title="redis设计与实现——压缩列表"></a>redis设计与实现——压缩列表</h1><p>ziplist压缩列表是有序集合键（另一个是跳表）和哈希键（另一个是字典）的底层实现之一（在3.2之后不再是list的底层实现，被quicklist取代了）。如果一个列表键只包含少量的项，并且每个列表项要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示列表键。</p>
 <p>另外，当一个哈希键只包含少量键值对，并且每个key和value要么是小整数值，要么是短的字符串，那么Redis就会用ziplist表示哈希键。</p>
 <h2 id="压缩列表的构成"><a href="#压缩列表的构成" class="headerlink" title="压缩列表的构成"></a>压缩列表的构成</h2><p>压缩列表并没有使用一个数据结构去表示。为了节省内存，ziplist是通过特殊编码的连续内存块组成的顺序型结构。我们可以通过其创建步骤来看其结构内容，一个压缩列表包含了多个节点，</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* ziplist头: 2个32位的整数存总共字节数，1个16位的整数存item */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ZIPLIST_HEADER_SIZE     (sizeof(uint32_t)*2+sizeof(uint16_t))</span></span><br><span class="line"><span class="comment">/* 1个字节表示ziplist的最后一个item的size */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ZIPLIST_END_SIZE        (sizeof(uint8_t))</span></span><br><span class="line"><span class="comment">/* 获取ziplist的zlbytes指针 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ZIPLIST_BYTES(zl)       (*((uint32_t*)(zl)))</span></span><br><span class="line"><span class="comment">/* 获取ziplist的zltail指针 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ZIPLIST_TAIL_OFFSET(zl) (*((uint32_t*)((zl)+sizeof(uint32_t))))</span></span><br><span class="line"><span class="comment">/* 获取zllen指针 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ZIPLIST_LENGTH(zl)      (*((uint16_t*)((zl)+sizeof(uint32_t)*2)))</span></span><br><span class="line"><span class="comment">/* 特殊值，0xFF用来标记压缩列表的末端 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ZIP_END 255         </span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Create a new empty ziplist. */</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">char</span> *<span class="title">ziplistNew</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> bytes = ZIPLIST_HEADER_SIZE+ZIPLIST_END_SIZE;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *zl = zmalloc(bytes);</span><br><span class="line">    ZIPLIST_BYTES(zl) = intrev32ifbe(bytes);</span><br><span class="line">    ZIPLIST_TAIL_OFFSET(zl) = intrev32ifbe(ZIPLIST_HEADER_SIZE);</span><br><span class="line">    ZIPLIST_LENGTH(zl) = <span class="number">0</span>;</span><br><span class="line">    zl[bytes<span class="number">-1</span>] = ZIP_END;</span><br><span class="line">    <span class="keyword">return</span> zl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
