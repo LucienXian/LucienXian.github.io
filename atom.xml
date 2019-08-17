@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-08-15T17:48:02.601Z</updated>
+  <updated>2019-08-17T17:12:43.088Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Atomicity All-or-Nothing and Before-or-After——MIT6.824</title>
+    <link href="http://yoursite.com/2019/08/18/Atomicity-All-or-Nothing-and-Before-or-After%E2%80%94%E2%80%94MIT6-824/"/>
+    <id>http://yoursite.com/2019/08/18/Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824/</id>
+    <published>2019-08-17T17:12:19.000Z</published>
+    <updated>2019-08-17T17:12:43.088Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824"><a href="#Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824" class="headerlink" title="Atomicity: All-or-Nothing and Before-or-After——MIT6.824"></a>Atomicity: All-or-Nothing and Before-or-After——MIT6.824</h1><blockquote><p>《Principles Computer System Design Introduction》</p></blockquote><h2 id="Before-or-After-Atomicity-Coordinating-Concurrent-Threads"><a href="#Before-or-After-Atomicity-Coordinating-Concurrent-Threads" class="headerlink" title="Before-or-After Atomicity: Coordinating Concurrent Threads"></a>Before-or-After Atomicity: Coordinating Concurrent Threads</h2><p>并发操作中经常会出现data race condition，从程序员的角度看，有两种不同的并发协调做法：序列协调和原子性（<em>sequence coordina­tion</em> and <em>before-or-after atomicity</em>）。序列协调指的是约束”动作W必须在动作X之前发生”，而原子性则是一种更普遍的约束，即同时对同一个数据进行操作的若干动作不会相互干扰。我们对Before-or-after atomicity的定义是：</p><blockquote><p>Concurrent actions have the <em>before-or-afte</em>r property if their effect from the point of view of their invokers is the same as if the actions occurred either <em>completely before</em> or <em>completely after</em> one another.</p></blockquote><p>与序列协调不同，before-or-after原子性对于程序员来说无法知道共享变量的所有其他动作的ID。程序员需要的是一种自动的隐式机制，可确保正确处理每个共享变量。举个例子，在操作系统中，几个并发线程可能决定在某个时间使用共享打印机。而且，哪个线程首先使用打印机并不重要，重要的是是打印机的一次使用在下一次开始之前必须要完成。</p><p>否则，多个线程交叉发生很可能引起最终的结果不一致，如图，如果两个线程对这个操作交叉执行，就会产生不一致的行为，原子性要保证的就是两个线程对B的操作必须是原子操作。</p><p><img src="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0" alt="img"></p><h2 id="Correctness-and-Serialization"><a href="#Correctness-and-Serialization" class="headerlink" title="Correctness and Serialization"></a>Correctness and Serialization</h2><p>我们的目标是对before-or-after原子性进行正确性的验证，而不会涉及使用该机制的应用程序是否正确的问题。此正确性标准意味着如果并发操作的结果是通过某些纯串行应用的相同操作获得的结果，则算正确协调并发操作。</p><p>因此我们对before-or-after原子性的定义就是每个before-or-after的行为都表现得是执行之前或者完全执行之后的效果。</p><h2 id="Simple-Locking"><a href="#Simple-Locking" class="headerlink" title="Simple Locking"></a>Simple Locking</h2><p>simple locking有两个规则，首先是每个事务必须在执行任何实际读取和写入之前为其操作的所有共享对象获取锁；其次是必须事务完成上次更新并提交或者重新加载数据并终止后才会释放锁。</p><p>simple locking能有效地协调并发事务，在该规则下一个事务必须在前一个事务完成之后进行、在后一个事务开始之前进行，并且进行中的事务不会拥有共同的数据。并发事务产生的结果就像是按照序列化顺序进行的一样。</p><p>但是simple locking也会因为性能问题影响其并发过程，因为它要求事务获取它将要读取或写入的每个共享对象的锁，如果其需要读取的锁数量大于当前的数量，那么就会在一定程度上影响其并发性能。</p><h2 id="Two-Phase-Locking"><a href="#Two-Phase-Locking" class="headerlink" title="Two-Phase Locking"></a>Two-Phase Locking</h2><p>两阶段锁协议整个过程分为两个阶段：一是加锁，二是释放锁。加锁过程中事务只能加锁或者操作数据，在其通过某个锁定点之前都不能释放锁。而释放锁的过程中事务只能解锁或者操作数据，而不能再重新上锁了。</p><p>虽然两阶段锁协议比简单的锁定具有更好的并发性能，例如假设事务T1读取X，接着写Y，而事务T2只执行写入Y。在两阶段锁协议下，T2只能在T1两个动作之前或者之后发生。但事实上T2在T1两个动作中间进行与T2完全在T1之前进行的效果是一样的。允许所有可能的并发性同时确保的before-or-after atomicity规则很难设计。</p><p>锁与日志之间的关系有两点是需要考虑的：单个的中止事务和系统恢复。对于前者，协议要求中止事务在释放任何锁之前将其更改的数据对象恢复为原始值，因此不需要对中止的事务采取特殊的计算。至于后者，锁不是在非易失性存储中，因此在系统的恢复过程中必须将锁捕获以释放锁。然而我们还需要考虑的是，基于日志的恢复算法是否构建了正确的系统状态，因为系统崩溃可能是由于在崩溃之前提交的那些事务的串行排序引起的。</p><p>假设锁是在易失性存储器中，在系统崩溃的瞬间所有锁的记录都丢失。某些事务（记录BEGIN记录但尚未记录END记录的事务）可能尚未完成。但由于在那一瞬间所有事物的锁集合都是不重叠的，因此在恢复过程中可以不加锁地通过执行恢复算法重建系统状态，当然这一恢复过程中不能有新的事务产生。</p><h2 id="Multiple-Site-Atomicity-Distributed-Two-Phase-Commit"><a href="#Multiple-Site-Atomicity-Distributed-Two-Phase-Commit" class="headerlink" title="Multiple-Site Atomicity: Distributed Two-Phase Commit"></a>Multiple-Site Atomicity: Distributed Two-Phase Commit</h2><p>如果事务需要在分布式的环境下执行，则需要使用结合了persis­tent senders, duplicate suppression和single-site transactions的两阶段提交协议。</p><p>这是因为分布式架构中，不同的节点之间只能知道自己的操作是否成功，而无法知道其他节点的操作的成功或失败。为了保证事务的特性，需要引入一个作为<strong>协调者</strong>的组件来统一掌控所有节点（<strong>参与者</strong>）的操作结果并最终指示这些节点的最终提交。</p><p>第一阶段：提交请求的投票阶段</p><ol><li>协调者向所有参与者节点发起是否可以提交事务的询问；</li><li>参与者执行相关的事务操作，并记录Undo和Redo日志；</li><li>各个参与对询问进行响应，同意或者终止；</li></ol><p>第二阶段：提交执行的完成阶段</p><ol><li>协调者节点向所有参与者节点发出”正式提交”/“回滚操作”的请求；</li><li>参与者节点正式完成操作/参与者利用Undo信息进行回滚，并释放在整个事务期间内占用的资源；</li><li>参与者响应完成信息；</li><li>协调者收到所有信息后，完成事务；</li></ol><p>通信流程参考：</p><p><img src="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0" alt="img"></p><p>2PC也存在一些缺点，其中一个就是执行过程中，节点处于阻塞状态；另一个就是出现节点崩溃时，只能依赖协调者去进行回滚；并且协调者还存在单点故障的问题。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824&quot;&gt;&lt;a href=&quot;#Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824&quot; class=&quot;hea
+      
+    
+    </summary>
+    
+    
+      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
+  </entry>
   
   <entry>
     <title>redis设计与实现——压缩列表</title>
@@ -445,29 +468,6 @@
       
       
         &lt;h1 id=&quot;packaged-task-lt-gt-Example-and-Tutorial&quot;&gt;&lt;a href=&quot;#packaged-task-lt-gt-Example-and-Tutorial&quot; class=&quot;headerlink&quot; title=&quot;packaged_tas
-      
-    
-    </summary>
-    
-    
-      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>std::async Tutorial &amp; Example</title>
-    <link href="http://yoursite.com/2019/05/01/std-async-Tutorial-Example/"/>
-    <id>http://yoursite.com/2019/05/01/std-async-Tutorial-Example/</id>
-    <published>2019-05-01T06:12:04.000Z</published>
-    <updated>2019-05-01T06:12:30.845Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="std-async-Tutorial-amp-Example"><a href="#std-async-Tutorial-amp-Example" class="headerlink" title="std::async Tutorial &amp; Example"></a>std::async Tutorial &amp; Example</h1><p>本文将介绍在C++11中如何执行异步任务。</p><h2 id="what-is-std-async"><a href="#what-is-std-async" class="headerlink" title="what is std::async()"></a>what is std::async()</h2><p>std::async()是一个函数模版，可以接收一个回调作为参数，并异步执行该函数。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Fn</span>, <span class="title">class</span>... <span class="title">Args</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">future</span>&lt;typename result_of&lt;Fn(Args...)&gt;::type&gt; <span class="title">async</span> (<span class="title">launch</span> <span class="title">policy</span>, <span class="title">Fn</span>&amp;&amp; <span class="title">fn</span>, <span class="title">Args</span>&amp;&amp;... <span class="title">args</span>);</span></span><br></pre></td></tr></table></figure><p>返回值是一个future对象，该对象存着异步执行的函数的返回值。</p><p>第一个参数launch policy是一个启动策略，它控制着异步执行的行为，我们可以创建三种异步启动的策略：</p><ul><li>std::launch::async：传递进来的函数在独立的线程中执行；</li><li>std::launch::deferred：只有某个线程对future对象调用get()的时候才会调用函数；</li><li>std::launch::async | std::launch::deferred：默认行为；</li></ul><p>我们可以传递以下的回调到std::async中：</p><ul><li>函数指针；</li><li>函数对象；</li><li>lambda函数；</li></ul><p>假设这样的一个场景，异步调用函数：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::future&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; resultFromDB = <span class="built_in">std</span>::async(<span class="built_in">std</span>::launch::async, fetchDataFromDB, <span class="string">"Data"</span>);</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Do Some Stuff </span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//Fetch Data from DB</span></span><br><span class="line"><span class="comment">// Will block till data is available in future&lt;std::string&gt; object.</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> dbData = resultFromDB.get();</span><br></pre></td></tr></table></figure><p>std::async()的行为如下：</p><ol><li>自动创建一个线程或者从线程池中获取一个，还会有创建一个promise对象；</li><li>然后将promise对象传递进线程，并返回future对象；</li><li>当传递进的参数，即函数退出时，它的返回值会被promise对象给设置进去；</li></ol>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;std-async-Tutorial-amp-Example&quot;&gt;&lt;a href=&quot;#std-async-Tutorial-amp-Example&quot; class=&quot;headerlink&quot; title=&quot;std::async Tutorial &amp;amp; Exampl
       
     
     </summary>

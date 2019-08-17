@@ -265,6 +265,143 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/28/weak-ptr-unique-ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/28/weak-ptr-unique-ptr/" itemprop="url">weak_ptr&unique_ptr</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-28T11:07:57+08:00">
+                2019-05-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="weak-ptr-amp-unique-ptr"><a href="#weak-ptr-amp-unique-ptr" class="headerlink" title="weak_ptr&amp;unique_ptr"></a>weak_ptr&amp;unique_ptr</h1><h2 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h2><blockquote>
+<p>shared_ptr, Binary trees and the problem of Cyclic References</p>
+</blockquote>
+<p>shared_ptr最大的优点是在不再使用的时候，能够自动释放相关的内存，但也存在缺点，就是循环引用——如果两个对象使用shared_ptr相互引用，在对象超出作用域时，就没办法删除内存。</p>
+<p>这是因为由于相互引用，引用计数永远不会为0。</p>
+<h3 id="Now-How-to-fix-this-problem"><a href="#Now-How-to-fix-this-problem" class="headerlink" title="Now How to fix this problem?"></a>Now How to fix this problem?</h3><p>答案就是使用weak_ptr，weak_ptr能够分享对象，但不会拥有这个对象，它是通过shared_ptr进行创建：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; ptr = <span class="built_in">std</span>::make_shared&lt;<span class="keyword">int</span>&gt;(<span class="number">4</span>);</span><br><span class="line"><span class="built_in">std</span>::weak_ptr&lt;<span class="keyword">int</span>&gt; weakPtr(ptr);</span><br></pre></td></tr></table></figure>
+<p>对于weak_ptr对象，我们无法直接使用操作符*和-&gt;去访问相关的内存，因此我们只能通过weak_ptr对像去创建shared_ptr，方法是调用lock函数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; ptr = <span class="built_in">std</span>::make_shared&lt;<span class="keyword">int</span>&gt;(<span class="number">4</span>);</span><br><span class="line">    <span class="built_in">std</span>::weak_ptr&lt;<span class="keyword">int</span>&gt; weakPtr(ptr);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; ptr_2 =  weakPtr.lock();</span><br><span class="line">    <span class="keyword">if</span>(ptr_2)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;(*ptr_2)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Reference Count :: "</span>&lt;&lt;ptr_2.use_count()&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;   </span><br><span class="line">    <span class="keyword">if</span>(weakPtr.expired() == <span class="literal">false</span>)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Not expired yet"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果shared_ptr已经被删除，lock()函数返回空的shared_ptr。</p>
+<h2 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h2><p>unique_ptr是c++11提供的智能指针实现之一，用于防止内存泄漏。unique_ptr对象包装了一个原始指针，并负责其生命周期。当该对象被破坏时，然后在其析构函数中删除关联的原始指针。</p>
+<p>它跟shared_ptr的用法类似，也能使用原生指针的一些操作符。但不同的是归属权，unique_ptr对象始终是关联的原始指针的唯一所有者。 我们无法复制unique_ptr对象，它只能移动。也因为如吃，其析构函数中不需要任何引用计数，可以直接删除相关的指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create a unique_ptr object through raw pointer</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr2(<span class="keyword">new</span> Task(<span class="number">55</span>));</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr3 = taskPtr2; <span class="comment">// Compile error</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line">taskPtr = taskPtr2; <span class="comment">//compile error</span></span><br></pre></td></tr></table></figure>
+<p>在unique_ptr类中，拷贝构造函数和赋值构造函数都已经被删除了。</p>
+<h3 id="Transfering-the-ownership-of-unique-ptr-object"><a href="#Transfering-the-ownership-of-unique-ptr-object" class="headerlink" title="Transfering the ownership of unique_ptr object"></a>Transfering the ownership of unique_ptr object</h3><p>虽然不能拷贝一个unique_ptr对象，但我们可以move它们，即传递拥有权。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr2(<span class="keyword">new</span> Task(<span class="number">55</span>));</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr4 = <span class="built_in">std</span>::move(taskPtr2);</span><br></pre></td></tr></table></figure>
+<h3 id="Releasing-the-associated-raw-pointer"><a href="#Releasing-the-associated-raw-pointer" class="headerlink" title="Releasing the associated raw pointer"></a>Releasing the associated raw pointer</h3><p>对unique_ptr对象调用release()函数可以释放相关原始指针的拥有权，即返还一个原始指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Task&gt; taskPtr5(<span class="keyword">new</span> Task(<span class="number">55</span>));</span><br><span class="line">Task * ptr = taskPtr5.release();</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/27/shared-ptr-in-C-11/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1609,149 +1746,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/01/std-async-Tutorial-Example/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/01/std-async-Tutorial-Example/" itemprop="url">std::async Tutorial & Example</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-01T14:12:04+08:00">
-                2019-05-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="std-async-Tutorial-amp-Example"><a href="#std-async-Tutorial-amp-Example" class="headerlink" title="std::async Tutorial &amp; Example"></a>std::async Tutorial &amp; Example</h1><p>本文将介绍在C++11中如何执行异步任务。</p>
-<h2 id="what-is-std-async"><a href="#what-is-std-async" class="headerlink" title="what is std::async()"></a>what is std::async()</h2><p>std::async()是一个函数模版，可以接收一个回调作为参数，并异步执行该函数。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Fn</span>, <span class="title">class</span>... <span class="title">Args</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">future</span>&lt;typename result_of&lt;Fn(Args...)&gt;::type&gt; <span class="title">async</span> (<span class="title">launch</span> <span class="title">policy</span>, <span class="title">Fn</span>&amp;&amp; <span class="title">fn</span>, <span class="title">Args</span>&amp;&amp;... <span class="title">args</span>);</span></span><br></pre></td></tr></table></figure>
-<p>返回值是一个future对象，该对象存着异步执行的函数的返回值。</p>
-<p>第一个参数launch policy是一个启动策略，它控制着异步执行的行为，我们可以创建三种异步启动的策略：</p>
-<ul>
-<li>std::launch::async：传递进来的函数在独立的线程中执行；</li>
-<li>std::launch::deferred：只有某个线程对future对象调用get()的时候才会调用函数；</li>
-<li>std::launch::async | std::launch::deferred：默认行为；</li>
-</ul>
-<p>我们可以传递以下的回调到std::async中：</p>
-<ul>
-<li>函数指针；</li>
-<li>函数对象；</li>
-<li>lambda函数；</li>
-</ul>
-<p>假设这样的一个场景，异步调用函数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::future&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; resultFromDB = <span class="built_in">std</span>::async(<span class="built_in">std</span>::launch::async, fetchDataFromDB, <span class="string">"Data"</span>);</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Do Some Stuff </span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//Fetch Data from DB</span></span><br><span class="line"><span class="comment">// Will block till data is available in future&lt;std::string&gt; object.</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> dbData = resultFromDB.get();</span><br></pre></td></tr></table></figure>
-<p>std::async()的行为如下：</p>
-<ol>
-<li>自动创建一个线程或者从线程池中获取一个，还会有创建一个promise对象；</li>
-<li>然后将promise对象传递进线程，并返回future对象；</li>
-<li>当传递进的参数，即函数退出时，它的返回值会被promise对象给设置进去；</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1800,7 +1794,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">227</span>
+                <span class="site-state-item-count">228</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
