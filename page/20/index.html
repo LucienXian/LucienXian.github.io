@@ -265,6 +265,192 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/01/死锁-Deadlock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/01/死锁-Deadlock/" itemprop="url">死锁(Deadlock)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-01T13:46:01+08:00">
+                2017-12-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="deadlock"><a href="#deadlock" class="headerlink" title="deadlock"></a>deadlock</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>一个进程在得不到资源之后进入等待状态，而这个状态永远不会改变，这种情况就叫做死锁。</p>
+<p>死锁主要发生的情况就在于资源的请求与释放不合理，而这些资源包括了physical resource和logical resource（锁，信号量，文件等）</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><h3 id="发生死锁的必要不充分条件"><a href="#发生死锁的必要不充分条件" class="headerlink" title="发生死锁的必要不充分条件"></a>发生死锁的必要不充分条件</h3><blockquote>
+<p>不是独立的四个条件</p>
+</blockquote>
+<ul>
+<li>mutual exclusion：在同一时间内只有一个进程能访问该资源</li>
+<li>hold and wait：一个进程必须同时拥有一个资源，并且在请求另一份被别的进程拥有着的资源</li>
+<li>no preemption：资源不能被抢占</li>
+<li>circular wait：一系列的进程在循环等待，比如p1在等待p2的资源，p2在等待p3的资源，p3在等待p1的资源</li>
+</ul>
+<h3 id="利用资源分配图可以检测是否发生了死锁"><a href="#利用资源分配图可以检测是否发生了死锁" class="headerlink" title="利用资源分配图可以检测是否发生了死锁"></a>利用资源分配图可以检测是否发生了死锁</h3><p>在资源分配图中，顶点分为resource(R)和process(P)两种，由R指向P的称为分配边（即P已经获得R的资源），由P指向R的称为请求边（即P在请求R的资源），而边是可以动态变化的。一旦分配成功，即从请求边转化为分配边。</p>
+<p>如下图：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics.png" alt="img"></p>
+<p>那么如何检测死锁呢？</p>
+<p>一旦成环并且环中的每种资源只有一个实例(即没有多余的资源可用时)，就会发生死锁。如下图有两个环，其中没有多余资源。</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics1.png" alt="img"></p>
+<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><p>目前有三种：</p>
+<ul>
+<li>采取办法去避免死锁，保证系统永远不会进入死锁状态；</li>
+<li>允许系统进入死锁状态，检测出来然后恢复；</li>
+<li>忽略死锁，然后假装死锁没有发生过；</li>
+</ul>
+<p>大多数操作系统采用第三种。</p>
+<h3 id="deadlock-prevention"><a href="#deadlock-prevention" class="headerlink" title="deadlock prevention"></a>deadlock prevention</h3><blockquote>
+<p>使得前面提到的那四个死锁发生的必要不充分条件之一不成立，即可以避免死锁</p>
+</blockquote>
+<ul>
+<li>mutual exclusion：某些资源可以允许多个进程访问，比如read-only file。但互斥锁不能允许多个进程访问，因此这个方法不能采用。</li>
+<li>hold and wait：一个方法是实现一个协议使得进程应该一次性获得所有资源；另一种方法则是要求实现一个协议使得进程在释放所有资源之前，不能请求资源；但这两个方法有很多缺点：一是资源的调度效率很低，有些不用的资源却一直hold住。二是有可能发生饥饿，有可能想要的资源因为其它进程hold住而一直等待。</li>
+<li>no preemption：实现抢占式。一般应用在那些保存方便，易于重新加载的资源（比如寄存器）。但不能用在互斥锁和信号量。</li>
+<li>circular wait：举个例子，可以实现一个协议使得进程在请求资源时，按照资源id，从大到小去请求（也就是设置一个资源请求顺序）</li>
+</ul>
+<h3 id="deadlock-avoidance"><a href="#deadlock-avoidance" class="headerlink" title="deadlock avoidance"></a>deadlock avoidance</h3><blockquote>
+<p>了解额外信息，决定资源如何分配</p>
+</blockquote>
+<ul>
+<li>safe state：系统以某些分配顺序去分配资源，不会发生死锁。这个顺序也叫safe sequence</li>
+<li>算法一：resource-allocation-graph algorithm<ul>
+<li>还是利用资源分配图表示，但此时由p指向r的虚线表示p请求资源；</li>
+<li>在多个进程请求资源资源时，系统会检测分配该资源给某个进程后，该图会否成环</li>
+</ul>
+</li>
+<li>算法二：banker’s algorithm<ul>
+<li>算法一 只适合于某种资源只有一个实例的情况；</li>
+<li>数据结构：available(某种资源的可用数量)、max(nxm的矩阵，某个进程Pi需要Ri资源的最大数量)、allocation(nxm的矩阵，某个进程Pi已经得到Ri资源的数量)、need(还需要多少资源)；need = max - allocation</li>
+<li>safety algorithm：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">初始化Work=avaliable和finish=<span class="literal">false</span>；<span class="comment">//数组</span></span><br><span class="line"><span class="number">2</span>：找一个索引i满足：finish[i]=<span class="literal">false</span> &amp;&amp; need[i]&lt;=work[i]</span><br><span class="line">如果不存在这个i，就goto4</span><br><span class="line">work = work+allocation</span><br><span class="line">finish[i]=<span class="literal">true</span></span><br><span class="line">goto2</span><br><span class="line"><span class="number">4</span>：如果所有都完成了，那么系统是安全状态</span><br></pre></td></tr></table></figure>
+<p>​        resource-request algorithm：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//requesti[ij]=k意味着进程i需要j类资源k个</span></span><br><span class="line"><span class="comment">//如果发生了请求,模拟一下操作</span></span><br><span class="line"><span class="number">1.</span> <span class="keyword">if</span> requesti&lt;=needi；<span class="keyword">goto</span> <span class="number">2</span>; <span class="keyword">else</span> 出错</span><br><span class="line"><span class="number">2.</span> requesti&lt;=available;<span class="keyword">goto</span> <span class="number">3</span>；<span class="keyword">else</span> waiting</span><br><span class="line"><span class="number">3.</span> available -= request; allocation += quest; need -= quest</span><br></pre></td></tr></table></figure>
+<h3 id="deadlock-detection"><a href="#deadlock-detection" class="headerlink" title="deadlock detection"></a>deadlock detection</h3><blockquote>
+<p>如果系统没有采用以上两种死锁避免方法，就必须要有算法检测系统是否发生了死锁，并且使得系统从死锁中恢复</p>
+</blockquote>
+<ul>
+<li>假如每种资源只有一个实例，可以采用wait-for 图来检测死锁是否发生（Pi指向Pj意味着Pi在等待Pj释放资源）。如果改图含有环，则意味着死锁发生了</li>
+<li>假如每种资源含有多个实例，那么可以采用以上的safety算法，只要在最后检查每个finish是否都是true即可</li>
+</ul>
+<h3 id="recovery-from-deadlock"><a href="#recovery-from-deadlock" class="headerlink" title="recovery from deadlock"></a>recovery from deadlock</h3><blockquote>
+<p>当检测到死锁发生时，需要从死锁中恢复</p>
+</blockquote>
+<ul>
+<li>中断一个或多个进程的运行，打破成环</li>
+<li>抢占资源：关键是要选择抢占谁的资源；实现回滚；并且如何避免饥饿的发生</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/29/Effective-cpp-10-11/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1508,154 +1694,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/21/Effective-cpp-4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/21/Effective-cpp-4/" itemprop="url">Effective-cpp-4</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-21T23:54:30+08:00">
-                2017-11-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Make-sure-that-objects-are-initialized-before-they’re-used"><a href="#Make-sure-that-objects-are-initialized-before-they’re-used" class="headerlink" title="Make sure that objects are initialized before they’re used"></a>Make sure that objects are initialized before they’re used</h1><h2 id="尽量使用member-initialization-list"><a href="#尽量使用member-initialization-list" class="headerlink" title="尽量使用member initialization list"></a>尽量使用member initialization list</h2><ul>
-<li>如果只是在构造函数体内进行赋值，非内置类型会在<strong>default</strong>构造函数中先被初始化</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myClass</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	myClass(<span class="built_in">std</span>::<span class="built_in">string</span>&amp; address, <span class="built_in">std</span>::<span class="built_in">list</span>&lt;myClass&gt;&amp; l)&#123;</span><br><span class="line">      addr = address;<span class="comment">//只是赋值，早在默认构造函数已经被初始化</span></span><br><span class="line">      <span class="built_in">list</span> = l;</span><br><span class="line">  	&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="built_in">std</span>::<span class="built_in">string</span> addr;</span><br><span class="line">  	<span class="built_in">std</span>::<span class="built_in">list</span>&lt;myClass&gt; <span class="built_in">list</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果使用member initialization list，会更加高效，避免了内置类型进行结果相同的初始化和赋值；而且member initialization list也能通过默认构造函数初始化成员变量；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">myClass::myClass()</span><br><span class="line">	:addr(),</span><br><span class="line">	 <span class="built_in">list</span>()</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>C++的成员初始化次序是固定<ul>
-<li>base class-&gt; derived class</li>
-<li>class的成员变量按照声明次序初始化；</li>
-</ul>
-</li>
-</ul>
-<h2 id="不同编译单元的non-local-static对象"><a href="#不同编译单元的non-local-static对象" class="headerlink" title="不同编译单元的non-local static对象"></a>不同编译单元的non-local static对象</h2><ul>
-<li>这个问题的起源是C++不保证不同的编译单元的初始化次序。</li>
-<li>例如</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//file1.cpp</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileSystem</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="built_in">std</span>::<span class="keyword">size_t</span> numDisks() <span class="keyword">const</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">extern</span> FileSystem tfs;</span><br><span class="line"></span><br><span class="line"><span class="comment">//file2.cpp</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dir</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	Dir(params)&#123;</span><br><span class="line">  		<span class="built_in">std</span>::<span class="keyword">size_t</span> disks = tfs.numDisks();</span><br><span class="line">  	&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>在这种情况，倘若tfs在tempDir初始化并没有完成初始化，这样就会出现问题；</li>
-</ul>
-<p>为了解决这个问题，我们采取singleton模式，把每个non-local static放到专属函数中。以local static对象替代non-local static对象。因为C++保证一个local static对象会在函数调用期间/首次遇到该对象被定义时进行初始化。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">FileSystem&amp; <span class="title">tfs</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">static</span> FileSystem fs;</span><br><span class="line">  <span class="keyword">return</span> fs;</span><br><span class="line">&#125;<span class="comment">//第一行是定义并初始化一个对象，第二行是返回该对象的引用。</span></span><br><span class="line"><span class="comment">//而且如果函数被反复调用，可以声明为inline</span></span><br></pre></td></tr></table></figure>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>构造函数最好使用member initialization list；</li>
-<li>以local static对象替代non-local static对象，保证跨编译单元的对象初始化；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1704,7 +1742,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">228</span>
+                <span class="site-state-item-count">229</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

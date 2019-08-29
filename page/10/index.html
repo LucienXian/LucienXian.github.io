@@ -265,6 +265,232 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Effective-Go学习/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/Effective-Go学习/" itemprop="url">Effective Go学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:18:41+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="EffectiveGo学习笔记"><a href="#EffectiveGo学习笔记" class="headerlink" title="EffectiveGo学习笔记"></a>EffectiveGo学习笔记</h1><h2 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a>格式化</h2><p>在go中，为了避免各种格式化问题的争论而浪费时间，我可以用gofmt将go程序进行统一的格式化，使得所有人遵循标准风格。</p>
+<p>使用命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gofmt -w program.go</span><br></pre></td></tr></table></figure>
+<p>该命令会将源代码格式化后再去覆盖原来的内容。</p>
+<blockquote>
+<p>All GO code in the standard packages has been formatted with gofmt</p>
+</blockquote>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>Go语言支持块注释<strong>/<em> </em>/</strong>和行注释<strong>/ /</strong>。在golang中，因为godoc的提供，我们可以通过两种方式来查看文档。godoc既是一个程序，也是一个web服务器。</p>
+<p>考虑这样一段代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">提供常用库，输出一个vim-go</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//只是一个main函数</span></span><br><span class="line"><span class="comment">//不知道说什么了</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">"vim-go"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>go doc的使用可以接收包名作为参数，也可以不输入任何参数，那么显示觉得就是当前目录下的文档。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> go doc</span><br><span class="line"><span class="meta">&gt;</span> 提供常用库，输出一个vim-go</span><br></pre></td></tr></table></figure>
+<p>当然也可以打开web服务器去访问：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">godoc -http=:6060</span><br></pre></td></tr></table></figure>
+<p>打开之后是官网的一个拷贝，但包的文档<strong><a href="http://127.0.0.1:6060/pkg/" target="_blank" rel="noopener">http://127.0.0.1:6060/pkg/</a></strong>会更丰富，因为它是基于电脑上GOROOT和GOPATH路径下的所有包生成的文档。</p>
+<h2 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h2><p>命名在任何语言中都是非常重要的</p>
+<h3 id="包名"><a href="#包名" class="headerlink" title="包名"></a>包名</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"bytes"</span></span><br></pre></td></tr></table></figure>
+<p>一般来说，包名应该以小写的单个单词为命名；另一个约定俗成的是包名应为其源码目录的基本名称。</p>
+<p>由于包名作为一个访问器，使得导出名称可以避免冲突。比如bufio.Reader和io.Reader就不会发生冲突。</p>
+<h3 id="接口名"><a href="#接口名" class="headerlink" title="接口名"></a>接口名</h3><p>按照约定，只包含一个方法的接口应该以该方法的名称加上-er后缀来命名，如Reader、Writer。</p>
+<h2 id="分号"><a href="#分号" class="headerlink" title="分号"></a>分号</h2><p>和C一天，go的正式语法使用分号来结束语句，但这些分号不在源码中出现，而是此法解析器会在每行最后一个标记为标识符时，在后面加上分号。</p>
+<p>另外，分号在闭合的大括号之前可以直接省略，所以尽量不要将大括号换行，以下是错误做法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> i &lt; f()</span><br><span class="line">&#123;</span><br><span class="line">    g()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果一行内写多个语句，也应该用分号隔开。</p>
+<h2 id="控制结构"><a href="#控制结构" class="headerlink" title="控制结构"></a>控制结构</h2><p>Golang有几种控制结构，for，if，switch和select，没有圆括号，而且主体必须使用大括号。</p>
+<h3 id="if"><a href="#if" class="headerlink" title="if"></a>if</h3><p>一个简单的if语句：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> x &gt; <span class="number">0</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外，if可以接收初始化语句，设置局部变量：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := file.Chmod(<span class="number">0664</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Print(err)</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="重新声明与再次赋值"><a href="#重新声明与再次赋值" class="headerlink" title="重新声明与再次赋值"></a>重新声明与再次赋值</h3><p>比如这样的例程：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f, err := os.Open(name)</span><br><span class="line"><span class="comment">//xxxxxx</span></span><br><span class="line">d, err := f.Stat()</span><br></pre></td></tr></table></figure>
+<p>在满足下列条件时，已被声明的变量可以出现<strong>:=</strong>声明中：</p>
+<ul>
+<li>本次声明与已声明的v处于同一作用域；（若v在外层作用域已经声明过，则此次声明会创建新的变量）</li>
+<li>在初始化中与其类型相应的值才能赋予v，并且此次声明中至少另有一个变量是新声明的</li>
+</ul>
+<h3 id="for"><a href="#for" class="headerlink" title="for"></a>for</h3><p>golang的for循环有三种：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> init; condition; post &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> condition &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> &#123; &#125;</span><br></pre></td></tr></table></figure>
+<p>如果要遍历数组、切片、字符串或者映射，抑或是从channel中读取信息，可以使用range子句：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> key, value := <span class="keyword">range</span> oldMap &#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="switch"><a href="#switch" class="headerlink" title="switch"></a>switch</h3><p>golang的switch语句，其表达式无需为常量或整数。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">unhex</span><span class="params">(c <span class="keyword">byte</span>)</span> <span class="title">byte</span></span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'0'</span> &lt;= c &amp;&amp; c &lt;= <span class="string">'9'</span>:</span><br><span class="line">        <span class="keyword">return</span> c - <span class="string">'0'</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">'a'</span> &lt;= c &amp;&amp; c &lt;= <span class="string">'f'</span>:</span><br><span class="line">        <span class="keyword">return</span> c - <span class="string">'a'</span> + <span class="number">10</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">'A'</span> &lt;= c &amp;&amp; c &lt;= <span class="string">'F'</span>:</span><br><span class="line">        <span class="keyword">return</span> c - <span class="string">'A'</span> + <span class="number">10</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就可以将一系列的if-else转为switch-case。</p>
+<p>另外，switch的case可以使用逗号分隔来列举相同的处理条件：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">shouldEscape</span><span class="params">(c <span class="keyword">byte</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> c &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">' '</span>, <span class="string">'?'</span>, <span class="string">'&amp;'</span>, <span class="string">'='</span>, <span class="string">'#'</span>, <span class="string">'+'</span>, <span class="string">'%'</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>跟C一样，我们往往会希望用break打破循环，在golang中，如果我们希望打破外层的循环，可以给break增加一个标签：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Loop:</span><br><span class="line">	<span class="keyword">for</span> n := <span class="number">0</span>; n &lt; <span class="built_in">len</span>(src); n += size &#123;</span><br><span class="line">		<span class="keyword">switch</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> src[n] &lt; sizeOne:</span><br><span class="line">			<span class="keyword">if</span> validateOnly &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			size = <span class="number">1</span></span><br><span class="line">			update(src[n])</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> src[n] &lt; sizeTwo:</span><br><span class="line">			<span class="keyword">if</span> n+<span class="number">1</span> &gt;= <span class="built_in">len</span>(src) &#123;</span><br><span class="line">				err = errShortInput</span><br><span class="line">				<span class="keyword">break</span> Loop</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> validateOnly &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			size = <span class="number">2</span></span><br><span class="line">			update(src[n] + src[n+<span class="number">1</span>]&lt;&lt;shift)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="命名的结果参数"><a href="#命名的结果参数" class="headerlink" title="命名的结果参数"></a>命名的结果参数</h3><p>Go函数的返回可以给定一个名字，在命名后，一旦函数开始执行，它们就会被初始化为与其类型响应的零值；若该函数执行了一条不带参数的return语句，该结果形参的当前值就会被返回。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadFull</span><span class="params">(r Reader, buf []<span class="keyword">byte</span>)</span> <span class="params">(n <span class="keyword">int</span>, err error)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">len</span>(buf) &gt; <span class="number">0</span> &amp;&amp; err == <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> nr <span class="keyword">int</span></span><br><span class="line">        nr, err = r.Read(buf)</span><br><span class="line">        n += nr</span><br><span class="line">        buf = buf[nr:]</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h3><p>Go的defer语句可以预设一个函数调用，让它在执行defer的函数返回之前立即执行，这可以用来执行一些释放资源的函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Contents returns the file's contents as a string.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Contents</span><span class="params">(filename <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, error)</span></span> &#123;</span><br><span class="line">    f, err := os.Open(filename)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">""</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> f.Close()  <span class="comment">// f.Close will run when we're finished.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> result []<span class="keyword">byte</span></span><br><span class="line">    buf := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">100</span>)</span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">        n, err := f.Read(buf[<span class="number">0</span>:])</span><br><span class="line">        result = <span class="built_in">append</span>(result, buf[<span class="number">0</span>:n]...) <span class="comment">// append is discussed later.</span></span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">""</span>, err  <span class="comment">// f will be closed if we return here.</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">string</span>(result), <span class="literal">nil</span> <span class="comment">// f will be closed if we return here.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>被defer的函数调用按照LIFO的顺序执行，比如这样的代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5</span>; i++ &#123;</span><br><span class="line">    <span class="keyword">defer</span> fmt.Printf(<span class="string">"%d "</span>, i)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//4 3 2 1 0</span></span><br></pre></td></tr></table></figure>
+<h2 id="data"><a href="#data" class="headerlink" title="data"></a>data</h2><p>golang提供了两种分配方法，即内建函数make和new，它们做的事情不同，但可能引起混淆。</p>
+<h3 id="new分配"><a href="#new分配" class="headerlink" title="new分配"></a>new分配</h3><p>这个内建函数会分配内存，并且将内存置为0，但不会初始化内存。在分配完已置为0的内存之后，会返回它的地址，比如<strong>new(T)</strong>会返回*T，即一个指向新分配的，类型为T的零值。</p>
+<p>因此使用者只需要用new就可以创建一个新的对象，例如：零值bytes.Buffer就是已准备就绪的缓冲区，而零值的sync.Mutex就是已解锁的互斥锁。</p>
+<p>另外这种零值属性是具有传递性的，考虑这样的structure：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SyncedBuffer <span class="keyword">struct</span> &#123;</span><br><span class="line">    lock    sync.Mutex</span><br><span class="line">    buffer  bytes.Buffer</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么在后续的声明时，对于SyncedBuffer类型，只要声明分配好内存就可以直接使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p := <span class="built_in">new</span>(SyncedBuffer)  <span class="comment">// type *SyncedBuffer</span></span><br><span class="line"><span class="keyword">var</span> v SyncedBuffer      <span class="comment">// type  SyncedBuffer</span></span><br></pre></td></tr></table></figure>
+<h3 id="构造函数与复合字面量"><a href="#构造函数与复合字面量" class="headerlink" title="构造函数与复合字面量"></a>构造函数与复合字面量</h3><p>在很多情况下，我们声明一个对象不单单是要零值，还希望初始化成员，但总不能逐个赋值这么丑陋的做法嘛：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewFile</span><span class="params">(fd <span class="keyword">int</span>, name <span class="keyword">string</span>)</span> *<span class="title">File</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> fd &lt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    &#125;</span><br><span class="line">    f := <span class="built_in">new</span>(File)</span><br><span class="line">    f.fd = fd</span><br><span class="line">    f.name = name</span><br><span class="line">    f.dirinfo = <span class="literal">nil</span></span><br><span class="line">    f.nepipe = <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span> f</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而golang的做法是这样的：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewFile</span><span class="params">(fd <span class="keyword">int</span>, name <span class="keyword">string</span>)</span> *<span class="title">File</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> fd &lt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//return &amp;File&#123;fd, name, nil, 0&#125;</span></span><br><span class="line">    <span class="keyword">return</span> &amp;File&#123;fd: fd, name: name&#125; <span class="comment">//此时其它字段默认为零值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>与C不同的是，golang返回一个局部变量地址是有效的，因此可以直接合并上面的语句。当然也可以以key：value的方式标出长远，如上。</p>
+<h3 id="make分配"><a href="#make分配" class="headerlink" title="make分配"></a>make分配</h3><p>内建函数make(T, args) 的目的不同于 new(T)。它只用于创建切片、映射和信道，并返回类型为 T（而非 <code>*T</code>）的一个已初始化 （而非置零）的值。例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">10</span>, <span class="number">100</span>) <span class="comment">//分配一个100个int的数组空间，接着创建一个长度为10，容量为100并且指向该数组前10个元素的切片结构</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>若要返回指针，请用new分配内存</p>
+</blockquote>
+<h3 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h3><p>切片是对数组的封装，保存了对底层数组的引用。若某个函数将一个切片作为参数传入时，函数对切片的修改对调用者而言是可见的。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(file *File)</span> <span class="title">Read</span><span class="params">(buf []<span class="keyword">byte</span>)</span> <span class="params">(n <span class="keyword">int</span>, err error)</span></span></span><br></pre></td></tr></table></figure>
+<p>若要从更大的缓冲区 b 中读取前 32 个字节，只需对其进行切片即可。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">n, err := f.Read(buf[<span class="number">0</span>:<span class="number">32</span>])</span><br></pre></td></tr></table></figure>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map的key可以是任何相等性操作符支持的类型， 如整数、浮点数、复数、字符串、指针、接口，结构以及数组，但不能是切片。</p>
+<p>若试图通过map中不存在的键来取值，就会返回与该映射中项的类型对应的零值。</p>
+<p>但这种设计我们不知道到底是不是因为不存在该项而得到零值，因此可以使用这种做法来检查：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> seconds <span class="keyword">int</span></span><br><span class="line"><span class="keyword">var</span> ok <span class="keyword">bool</span></span><br><span class="line">seconds, ok = timeZone[tz]</span><br></pre></td></tr></table></figure>
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><h3 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h3><p>Golang中的常量在编译时创建，而且只能是数字，字符，字符串或者布尔量。</p>
+<h3 id="init函数"><a href="#init函数" class="headerlink" title="init函数"></a>init函数</h3><p>init函数会在每个包完成初始化后自动执行，并且执行优先级会比main函数高，一般用来：</p>
+<ul>
+<li>对变量进行初始化；</li>
+<li>检查或者修复程序的状态；</li>
+<li>注册；</li>
+<li>进行一次计算；</li>
+</ul>
+<h2 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h2><p>golang的接口为指定对象的行为提供了一种途径，如果某个类型可以完成这个，那么它就可以被用在这里。通过实现 String 方法，我们可以自定义打印函数，而通过 Write 方法，Fprintf 则能对任何对象产生输出。</p>
+<p>例如一个实现了 sort.Interface 接口的集合就可通过 sort 包中的例程进行排序。该接口包括 Len()、Less(i, j int) bool 以及 Swap(i, j int)。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Sequence []<span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Methods required by sort.Interface.</span></span><br><span class="line"><span class="comment">// sort.Interface 所需的方法。</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span> <span class="title">Len</span><span class="params">()</span> <span class="title">int</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(s)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span> <span class="title">Less</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> s[i] &lt; s[j]</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span> <span class="title">Swap</span><span class="params">(i, j <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">    s[i], s[j] = s[j], s[i]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="接口转换和类型断言"><a href="#接口转换和类型断言" class="headerlink" title="接口转换和类型断言"></a>接口转换和类型断言</h3><p>类型选择是类型转换的一种形式：它接受一个接口，通过switch判断选择读经的case，并在某种意义上将其转换为该种类型。以下代码为 fmt.Printf 通过类型选择将值转换为字符串的简化版。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Stringer <span class="keyword">interface</span> &#123;</span><br><span class="line">    String() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> value <span class="keyword">interface</span>&#123;&#125; <span class="comment">// Value provided by caller.</span></span><br><span class="line"><span class="keyword">switch</span> str := value.(<span class="keyword">type</span>) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="keyword">string</span>:</span><br><span class="line">    <span class="keyword">return</span> str</span><br><span class="line"><span class="keyword">case</span> Stringer:</span><br><span class="line">    <span class="keyword">return</span> str.String()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一个接口类型的变量可能包含任何类型的值，因此我们需要用类型断言来检查其动态类型，即运行时在变量中存储的值的实际类型。例如我们可以测试某个时刻接口varI是否包含类型T的值：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> v, ok := varI.(T); ok &#123;  <span class="comment">// checked type assertion</span></span><br><span class="line">    Process(v)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// varI is not of type T</span></span><br></pre></td></tr></table></figure>
+<p>如果转换合法，那么v就是varI转换到类型T的值。</p>
+<h2 id="空白标识符"><a href="#空白标识符" class="headerlink" title="空白标识符"></a>空白标识符</h2><p>空白标识符可被赋予为任何类型的任何值，它表示只写的值，作为占位符。</p>
+<p>另外，空白标识符能使得那些未使用的导入和变量不受影响，能顺利通过编译，比如这样的程序，由于有两个未使用的导入和一个未使用的变量fd，因此不能编译。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"io"</span></span><br><span class="line">    <span class="string">"log"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fd, err := os.Open(<span class="string">"test.go"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> use fd.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过引入空白标识符，则可以顺利通过编译：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"io"</span></span><br><span class="line">    <span class="string">"log"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _ = fmt.Printf <span class="comment">// For debugging; delete when done. // 用于调试，结束时删除。</span></span><br><span class="line"><span class="keyword">var</span> _ io.Reader    <span class="comment">// For debugging; delete when done. // 用于调试，结束时删除。</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fd, err := os.Open(<span class="string">"test.go"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> use fd.</span></span><br><span class="line">    _ = fd</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还有一种用法，是为了使用其副作用而引入包，比如在 net/http/pprof 包的 init 函数中记录了 HTTP 处理程序的调试信息。它有个可导出的 API， 但大部分客户端只需要该处理程序的记录和通过 Web 页面访问数据。那么可以这样使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="string">"net/http/pprof"</span></span><br></pre></td></tr></table></figure>
+<h2 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h2><p>由于golang的多值返回，我们可以很轻易地返回各种类型的错误提示，按照约定，错误的类型通常为 error，这是一个内建的简单接口。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> error <span class="keyword">interface</span> &#123;</span><br><span class="line">    Error() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Panic"><a href="#Panic" class="headerlink" title="Panic"></a>Panic</h3><p>内建的panic函数，会产生一个运行时错误并终止程序，还会在程序终止时打印。比如这样：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CubeRoot</span><span class="params">(x <span class="keyword">float64</span>)</span> <span class="title">float64</span></span> &#123;</span><br><span class="line">    z := x/<span class="number">3</span>   <span class="comment">// Arbitrary initial value</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">1e6</span>; i++ &#123;</span><br><span class="line">        prevz := z</span><br><span class="line">        z -= (z*z*z-x) / (<span class="number">3</span>*z*z)</span><br><span class="line">        <span class="keyword">if</span> veryClose(z, prevz) &#123;</span><br><span class="line">            <span class="keyword">return</span> z</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// A million iterations has not converged; something is wrong.</span></span><br><span class="line">    <span class="built_in">panic</span>(fmt.Sprintf(<span class="string">"CubeRoot(%g) did not converge"</span>, x))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于panic被调用后，程序会终止当前函数的执行，并开始回溯goroutine的栈，当到达栈顶时，程序就会终止。不过我们可以用内建的 recover 函数来重新取回 goroutine 的控制权限并使其恢复正常执行。</p>
+<p> 由于在回溯时只有被推迟函数中的代码在运行，因此 recover 只能在被推迟的函数中才有效。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">server</span><span class="params">(workChan &lt;-<span class="keyword">chan</span> *Work)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> work := <span class="keyword">range</span> workChan &#123;</span><br><span class="line">        <span class="keyword">go</span> safelyDo(work)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">safelyDo</span><span class="params">(work *Work)</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> err := <span class="built_in">recover</span>(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            log.Println(<span class="string">"work failed:"</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">    do(work)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Golang实现Json序列化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1672,178 +1898,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/24/Linux内核学习——内核同步方法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/24/Linux内核学习——内核同步方法/" itemprop="url">Linux内核学习——内核同步方法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-24T21:32:58+08:00">
-                2018-07-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="内核同步方法"><a href="#内核同步方法" class="headerlink" title="内核同步方法"></a>内核同步方法</h1><h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>原子操作的意义在于要么就完整地执行所有的指令，要么就都不执行。在内核中提供了两组原子操作的接口——<strong>原子整数和原子位</strong>。</p>
-<h3 id="原子整数操作"><a href="#原子整数操作" class="headerlink" title="原子整数操作"></a>原子整数操作</h3><p>原子整数操作提供了一种新的数据类型，以避免原子操作函数与非原子操作函数使用相同的函数，同时也能屏蔽不同体系结构之间的差异：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">int</span> counter;</span><br><span class="line">&#125; <span class="keyword">atomic_t</span>;</span><br></pre></td></tr></table></figure>
-<p>在<strong>&lt;asm/atomic.h&gt;</strong>中提供了一系列原子整数操作的接口：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">atomic_t</span> v;</span><br><span class="line"><span class="keyword">atomic_t</span> u = ATOMIC_INIT(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">atomic_set(&amp;v, <span class="number">4</span>); <span class="comment">//v=4</span></span><br><span class="line">atomic_add(<span class="number">2</span>, &amp;v); <span class="comment">//v = v+4</span></span><br><span class="line">atomic_inc(&amp;v); <span class="comment">//v = v+1</span></span><br></pre></td></tr></table></figure>
-<p>原子整数操作最常见的应用就是计数器，例如可以在c++的智能指针中增加原子整数作为计数器。能用原子操作就尽量不用锁机制，增加效率。</p>
-<h3 id="64位原子操作"><a href="#64位原子操作" class="headerlink" title="64位原子操作"></a>64位原子操作</h3><p>随着64位系统的发展，内核开发者也引入了64位的atomic64_t。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">long</span> counter;</span><br><span class="line">&#125; <span class="keyword">atomic64_t</span>;</span><br></pre></td></tr></table></figure>
-<h3 id="原子位操作"><a href="#原子位操作" class="headerlink" title="原子位操作"></a>原子位操作</h3><p>与原子整数操作不同，原子位操作是在普通的内存地址上进行操作，因此原子位操作没有特定的类型，针对的只是普通指针类型。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> word = <span class="number">0</span>;</span><br><span class="line">set_bit(<span class="number">0</span>, &amp;word);<span class="comment">//设置第0位</span></span><br><span class="line">set_bit(<span class="number">1</span>, &amp;word);<span class="comment">//设置第1位</span></span><br></pre></td></tr></table></figure>
-<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>临界区的情况可能非常复杂，不能像上面那样只是简单声明原子变量就可以保证同步，因此就引入更为复杂的同步方法——锁。</p>
-<p>Linux内核中最常见的锁是自旋锁（spin lock）——这种锁最多只能被一个可执行线程持有。一个可争用的自旋锁会使得请求线程busy wait，不断消耗处理器的时间。当然有方法可以让线程先行睡眠，待锁可用时再唤醒。但考虑到上下文切换的消耗，如果持有锁的时间比较短，自旋锁是一个比较好的选择。</p>
-<p>如果持有自旋锁的时间小于两次上下文切换，那么可以选用自旋锁。</p>
-<h3 id="自旋锁方法"><a href="#自旋锁方法" class="headerlink" title="自旋锁方法"></a>自旋锁方法</h3><p>自旋锁的实现是和体系结构相关的，代码往往通过汇编来实现。基本的使用形式如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DEFINE_SPINLOCK(mr_lock);</span><br><span class="line">spin_lock(&amp;mr_lock);</span><br><span class="line"><span class="comment">/*临界区*/</span></span><br><span class="line">spin_unlock(&amp;my_lock);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>自旋锁不可递归，如果一个线程试图去获取一个自己已经拥有的自旋锁，就会陷入死锁</p>
-</blockquote>
-<h3 id="其它针对自旋锁的操作"><a href="#其它针对自旋锁的操作" class="headerlink" title="其它针对自旋锁的操作"></a>其它针对自旋锁的操作</h3><p>可以使用<strong>spin_lock_init()</strong>来初始化动态创建的自旋锁（此时返回一个指向spinlock_t类型的指针）。spin_try_lock()会试图获取某个特定的自旋锁，而spin_is_locked()方法则只是判断特定锁是否被占用。</p>
-<h3 id="自旋锁和下半部"><a href="#自旋锁和下半部" class="headerlink" title="自旋锁和下半部"></a>自旋锁和下半部</h3><p>与下半部配合使用时，我们在获取锁的时候需要禁止所有下半部的执行，因为下半部可以抢占进程上下文中的代码，此时可以使用方法——<strong>spin_lock_bh()</strong>。</p>
-<h2 id="读－写自旋锁"><a href="#读－写自旋锁" class="headerlink" title="读－写自旋锁"></a>读－写自旋锁</h2><p>由于锁的用途可以明确分为读取和写入两个场景，因此提供了读－写自旋锁进行保护。一个或者多个任务可以并发地拥有读者锁，但写者锁只能被一个写任务拥有。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">DEFINE_SPINLOCK(mr_rwlock);</span><br><span class="line">read_lock(&amp;mr_rwlock);</span><br><span class="line"><span class="comment">/*临界区，只读*/</span></span><br><span class="line">read_unlock(&amp;mr_rwlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*写者分支*/</span></span><br><span class="line">write_lock(&amp;mr_rwlock);</span><br><span class="line"><span class="comment">/*临界区*/</span></span><br><span class="line">write_unlock(&amp;mr_rwlock);</span><br></pre></td></tr></table></figure>
-<p>注意这样的一种死锁情况，写者锁不断自旋，等待读者锁释放</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">read_lock(&amp;mr_lock);</span><br><span class="line">write_lock(&amp;mr_lock);</span><br></pre></td></tr></table></figure>
-<h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>linux中的信号量实际上是一种睡眠锁，则任务试图获得一个不可用的信号量时，就会进入一个等待队列，然后处于休眠状态，此时处理器就可以释放。与自旋锁不同，信号量在等待锁时会睡眠，所以信号量适用于锁被长时间占有的情况。如果占有锁时间较短，那么维护队列，切换上下文的开销就不值得了。另外，在占有信号量时，不能同时占用自旋锁，因为拥有自旋锁时不允许睡眠。</p>
-<h3 id="计数信号量和二值信号量"><a href="#计数信号量和二值信号量" class="headerlink" title="计数信号量和二值信号量"></a>计数信号量和二值信号量</h3><p>信号量可以允许持有计数器，如果一个时刻只允许一个锁持有者，那就是二值信号量，如果计数可以大于1，那就是计数信号量。</p>
-<p>由于引入了计数机制，因此信号量支持两个原子操作P()和V()。一个将信号量计数减一来请求一个信号量，另一个则是讲信号加一来释放信号量。</p>
-<h3 id="创建和初始化信号量"><a href="#创建和初始化信号量" class="headerlink" title="创建和初始化信号量"></a>创建和初始化信号量</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> <span class="title">name</span>;</span></span><br><span class="line">sema_init(&amp;name, count);</span><br><span class="line"><span class="comment">//动态创建信号量</span></span><br><span class="line">init_MUTEX(sem);</span><br></pre></td></tr></table></figure>
-<h3 id="使用信号量"><a href="#使用信号量" class="headerlink" title="使用信号量"></a>使用信号量</h3><p>函数down_interruptible()会试图获取指定信号量，如果信号量不可用，它会将进程置成TASK_INTERRUPTLE状态，进入睡眠。</p>
-<h2 id="读－写信号量"><a href="#读－写信号量" class="headerlink" title="读－写信号量"></a>读－写信号量</h2><p>读写信号量与读写自旋锁差别不大，但是读写信号量相比读写自旋锁多一种特有的操作——<strong>downgrade_write()</strong>，这个函数可以动态地将获取的写锁转换为读锁。</p>
-<h2 id="互斥体"><a href="#互斥体" class="headerlink" title="互斥体"></a>互斥体</h2><p>互斥体(mutex)是指任何可以睡眠的强制互斥锁，就像计数是1的信号量。互斥体在内核中对应的数据结构为mutex：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//静态创建</span></span><br><span class="line">DEFINE_MUTEX(name);</span><br><span class="line"><span class="comment">//动态</span></span><br><span class="line">mutex_init(&amp;mutex);</span><br><span class="line"><span class="comment">//加锁、解锁</span></span><br><span class="line">mutex_lock(&amp;mutex);</span><br><span class="line">mutex_unlock(&amp;mutex);</span><br></pre></td></tr></table></figure>
-<p>相比信号量，mutex的限制更多：</p>
-<ul>
-<li>只有一个任务可以拥有mutex；</li>
-<li>给mutex上锁的任务必须负责解锁；</li>
-<li>不能递归地上锁和解锁；</li>
-<li>mutex不能在中断或者下半部使用；</li>
-<li>mutex只能通过官方API管理；</li>
-</ul>
-<blockquote>
-<p>尽量使用mutex，除非mutex的限制影响了你；除非是低开销的加锁、或者短期锁定，又或者需要在中断上下文加锁，某人都用mutex；</p>
-</blockquote>
-<h2 id="顺序锁"><a href="#顺序锁" class="headerlink" title="顺序锁"></a>顺序锁</h2><p>在2.6版本内核中引进了一种新型锁，顺序锁(seq)，通过一个序列计数器，在有数据写入的时候，就会得到一个锁，并且序列值增加。在读取数据之前和之后，会比较序列号，相同才证明数据没有被修改。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> seq;</span><br><span class="line"><span class="keyword">do</span>&#123;</span><br><span class="line">    seq = read_seqbegin(&amp;mr_seq_lock);</span><br><span class="line">&#125;<span class="keyword">while</span> (read_seqretry(&amp;mr_seq_lock, seq));</span><br></pre></td></tr></table></figure>
-<p>seq锁对于写者更有利，如果有写者，那么读数据就会不断进入循环。</p>
-<h2 id="禁止抢占"><a href="#禁止抢占" class="headerlink" title="禁止抢占"></a>禁止抢占</h2><p>由于内核是抢占性的，内核中的进程在任何时刻都可能停下了，另一个进程运行，这就可能出现临界区有两个进程。自旋锁可以避免这个问题，但某些情况不需要自旋锁，可以通过禁止抢占来实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">preempt_disable();</span><br><span class="line"><span class="comment">/*抢占被禁止...*/</span></span><br><span class="line">preempt_enable();</span><br></pre></td></tr></table></figure>
-<h2 id="顺序和屏障"><a href="#顺序和屏障" class="headerlink" title="顺序和屏障"></a>顺序和屏障</h2><p>当处理多处理器之间的同步问题时，我们可能需要在代码中指定读内存和写内存的指令，这种确保顺序的指令就叫屏障(barriers)。</p>
-<ul>
-<li>rmb()提供了读内存屏障，它确保跨越rmb()的载入动作不会发送重排；</li>
-<li>wmb()提供的是写内存屏障；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1892,7 +1946,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">228</span>
+                <span class="site-state-item-count">229</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
