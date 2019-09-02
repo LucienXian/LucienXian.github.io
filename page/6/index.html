@@ -265,6 +265,141 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/17/反向传播和其他的微分算法——DeepLearning系列/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/17/反向传播和其他的微分算法——DeepLearning系列/" itemprop="url">反向传播和其他的微分算法——DeepLearning系列</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-17T01:53:16+08:00">
+                2019-02-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="反向传播和其他的微分算法"><a href="#反向传播和其他的微分算法" class="headerlink" title="反向传播和其他的微分算法"></a>反向传播和其他的微分算法</h2><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在训练过程中，前向传播可以向前直到它产生一个标量代价函数$J(\theta)$，而反向传播会计算代价函数关于参数的梯度，即$\nabla_\theta J(\theta)$。</p>
+<h2 id="计算图"><a href="#计算图" class="headerlink" title="计算图"></a>计算图</h2><p>我们将计算形式转化为图形，形成计算图。那么我们每一个结点代表一个变量，操作则是一个或者多个变量的简单函数，我们定义一个操作仅仅返回单个输出变量。</p>
+<p>如果变量 y 是变量 x 通过一个操作计算得到的,那么我们画一条从 x 到 y 的有向边。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/compute_graph_dl6_8.png" alt="img"></p>
+<h2 id="微积分中的链式法则"><a href="#微积分中的链式法则" class="headerlink" title="微积分中的链式法则"></a>微积分中的链式法则</h2><p>微积分中的链式法则用于计算符合函数的导数。</p>
+<p>假设x是实数，f和g是从实数映射到实数的函数。假设y=g(x)并且z=f(g(x))=f(y)。那么就有：<br>$$<br>\frac{dz}{dx} = \frac{dz}{dy} \frac{dy}{dx}<br>$$<br>如果向向量的情况扩展：<br>$$<br>\frac{\alpha z}{\alpha x_i} = \sum_j \frac{\alpha z}{\alpha y_i} \frac{\alpha y_i}{\alpha x} \<br>\nabla_x{^z} = (\frac {\alpha y} {\alpha x})^T \nabla_y{^z}<br>$$<br>这个$ \frac {\alpha y} {\alpha x}$是g的Jacobian矩阵。</p>
+<p>当然，也可以将反向传播应用到任意维度的张量，在我们运行反向传播之前,将每个张量变平为一个向量，计算一个向量值梯度,然后将该梯度重新构造成一个张量。</p>
+<h2 id="递归地使用链式法则来实现反向传播"><a href="#递归地使用链式法则来实现反向传播" class="headerlink" title="递归地使用链式法则来实现反向传播"></a>递归地使用链式法则来实现反向传播</h2><p>使用链式法则，我们可以直接写出某个标量关于计算图中任何产生该标量的梯度的代数表达式，但一般计算机在计算时会引入一些额外的考虑。<br>$$<br>\frac{\alpha u^{(n)} }{\alpha x^{(j)} } = \sum_{i:j  \in Pa(u^{(i)})} \frac{\alpha u^{(n)} }{\alpha u^{(i)} } \frac{\alpha u^{(i)} }{\alpha u^{(j)} }<br>$$<br>考虑这种计算图，在计算梯度时导致子表达式重复计算：</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deeploearning_6_9.png" alt="img"></p>
+<p>为了计算z对w的梯度：<br>$$<br>\frac{\alpha z}{\alpha w} \<br>=\frac{\alpha z}{\alpha y} \frac{\alpha y}{\alpha x} \frac{\alpha x}{\alpha w} \<br>=f’(y)f’(x)f’(w) ………….1\<br>=f’(f(fw)) f’(f(w)) f’(w) ………….2<br>$$<br>对于1式，我们采用的实现方式是仅仅计算f(w)一次，并存储起来，这种方式减少了运行时间；</p>
+<p>而对于2式，每次只在需要时重新计算f(w)，在存储受限时它是有用的。</p>
+<h2 id="符号到符号的导数"><a href="#符号到符号的导数" class="headerlink" title="符号到符号的导数"></a>符号到符号的导数</h2><p>代数表达式和计算图都对符号或不具有特定值的变量进行操作，这些代数或者基于图的表达式就是符号表示。一些反向传播的方法采用计算图和一组用于图的输入的数值，然后返回在这些输入值处梯度的一组数值。我们将这种方法称为 符号到数值的微分。这是Torch和Caffe使用的方法；</p>
+<p>另一种方法则是采用计算图以及添加额外的结点到计算图中，其提供了我们需要导数的符号描述，这是Theano和TensorFlow采用的方法。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deaplearning_6_10.png" alt="img"></p>
+<h2 id="一般化的反向传播"><a href="#一般化的反向传播" class="headerlink" title="一般化的反向传播"></a>一般化的反向传播</h2><p>反向传播算法比较容易理解，其实就是为了计算某个标量z关于图中它的一个祖先x的梯度，我们首先观察到它关于z的梯度由1给出，然后，我们对图中z的每个父节点的梯度进行计算，通过现有的梯度乘以产生z的操作的Jacobian。如果从z触发经过多条路径到达父结点，我们应该对不同路径上的梯度进行求和。</p>
+<p>求解这种表达式$\frac{\alpha u^{(i)} }{\alpha u^{(j)} }$的时候，相同的计算可能会重复多次，为了避免重复计算，我们利用存储的中间结果$\frac{\alpha u^{(n)} }{\alpha u^{(i)} }$来进行补充计算。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/15/Java通配符学习/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1430,135 +1565,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/03/DESIGN-INTERFACES-FOR-POSTERITY/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/03/DESIGN-INTERFACES-FOR-POSTERITY/" itemprop="url">DESIGN INTERFACES FOR POSTERITY</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-03T17:04:33+08:00">
-                2019-02-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="DESIGN-INTERFACES-FOR-POSTERITY"><a href="#DESIGN-INTERFACES-FOR-POSTERITY" class="headerlink" title="DESIGN INTERFACES FOR POSTERITY"></a>DESIGN INTERFACES FOR POSTERITY</h1><p>##概述</p>
-<p>在Java8之前，要想往接口添加方法，就必须要破坏现有接口的实现类。在Java时，添加了默认方法构造，使得可以在不破坏现有接口实现类的情况下，可以将方法加入现有接口。</p>
-<h2 id="风险"><a href="#风险" class="headerlink" title="风险"></a>风险</h2><p>虽然Java加入默认方法使得我们可以往现有接口里添加方法，但这并不保证这些方法会在现有的接口实现类里工作。而在Java8之前，这些接口实现类都是基于默认接口不会添加任何新方法的情况下编写的。</p>
-<p>在Java8里，很多新的默认方法被加入到核心的集合接口里，以便促进lambda表达式的使用。</p>
-<blockquote>
-<p>The Java libraries’ default methods are high-quality general-purpose implementations, and in most cases, they work fine. But <strong>it is not always possible to write a default method that maintains all invariants of every conceivable implementation.</strong></p>
-</blockquote>
-<p>例如，考虑removeIf方法的情况，这个方法在Java 8里被添加进集合接口。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Default method added to the Collection interface in Java 8</span></span><br><span class="line"><span class="function"><span class="keyword">default</span> <span class="keyword">boolean</span> <span class="title">removeIf</span><span class="params">(Predicate&lt;? <span class="keyword">super</span> E&gt; filter)</span> </span>&#123;</span><br><span class="line">    Objects.requireNonNull(filter);</span><br><span class="line">    <span class="keyword">boolean</span> result = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (Iterator&lt;E&gt; it = iterator(); it.hasNext(); ) &#123;</span><br><span class="line">        <span class="keyword">if</span> (filter.test(it.next())) &#123;</span><br><span class="line">            it.remove();</span><br><span class="line">            result = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>虽然这已经是该方法最好的通用实现了，但遗憾的是，它在现实中的一些集合框架里是无法工作的。例如，考虑org.apache.commons.collections4.collection.SynchronizedCollection。这个来自Apache公共库的类，并未覆盖removeIf方法。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1607,7 +1613,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">229</span>
+                <span class="site-state-item-count">230</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

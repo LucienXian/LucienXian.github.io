@@ -265,6 +265,140 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/03/Effective-cpp-12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/03/Effective-cpp-12/" itemprop="url">Effective-cpp-#12</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-03T00:02:45+08:00">
+                2017-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="copy-all-parts-of-an-object"><a href="#copy-all-parts-of-an-object" class="headerlink" title="copy all parts of an object"></a>copy all parts of an object</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><ul>
+<li>局部的拷贝，编译器是允许的。假如你自定义了一个拷贝构造函数或者拷贝复制函数，但函数内部只复制了部分的成员变量，那么编译器并不会报错。</li>
+<li>另一个问题是在继承时，由于子类无法访问基类的私有变量，那么拷贝构造函数可能会没有拷贝所有成员变量，而是由基类的default constructor初始化成员变量；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Customer</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	...</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line">  Date last;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PriorityCustomer</span>:</span> <span class="keyword">public</span> Customer&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  PriorityCustomer(<span class="keyword">const</span> PriorityCustomer&amp; rhs):priority(rhs.prioruty)&#123;&#125;</span><br><span class="line">  <span class="comment">//在这种情况，基类成员的初始化是在default constructor中完成的</span></span><br><span class="line">  PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">    priority = rhs.priority;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">int</span> priority;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ul>
+<li>针对第一种情况，要注意在修改类之后，要同时修改两个拷贝函数；</li>
+<li>第二情况，则需要让派生类去调用基类的copy函数；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PriorityCustomer(<span class="keyword">const</span> PriorityCustomer&amp; rhs):Customer(rhs) ,priority(rhs.prioruty)&#123;&#125;</span><br><span class="line"><span class="comment">//分别调用基类的copy函数</span></span><br><span class="line">PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">	Customer::<span class="keyword">operator</span>=(rhs);</span><br><span class="line">  priority = rhs.priority;</span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="注意问题"><a href="#注意问题" class="headerlink" title="注意问题"></a>注意问题</h2><ul>
+<li>不应该在copy assignment操作符函数中调用copy构造函数，因为这相当于初始化一个已经存在存在的对象，这没意义，并且增加复杂度；</li>
+<li>也不应该在copy构造函数中调用copy assignment操作符，这相当于在一个尚未初始化的对象身上做“对已经初始化的对象的操作”；</li>
+<li>往往以上两种操作都很有可能造成循环调用；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/01/死锁-Deadlock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1552,148 +1686,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/Effective-cpp-5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/22/Effective-cpp-5/" itemprop="url">Effective-cpp-#5</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-22T23:48:17+08:00">
-                2017-11-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Know-what-functions-C-silently-writes-and-calls"><a href="#Know-what-functions-C-silently-writes-and-calls" class="headerlink" title="Know what functions C++ silently writes and calls"></a>Know what functions C++ silently writes and calls</h1><h2 id="关于类的构造、析构、和拷贝构造、拷贝赋值函数"><a href="#关于类的构造、析构、和拷贝构造、拷贝赋值函数" class="headerlink" title="关于类的构造、析构、和拷贝构造、拷贝赋值函数"></a>关于类的构造、析构、和拷贝构造、拷贝赋值函数</h2><ul>
-<li>如果自定义类时没有创建构造函数、析构函数、拷贝构造函数和拷贝赋值函数，编译器会默认为类创建；</li>
-</ul>
-<ul>
-<li>copy构造函数和copy赋值函数，编译器创建的版本只是简单地将类中每一个non-static对象拷贝到目标对象；</li>
-</ul>
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ol>
-<li>类中的成员变量为引用类型，此时使用默认函数容易出错；</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">NamedObj</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	NamedObj(<span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> T&amp; value);</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="built_in">std</span>::<span class="built_in">string</span>&amp; nameValue;</span><br><span class="line">  	<span class="keyword">const</span> T&amp; objValue;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">NamedObj&lt;<span class="keyword">int</span>&gt; p(<span class="string">"dog"</span>, <span class="number">2</span>);</span><br><span class="line">NamedObj&lt;<span class="keyword">int</span>&gt; q(<span class="string">"cat"</span>, <span class="number">3</span>);</span><br><span class="line">p = s;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>倘若该例子没有错，那么p.nameValue和s.nameValue是否指向同一个string呢？如果指向同一个对象，你们就意味着reference被改变了，但是C++<strong>不允许reference改变指向不同的对象</strong>；</li>
-<li>此时，编译器会拒绝编译这一行的赋值；</li>
-</ul>
-<ol>
-<li>同理，对面对const成员变量也一样。由于更改const是不合法的，因此编译器也会拒绝进行赋值；</li>
-</ol>
-<ol>
-<li>如果某个基类将copy赋值函数声明为private的，那么编译器会拒绝为派生类生成一个copy赋值函数，因为编译器需要权限去处理基类的成分（在编译时，编译器会假设copy赋值函数需要处理基类的成分）。</li>
-</ol>
-<h2 id="提醒"><a href="#提醒" class="headerlink" title="提醒"></a>提醒</h2><ul>
-<li>编译器会暗自创建构造函数、析构函数、拷贝构造函数和拷贝赋值函数；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1742,7 +1734,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">229</span>
+                <span class="site-state-item-count">230</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
