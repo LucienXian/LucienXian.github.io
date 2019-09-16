@@ -265,6 +265,132 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/17/消除未检查警告/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/17/消除未检查警告/" itemprop="url">消除未检查警告</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-17T15:25:05+08:00">
+                2019-02-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在编译过程中出现warning的时候，我们应该根据编译器的指示来进行修正，让警告消失。</p>
+<p>对于不能消除的警告，如果能够引起这个警告的代码是类型安全的话，那么就可以使用注解<strong>@SuppressWarnings(“unchecked”)</strong>来禁止这个警告。该注解可以在任意声明上使用，从单独的局部变量到整个类都可以，但我们应该在尽可能小的作用域上使用该注解。永远不要在整个类上使用SuppressWarnings注解。</p>
+<p>对于以下的方法，编译的时候会生成warning：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123; </span><br><span class="line">    <span class="keyword">if</span> (a.length &lt; size)</span><br><span class="line">        <span class="keyword">return</span> (T[]) Arrays.copyOf(elements, size, a.getClass()); </span><br><span class="line">    System.arraycopy(elements, <span class="number">0</span>, a, <span class="number">0</span>, size);</span><br><span class="line">    <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">        a[size] = <span class="keyword">null</span>; </span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ArrayList.java:<span class="number">305</span>: warning: [unchecked] <span class="function">unchecked cast <span class="title">return</span> <span class="params">(T[])</span> Arrays.<span class="title">copyOf</span><span class="params">(elements, size, a.getClass()</span>)</span>;</span><br><span class="line">                                                                     ^ </span><br><span class="line">required: T[]</span><br><span class="line">found: Object[]</span><br></pre></td></tr></table></figure>
+<p>对于这种情况，我们不能将注解放在返回语句上，因为其不是一个声明。因此我们可以声明一个局部变量来保存返回值，并注解这个局部变量的声明，并且需要在注释里记录禁止warning的原因：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Adding local variable to reduce scope of @SuppressWarnings</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123;</span><br><span class="line">    <span class="keyword">if</span> (a.length &lt; size) &#123;</span><br><span class="line">        <span class="comment">// This cast is correct because the array we're creating</span></span><br><span class="line">        <span class="comment">// is of the same type as the one passed in, which is T[].</span></span><br><span class="line">        <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>) </span><br><span class="line">        T[] result = (T[]) Arrays.copyOf(elements, size, a.getClass());</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    System.arraycopy(elements, <span class="number">0</span>, a, <span class="number">0</span>, size); </span><br><span class="line">    <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">        a[size] = <span class="keyword">null</span>; </span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/17/反向传播和其他的微分算法——DeepLearning系列/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1437,139 +1563,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/06/实例：学习XOR——DeepLearning系列/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/06/实例：学习XOR——DeepLearning系列/" itemprop="url">实例：学习XOR——DeepLearning系列</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-06T01:11:48+08:00">
-                2019-02-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="实例：学习XOR"><a href="#实例：学习XOR" class="headerlink" title="实例：学习XOR"></a>实例：学习XOR</h1><h2 id="前馈神经网络"><a href="#前馈神经网络" class="headerlink" title="前馈神经网络"></a>前馈神经网络</h2><p>前馈神经网络(feedforward netural network)是典型的深度学习模型，目标是近似某个函数f*。例如对于分类器，则是</p>
-<p>$y = f^*{(x)}$将输入x映射到一个类别y，前馈网络定义了一个映射$y=f(x, \theta)$，并且学习参数$\theta$的值，使得它可以获得最佳的函数近似。</p>
-<p>前馈神经网络是由许多不同的函数符合组成表示的，例如，我们有这样的结构$f(x)=f^{(3)}(f^{(2)}(f^{(1)}(x)))$，这种链式结构是比较典型的神经网络结构。前馈网络的最后一层被称为输出层，每个样本x都伴随着一个类别$y \approx f^*(x)$。由于训练数据没有指明隐藏层在每一点x上必须做什么，因此学习算法必须要自行决定产生想要的输出。</p>
-<h2 id="实例：学习XOR-1"><a href="#实例：学习XOR-1" class="headerlink" title="实例：学习XOR"></a>实例：学习XOR</h2><p>为了了解前馈网络，我们从一个完整的前馈网络说起：学习XOR函数，这是两个二进制值x1和x2的运算。这个例子中，我们不关心统计泛化，而是希望在四个点{[0, 0], [0, 1], [1, 0], [1, 1]}上都表现正确。</p>
-<p>评估整个训练集上表现的的MSE损失函数为：<br>$$<br>J(\theta) = 1/4 \sum_x (f^*(x) - f(x, \theta))^2<br>$$<br>假设我们选择一个线性模型：<br>$$<br>f(x, w, b) = x^Tw+b<br>$$<br>我们如果使用正规方程关于w和b最小化$J(\theta)$，得到w=0以及b=1/2。但这不是一个正确的解，因为直接应用于原始输入的线性模型不能实现XOR函数，当x1=0时，模型的输出必须随着x2的增大而增大。而x1=1时，模型的输出必须随着x2的增大而减小。</p>
-<p>因此，我们必须引入一个前馈神经网络，它有一层隐藏层并且隐藏层包含两个单元。这个网络通过函数f(x, W, x)计算的搭配的隐藏单元的向量h，这些隐藏单元的值被用作第二层即输出层，输出层还是一个线性回归模型。在由神经网络提取的特征表示的变换空间中，非线性特征点映射到另外的特征空间，这样就可以使用线性模型。</p>
-<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/xor_sample1.png" alt="img"></p>
-<p>由于我们必须使用非线性函数来描述这些特征，因此大多数神经网络通过仿射变换后紧跟着一个激活函数的固定非线性函数来实现这个目标。默认推荐的是使用激活函数$g(z)=max{0, z}$定义的整流线性单元或者ReLU。</p>
-<p>那么就可以指明现在的整个网络是：<br>$$<br>f(x, W, c, w, b) = w^T max{0, W^Tx+c} + b<br>$$</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1613,7 +1611,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">230</span>
+                <span class="site-state-item-count">231</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

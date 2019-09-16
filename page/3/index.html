@@ -265,6 +265,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/04/Move-Contsructor-rvalue-References/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/04/Move-Contsructor-rvalue-References/" itemprop="url">Move Contsructor & rvalue References</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-04T11:27:42+08:00">
+                2019-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Move-Contsructor-amp-rvalue-References"><a href="#Move-Contsructor-amp-rvalue-References" class="headerlink" title="Move Contsructor &amp; rvalue References"></a>Move Contsructor &amp; rvalue References</h1><h2 id="Problem-of-Temporary-Objects"><a href="#Problem-of-Temporary-Objects" class="headerlink" title="Problem of Temporary Objects"></a>Problem of Temporary Objects</h2><p>这篇文章的主要目的是研究如何使用move语义去降低内存中临时对象的负载。每次从函数中返回一个对象时，都会有一个临时对象被创建出来，然后进行拷贝。最终我们将会创建出两个对象，但实质上我们只需要一个。</p>
+<p>举个例子，我们有一个容器类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Container</span> &#123;</span></span><br><span class="line">		<span class="keyword">int</span> * m_Data;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Container() &#123;</span><br><span class="line">        <span class="comment">//Allocate an array of 20 int on heap</span></span><br><span class="line">        m_Data = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];</span><br><span class="line"></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Constructor: Allocation 20 int"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ~Container() &#123;</span><br><span class="line">        <span class="keyword">if</span> (m_Data) &#123;</span><br><span class="line">          <span class="keyword">delete</span>[] m_Data;</span><br><span class="line">          m_Data = <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    Container(<span class="keyword">const</span> Container &amp; obj) &#123;</span><br><span class="line">        <span class="comment">//Allocate an array of 20 int on heap</span></span><br><span class="line">        m_Data = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Copy the data from passed object</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">20</span>; i++)</span><br><span class="line">          	m_Data[i] = obj.m_Data[i];</span><br><span class="line"></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Copy Constructor: Allocation 20 int"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这个类中，我们每次创建一个容器对象，其默认构造器都会分配一个20个int大的数组在堆上。同理，容器类的靠背构造器也会做类似的工作，首先是分配数组，然后将传递进的数组内容拷贝到新创建出数组里。</p>
+<p>一般来说，我们使用工厂类来创建对象：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Container <span class="title">getContainer</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Container obj;</span><br><span class="line">    <span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设我们创建一个容器类型的vector，每次插入一个由getContainer()返回的对象：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Create a vector of Container Type</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Container&gt; vecOfContainers;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Add object returned by function into the vector</span></span><br><span class="line">    vecOfContainers.push_back(getContainer());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>vector里的一个对象，实际上背后我们为此创建了两个对象。</p>
+<ul>
+<li>一个是在getContainer()使用Container类的默认函数创建出来的；</li>
+<li>一个是在加入vector中使用Container类的拷贝构造函数创建出来的；</li>
+</ul>
+<p>这样每一个对象，都会带来两次在heap上创建数组。</p>
+<h2 id="Solving-Problem-of-Temporary-Objects-using-rvalue-references-amp-Move-Constructor"><a href="#Solving-Problem-of-Temporary-Objects-using-rvalue-references-amp-Move-Constructor" class="headerlink" title="Solving Problem of Temporary Objects using rvalue references &amp; Move Constructor"></a>Solving Problem of Temporary Objects using rvalue references &amp; Move Constructor</h2><p>getContainer()函数实际上是一个右值，所以可以被右值引用指向。因此为了实现这个目的，我们可以重载一个新的构造器，即move构造器：</p>
+<h2 id="Move-Constructor"><a href="#Move-Constructor" class="headerlink" title="Move Constructor"></a>Move Constructor</h2><p>Move构造函数将右值引用作为参数，并重载该函数。在move构造函数中，我们只是将传递对象的成员变量move到新对象的成员变量中，而不是分配新内存。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Container(Container &amp;&amp; obj)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Just copy the pointer</span></span><br><span class="line">    m_Data = obj.m_Data;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set the passed object's member to NULL</span></span><br><span class="line">    obj.m_Data = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Move Constructor"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在移动构造函数中，我们只是复制了指针，即成员变量m_Data指向了堆上的相同内存，然后将传递进的对象的m_Data设置为NULL。所以我们并没有在该构造函数中分配新的内存，而是转移了内存的控制。</p>
+<p>现在再将getContainer()返回的对象push到数组中，由于getContainer()是一个右值，因此会调用container类的move构造器，此时只会创建一个整数数组。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/03/Rvalue-in-C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1486,143 +1624,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/20/Passing-Arguments-to-Threads/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/20/Passing-Arguments-to-Threads/" itemprop="url">Passing Arguments to Threads</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-20T11:49:07+08:00">
-                2019-04-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Passing-Arguments-to-Threads"><a href="#Passing-Arguments-to-Threads" class="headerlink" title="Passing Arguments to Threads"></a>Passing Arguments to Threads</h1><p>要想传递参数给线程相关的回调对象或者函数，可以通过在std::thread的构造器中传递，默认情况下，所有的参数都会被拷贝进线程的内部存储。</p>
-<h2 id="Passing-simple-arguments-to-a-std-thread-in-C-11"><a href="#Passing-simple-arguments-to-a-std-thread-in-C-11" class="headerlink" title="Passing simple arguments to a std::thread in C++11"></a>Passing simple arguments to a std::thread in C++11</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">threadCallback</span><span class="params">(<span class="keyword">int</span> x, <span class="built_in">std</span>::<span class="built_in">string</span> str)</span></span>&#123; ... &#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> str = <span class="string">"Sample String"</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">(threadCallback, x, str)</span></span>;</span><br><span class="line">    threadObj.join();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="How-not-to-pass-arguments-to-threads-in-C-11"><a href="#How-not-to-pass-arguments-to-threads-in-C-11" class="headerlink" title="How not to pass arguments to threads in C++11"></a>How not to pass arguments to threads in C++11</h2><p>不要将变量的地址从本地栈传递给线程的回调函数，因为线程1中的局部变量可能已经不在作用域，但线程2访问了它的非法地址。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">newThreadCallback</span><span class="params">(<span class="keyword">int</span> * p)</span> </span>&#123; ... &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">startNewThread</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">t</span><span class="params">(newThreadCallback,&amp;i)</span></span>;</span><br><span class="line">    t.detach();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>同样要注意的是，不要把指向位于堆上内存的指针传递进线程，因为有可能在新线程访问之前，原线程已经删除了该内存。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">newThreadCallback</span><span class="params">(<span class="keyword">int</span> * p)</span> </span>&#123; ... &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">startNewThread</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> * p = <span class="keyword">new</span> <span class="keyword">int</span>();</span><br><span class="line">    *p = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">t</span><span class="params">(newThreadCallback,p)</span></span>;</span><br><span class="line">    t.detach();</span><br><span class="line">  	<span class="keyword">delete</span> p;</span><br><span class="line">    p = <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="How-to-pass-references-to-std-thread-in-C-11"><a href="#How-to-pass-references-to-std-thread-in-C-11" class="headerlink" title="How to pass references to std::thread in C++11"></a>How to pass references to std::thread in C++11</h2><p>如果是传递引用，参数会被拷贝进线程栈：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">threadCallback</span><span class="params">(<span class="keyword">int</span> <span class="keyword">const</span> &amp; x)</span> </span>&#123;&#125; <span class="comment">//change x</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">(threadCallback, x)</span></span>;</span><br><span class="line">    threadObj.join();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这种情况下，线程内部对于x的改动，外部域是看不到的。因为线程函数threadCallback中的x引用了在新线程堆栈中复制的临时值。</p>
-<p>如果想要外部也是可视的，可以使用std::ref。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">threadCallback</span><span class="params">(<span class="keyword">int</span> <span class="keyword">const</span> &amp; x)</span> </span>&#123;&#125; <span class="comment">//hange x</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">(threadCallback, <span class="built_in">std</span>::ref(x))</span></span>;</span><br><span class="line">    threadObj.join();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Assigning-pointer-to-member-function-of-a-class-as-thread-function"><a href="#Assigning-pointer-to-member-function-of-a-class-as-thread-function" class="headerlink" title="Assigning pointer to member function of a class as thread function"></a>Assigning pointer to member function of a class as thread function</h2><p>将指向类成员函数的指针传递给回调函数，并将指针作为第二个参数传递给object：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DummyClass</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    DummyClass()</span><br><span class="line">    &#123;&#125;</span><br><span class="line">    DummyClass(<span class="keyword">const</span> DummyClass &amp; obj)</span><br><span class="line">    &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sampleMemberFunction</span><span class="params">(<span class="keyword">int</span> x)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Inside sampleMemberFunction "</span>&lt;&lt;x&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">    DummyClass dummyObj;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">threadObj</span><span class="params">(&amp;DummyClass::sampleMemberFunction,&amp;dummyObj, x)</span></span>;</span><br><span class="line">    threadObj.join();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1666,7 +1672,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">230</span>
+                <span class="site-state-item-count">231</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

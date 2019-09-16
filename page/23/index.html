@@ -265,6 +265,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/30/区块链学习-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/30/区块链学习-1/" itemprop="url">区块链学习<1></1></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-30T23:29:16+08:00">
+                2017-10-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="区块链学习-lt-一-gt-核心技术概览"><a href="#区块链学习-lt-一-gt-核心技术概览" class="headerlink" title="区块链学习&lt;一&gt; 核心技术概览"></a>区块链学习&lt;一&gt; 核心技术概览</h1><p><br></p>
+<h2 id="定义与原理"><a href="#定义与原理" class="headerlink" title="定义与原理"></a>定义与原理</h2><blockquote>
+<p>区块链最早出现应用在比特币项目中，作为比特币背后的分布式记账平台。</p>
+</blockquote>
+<ul>
+<li>transaction：一次对账本的操作，导致账本状态的改变；</li>
+<li>block：记录着一段时间内交易状态和结果；</li>
+<li>chain：由block按照发生顺序连接而成，相当于账本的日志记录；</li>
+</ul>
+<p><br></p>
+<p>假设存在一个分布式的记账本，这个账本只允许添加，不允许删除。而这个账本的底层数据结构是由一个线性链表组成的，其中每个元素即block。后续block的加入要加入前一个block的信息，并必须得到共识机制来选择。</p>
+<p>任何结点都可以提一个区块。</p>
+<p><br></p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>基于区块链的分布式账本应具备以下特点：</p>
+<ul>
+<li>维护一条不断增长的链，只能添加，禁止删除；</li>
+<li>去中心化，避免集中控制，达成共识过程采用分布式的做法；</li>
+<li>基于密码学的特性来避免交易被破坏；</li>
+</ul>
+<p><br></p>
+<h2 id="分布式共识"><a href="#分布式共识" class="headerlink" title="分布式共识"></a>分布式共识</h2><p>其实这个。。。我也不大懂，大概意思就是怎样确保某个transaction能在分布式网络中得到一致的、同步的执行结果，而且这个执行结果被多方确认，同时这个执行结果是一旦确定就无法被推翻的。</p>
+<p>目前学术界和工业界大概确定了两类算法思想：</p>
+<ul>
+<li>基于概率的算法；</li>
+<li>确定性算法；</li>
+</ul>
+<h2 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h2><p>区块链衡量性能的指标主要以<strong>transactions per second</strong>即<strong>tps</strong>为主，区块链系统不能通过单纯增加结点来进行扩展，很大程度上取决于单个节点的处理能力，因为当节点数过多时，可能会因为一致性的达成过程所需时间过长而降低全网的性能。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/28/chaincode-lifecycle/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1738,173 +1884,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/05/bomb-lab解题报告-CMU15213/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/05/bomb-lab解题报告-CMU15213/" itemprop="url">bomb lab解题报告(CMU15213)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-05T15:33:06+08:00">
-                2017-08-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="phase5"><a href="#phase5" class="headerlink" title="phase5"></a>phase5</h2><ol>
-<li>应该输入一个字符串，可以知道字符串长度为6；rbx是这个字符串所在位置；</li>
-</ol>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/1.png" alt="image"></p>
-<ol>
-<li><p>从最下面可以知道，这一段是循环，循环六次跳出；从+41开始，首先是rbx+rax所指向的值赋予给ecx，ecx的低八位赋给rsp的所指向的地址，然后再赋值给rdx，然后将这个值的低八位再赋值给rsp+rax+16;<br></p>
-<p>总结一下，由于rbx存着输入字符串的地址，eax贡献了从0~5的偏移，也就是把输入字符串的六个字符分别赋值给rdx，然后通过与0xf与操作，取出低4位，这个值作为偏移量取0x4024b0后某个变量的值，将这个变量的低八位放到rsp+rax+16上，也就是循环结束时，rsp+16 ～ rsp+21 这6个字节上存储着从0x4024b0开始的一段地址内搬运来的6个变量。</p>
-</li>
-</ol>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/2.png" alt="image"></p>
-<ol>
-<li>紧接着是比较新的字符串和0x40245e内的字符串是否相等，如果相等，则返回0，成功跳出函数</li>
-</ol>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/3.png" alt="image"></p>
-<ol>
-<li><p>查看0x4024b0和0x40245e的值，计算偏移量为9 15 14 5 6 7，对应的二进制1001 1111 1100 0101 0110 0111<br></p>
-<p>然后查看ascii码表，找出对应的低四位为上面哪几个字符就好，例如9FC567</p>
-</li>
-</ol>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/4.png" alt="image"></p>
-<h2 id="phase6"><a href="#phase6" class="headerlink" title="phase6"></a>phase6</h2><p>参考资料：<a href="http://blog.csdn.net/jason_ranger/article/details/51593255" target="_blank" rel="noopener">http://blog.csdn.net/jason_ranger/article/details/51593255</a></p>
-<p>第六个非常长啊。。。。看了我好久，还好有前人的解题报告可以参考；<br></p>
-<p>首先：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/p6_1.png" alt="image"></p>
-<p>第一部分，函数（read_six_numbers）将输入两个数字存在<strong>rsp</strong>连续的24个字节中；然后将rsp存在r14中，r12被赋值0；r13所指的值是第一个输入数<br></p>
-<p>开始while循环，将r13的值赋予rbp，r13所指的值赋给eax，然后eax-1要小于或者等于5，则输入第一个数要小于或者等于6；然后r12加1，与6比较(while循环6次)，然后将r12赋值给<strong>ebx</strong>，再将其赋值给eax（也就是由1~6）；接着rsp+4*rax与rbp（rbp与r13挂钩）比较，必须不想等，否则bomb；如果成功跳过，ebx+1与5比较（for循环）；这一段就是num1要与num2,num3,num4,num5,num6都不相等；<br></p>
-<p>然后r13加4，也就是，重复while循环，num2分别与num3,num4,num5,num6都不相等。。。。。。。。。<br></p>
-<p>第二部分：<br><img src="http://ou7boskhm.bkt.clouddn.com/p6_2.png" alt="image"></p>
-<p>就是把输入的六个数变为7-num，例如1，2，3，4，5，6变为6，5，4，3，2，1</p>
-<p>第三部分：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/p7_2.png" alt="image"></p>
-<p>这一部分是参考上述链接的：</p>
-<p>如果小于等于1则跳到401183：edx赋成0x6032d0，rdx被赋给rsp+2*rsi+32所指向的为止，然后rsi加上4，与24比较，如果相等则跳出这个循环，否则将ecx被赋值成rsp+rsi所指向的值，继续与1比较的过程<br></p>
-<p>不妨假设我们输入的第一个数就是6，所以从401174跳到401197，ecx到这里变成了1，这样满足40119d的跳跃条件，跳到401183，edx赋成6032d0，然后把rdx存到rsp+32的位置（这时rsi是0），然后rsi加上4;<br></p>
-<p>这时可以查看0x6032d0及其后面连续的地址存着什么：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/num.png" alt="image"></p>
-<p>例如我们输入的1，2，3，4，5，6，7-num之后，链表顺序变为node6，node5，node4，node3，node2，node1</p>
-<p>第四部分是将其连起来：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/p6_3.png" alt="image"></p>
-<p>第五部分：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/p6_4.png" alt="image"></p>
-<p>这首先把eax赋值成rbx+8的值（rbx在上一个循环中等于rsp+32，第一个节点的地址），然后将eax与rbx所指的结点比较，这里是一个循环，循环五次，依次将前一个结点与后一个比较，要求前面的更大；<br></p>
-<p>观察第三部分的第二张图，可以知道重排链表是: node3 node4 node5 node6 node1 node2；由于7-num；因此输入的是<strong>4 3 2 1 6 5</strong>；</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/22/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><span class="page-number current">23</span>
+    <a class="extend prev" rel="prev" href="/page/22/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><span class="page-number current">23</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/24/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1948,7 +1932,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">230</span>
+                <span class="site-state-item-count">231</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

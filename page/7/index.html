@@ -265,6 +265,134 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/06/实例：学习XOR——DeepLearning系列/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/06/实例：学习XOR——DeepLearning系列/" itemprop="url">实例：学习XOR——DeepLearning系列</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-06T01:11:48+08:00">
+                2019-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="实例：学习XOR"><a href="#实例：学习XOR" class="headerlink" title="实例：学习XOR"></a>实例：学习XOR</h1><h2 id="前馈神经网络"><a href="#前馈神经网络" class="headerlink" title="前馈神经网络"></a>前馈神经网络</h2><p>前馈神经网络(feedforward netural network)是典型的深度学习模型，目标是近似某个函数f*。例如对于分类器，则是</p>
+<p>$y = f^*{(x)}$将输入x映射到一个类别y，前馈网络定义了一个映射$y=f(x, \theta)$，并且学习参数$\theta$的值，使得它可以获得最佳的函数近似。</p>
+<p>前馈神经网络是由许多不同的函数符合组成表示的，例如，我们有这样的结构$f(x)=f^{(3)}(f^{(2)}(f^{(1)}(x)))$，这种链式结构是比较典型的神经网络结构。前馈网络的最后一层被称为输出层，每个样本x都伴随着一个类别$y \approx f^*(x)$。由于训练数据没有指明隐藏层在每一点x上必须做什么，因此学习算法必须要自行决定产生想要的输出。</p>
+<h2 id="实例：学习XOR-1"><a href="#实例：学习XOR-1" class="headerlink" title="实例：学习XOR"></a>实例：学习XOR</h2><p>为了了解前馈网络，我们从一个完整的前馈网络说起：学习XOR函数，这是两个二进制值x1和x2的运算。这个例子中，我们不关心统计泛化，而是希望在四个点{[0, 0], [0, 1], [1, 0], [1, 1]}上都表现正确。</p>
+<p>评估整个训练集上表现的的MSE损失函数为：<br>$$<br>J(\theta) = 1/4 \sum_x (f^*(x) - f(x, \theta))^2<br>$$<br>假设我们选择一个线性模型：<br>$$<br>f(x, w, b) = x^Tw+b<br>$$<br>我们如果使用正规方程关于w和b最小化$J(\theta)$，得到w=0以及b=1/2。但这不是一个正确的解，因为直接应用于原始输入的线性模型不能实现XOR函数，当x1=0时，模型的输出必须随着x2的增大而增大。而x1=1时，模型的输出必须随着x2的增大而减小。</p>
+<p>因此，我们必须引入一个前馈神经网络，它有一层隐藏层并且隐藏层包含两个单元。这个网络通过函数f(x, W, x)计算的搭配的隐藏单元的向量h，这些隐藏单元的值被用作第二层即输出层，输出层还是一个线性回归模型。在由神经网络提取的特征表示的变换空间中，非线性特征点映射到另外的特征空间，这样就可以使用线性模型。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/xor_sample1.png" alt="img"></p>
+<p>由于我们必须使用非线性函数来描述这些特征，因此大多数神经网络通过仿射变换后紧跟着一个激活函数的固定非线性函数来实现这个目标。默认推荐的是使用激活函数$g(z)=max{0, z}$定义的整流线性单元或者ReLU。</p>
+<p>那么就可以指明现在的整个网络是：<br>$$<br>f(x, W, c, w, b) = w^T max{0, W^Tx+c} + b<br>$$</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/03/DESIGN-INTERFACES-FOR-POSTERITY/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1610,136 +1738,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/组合优先于继承/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/26/组合优先于继承/" itemprop="url">组合优先于继承</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:43:21+08:00">
-                2019-01-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="组合优于继承"><a href="#组合优于继承" class="headerlink" title="组合优于继承"></a>组合优于继承</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>对于继承而言，这是代码复用的一种有效途径。在同一个包中使用继承是安全的，另外，如果类是专门设计来被继承而且具有良好文档，那么采用继承进行扩展也是安全的。请注意，尽量不要跨包去继承一个普通具体的类。</p>
-<h2 id="继承违反了封装的原则"><a href="#继承违反了封装的原则" class="headerlink" title="继承违反了封装的原则"></a>继承违反了封装的原则</h2><p>一个子类依赖于父类的实现细节来实现本身的功能，这样随着父类的变化，子类将会被破坏。即便子类本身代码没有发生变化，它都必须随着父类演化。</p>
-<p>这两个问题——子类实现依赖于父类实现，父类添加方法可能出现漏洞。</p>
-<h2 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h2><p>为了避免上面的问题，可以让新类包含一个私有域，这个域指向现有类的一个实例。因为现有类成为了新类组件，新类的每个实例方法调用现有类实例的对应方法然后返回值，这就叫转发。</p>
-<p>包装者对象几乎没有缺点，但需要注意的是包装者对象不适合于回调框架。因为在回调框架里，对象需要将自身引用传给别的对象，以便别的对象在后续进行调用。因为被包装对象并不知道自己的包装者，它将一个引用传给自己同时回调也避开了包装者。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>继承虽然强大，但它存在一些问题，违反了封装，只有父类和子类之间存在真正的父子关系才会使用。为了避免子类的脆弱性，我们应该使用组合和转发，而不是继承。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1783,7 +1786,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">230</span>
+                <span class="site-state-item-count">231</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
