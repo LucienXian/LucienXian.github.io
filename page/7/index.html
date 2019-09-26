@@ -265,6 +265,130 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/07/接口只用来定义类型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/07/接口只用来定义类型/" itemprop="url">接口只用来定义类型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-07T13:44:09+08:00">
+                2019-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="接口只用来定义类型"><a href="#接口只用来定义类型" class="headerlink" title="接口只用来定义类型"></a>接口只用来定义类型</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>当一个类实现了一个接口，那么这个接口可以作为一个类型，并作为实现它的类实例的引用。这是定义一个接口的目的。</p>
+<h2 id="常量接口"><a href="#常量接口" class="headerlink" title="常量接口"></a>常量接口</h2><p>但常量接口比较特殊，不包含方法，仅仅由静态final域组成:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Constant interface antipattern - do not use!</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">PhysicalConstants</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Avogadro's number (1/mol)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> AVOGADROS_NUMBER = <span class="number">6.022_140_857e23</span>;</span><br><span class="line">    <span class="comment">// Boltzmann constant (J/K)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> BOLTZMANN_CONSTANT = <span class="number">1.380_648_52e-23</span>;</span><br><span class="line">    <span class="comment">// Mass of the electron (kg)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> ELECTRON_MASS = <span class="number">9.109_383_56e-31</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但常量接口是比较糟糕的做法，一是因为实现一个接口会导致类的导出API泄露了这个实现细节；二是因为如果我们不再需要这些常量，但为了保证二进制兼容仍然需要实现这个接口，如果它还是个非final类，那么它的所有子类命名空间都会被污染。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>接口应该只被用来定义类型，它们不能仅仅用来导出常量。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/06/实例：学习XOR——DeepLearning系列/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1589,155 +1713,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/27/cuda学习1——Udacity/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/27/cuda学习1——Udacity/" itemprop="url">cuda学习1——Udacity</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-27T01:12:45+08:00">
-                2019-01-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="cuda学习1——Udacity"><a href="#cuda学习1——Udacity" class="headerlink" title="cuda学习1——Udacity"></a>cuda学习1——Udacity</h1><h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://classroom.udacity.com/courses/cs344/lessons/55120467/concepts/670743010923" target="_blank" rel="noopener">https://classroom.udacity.com/courses/cs344/lessons/55120467/concepts/670743010923</a></p>
-<h2 id="CPU与GPU"><a href="#CPU与GPU" class="headerlink" title="CPU与GPU"></a>CPU与GPU</h2><p>异构型计算机(termed heterogeneous)有两种：根据不同的处理器区分——CPU与GPU。cuda编程模型允许我们在GPU上运行。程序运行在CPU的部分成为host，在GPU的部分则是的device，并且还假设host和device有各自分开的内存。在CPU与GPU的关系中，前者占据着重要的位置，它告诉GPU应该做什么</p>
-<p>流程：</p>
-<ol>
-<li>从CPU拷贝数据到GPU</li>
-<li>从GPU拷贝数据到CPU</li>
-</ol>
-<p>这两部就是cudaMemcpy</p>
-<ol start="3">
-<li>分配GPU内存：cudaMalloc</li>
-<li>在GPU上启动内核</li>
-</ol>
-<h2 id="cuda程序例子"><a href="#cuda程序例子" class="headerlink" title="cuda程序例子"></a>cuda程序例子</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">__<span class="function">global__ <span class="keyword">void</span> <span class="title">square</span><span class="params">(<span class="keyword">float</span> * d_out, <span class="keyword">float</span> * d_in)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> idx = threadIdx.x;<span class="comment">//threadIdx is a structure</span></span><br><span class="line">    <span class="keyword">float</span> f = d_in[idx];</span><br><span class="line">    d_out[idx] = f * f;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> ** argv)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">int</span> ARRAY_SIZE = <span class="number">64</span>;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">int</span> ARRAY_BYTES = ARRAY_SIZE * <span class="keyword">sizeof</span>(<span class="keyword">float</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// generate the input array on the host</span></span><br><span class="line">	<span class="keyword">float</span> h_in[ARRAY_SIZE];</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; ARRAY_SIZE; i++) &#123;</span><br><span class="line">		h_in[i] = <span class="keyword">float</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">float</span> h_out[ARRAY_SIZE];</span><br><span class="line"></span><br><span class="line">	<span class="comment">// declare GPU memory pointers</span></span><br><span class="line">	<span class="keyword">float</span> * d_in;</span><br><span class="line">	<span class="keyword">float</span> * d_out;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// allocate GPU memory</span></span><br><span class="line">	cudaMalloc((<span class="keyword">void</span>**) &amp;d_in, ARRAY_BYTES);</span><br><span class="line">	cudaMalloc((<span class="keyword">void</span>**) &amp;d_out, ARRAY_BYTES);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// transfer the array to the GPU</span></span><br><span class="line">	cudaMemcpy(d_in, h_in, ARRAY_BYTES, cudaMemcpyHostToDevice);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// launch the kernel</span></span><br><span class="line">	square&lt;&lt;&lt;<span class="number">1</span>, ARRAY_SIZE&gt;&gt;&gt;(d_out, d_in);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// copy back the result array to the CPU</span></span><br><span class="line">	cudaMemcpy(h_out, d_out, ARRAY_BYTES, cudaMemcpyDeviceToHost);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// print out the resulting array</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i =<span class="number">0</span>; i &lt; ARRAY_SIZE; i++) &#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%f"</span>, h_out[i]);</span><br><span class="line">		<span class="built_in">printf</span>(((i % <span class="number">4</span>) != <span class="number">3</span>) ? <span class="string">"\t"</span> : <span class="string">"\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	cudaFree(d_in);</span><br><span class="line">	cudaFree(d_out);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="设置kernel启动"><a href="#设置kernel启动" class="headerlink" title="设置kernel启动"></a>设置kernel启动</h3><p>以这个为例：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">square&lt;&lt;&lt;<span class="number">1</span>, ARRAY_SIZE&gt;&gt;&gt;(d_out, d_in);</span><br><span class="line"><span class="comment">//square&lt;&lt;&lt;dim3(bx, by, bz), dim3(tx, ty, tz), shmem&gt;&gt;&gt;(d_out, d_in);</span></span><br><span class="line"><span class="comment">//相对于启动了bx*by*bz个block，每个block具有tx*ty*tz个线程。sheme默认0</span></span><br></pre></td></tr></table></figure>
-<p>我们使用了这些启动参数1, ARRAY_SIZE，并以这些自变量d_out, d_in来启动它。</p>
-<p>在这里我们启动了64个线程，即1个带有64个线程的块。对于kernel而言：</p>
-<ul>
-<li>能够同时运行多个块；</li>
-<li>每个块带有多个线程；较新的GPU可以支持1024个线程，不要超过1024.</li>
-</ul>
-<p>threadIdx这个结构中，x, y, z分别表示线程在block中不同纬度的索引。</p>
-<p>blockDim：block的大小，有多少个线程；</p>
-<p>blockIdx：网格中block的索引；</p>
-<p>gridDim：网格大小；</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>当我们写一个程序，它看起来是运行在一个线程上；</li>
-<li>当我们启动程序的时候，我们从CPU代码启动这个内核；</li>
-<li>在内核中，每个线程都知道自己所在index；</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1786,7 +1761,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">231</span>
+                <span class="site-state-item-count">232</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

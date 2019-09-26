@@ -265,6 +265,173 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/04/go入门学习/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/04/go入门学习/" itemprop="url">go入门学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T21:17:45+08:00">
+                2018-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="GO入门学习"><a href="#GO入门学习" class="headerlink" title="GO入门学习"></a>GO入门学习</h1><h2 id="why"><a href="#why" class="headerlink" title="why"></a>why</h2><ul>
+<li>语法简单；</li>
+<li>性能好；</li>
+</ul>
+<h2 id="常用类型"><a href="#常用类型" class="headerlink" title="常用类型"></a>常用类型</h2><p>主要讲三种类型：</p>
+<h3 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h3><p>go里面有数组类型。但开发过程中使用比较少。因为其元素类型确定，长度不可变，并且传递参数时是值拷贝；</p>
+<p>slice是对底层数组的一段内容的引用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data := [...]<span class="keyword">int</span>&#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>&#125;</span><br><span class="line">slice := data[<span class="number">1</span>:<span class="number">4</span>:<span class="number">5</span>] <span class="comment">//[low:high:max]</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>避免在两个变量中修改同一个底层数组；可以这样修改：</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">v2 := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">6</span>)</span><br><span class="line"><span class="built_in">copy</span>(v2, v1[<span class="number">0</span>:<span class="number">6</span>])</span><br><span class="line">v3 := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">3</span>)</span><br><span class="line"><span class="built_in">copy</span>(v3, v1[<span class="number">2</span>:<span class="number">5</span>])</span><br></pre></td></tr></table></figure>
+<h3 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+<p>创造一个长度为10，元素类型为int的管道；</p>
+<ul>
+<li>读 v := &lt;- ch</li>
+<li>写 ch &lt;- v</li>
+<li>关闭 close(ch)</li>
+</ul>
+<p>目的是保证协程之间交换数据时，并发安全；</p>
+<ul>
+<li>长度为0的channel为不带buffer的channel</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br></pre></td></tr></table></figure>
+<p>同时读写的时候，读会在写之前发生。也不会发生额外的数据拷贝。</p>
+<ul>
+<li>长度不为0的</li>
+</ul>
+<p>写会在读之前发生；</p>
+<h3 id="interface"><a href="#interface" class="headerlink" title="interface"></a>interface</h3><p>定义一个抽象的方法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Gun <span class="keyword">interface</span>&#123;</span><br><span class="line">    Shoot()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>作用：解耦，抽象</li>
+</ul>
+<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><p>通过通信来共享数据，而不是通过共享数据来通信。</p>
+<h3 id="context"><a href="#context" class="headerlink" title="context"></a>context</h3><p>这是一个接口，内部有几个方法。context是在多个协程之间传递，如何保证数据安全。</p>
+<h3 id="web服务端模型"><a href="#web服务端模型" class="headerlink" title="web服务端模型"></a>web服务端模型</h3><p>接受一个请求，创建一个新的协程用于读写该连接上的数据，但这种方式在请求处理阻塞的情况下，容易引发协程爆炸。</p>
+<h2 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h2><p>go提供了一些性能分析的工具</p>
+<h3 id="profile"><a href="#profile" class="headerlink" title="profile"></a>profile</h3><ul>
+<li>cpu分析：每隔一段时间，记录当前正在运行的协程的栈，出现频率比较高的函数就是占用CPU比较多的；</li>
+<li>mem分析：分析堆上申请内存的情况；</li>
+</ul>
+<p>一般都是通过采样实现。</p>
+<h2 id="高效的go代码"><a href="#高效的go代码" class="headerlink" title="高效的go代码"></a>高效的go代码</h2><ul>
+<li>减少对象创建，减少内存分配；</li>
+<li>sync.Pool</li>
+<li>sync/atomic</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/29/Linux内核学习——虚拟文件系统/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1839,150 +2006,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/15/Linux内核学习——系统调用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/15/Linux内核学习——系统调用/" itemprop="url">Linux内核学习——系统调用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-15T21:53:34+08:00">
-                2018-07-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h1><p>在操作系统中，内核提供了用户进程与内核进行交互的一组接口。</p>
-<h2 id="与内核通信"><a href="#与内核通信" class="headerlink" title="与内核通信"></a>与内核通信</h2><p>系统调用在用户空间与硬件设备之间添加了一个中间层，该层主要有三个作用：</p>
-<ul>
-<li>提供硬件的抽象接口，这样用户就不需要理会硬件类型；</li>
-<li>保障系统的稳定和安全，内核可以基于权限等规则去对用户的访问进行裁决；</li>
-<li>因为每个进程都运行在虚拟内存中，如果允许用户进程随意访问硬件，就无法实现多任务和虚拟内存了；</li>
-</ul>
-<h2 id="API-POSIX和C库"><a href="#API-POSIX和C库" class="headerlink" title="API, POSIX和C库"></a>API, POSIX和C库</h2><p>API定义了一组应用程序使用的编程接口，它可以是一个系统调用，也可以是通过多个系统调用来实现。C库实现了Unix系统的主要API，包括标准C库函数和系统调用接口。</p>
-<h2 id="系统调用-1"><a href="#系统调用-1" class="headerlink" title="系统调用"></a>系统调用</h2><p>通常我们会通过C库中定义的函数来调用系统调用(syscall)。系统调用往往具有一个明确的操作，例如getpid()系统调用，它会返回当前进程，在内核中的实现为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SYSCALL_DEFINE0(getpid)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> task_tgid_vnr(current);<span class="comment">//这个宏定义了一个无参数的系统调用，因此这里数字为0</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//展开后</span></span><br><span class="line"><span class="function">asmlinkage <span class="keyword">long</span> <span class="title">sys_getpid</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br></pre></td></tr></table></figure>
-<p>函数声明中的<strong>asmlinkage</strong>为一个编译指令，通知编译器仅仅从栈中提取参数，其次，为了保证32位和64位的兼容，应该返回long（调用失败返回负数，返回0通常表明成功）。另外，在调用出现错误的时候，C库会把错误码写入errno这个全局变量。</p>
-<h3 id="系统调用号"><a href="#系统调用号" class="headerlink" title="系统调用号"></a>系统调用号</h3><p>在Linux中，每个系统调用都被赋予一个系统调用号，而且系统调用号不能变更，也不能删除。另外，为了避免一个系统调用被删除或者出现问题后不可用，Linux用一个“未实现”的系统调用sys_ni_syscall()来填补空缺。</p>
-<p>内核在arch/i386/kernel/syscall_64.c中为已经注册过的系统调用表存储系统调用号——sys_call_table。</p>
-<h3 id="系统调用的性能"><a href="#系统调用的性能" class="headerlink" title="系统调用的性能"></a>系统调用的性能</h3><p>Linux系统调用通常非常快：</p>
-<ul>
-<li>上下文切换时间较短；</li>
-<li>操作本身比较简洁；</li>
-</ul>
-<h2 id="系统调用处理程序"><a href="#系统调用处理程序" class="headerlink" title="系统调用处理程序"></a>系统调用处理程序</h2><p>由于用户空间的程序无法直接执行内核代码，所以需要某种机制保证用户去通知内核执行某个系统调用。</p>
-<p>这个机制是用软中断实现的，通过引发一个异常（int $0x80指令）使得系统切换到内核态去执行异常处理程序（第128号异常处理程序），而这个异常处理程序实际上就是系统调用处理程序——system_call()。</p>
-<h3 id="指定恰当的系统调用"><a href="#指定恰当的系统调用" class="headerlink" title="指定恰当的系统调用"></a>指定恰当的系统调用</h3><p>刚刚的操作只是切换到内核态，但我们仍然需要告诉内核用户进程的系统调用号，在x86里，该系统调用号是通过寄存器eax传递的。在陷入内核态之前将系统调用号存放到eax里，这样就可以在系统调用程序运行的时候拿到数据。</p>
-<p>在拿到系统调用号后，system_call()就会将系统调用号和NR_syscalls作比对，检查有效性。</p>
-<h3 id="参数传递"><a href="#参数传递" class="headerlink" title="参数传递"></a>参数传递</h3><p>多数的系统调用需要一些外部的参数输入，而这些参数的输入通常也是存放在寄存器里传递的，例如前五个参数通过<strong>ebx,ecx,edx,esi和edi</strong>这五个寄存器传递，如果参数超过5个，就存放一个指向参数所在用户空间的地址。</p>
-<p>返回值也是通过寄存器eax传递。</p>
-<h2 id="系统调用上下文"><a href="#系统调用上下文" class="headerlink" title="系统调用上下文"></a>系统调用上下文</h2><p>内核在执行系统调用的时候处于进程的上下文，并且在进程上下文中，内核可以休眠且可以被抢占。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2031,7 +2054,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">231</span>
+                <span class="site-state-item-count">232</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
