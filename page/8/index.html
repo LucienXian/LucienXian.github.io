@@ -265,6 +265,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/27/继承需要提供文档/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/27/继承需要提供文档/" itemprop="url">继承需要提供文档</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-27T14:59:10+08:00">
+                2019-01-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="若要设计继承，则提供文档说明，否则禁止继承"><a href="#若要设计继承，则提供文档说明，否则禁止继承" class="headerlink" title="若要设计继承，则提供文档说明，否则禁止继承"></a>若要设计继承，则提供文档说明，否则禁止继承</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>对于那些不是为了继承，并且没有良好说明文档的外来类来说，去继承产生子类是非常危险的。</p>
+<h2 id="如何设计文档"><a href="#如何设计文档" class="headerlink" title="如何设计文档"></a>如何设计文档</h2><ol>
+<li>必须在这个类的文档里为可覆盖方法说明它的自用性</li>
+</ol>
+<p>对于每个公有方法或者受保护方法，文档里必须指明这个方法调用了哪些可覆盖方法，是以什么顺序调用的，每个调用的结果是如何影响接下来的处理过程。</p>
+<p>调用可覆盖方法的方法应该在注释末尾包含这些调用的描述，这可以由Javadoc标签@implSpec生成。</p>
+<p>以下为ava.util.AbstractCollection的remove方法的规范：</p>
+<blockquote>
+<p>Removes a single instance of the specified element from this collection, if it is present (optional operation). More formally, removes an element e such that Objects.equals(o, e), if this collection contains one or more such elements. Returns true if this collection contained the specified element (or equivalently, if this collection changed as a result of the call).</p>
+<p><strong>Implementation Requirements:</strong>This implementation iterates over the collection looking for the specified element. If it finds the element, it removes the element from the collection using the iterator’s remove method. Note that this implementation throws an UnsupportedOperationException if the iterator returned by this collection’s iterator method does not implement the remove method and this collection contains the specified object.</p>
+</blockquote>
+<ol start="2">
+<li>父类必须以某种形式提供能够进入到其内部运转的hook</li>
+</ol>
+<p>这里可以选择一个受保护的方法、或者是受保护域。</p>
+<h2 id="约束条件"><a href="#约束条件" class="headerlink" title="约束条件"></a>约束条件</h2><p>若一个类允许被继承，有几点约束需要遵守：</p>
+<ol>
+<li>构造器一定不能调用可覆盖方法</li>
+</ol>
+<p>无论是直接还是间接调用，因为父类构造器在子类构造器之前运行，所以子类的覆盖方法会在子类构造器运行之前被调用。如果覆盖后的方法依赖于子类构造器的任意初始化操作，那么找哥哥方法很可能会产生非预期的行为。</p>
+<ol start="2">
+<li>如何使用Cloneable和Serializable接口</li>
+</ol>
+<p>对于Cloneable接口，由于clone方法和readObject方法的行为类似构造器，所以类似上面的约束依然存在。</p>
+<p>而对于Serializable接口，而且这个类拥有readResolve方法或writeReplace方法，你一定要把readResolve方法或writeReplace方法设为受保护的，而不是私有的。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>设计一个用来被继承的类是不容易的，我们必须在文档里说明该类的自用模式，并且为了让别人编写有效的子类，我们也需要导出一个或多个受保护的方法。</p>
+<p>除非我们知道某个类的确是要被子类化，否则最好将声明为final或者保证其没有可访问的构造器来禁止该类被继承。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/27/cuda学习1——Udacity/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1538,140 +1684,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/用私有构造器或者枚举类型强化Singleton属性/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/16/用私有构造器或者枚举类型强化Singleton属性/" itemprop="url">用私有构造器或者枚举类型强化Singleton属性</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:11:53+08:00">
-                2018-12-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="用私有构造器或者枚举类型强化Singleton属性"><a href="#用私有构造器或者枚举类型强化Singleton属性" class="headerlink" title="用私有构造器或者枚举类型强化Singleton属性"></a>用私有构造器或者枚举类型强化Singleton属性</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Singleton指仅仅被实例化一次的类。</p>
-<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><p>在jsk1.5之前，实现Singleton的两种方式都把构造函数声明为private：</p>
-<ul>
-<li>公有静态成员是一个final域</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Elvis</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Elvis INSTANCE = <span class="keyword">new</span> Elvis();</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Elvis</span><span class="params">()</span> </span>&#123;...&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> leaveTheBuilding&#123;...&#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>但这种方法存在一个缺点，客户端可以通过反射来生成第二个实例，要避免这种弊端，可以在创建第二个对象的时候抛出异常</p>
-</blockquote>
-<ul>
-<li>公有成员是一个静态工厂方法</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Elvis</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Elvis INSTANCE = <span class="keyword">new</span> Elvis();</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Elvis</span><span class="params">()</span> </span>&#123;...&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Elvis <span class="title">getInstance</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> INSTANCE; &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> leaveTheBuilding&#123;...&#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<p>jdk1.5发布之后，可以编写一个包含单个元素的枚举类型：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Elvis &#123;</span><br><span class="line">	INSTANCE;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> leaveTheBuilding&#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1720,7 +1732,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">232</span>
+                <span class="site-state-item-count">233</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
