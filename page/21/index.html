@@ -265,6 +265,139 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/25/Factory-method-DesignPattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/25/Factory-method-DesignPattern/" itemprop="url">Factory method(DesignPattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-25T23:42:48+08:00">
+                2017-11-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Factory-method"><a href="#Factory-method" class="headerlink" title="Factory method"></a>Factory method</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>定义一个用于创建对象的接口，让子类去决定实例化哪一个类</p>
+<h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>一个框架通过抽象类来定义对象之间的关系，并且客户通过子类来定义相关对象的实现。假设有一个应用框架来显示文档，画图框架显示画图文档等，我们需要具体的子类来重定义创建文档的操作，而这个操作就叫做抽象方法。</p>
+<h2 id="使用范围"><a href="#使用范围" class="headerlink" title="使用范围"></a>使用范围</h2><ul>
+<li>当一个类不知道它所创建的对象的类的时候；</li>
+<li>当一个类希望它的子类来指定创建哪个对象的时候；</li>
+</ul>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><ul>
+<li>工厂方法不会将与特定的应用有关的类绑定到代码中，代码仅仅处理product的接口；</li>
+<li>客户为了创建一个product，往往需要创建一个具体的creator；</li>
+</ul>
+<blockquote>
+<p>与abstract factory不同的是，factory method的工厂仅仅是一个方法，而抽象工厂里的工厂是一个类。因此抽象工厂里，客户在使用时，产品本身是固定死的；而工厂方法则需要使用到产品本身（接口）。总结就是，抽象工厂看不到产品，因此需要使用客户端和更换工程，而工厂方法直接使用产品，从而生产产品；</p>
+</blockquote>
+<h2 id="代码示范"><a href="#代码示范" class="headerlink" title="代码示范"></a>代码示范</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Factory_method.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Product() &#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"Product..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"partA..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"partB..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">derivedPro</span> :</span> <span class="keyword">public</span> Product &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	derivedPro() &#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"derived Product..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"derived partA..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"derived partB..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Creator</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">getProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (_product == <span class="number">0</span>) &#123;</span><br><span class="line">			_product = createProduct();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> _product;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Product* _product;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">TheProduct</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">standardCreator</span> :</span><span class="keyword">public</span> Creator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">TheProduct</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">Product</span>* <span class="title">standardCreator</span>&lt;TheProduct&gt;:</span>:createProduct() &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> TheProduct;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	standardCreator&lt;Product&gt; myCreator1;</span><br><span class="line">	Product* p = myCreator1.getProduct();</span><br><span class="line">	p-&gt;partA();</span><br><span class="line">	p-&gt;partB();</span><br><span class="line"></span><br><span class="line">	standardCreator&lt;derivedPro&gt; myCreator2;</span><br><span class="line">	Product* q = myCreator2.getProduct();</span><br><span class="line">	q-&gt;partA();</span><br><span class="line">	q-&gt;partB();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/25/Effective-cpp-7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1497,154 +1630,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/16/四种类型转换——CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/16/四种类型转换——CPP/" itemprop="url">四种类型转换——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-16T19:49:20+08:00">
-                2017-11-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="C-的四种类型转换"><a href="#C-的四种类型转换" class="headerlink" title="C++的四种类型转换"></a>C++的四种类型转换</h1><h2 id="static-cast-lt-T-gt-e"><a href="#static-cast-lt-T-gt-e" class="headerlink" title="static_cast&lt; T *&gt;(e)"></a>static_cast&lt; T *&gt;(e)</h2><ul>
-<li>静态转换，在编译期间进行处理；</li>
-<li>常用：<ul>
-<li>在C++中内置的基本数据类型之间进行转换；</li>
-<li>在基类和子类之间的指针或引用进行转换，基类指针或引用转换成子类的是不安全的，相反则是安全的；</li>
-<li>把void类型指针转换成目标类型；（不安全）</li>
-<li>把任何类型的表达式转换成void类型；</li>
-</ul>
-</li>
-</ul>
-<h2 id="const-cast-lt-T-gt-e"><a href="#const-cast-lt-T-gt-e" class="headerlink" title="const_cast&lt; T*&gt;(e)"></a>const_cast&lt; T*&gt;(e)</h2><ul>
-<li>作用于<strong>同一个类型</strong>之间的去常和添常属性的转换；</li>
-<li>可以在添加常量属性或者去除常量属性；</li>
-</ul>
-<h2 id="dynamic-cast-lt-T-gt-e"><a href="#dynamic-cast-lt-T-gt-e" class="headerlink" title="dynamic_cast&lt; T * &gt;(e)"></a>dynamic_cast&lt; T * &gt;(e)</h2><ul>
-<li>在运行期进行类型转换；</li>
-<li>如果转换成功则返回指针或者引用，失败则返回NULL(指针)或者抛出异常std::cast（引用）；</li>
-<li>通常情况，转换时基类要有虚函数;</li>
-</ul>
-<h2 id="reinterpret-cast-lt-T-gt-e"><a href="#reinterpret-cast-lt-T-gt-e" class="headerlink" title="reinterpret_cast&lt; T*&gt;(e)"></a>reinterpret_cast&lt; T*&gt;(e)</h2><ul>
-<li>执行低级转换，具体结果取决于编译器；</li>
-<li>比如将一个int* 转换成int；</li>
-<li>它的原理是对二进制进行重新的解释；</li>
-</ul>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><ul>
-<li>尽量避免类型转换，在注重效率的代码中尽量避免dynamic_cast；</li>
-<li>如果类型转换时必要的，应该隐藏在某个函数中；</li>
-<li>尽量用上述四种类型转换，不要使用旧式转换；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1693,7 +1678,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">233</span>
+                <span class="site-state-item-count">234</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
