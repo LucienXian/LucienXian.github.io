@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/12/07/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing%E2%80%94%E2%80%94MIT6-824/</loc>
+    
+    <lastmod>2019-12-07T15:55:35.489Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/11/05/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94AOF%E6%8C%81%E4%B9%85%E5%8C%96/</loc>
     
     <lastmod>2019-11-04T16:55:28.390Z</lastmod>
