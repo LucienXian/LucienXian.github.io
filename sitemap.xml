@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/12/15/Scaling-Distributed-Machine-Learning-with-the-Parameter-Server%E2%80%94%E2%80%94MIT6-824/</loc>
+    
+    <lastmod>2019-12-14T17:32:39.840Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/12/07/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing%E2%80%94%E2%80%94MIT6-824/</loc>
     
     <lastmod>2019-12-07T15:55:35.489Z</lastmod>
