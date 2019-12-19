@@ -265,6 +265,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/21/Linux内核学习——下半部与推后执行的工作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/21/Linux内核学习——下半部与推后执行的工作/" itemprop="url">Linux内核学习——下半部与推后执行的工作</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-21T17:22:22+08:00">
+                2018-07-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="下半部与推后执行的工作"><a href="#下半部与推后执行的工作" class="headerlink" title="下半部与推后执行的工作"></a>下半部与推后执行的工作</h1><p>中断处理程序异步执行，需要快速地执行硬件与操作系统的操作，避免其它中断停止太久，因此中断处理程序不能阻塞。</p>
+<h2 id="下半部"><a href="#下半部" class="headerlink" title="下半部"></a>下半部</h2><p>上半部只能通过中断处理程序实现，而下半部则提供了多种实现机制——软中断、tasklet、工作队列。</p>
+<p>内核定时器，这个机制用来将工作推后执行，推后到某个明确的时间段之后执行。</p>
+<h2 id="软中断"><a href="#软中断" class="headerlink" title="软中断"></a>软中断</h2><p>软中断是一组静态定义的下半部接口，有32个。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> &#123;</span></span><br><span class="line">  	<span class="keyword">void</span> (*action)(struct softirq_action *);  </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> <span class="title">softirq_vec</span>[<span class="title">NR_SOFTIRQS</span>];</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>软中断处理程序</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sofrirq_handler</span><span class="params">(struct softirq_action *)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    my_softirq-&gt;action(my_softirq);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之所以传递一个指针而不是一个数值，是因为防止后面加上新的域时，无需对处理程序进行改动；</p>
+<ol start="2">
+<li>执行软中断</li>
+</ol>
+<p>一个注册的软中断会在中断处理程序返回前标记了之后才能被执行，会在标记之后一定时间内执行。</p>
+<p>在中断处理程序中触发软中断是比较常见的。软中断会在do_softirq()中遍历所有软中断，进行调用。</p>
+<h2 id="tasklet"><a href="#tasklet" class="headerlink" title="tasklet"></a>tasklet</h2><p>tasklet是使用软中断实现的一种下半部机制，接口更加简单。</p>
+<h3 id="tasklet的实现"><a href="#tasklet的实现" class="headerlink" title="tasklet的实现"></a>tasklet的实现</h3><p>tasklet有两种软中断代表：HI_SOFTIRQ和TASKLET_SOFTIRQ。</p>
+<ol>
+<li>tasklet结构体</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span>&#123;</span></span><br><span class="line">  	<span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> *<span class="title">next</span>;</span> <span class="comment">//链表中下一个tasklet_struct</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> state; <span class="comment">//0, TASKLET_STATE_SCHED，TASKLET_STATE_RUN</span></span><br><span class="line">    <span class="keyword">atomic_t</span> count; <span class="comment">//为0时才被激活</span></span><br><span class="line">    <span class="keyword">void</span> (*func)(<span class="keyword">unsigned</span> <span class="keyword">long</span>);<span class="comment">//tasklet处理函数</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> data; <span class="comment">//给tasklet</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>调度tasklet</li>
+</ol>
+<p>已经调度的tasklet相当于被触发的软中断，会被放在两个数据结构里——tasklet_vec（普通tasklet）和tasklet_hi_vec（高优先级的tasklet）。</p>
+<p>tasklet由tasklet_schedule()和tasklet_hi_schedule()进行调度，它接受一个指向tasklet_struct结构的指针作为参数。</p>
+<p>执行步骤：</p>
+<ol>
+<li>检查tasklet的状态，如果是TASKLET_STATE_SCHED则直接返回；</li>
+<li>调用_tasklet_schedule()；</li>
+<li>保持中断状态，禁止本地中断；</li>
+<li>把需要调度的tasklet加到链表里；</li>
+<li>唤起软中断，这样在后面调用do_softriq()时执行这个tasklet；</li>
+<li>恢复中断到原状态返回；</li>
+</ol>
+<h2 id="工作队列"><a href="#工作队列" class="headerlink" title="工作队列"></a>工作队列</h2><p>工作队列是另一种将工作推后实现的机制，它是通过将工作交由一个内核线程在进程上下文执行的方法。工作队列可以重新调度，也可以睡眠。</p>
+<h2 id="下半部机制的选择"><a href="#下半部机制的选择" class="headerlink" title="下半部机制的选择"></a>下半部机制的选择</h2><ul>
+<li>软中断处于中断上下文里，同类型的软中断能同时执行；</li>
+<li>tasklet处于中断上下文里，同类型不能同时执行；</li>
+<li>工作队列处于进程上下文，能睡眠和唤醒；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/19/Linux内核学习——中断和中断处理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1848,181 +2009,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/07/Redis学习《一》/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/07/Redis学习《一》/" itemprop="url">Redis学习《一》</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-07T00:06:18+08:00">
-                2018-07-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Redis学习《一》"><a href="#Redis学习《一》" class="headerlink" title="Redis学习《一》"></a>Redis学习《一》</h1><h2 id="Redis-简介"><a href="#Redis-简介" class="headerlink" title="Redis 简介"></a>Redis 简介</h2><p>Redis是一个远程的，高性能的，内存数据库。Redis有几个特点：</p>
-<ul>
-<li>性能高——读写速度比传统数据库更快；</li>
-<li>数据类型丰富——支持二进制的strings，lists，hash，sets和ordered sets五种类型；</li>
-<li>支持数据备份——拥有两种不同形式的持久化方法，可以用小而紧凑的格式将内存中的数据写入到磁盘；</li>
-</ul>
-<h2 id="Redis安装"><a href="#Redis安装" class="headerlink" title="Redis安装"></a>Redis安装</h2><p>在Ubuntu下安装：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span>sudo apt-get update</span><br><span class="line"><span class="meta">$</span>sudo apt-get install redis-server</span><br></pre></td></tr></table></figure>
-<p>我用的是docker-redis：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span>docker search redis</span><br></pre></td></tr></table></figure>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/docker-redis-search.png" alt="img"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span>docker pull redis</span><br><span class="line"><span class="meta">$</span>docker run -p 6379:6379 -v $PWD/data:/data  -d redis redis-server --appendonly yes</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>命令说明：</p>
-<p><strong>-p 6379:6379 :</strong> 将容器的6379端口映射到主机的6379端口</p>
-<p><strong>-v $PWD/data:/data :</strong> 将主机中当前目录下的data挂载到容器的/data</p>
-<p><strong>redis-server –appendonly yes :</strong> 在容器执行redis-server启动命令，并打开redis持久化配置</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it 43f7a65ec7f8 redis-cli</span><br></pre></td></tr></table></figure>
-<p>执行redis-cli命令连接刚启动的容器服务器</p>
-<h2 id="redis基本类型"><a href="#redis基本类型" class="headerlink" title="redis基本类型"></a>redis基本类型</h2><table>
-<thead>
-<tr>
-<th style="text-align:center">类型</th>
-<th style="text-align:center">存储值</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">string</td>
-<td style="text-align:center">字符串、整数或者浮点数</td>
-<td style="text-align:center">redis最基本的类型。该类型是二进制安全的，比如JPG图片或者序列化的对象</td>
-</tr>
-<tr>
-<td style="text-align:center">list</td>
-<td style="text-align:center">一个链表，结点是字符串</td>
-<td style="text-align:center">该链表按照插入顺序排序，可以添加一个元素到头部或者尾部</td>
-</tr>
-<tr>
-<td style="text-align:center">hash</td>
-<td style="text-align:center">key-value无序散列表</td>
-<td style="text-align:center">一个key-value的集合</td>
-</tr>
-<tr>
-<td style="text-align:center">set</td>
-<td style="text-align:center">包含字符串的无序集合</td>
-<td style="text-align:center">string类型的无序集合，并且该集合是通过哈希表实现的</td>
-</tr>
-<tr>
-<td style="text-align:center">zset</td>
-<td style="text-align:center">有序集合，字符串成员与score的映射</td>
-<td style="text-align:center">有序集合，每个元素都会关联到一个double类型的分数。 通过分数来为集合中的成员进行从小到大的排序，成员是唯一的，分数可以重复。分数一样的按照字符串排序。</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2071,7 +2057,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">236</span>
+                <span class="site-state-item-count">237</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
