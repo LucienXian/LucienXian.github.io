@@ -265,6 +265,148 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/09/深度探索C-对象模型-二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/09/深度探索C-对象模型-二/" itemprop="url">深度探索C++对象模型<二></二></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-09T10:54:05+08:00">
+                2018-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="关键词带来的困扰"><a href="#关键词带来的困扰" class="headerlink" title="关键词带来的困扰"></a>关键词带来的困扰</h1><p>这里需要区分的是struct和class，通常情况下我们认为在C的struct和C++支持的class之间，关键词本身并没有提供了差异。</p>
+<p>另外一个需要的注意的问题是，有一些在C中可用的trick，用在C++里可能出现意想不到的问题。例如我希望一个struct有可变的长度</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mumble</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> pc[<span class="number">1</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mumble</span>* <span class="title">p_mumble</span> = (<span class="title">struct</span> <span class="title">mumble</span>* )<span class="title">malloc</span>(<span class="title">sizeof</span>(<span class="title">mumble</span>)+<span class="title">sizeof</span>(<span class="title">string</span>)+1);</span></span><br></pre></td></tr></table></figure>
+<p>但如果是用class来声明，由于多个区域之间的顺序内存布局是不一定的，也就无法这样精细地控制内存。</p>
+<h2 id="对象的差异"><a href="#对象的差异" class="headerlink" title="对象的差异"></a>对象的差异</h2><p>C++程序设计模型支持三种programming paradigms:</p>
+<ul>
+<li>prodedural model</li>
+<li>ADT</li>
+<li>object-oriented model</li>
+</ul>
+<p>需要多大的内存来保存一个class的大小：</p>
+<ul>
+<li>其所有nonstatic data members的大小；</li>
+<li>由于alignment而需要进行padding的大小，有可能在数据成员上填补，也可能在集合体上进行填补；</li>
+<li>为了支持virtual function而带来的额外负担；</li>
+</ul>
+<p>指针的类型，例如一个指向对象的指针和一个指向整数的指针，一个指向template array的指针有什么区别？关键不在于指针内容的不同，而是通过指针寻址出来的对象不同，也就是指针类型告诉了编译器应该如何解释特定内存地址的内容和大小。</p>
+<p>而一个指针类型为void*的指针，其仅仅代表一个地址，通过转型cast，使得编译器能够解释指出内存的大小和位置。</p>
+<p>考虑这种情况：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Bear b;</span><br><span class="line">ZooAnimal *pz = &amp;b;</span><br><span class="line">Bear *pb = &amp;b;</span><br></pre></td></tr></table></figure>
+<p>上面的两个指针都执行了Bear object的第一个字节，但不同的是，pz涵盖的只有Bear object的ZooAnimal部分。而pb则涵盖了整个Bear object;也就是你无法通过pz去使用Bear的任何members。除非使用虚函数机制；</p>
+<p>也就是通过pz所指向的类型去调用某个函数，这里的关键是类型信息并不是存储在pz里，而是存储pz所指向的对象的虚指针和虚指针所指向的虚表里。</p>
+<p>而如果直接把派生类的对象塞进基类的对象里，派生类对象会被切割，也就是失去了多态的功能，</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/08/面经-一/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1508,140 +1650,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/深度探索C-对象模型-一/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/01/深度探索C-对象模型-一/" itemprop="url">深度探索C++对象模型<一></一></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T23:16:17+08:00">
-                2018-03-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>开始看这本神书，做一些笔记：</p>
-<h1 id="简单对象模型"><a href="#简单对象模型" class="headerlink" title="简单对象模型"></a>简单对象模型</h1><p>第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img"></p>
-<h1 id="表格驱动对象模型"><a href="#表格驱动对象模型" class="headerlink" title="表格驱动对象模型"></a>表格驱动对象模型</h1><p>存储两个指针，分别指向data member table和function member table</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png" alt="img"></p>
-<h1 id="C-对象模型"><a href="#C-对象模型" class="headerlink" title="C++对象模型"></a>C++对象模型</h1><p>来看看重头戏——C++对象模型。有几个需要注意的：</p>
-<ul>
-<li><p>非静态数据成员放在类的对象中；</p>
-</li>
-<li><p>静态数据成员和成员函数放在类对象之外；</p>
-</li>
-<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info object；</p>
-</li>
-</ul>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png" alt="img"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1690,7 +1698,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">239</span>
+                <span class="site-state-item-count">240</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
