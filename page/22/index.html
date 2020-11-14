@@ -265,6 +265,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/Builder-DesignPattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/22/Builder-DesignPattern/" itemprop="url">Builder(DesignPattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-22T23:49:26+08:00">
+                2017-11-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Builder"><a href="#Builder" class="headerlink" title="Builder"></a>Builder</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>构造一个复杂的对象，并且构造与表示分开，同一个构建方式能达到不同的表示</p>
+<h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>假设有一个富文本的编辑器，你需要将RTF转换为多种不同的正文格式（比如普通的ASCII文本或者能进行交互的窗口），倘若需要转换很多种文本格式，那么我们就需要快速实现新的转换方式。因此我们可以构建一个文本转换器，在读入不同的标记时进行不同的转换。</p>
+<h2 id="使用范围"><a href="#使用范围" class="headerlink" title="使用范围"></a>使用范围</h2><ul>
+<li>构建对象的算法与对象的组成部分无关；</li>
+<li>构造的对象要有不同表示，即可能由不同的组件组成；</li>
+<li>角色：<ul>
+<li>builder：创建一个product的各个组件时，提供接口；</li>
+<li>concretebuilder：具体实现builder的接口并提供返回产品的接口；</li>
+<li>director：蓝图，指导builder如何构造产品；</li>
+<li>product：被构造的对象；</li>
+</ul>
+</li>
+</ul>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><ul>
+<li>可以根据蓝图（director）随机修改产品的<strong>内部表示</strong>；</li>
+<li>director可以<strong>复用</strong>builder封装的接口去生成product；</li>
+<li>精装控制product的构造，这也是与abstract factor不同的地方，后者着重在生成一系列统一风格的product，前者可以一步一步地控制product的生成；</li>
+</ul>
+<h2 id="代码示范"><a href="#代码示范" class="headerlink" title="代码示范"></a>代码示范</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Builder.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Product() &#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"A product..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Builder</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Builder() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildA</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildB</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildC</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">buildPro</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">GetProduct</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="literal">NULL</span>; &#125;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">concreteBuilder</span> :</span> <span class="keyword">public</span> Builder&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	concreteBuilder() &#123; product = <span class="number">0</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">buildPro</span><span class="params">()</span> </span>&#123; product = <span class="keyword">new</span> Product; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildA</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"build a"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildB</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"build b"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildC</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"build c"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">GetProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> product;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Product* product;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Director</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">create</span><span class="params">(Builder&amp; builder)</span> </span>&#123;</span><br><span class="line">		builder.buildPro();</span><br><span class="line">		builder.BuildA();</span><br><span class="line">		builder.BuildA();</span><br><span class="line">		builder.BuildB();</span><br><span class="line">		builder.BuildC();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> builder.GetProduct();</span><br><span class="line">	&#125;</span><br><span class="line">	Director()&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Director director;</span><br><span class="line">	concreteBuilder concretebuilder;</span><br><span class="line">	director.create(concretebuilder);</span><br><span class="line">	Product* pro = concretebuilder.GetProduct();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">delete</span> pro;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/Effective-cpp-5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1516,147 +1654,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/多态与虚函数——CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/15/多态与虚函数——CPP/" itemprop="url">多态与虚函数——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T00:39:45+08:00">
-                2017-11-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="多态性与虚函数"><a href="#多态性与虚函数" class="headerlink" title="多态性与虚函数"></a>多态性与虚函数</h1><h2 id="多态性"><a href="#多态性" class="headerlink" title="多态性"></a>多态性</h2><blockquote>
-<p>多态意义就是使得接口重用，不管传过来哪一个类的对象，我们都可以通过同一个接口去找到相对应的调用方法；</p>
-</blockquote>
-<p>OOP的核心思想之一。当我们使用基类的引用或者指针去调用基类中定义的一个函数时，我们并不知道该函数真正的作用对象是基类的对象还是子类的对象。引用或指针的静态类型和动态类型不一致正是支持这一特性的根本原因。如果该类是一个虚函数，那么直到运行时才能完全确定执行那个版本，依据则是指针或者引用绑定了哪个版本的对象。</p>
-<h2 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h2><h3 id="通常用法"><a href="#通常用法" class="headerlink" title="通常用法"></a>通常用法</h3><blockquote>
-<p>声明基类的指针，利用该指针去指向任意一个子类对象，调用相应的虚函数，这样可以根据子类的不同而调用不同的方法；</p>
-</blockquote>
-<h3 id="派生类中的虚函数"><a href="#派生类中的虚函数" class="headerlink" title="派生类中的虚函数"></a>派生类中的虚函数</h3><ul>
-<li>如果在派生类中覆盖了某个虚函数，可以再一次用virtual关键字进行声明，也可以不用，因为默认如果基类的某个函数是虚函数，则所有派生类中它都是虚函数。</li>
-<li>派生类覆盖的虚函数的参数列表类型必须与基类中的函数形参类型严格匹配；</li>
-</ul>
-<h3 id="虚函数表"><a href="#虚函数表" class="headerlink" title="虚函数表"></a>虚函数表</h3><p>虚函数本质上是通过一张虚函数表实现的，每当程序声明了一个虚函数时，就会为这个<strong>类</strong>构造一张表。V表是由虚函数的地址组成的。</p>
-<p>每当有虚函数被调用时，V表就会被用来解析函数地址。包含虚函数的类的对象实例都会包含一个虚拟指针，这个指针会在对象地址的最开始处，称为vptr，通过这个vprt就可以找到V表的内存地址。而V表又包含一个或多个虚函数的基地址。</p>
-<p>这就可以完成虚函数调用期间的动态绑定：在运行时，首先是基类的指针被赋予派生类对象的地址，这样就可以找到所属类的虚函数表的地址，通过虚函数的名字在虚函数表中找到对应的虚函数地址，然后进行调用。</p>
-<blockquote>
-<p>注意：虚函数表是针对类的，同一个类的多个对象都指向同一个虚函数表；</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/21/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><span class="page-number current">22</span><a class="page-number" href="/page/23/">23</a><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/23/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/21/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><span class="page-number current">22</span><a class="page-number" href="/page/23/">23</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/23/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1700,7 +1702,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">240</span>
+                <span class="site-state-item-count">241</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

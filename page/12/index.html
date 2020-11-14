@@ -265,6 +265,163 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/29/Linux内核学习——虚拟文件系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/29/Linux内核学习——虚拟文件系统/" itemprop="url">Linux内核学习——虚拟文件系统</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-29T23:04:27+08:00">
+                2018-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="虚拟文件系统"><a href="#虚拟文件系统" class="headerlink" title="虚拟文件系统"></a>虚拟文件系统</h1><p>虚拟文件系统为用户空间提供了文件和不同文件系统相关的通用接口。</p>
+<h2 id="通用文件系统接口"><a href="#通用文件系统接口" class="headerlink" title="通用文件系统接口"></a>通用文件系统接口</h2><p>VFS使得用户可以直接使用诸如open()，read()和write()的系统调用接口，而不需要考虑具体的文件系统和物理介质。它把不同的文件系统抽象后采用统一的方式。</p>
+<h2 id="文件系统抽象层"><a href="#文件系统抽象层" class="headerlink" title="文件系统抽象层"></a>文件系统抽象层</h2><p>由于内核在底层的文件系统接口之上建立了一个抽象层，底层文件系统通过实现VFS期望的抽象接口和数据接口，这样用户空间就可以调用统一的系统调用。</p>
+<p>以write()为例，这个系统调用会被一个sys_write()进行处理，sys_write会找到文件描述符fd对应的真实文件系统调用该文件系统的写方法。</p>
+<h2 id="Unix文件系统"><a href="#Unix文件系统" class="headerlink" title="Unix文件系统"></a>Unix文件系统</h2><p>Unix使用了四种和文件系统相关的抽象概念：文件、目录项、索引节点和挂载点。</p>
+<p>这是一种分层存储结构的结构。在unix中，文件系统挂载在一个特定的挂载点，相当于是一个命名空间，所有已安装的文件系统都作为根文件系统树的树叶出现在系统上。</p>
+<p>文件通过目录组织起来，但VFS把目录也看做一种文件。Unix会把文件的相关信息诸如权限，创建时间，创建者这些元数据和文件区分对待，这些元数据存储在inode结点中，这是一个单独的数据结构。</p>
+<p>文件的元数据和文件系统的控制信息息息相关，文件系统的控制信息存储在超级块，这样一个数据结构上。</p>
+<h2 id="VFS对象及其数据结构"><a href="#VFS对象及其数据结构" class="headerlink" title="VFS对象及其数据结构"></a>VFS对象及其数据结构</h2><p>VFS主要有四种对象类型：</p>
+<ul>
+<li>超级块对象，一个具体的已安装文件系统；</li>
+<li>索引节点对象，一个具体的文件；</li>
+<li>目录项对象，代表一个目录项，是路径的一个组成成分；</li>
+<li>文件对象，由进程打开的文件（注意目录也是一种文件）</li>
+</ul>
+<h2 id="超级块对象"><a href="#超级块对象" class="headerlink" title="超级块对象"></a>超级块对象</h2><p>每个文件系统都必须要实现超级块对象，用来存储特定文件系统的信息。超级块对象由<strong>super_block</strong>结构体表示。</p>
+<h2 id="索引结点对象"><a href="#索引结点对象" class="headerlink" title="索引结点对象"></a>索引结点对象</h2><p>索引节点对象包含了内核在操作文件时所需要的全部信息，如果一个文件系统没有索引结点，这些文件系统会将文件描述的信息作为文件的一部分存放。无论如何，索引结点信息必须要创建。</p>
+<p>索引结点对象由结构体<strong>inode</strong>表示</p>
+<h2 id="目录项对象"><a href="#目录项对象" class="headerlink" title="目录项对象"></a>目录项对象</h2><p>考虑这一个路径/bin/vi，那么/，bin和vi都属于目录项对象，前两个是目录，后一个是普通文件。由于路径中每个部分都是目录项对象，为了路径查找方便，就引入了目录项对象。目录项对象由结构体<strong>dentry</strong>表示。目录项对象没有对应的磁盘数据结构，因为目录项对象不是保存在物理硬盘中的。</p>
+<h3 id="目录项状态"><a href="#目录项状态" class="headerlink" title="目录项状态"></a>目录项状态</h3><p>目录项对象有三种状态：被使用、未被使用和负状态。</p>
+<p>一个被使用的目录项对应一个有效的索引结点，并且该对象存在使用者；一个未被使用的目录项对应一个有效的索引结点，但未被使用；而负状态的目录项则没有对应的有效索引点，只是目录项还存在。</p>
+<h3 id="目录项缓存"><a href="#目录项缓存" class="headerlink" title="目录项缓存"></a>目录项缓存</h3><p>由于VFS层遍历路径并解析其成dentry对象非常耗时，因此可以使用目录项缓存：</p>
+<ul>
+<li>被使用的目录项链表</li>
+<li>最近被使用的双向链表；</li>
+<li>散列表用来快速将给定路径解析成目录项对象；</li>
+</ul>
+<p>这样VFS会现在缓存中查找路径，如果找不到了，就必须要自己解析路径，找到dentry对象并将其假如到dcache中。</p>
+<h2 id="文件对象"><a href="#文件对象" class="headerlink" title="文件对象"></a>文件对象</h2><p>文件对象表示的是进程已经打开的文件在内存中的表示，涉及到诸如访问模式，位偏移等信息。一个文件对应的文件对象不是唯一的，但对应的目录项和索引结点是唯一的。</p>
+<p>文件对象由结构体file表示。</p>
+<p>文件操作由结构体file_operations表示，内定义了大量的函数指针。</p>
+<h2 id="和进程相关的数据结构"><a href="#和进程相关的数据结构" class="headerlink" title="和进程相关的数据结构"></a>和进程相关的数据结构</h2><p>有三个结构体将VFS和系统的进程紧密地联系在一起：file_struct, fs_struct和namespace。</p>
+<h3 id="file-struct"><a href="#file-struct" class="headerlink" title="file_struct"></a>file_struct</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">atomic_t</span> count; <span class="comment">/* 共享该表的进程数 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">rwlock_t</span> file_lock; <span class="comment">/* 保护以下的所有域,以免在tsk-&gt;alloc_lock中的嵌套*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> max_fds; <span class="comment">/*当前文件对象的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> max_fdset; <span class="comment">/*当前文件描述符的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> next_fd; ／*已分配的文件描述符加<span class="number">1</span>*/</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> ** <span class="title">fd</span>;</span> <span class="comment">/* 指向文件对象指针数组的指针 */</span></span><br><span class="line"></span><br><span class="line">    fd_set *close_on_exec; <span class="comment">/*指向执行exec( )时需要关闭的文件描述符*/</span></span><br><span class="line"></span><br><span class="line">    fd_set *open_fds; <span class="comment">/*指向打开文件描述符的指针*/</span></span><br><span class="line"></span><br><span class="line">    fd_set close_on_exec_init;<span class="comment">/* 执行exec( )时需要关闭的文件描述符的初 值集合*/</span></span><br><span class="line"></span><br><span class="line">    fd_set open_fds_init; <span class="comment">/*文件描述符的初值集合*/</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> * <span class="title">fd_array</span>[32];</span><span class="comment">/* 文件对象指针的初始化数组*/</span></span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>进程描述符的files域指向该结构体，包含了所有与单个进程相关的文件信息。</p>
+<h3 id="fs-struct"><a href="#fs-struct" class="headerlink" title="fs_struct"></a>fs_struct</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fs_struct</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> users; <span class="comment">//用户数目</span></span><br><span class="line">    <span class="keyword">rwlock_t</span> lock <span class="comment">//锁</span></span><br><span class="line">    <span class="keyword">int</span> umask; <span class="comment">//掩码</span></span><br><span class="line">    <span class="keyword">int</span> in_exec; <span class="comment">//正在执行的文件</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">path</span> <span class="title">root</span>;</span> <span class="comment">//根目录路径</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">path</span> <span class="title">pws</span>;</span> <span class="comment">//当前工作目录的路径</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>该结构体包含了进程与文件系统的相关信息，由fs域指向的；</p>
+<h3 id="namespace结构体"><a href="#namespace结构体" class="headerlink" title="namespace结构体"></a>namespace结构体</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mmt_namespace</span> &#123;</span></span><br><span class="line">  	<span class="keyword">atomic_t</span> count; <span class="comment">//结构体的使用计数</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vfsmount</span> *<span class="title">root</span>;</span> <span class="comment">//根目录的安装点对象</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span> <span class="comment">//安装点链表</span></span><br><span class="line">    <span class="keyword">wait_queue_head_t</span> poll; <span class="comment">//轮询的等待队列</span></span><br><span class="line">    <span class="keyword">int</span> event; <span class="comment">//事件计数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>该结构体使得进程在系统中看到唯一的安装文件系统，由进程描述符的mmt_namespace域指向。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/27/Linux内核学习——内存管理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1826,183 +1983,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/12/LinearModel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/12/LinearModel/" itemprop="url">LinearModel</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-12T22:43:49+08:00">
-                2018-07-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="线性模型"><a href="#线性模型" class="headerlink" title="线性模型"></a>线性模型</h1><h2 id="基本形式"><a href="#基本形式" class="headerlink" title="基本形式"></a>基本形式</h2><p>线性模型是通过一个属性的线性组合进行预测的函数：<br>$$<br>f(x) = w_1x_1 + w_2x_2 + … + w_dx_d + b = w^Tx + b<br>$$</p>
-<ul>
-<li>许多非线性模型可以通过在线性模型的基础上引入层级结构或者高维映射形成；</li>
-<li>另外，向量w直观地表达了各个属性在预测中的重要性；</li>
-</ul>
-<h2 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h2><p>给定数据集$D={(x_1, y_1), (x_2, y_2),…,(x_m, y_m)}$，其中向量$x_i=(x_{i1};x_{i2};…;x_{id})$。而线性回归就是希望找到一个线性模型能够准确地预测出值。也就是试图学习得：<br>$$<br>f(x) == w^Tx + b，使得f(x_i)\approx{y_i}<br>$$<br>那么这里的关键要确定w和b，也就是保证f(x)和y之间最小的时候获得w和b，从几何的角度来看，就是找到一条直线使得所有样本到直线上的欧氏距离之和最小。</p>
-<p>假设有<br>$$<br>X=<br>\begin{bmatrix}<br>    x_{11} &amp; x_{12} &amp; x_{13} &amp; \dots  &amp; x_{1d} \<br>    x_{21} &amp; x_{22} &amp; x_{23} &amp; \dots  &amp; x_{2d} \<br>    \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \<br>    x_{m1} &amp; x_{m2} &amp; x_{m3} &amp; \dots  &amp; x_{md}<br>\end{bmatrix}<br>$$</p>
-<p>$$<br>y = (y_1; y_2;…;y_m)<br>$$</p>
-<p>令$E_w = (y-Xw)^T (y-Xw)$，对$w$求导，得<br>$$<br>\frac{\alpha{E_w}}{\alpha{w}} = 2X^T(Xw-y)<br>$$<br>当$X^TX$为正定矩阵或者满秩矩阵，令导数为0可得：<br>$$<br>2X^T(Xw-y) = 0 \<br>X^TXw = X^Ty \<br>w = (X^TX)^{-1}X^Ty<br>$$<br>假如我们认为对应的输入会导致在指数尺度上发生变化，可以转换成对数线性回归：<br>$$<br>ln y = w^T+b<br>$$</p>
-<h2 id="对数几率回归"><a href="#对数几率回归" class="headerlink" title="对数几率回归"></a>对数几率回归</h2><p>上面提及的是利用线性模型做回归学习，如果面对分类任务应该怎么做呢？</p>
-<p>考虑二分类问题，则$y\in({0, 1})$，我们需要将线性回归模型产生的值转换为0/1值。则</p>
-<blockquote>
-<p>当z&lt;0，y = 0;</p>
-<p>当z=0，y = 0.5;</p>
-<p>当z&gt;0，y = 1</p>
-</blockquote>
-<p>因此我们可以sigmoid函数代替，$y = \frac{1}{1+e^{-z}}$，图像如下：</p>
-<p><img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg" alt="img"></p>
-<p>带入上式，可以得到：<br>$$<br>y = \frac{1}{1+e^{-{(w^Tx+b)}}} \<br>ln \frac{y}{1-y} = w^Tx+b<br>$$<br>若把y视为样本x作为正例的可能性，1-y为其反例可能性，那么$ln \frac{y}{1-y} $就是对数几率。这个方法不仅仅可以预测出类别，更可以得到近似概率的预测，提高决策效果。</p>
-<p>当要确定w和b的时候，可以使用极大似然法来估计，目的是使得每个样本属于真实样本的可能性越大越好：<br>$$<br>\iota(w, b) = \sum_{i=1}^{m}ln p(y_i|x_i;w,n)<br>$$<br>其中似然项可以写成：<br>$$<br>p(y_i|x_i;w, b) = y_ip(y=1|x,w;b) + (1-y_i)p(y=0|x,w;b)<br>$$<br>带入上式之后，使用梯度下降可以求得最优解。</p>
-<p>关于极大似然法，可以<a href="http://www.lucienxian.top/2018/05/15/Bayesian/" target="_blank" rel="noopener">参考</a></p>
-<h2 id="线性判别分析"><a href="#线性判别分析" class="headerlink" title="线性判别分析"></a>线性判别分析</h2><p><strong>linear discriminant analysis(LDA)</strong>是一种经典的线性学习方法，可用作分类，也可以为后续的分类做降维操作。</p>
-<p>LDA的思想：设法将样本投影到这样的一条直线上：同类的样例的投影点尽可能相近，异类样例的投影点尽可能远离，这样就可以根据投影点的位置来确定新样本的类别。</p>
-<p><img src="https://i.stack.imgur.com/9k7iT.png" alt="img"></p>
-<blockquote>
-<p><a href="https://i.stack.imgur.com/9k7iT.png" target="_blank" rel="noopener">https://i.stack.imgur.com/9k7iT.png</a></p>
-</blockquote>
-<p>令$X_i, \mu_i, \Sigma_{i}$分别表示第i类实例的集合、均值向量和协方差矩阵。在将样本值投影到直线之后，两个样本的协方差分别为$w_T\Sigma_0w$和$w_T\Sigma_1w$，而样本中心的投影则是$w_T\mu_0$和$w_T\mu_1$。因此，为了使得同类样例的投影点尽可能接近，异类样例的投影中心尽可能大，则需要最大化目标函数：<br>$$<br>J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w} \<br>= \frac{w_T(\mu_0-\mu_1)(\mu_0-\mu_1)^Tw}{w_T(\Sigma_0+\Sigma_1)w}<br>$$<br>分子$\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2$尽可能大，保证类中心之间距离尽可能大。分母$w_T\Sigma_0w+w_T\Sigma_1w$尽可能小，使得同样例的投影点的协方差尽可能小。</p>
-<h2 id="多分类学习"><a href="#多分类学习" class="headerlink" title="多分类学习"></a>多分类学习</h2><p>多分类学习的任务，可以基于二分类学习进行推广，即将多分类任务拆分为若干个二分类任务进行求解。有三种拆分策略：</p>
-<ul>
-<li>一对一：OvO；</li>
-<li>一对其余：OvR；</li>
-<li>多对多：MvM；</li>
-</ul>
-<h3 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h3><p>假设有N个类别，我们分别进行两两配对，那么就会产生N(N-1)/2个二分类任务，则有N(N-1)/2个分类器。那么在测试的时候，对于测试样本就会产生N(N-1)/2个结果。最终结果可以通过投票产生，被预测得最多的类别作为最终分类结果。</p>
-<h3 id="一对其余"><a href="#一对其余" class="headerlink" title="一对其余"></a>一对其余</h3><p>OvR的主要思路是每次将一个类别作为正例，其余所有类的样例作为反例，产生N个分类器。在测试的时候，若仅有一个分类器预测为正类，则对应的类别标记为最终结果；若有多个分类器预测为正类，则需要考虑分类器的预测置信度，选择置信度最大的作为分类结果。</p>
-<h3 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h3><p>多对多的思路是每次选取若干个类作为正类，若干个其它类作为反类，显然OvO和OvR都是MvM的特例，这里介绍一种最常见的MvM技术：纠错输出码(ECOC)。</p>
-<p>ECOC主要分为两个过程：</p>
-<ul>
-<li>编码：对N个类别做M次划分，每次将一部分类别作为正类，一部分作为反类。这样就形成了M个训练集和M个分类器。</li>
-<li>解码：M个分类器分别对测试样本进行预测，这些预测标记组成一个新的编码，将这个编码与各个类别的编码进行比较，返回其中距离最短的类别作为最终结构。</li>
-</ul>
-<p>类别的划分通过编码矩阵来指定，常见形式有二元码和三元码：</p>
-<p><img src="https://www.researchgate.net/profile/S_Escalera/publication/224347110/figure/fig1/AS:302774504968192@1449198475244/a-Binary-ECOC-design-for-a-4-class-problem-An-input-test-codeword-x-is-classified-to.png" alt="img"></p>
-<p>三元码的0表示$f_i$分类器不使用该类样本。</p>
-<p>纠错输出码对分类器的错误有一定的容忍和纠正能力，假设某个分类器出现了错误，基于这个编码仍能产生正确的分类的结果。另外ECOC编码越长，或者任意两个类别之间的编码距离越远，它的纠错能力就越强。</p>
-<h2 id="类别不平衡问题"><a href="#类别不平衡问题" class="headerlink" title="类别不平衡问题"></a>类别不平衡问题</h2><p>前面几章介绍的分类学习方法都有一个基本的前提，那就是不同类别的训练样本树木相当。但假设反例有998个，正例有2个，那么学习方法只要每次都返回一个永远将样本预测设为反例的学习器，那么精确度就有99.8%。但显然，这种学习没有意义。</p>
-<p>线性分类时，当我们用$y = w^Tx+b$对新样本x进行分类时，事实上是用y跟一个阈值进行比较。实际上y代表了正例的可能性，那么几率$\frac{y}{1-y}$代表了正例与反例的可能性比值，则：<br>$$<br>若\frac{y}{1-y} &gt; 1，预测为正例<br>$$<br>然而当训练集正反例数目不等时，令$m^+$为正例数目，$m^-$为反例数目，那么观测几率就是$\frac{m^+}{m^-}$，这是基于真实样本是无偏差采样的。因此，我们可以对类别平衡的样本进行一次<strong>“再缩放”</strong>。<br>$$<br>\frac{y}{1-y} = \frac{y}{1-y} \times \frac{m^+}{m^-}<br>$$<br>现有技术对于这种类别平衡问题有三种做法：</p>
-<ul>
-<li>欠采样：去掉一些反例，使得正反例数目接近；</li>
-<li>过采样：增加一些正例，使得正反例数目接近；</li>
-<li>阈值移动：就是刚刚的那个再缩放；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2046,7 +2031,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">240</span>
+                <span class="site-state-item-count">241</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

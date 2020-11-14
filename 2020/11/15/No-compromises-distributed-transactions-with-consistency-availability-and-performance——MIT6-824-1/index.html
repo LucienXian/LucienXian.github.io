@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="分布式,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="No compromises: distributed transactions with consistency, availability, and performance 强一致性和高可用性的事务简化了分布式系统的构建，但在从前，分布式事务的设计实现不大理想，这就迫使以前构建分布式系统的时候抛弃分布式事务或者使用弱一致性，或者使用单机事务，要求业务方通过数据分区的方式，保证事务数据落在一个机">
+<meta name="keywords" content="分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="No compromises distributed transactions with consistency, availability, and performance——MIT6-824">
+<meta property="og:url" content="http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="No compromises: distributed transactions with consistency, availability, and performance 强一致性和高可用性的事务简化了分布式系统的构建，但在从前，分布式事务的设计实现不大理想，这就迫使以前构建分布式系统的时候抛弃分布式事务或者使用弱一致性，或者使用单机事务，要求业务方通过数据分区的方式，保证事务数据落在一个机">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://pic.downk.cc/item/5fa03c371cd1bbb86b8e1d77.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5fa803141cd1bbb86b451dff.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5fb00c44ef76db7fe8909662.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5fb016c63e3fc2acb7182059.png">
+<meta property="og:updated_time" content="2020-11-14T17:44:27.460Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="No compromises distributed transactions with consistency, availability, and performance——MIT6-824">
+<meta name="twitter:description" content="No compromises: distributed transactions with consistency, availability, and performance 强一致性和高可用性的事务简化了分布式系统的构建，但在从前，分布式事务的设计实现不大理想，这就迫使以前构建分布式系统的时候抛弃分布式事务或者使用弱一致性，或者使用单机事务，要求业务方通过数据分区的方式，保证事务数据落在一个机">
+<meta name="twitter:image" content="https://pic.downk.cc/item/5fa03c371cd1bbb86b8e1d77.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/">
+
+
+
+
+
+  <title>No compromises distributed transactions with consistency, availability, and performance——MIT6-824 | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">No compromises distributed transactions with consistency, availability, and performance——MIT6-824</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-15T01:43:49+08:00">
+                2020-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="No-compromises-distributed-transactions-with-consistency-availability-and-performance"><a href="#No-compromises-distributed-transactions-with-consistency-availability-and-performance" class="headerlink" title="No compromises: distributed transactions with consistency, availability, and performance"></a>No compromises: distributed transactions with consistency, availability, and performance</h1><blockquote>
+<p>强一致性和高可用性的事务简化了分布式系统的构建，但在从前，分布式事务的设计实现不大理想，这就迫使以前构建分布式系统的时候抛弃分布式事务或者使用弱一致性，或者使用单机事务，要求业务方通过数据分区的方式，保证事务数据落在一个机器上。</p>
+<p>本文一个名为FaRM的内存分布式计算平台，具备以下特性：强序列化，高性能，持久性和高可用性。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>具有高可用性和强序列化的事务通过简单的抽象来简化了分布式系统的编程和推理：单机永不失败，一次执行一个实时同步的事务。但是，先前在分布式系统中实现此抽象的尝试都导致了较差的性能。因此，诸如Dynamo或Memcached之类的系统通过不支持事务或实施弱一致性保证来提高性能。其他系统仅在所有数据都驻留在一台机器中时才提供事务。</p>
+<p>本文证明了现代数据中心中的新软件可以消除折衷的要求。它在一种称为FaRM的内存分布式计算平台中描述了事务，复制和恢复协议。 FaRM为分布式ACID事务提供严格的可简化性，高可用性，高吞吐量和低延迟。FaRM平台利用了两个趋势：带有RDMA的网络和提供非易失性DRAM，消除了存储和网络瓶颈，并通过减少消息数量，使用单面RDMA读写存储而不是消息以及有效利用并行性，来解决CPU瓶颈。</p>
+<p>FaRM允许数据分布在不同机器，同时允许事务跨越任何数量的机器。FaRM通过使用vertical Paxos，而不是通过Paxos协议进行coordinators和数据的复制，此时副本是主-备，然后协调者是单个，不进行复制。FaRM使用具有四个阶段提交协议（锁定，验证，提交备份和主要提交）。</p>
+<p>在事务执行和验证期间和在事务中修改的对象副本上将记录记录到非易失性预写日志WAL时，都会使用RDMA，避免了本地CPU开销。不再需要CPU参与，意味着传统的故障恢复（failure-recovery）协议不再适合FaRM，因此文章使用了precise membership的解决方案：保证所有机器都在当前membership configuration上达成一致，并且只会发送请求给组员。</p>
+<p>FaRM中的故障恢复速度很快，因为它有效地利用了并行性。它在集群中平均分配恢复的数据，并在每台计算机之间并行进行恢复。</p>
+<h2 id="Hardware-trends"><a href="#Hardware-trends" class="headerlink" title="Hardware trends"></a>Hardware trends</h2><p>FaRM的设计受到数据中心机器中大量廉价DRAM的推动。FaRM利用两种硬件趋势来消除存储和网络瓶颈：非易失性DRAM和具有RDMA的网络。</p>
+<h3 id="Non-volatile-DRAM"><a href="#Non-volatile-DRAM" class="headerlink" title="Non-volatile DRAM"></a>Non-volatile DRAM</h3><p>distributed uninterruptible power supply (UPS)利用锂离子电池的广泛可用性来降低数据中心UPS的成本，与传统的UPS相比，这种方法更加可靠：锂离子电池配备了多个独立的电池单元，并且电池故障仅会影响机架的一部分。</p>
+<p>分布式UPS有效地使DRAM持久耐用。发生电源故障时，分布式UPS使用电池中的能量将内存内容保存到SSD中。这不仅避免了对SSD的同步写入，从而提高了常见情况的性能，而且还通过仅在发生故障时对其进行写入来延长SSD的寿命。另一种方法是使用非易失性DIMM（NVDIMM），它们包含自己的专用闪存，控制器和超级电容器，但这种设备成本更高。</p>
+<p>FaRM将所有数据存储在内存中，并在将其写入多个副本上的NVRAM中时，将其作为持久数据。</p>
+<h3 id="RDMA-networking"><a href="#RDMA-networking" class="headerlink" title="RDMA networking"></a>RDMA networking</h3><p>FaRM尽可能使用单边RDMA操作，因为它们不使用远程CPU。与RPC相比，RDMA的读取性能更高，并且消除了NIC消息速率瓶颈。但RPC和RDMA与CPU有关，减少CPU开销能更好释放新硬件的潜力。</p>
+<h2 id="Programming-model-and-architecture"><a href="#Programming-model-and-architecture" class="headerlink" title="Programming model and architecture"></a>Programming model and architecture</h2><p>FaRM提供了一个全局的抽象地址空间，提供对事务中本地和远程对象的透明访问。应用程序线程可以随时启动事务，而后会成为事务的协调者。在事务执行期间，线程可以执行任何逻辑，包括读取，写入，分配和释放对象。在执行结束时，线程调用FaRM提交事务。</p>
+<p>FaRM事务使用乐观并发控制，更新在执行期间会缓冲在本地，并且仅在成功提交后才对其他事务可见，FaRM对成功提交的事务提供了严格的串行性。至于读，FaRM保证对单个对象操作的原子性，每次读总能返回最新的值。不同对象间的读取不保证原子性，但保证严格串行。</p>
+<p>下图显示了具有四台计算机的FaRM实例和机器A的内部组成。每台机器在用户进程中运行FaRM，且内核线程固定在每个硬件线程上。每个内核线程运行一个事件循环，该循环执行应用程序代码并轮询RDMA完成队列。</p>
+<p><img src="https://pic.downk.cc/item/5fa03c371cd1bbb86b8e1d77.png" alt></p>
+<p>扩缩容的时候，FaRM实例会随着时间推移逐步进行一系列配置，配置是⟨i, S, F , CM⟩，其中i是唯一单调递增的64位配置id，S是配置的机器集合，F是Pair&lt;机器, 独立故障域&gt;，CM是配置管理机器。FaRM使用Zookeeper来确保机器就当前配置达成一致并进行存储，但是它不像通常那样依靠Zookeeper来管理租约，检测故障或协调恢复。 而是使用配置管理器通过RDMA快速恢复来负责。</p>
+<p>FaRM的全局内存以2GB进行划分，每个2GB称为一个region，每个region保存在1个primary和f个backups上，每个region存储在非易失内存中，能够被其他机器通过RMDA直接读取。一般会先读primary，如果在本地有就读本地内存，远程有就读RDMA。region到primary-backups的映射关系信息则是保存在CM上。</p>
+<p>机器可以与CM联系分配新区域。CM从单调递增的计数器分配region id，为该区域选择副本，并尽可能平衡各个机器的region数。与一致性哈希的方法相比，这种集中式方法提供了更大的灵活性来满足故障独立性和局部性约束。它还使平衡机器之间的负载和接近容量运行变得更加容易。</p>
+<p>每台机器还存储基于FIFO队列的环形缓冲区，用于事务日志或消息队列。每个发送方-接收方对都有自己的日志和消息队列，但物理上位于接收方处。发送方通过RDMA直接写到尾部，然后NIC直接回ACK，接收方则周期性的从头部读取数据处理。</p>
+<h2 id="Distributed-transactions-and-replication"><a href="#Distributed-transactions-and-replication" class="headerlink" title="Distributed transactions and replication"></a>Distributed transactions and replication</h2><p>FaRM结合了事务协议和副本协议来提高性能，并利用单端RDMA读写来提高cpu的有效性和低延迟。FaRM在非易失的内存中使用主备副本协议来存储数据和事务日志，协调器没有副本，并且协调器会直接和主备副本进行通信。在执行阶段，事务使用单面RDMA（如果与协调器在同一个机器则使用本地内存）读取对象，并且它们在本地缓冲写操作，下图是FaRM事务的执行时间表：</p>
+<p><img src="https://pic.downk.cc/item/5fa803141cd1bbb86b451dff.png" alt></p>
+<p>执行结束后，通过以下步骤进行提交：</p>
+<ol>
+<li>lock：协调器将LOCK记录（版本、新值和region列表）写入所有被修改对象的primary中。然后primary会使用CAS尝试锁住这些对象的指定版本，返回是否锁成功的消息。如果自从事务读取对象以来发生任何对象版本的更改，或者当前对象已被另一个事务锁定，则锁定可能失败，协调器终止事务；</li>
+<li>Validate：协调器对事务内所有的只读对象进行读校验，从这些只读对象的primary发起RMDA读或RPC读。默认情况下使用单面RDMA读取，只读对象的数量超过4个，则使用RPC。如果版本号变更了，事务就被终止；</li>
+<li>Commit backups：通过RDMA写log到所有backups，等待网卡的确认；</li>
+<li>Commit primaries：在确认所有COMMIT-BACKUP写入之后，协调器将Commit primaries记录写入每个primary的日志中，收到至少一个响应，协调器马上返回给应用成功。primary通过更新对象，增加其版本并对其进行解锁来处理这些记录，从而完成了事务所提交的写入；</li>
+<li>Truncate：协调器在收到来自所有primary的确认后，会延迟地truncate事务内的primary和backup的日志；</li>
+</ol>
+<p>正确性；</p>
+<p>在获取所有写锁时，已提交的读写事务是串行的，这是在串行点上所有读取和写入对象的版本与执行期间看到的版本相同。锁阶段保证了写对象的串行性，而校验阶段保证了只读对象的串行性，在没有失败的情况下，这等效于在串行点原子地执行和提交整个事务。 </p>
+<p>为了确保故障时的串行性，必须在写入COMMIT-PRIMARY之前等待所有backup的确认。否则当某些COMMIT-BACKUP失败，且协调器故障了，就会丢失记录。</p>
+<p>由于读的集合只保存在协调器中，一旦协调器挂了就没有commit记录可以证明验证成功了，这样就会导致事务abort。所以协调器等待一个primary的提交成功才会响应给client成功。这样能避免f个backup和coordinator一起挂了使得锁记录保存但丢失校验没成功的记录。</p>
+<p>传统的二阶段提交协议，可以在准备阶段去检查有没有资源。但FaRM因为只用单边RDMA，无法使用远程CPU，因此必须要保留空间去记录所有的提交协议记录，包括在开始commit之前截断primary和backup的记录。日志保留是协调器上的本地操作，因为协调器会将记录写入其在每个参与者处拥有的日志中，写完相应记录之后会释放保留空间。</p>
+<h3 id="Failure-detection"><a href="#Failure-detection" class="headerlink" title="Failure detection"></a>Failure detection</h3><p>FaRM使用租约机制来检测故障。除CM之外，每台机器都在CM处拥有租约，而CM则对其他所有机器拥有租约，这是一个双向租约的机制。租约使用三次握手的方式授权，每台机器向CM发送一个租约请求，CM返回的响应消息即代表对机器的授权，也是CM对该机器的租约请求，最后该机器授权租约给CM。</p>
+<p>FaRM租期非常短，这是高可用性的关键。在高负载下，FaRM可以为90台计算机群集使用5毫秒的租约，而不会产生误报。</p>
+<p>为了在高负载的情况下获得短期租约，FaRM使用专门的队列来支持租约，这样就能避免租约消息的延迟。另外为了避免性能的影响，FaRM的租约管理器通过无连接的不可靠数据包去发送和接收租约。默认情况下，租约的延续一般是租约超时周期的五分之一。</p>
+<p>续租还必须及时在CPU上定时调度，FaRM使用专用的租约管理器线程，该线程以最高的用户空间优先级运行，并且租约管理器线程没有固定到任何的硬件线程，它使用中断而不是轮询来避免在每个硬件线程上定期运行的关键OS任务饿死，导致误报租约过期。虽然增加了几毫秒的消息延迟，但对于租约来说不是问题。</p>
+<p>最后，在初始化期间预先分配租约管理器使用的所有内存，然后分页并固定其使用的所有代码，以避免由于内存管理而造成的延迟。</p>
+<h3 id="Reconfiguration"><a href="#Reconfiguration" class="headerlink" title="Reconfiguration"></a>Reconfiguration</h3><p>重新配置协议将FaRM实例从一种配置移到另一种，FaRM使用了RDMA操作来保证极高的性能，因为缺少CPU的使用，因此无法利用租约机制来实现一致性。FaRM使用的是精确的成员身份来实现这个问题，发生故障后，采用新配置的所有计算机必须先同意其成员身份，然后才能进行对象更改。这就允许了在客户端做检查而不是服务端。配置中的计算机不会向不在其中的计算机发出RDMA请求，并且也会忽略配置中不再存在的计算机做回应。</p>
+<p><img src="https://pic.downk.cc/item/5fb00c44ef76db7fe8909662.png" alt></p>
+<ol>
+<li>猜测：当CM上的一个机器租约过期时，CM会猜测那个机器挂了，并初始化重新配置，这个时间点开始阻塞所有外部客户端的请求。如果一个非CM机器上的租约过期了，它会推断CM挂了，这个非CM租约上的机器会尝试请求少量的CM备机去初始化配置。如果超时后配置未更改，则它将尝试重新配置自身。这种设计避免了在CM故障时会有大量机器同时尝试重新配置，在所有情况下，启动重新配置的机器都将尝试成为新的CM，作为重新配置的一部分。</li>
+<li>探测：新的CM向配置中的所有机器发出RDMA读取，除了前面猜测故障的机器和读失败的机器，这些读取探测允许通过一次重新配置来处理影响多台机器的相关故障，例如电源和开关故障。新CM仅在获得大多数响应后才继续进行重新配置。这样可以确保如果网络已分区，则CM不会位于较小的分区中。</li>
+<li>更新配置：CM尝试更新zk的配置为 ⟨c + 1, S, F , CM(id)⟩，c是当前的配置版本号id，S是探测有返回的机器列表，F是故障域映射，CM(id)是自己的id。FaRM使用zk的znode序列号去实现原子的CAS，只有当前配置的的版本仍然是c是，CAS才成功。</li>
+<li>重新映射区域：新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f + 1。它尝试平衡负载并满足容量和故障独立性约束的应用程序指定的局部性提示。对于失败的主数据库，它会将尚存的备份升级为新的主数据库，以减少恢复时间。如果它检测到丢失了所有副本的区域，或者没有空间可以重新复制区域，则会发出错误消息。</li>
+<li>发送新配置：重新映射区域后，CM会使用配置标识符，其自身的标识符，配置中其他机器的标识符以及区域到机器的所有新映射，向配置中的所有机器发送NEW-CONFIG消息。并根据需要重置租约或者进行租约交换；</li>
+<li>应用新配置：当机器收到配置标识符大于其自身配置的NEW-CONFIG时，它将更新其当前配置标识符及其区域映射的缓存副本，并分配空间以容纳分配给它的所有新区域副本。同时还会给CM进行租约的授权。</li>
+<li>提交新配置：一旦CM从配置中的所有计算机接收到NEW-CONFIG-ACK消息，它会等待所有不在新配置中的机器的租约过期。然后CM向所有配置成员发送NEW-CONFIG-COMMIT，和第6步租约申请的授权，最后所有成员解锁外部客户端请求；</li>
+</ol>
+<h3 id="Transaction-state-recovery"><a href="#Transaction-state-recovery" class="headerlink" title="Transaction state recovery"></a>Transaction state recovery</h3><p>在配置更改后，FaRM使用事务修改的对象副本之间的日志来恢复事务状态。这涉及到事务修改的对象副本和协调器恢复状态，以决定事务的结果。</p>
+<p><img src="https://pic.downk.cc/item/5fb016c63e3fc2acb7182059.png" alt></p>
+<ol>
+<li>阻塞访问正在恢复的region：当一个primary的region挂了，其中一个备份就会被提升为primary，在所有更新该region的操作都反映到该primary之前都不允许访问该region；</li>
+<li>清除日志：单面RDMA写一般会和故障恢复冲突，FaRM无法通过网卡来拒绝来自旧配置的消息，只能在收到NEW-CONFIG-COMMIT消息时清除所有的日志记录，然后拒绝新来的日志；</li>
+<li>找到正在恢复的日志：</li>
+<li>锁定恢复：region的每个primary会等本地机器日志被排出，并且从所有backup中收到NEED-RECOVERY消息，然后primary并行地从backup中拉取任意的、本地没有存储的事务日志记录，并对任何被恢复事务修改的对象进行锁定。当锁定恢复完成了一个region时，这个region就可以被本地或远程的coordinator获得本地指针和RDMA引用；</li>
+<li>备份日志记录：在primary中的线通过发送REPLICATE-TX-STATE消息给backup来备份日志记录；</li>
+<li>投票：恢复事务的coordinator基于每个被该事务修改的region的投票决定是否提交或abort事务；</li>
+<li>决定：如果从所有region收到了commit-primary，coordinator就会决定提交事务；如果至少有一个region投票了commit-backup并且所有其他的被事务修改的region提交了lock或commit-backup或truncated，则等待所有region去投票和提交；其他情况会abort；</li>
+</ol>
+<h3 id="Recovering-data"><a href="#Recovering-data" class="headerlink" title="Recovering data"></a>Recovering data</h3><p>FaRM一定会将region数据复制数据到新的backup上，以便将来能容忍f个故障。一个region的一个新的backup初始化空间为0。region被划分给worker线程并行地恢复数据。每一个线程发出一个单端RDMA操作去读primary的一个block。每个恢复对象被复制到backup之前都会做版本检查，然后使用CAS更新对象状态。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/21/Spanner-Google’s-Globally-Distributed-Database——MIT6-824/" rel="next" title="Spanner: Google’s Globally-Distributed Database——MIT6-824">
+                <i class="fa fa-chevron-left"></i> Spanner: Google’s Globally-Distributed Database——MIT6-824
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">241</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#No-compromises-distributed-transactions-with-consistency-availability-and-performance"><span class="nav-number">1.</span> <span class="nav-text">No compromises: distributed transactions with consistency, availability, and performance</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hardware-trends"><span class="nav-number">1.2.</span> <span class="nav-text">Hardware trends</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Non-volatile-DRAM"><span class="nav-number">1.2.1.</span> <span class="nav-text">Non-volatile DRAM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDMA-networking"><span class="nav-number">1.2.2.</span> <span class="nav-text">RDMA networking</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Programming-model-and-architecture"><span class="nav-number">1.3.</span> <span class="nav-text">Programming model and architecture</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Distributed-transactions-and-replication"><span class="nav-number">1.4.</span> <span class="nav-text">Distributed transactions and replication</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Failure-detection"><span class="nav-number">1.4.1.</span> <span class="nav-text">Failure detection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reconfiguration"><span class="nav-number">1.4.2.</span> <span class="nav-text">Reconfiguration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transaction-state-recovery"><span class="nav-number">1.4.3.</span> <span class="nav-text">Transaction state recovery</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recovering-data"><span class="nav-number">1.4.4.</span> <span class="nav-text">Recovering data</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

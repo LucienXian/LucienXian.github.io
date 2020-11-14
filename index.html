@@ -265,6 +265,190 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/" itemprop="url">No compromises distributed transactions with consistency, availability, and performance——MIT6-824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-15T01:43:49+08:00">
+                2020-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="No-compromises-distributed-transactions-with-consistency-availability-and-performance"><a href="#No-compromises-distributed-transactions-with-consistency-availability-and-performance" class="headerlink" title="No compromises: distributed transactions with consistency, availability, and performance"></a>No compromises: distributed transactions with consistency, availability, and performance</h1><blockquote>
+<p>强一致性和高可用性的事务简化了分布式系统的构建，但在从前，分布式事务的设计实现不大理想，这就迫使以前构建分布式系统的时候抛弃分布式事务或者使用弱一致性，或者使用单机事务，要求业务方通过数据分区的方式，保证事务数据落在一个机器上。</p>
+<p>本文一个名为FaRM的内存分布式计算平台，具备以下特性：强序列化，高性能，持久性和高可用性。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>具有高可用性和强序列化的事务通过简单的抽象来简化了分布式系统的编程和推理：单机永不失败，一次执行一个实时同步的事务。但是，先前在分布式系统中实现此抽象的尝试都导致了较差的性能。因此，诸如Dynamo或Memcached之类的系统通过不支持事务或实施弱一致性保证来提高性能。其他系统仅在所有数据都驻留在一台机器中时才提供事务。</p>
+<p>本文证明了现代数据中心中的新软件可以消除折衷的要求。它在一种称为FaRM的内存分布式计算平台中描述了事务，复制和恢复协议。 FaRM为分布式ACID事务提供严格的可简化性，高可用性，高吞吐量和低延迟。FaRM平台利用了两个趋势：带有RDMA的网络和提供非易失性DRAM，消除了存储和网络瓶颈，并通过减少消息数量，使用单面RDMA读写存储而不是消息以及有效利用并行性，来解决CPU瓶颈。</p>
+<p>FaRM允许数据分布在不同机器，同时允许事务跨越任何数量的机器。FaRM通过使用vertical Paxos，而不是通过Paxos协议进行coordinators和数据的复制，此时副本是主-备，然后协调者是单个，不进行复制。FaRM使用具有四个阶段提交协议（锁定，验证，提交备份和主要提交）。</p>
+<p>在事务执行和验证期间和在事务中修改的对象副本上将记录记录到非易失性预写日志WAL时，都会使用RDMA，避免了本地CPU开销。不再需要CPU参与，意味着传统的故障恢复（failure-recovery）协议不再适合FaRM，因此文章使用了precise membership的解决方案：保证所有机器都在当前membership configuration上达成一致，并且只会发送请求给组员。</p>
+<p>FaRM中的故障恢复速度很快，因为它有效地利用了并行性。它在集群中平均分配恢复的数据，并在每台计算机之间并行进行恢复。</p>
+<h2 id="Hardware-trends"><a href="#Hardware-trends" class="headerlink" title="Hardware trends"></a>Hardware trends</h2><p>FaRM的设计受到数据中心机器中大量廉价DRAM的推动。FaRM利用两种硬件趋势来消除存储和网络瓶颈：非易失性DRAM和具有RDMA的网络。</p>
+<h3 id="Non-volatile-DRAM"><a href="#Non-volatile-DRAM" class="headerlink" title="Non-volatile DRAM"></a>Non-volatile DRAM</h3><p>distributed uninterruptible power supply (UPS)利用锂离子电池的广泛可用性来降低数据中心UPS的成本，与传统的UPS相比，这种方法更加可靠：锂离子电池配备了多个独立的电池单元，并且电池故障仅会影响机架的一部分。</p>
+<p>分布式UPS有效地使DRAM持久耐用。发生电源故障时，分布式UPS使用电池中的能量将内存内容保存到SSD中。这不仅避免了对SSD的同步写入，从而提高了常见情况的性能，而且还通过仅在发生故障时对其进行写入来延长SSD的寿命。另一种方法是使用非易失性DIMM（NVDIMM），它们包含自己的专用闪存，控制器和超级电容器，但这种设备成本更高。</p>
+<p>FaRM将所有数据存储在内存中，并在将其写入多个副本上的NVRAM中时，将其作为持久数据。</p>
+<h3 id="RDMA-networking"><a href="#RDMA-networking" class="headerlink" title="RDMA networking"></a>RDMA networking</h3><p>FaRM尽可能使用单边RDMA操作，因为它们不使用远程CPU。与RPC相比，RDMA的读取性能更高，并且消除了NIC消息速率瓶颈。但RPC和RDMA与CPU有关，减少CPU开销能更好释放新硬件的潜力。</p>
+<h2 id="Programming-model-and-architecture"><a href="#Programming-model-and-architecture" class="headerlink" title="Programming model and architecture"></a>Programming model and architecture</h2><p>FaRM提供了一个全局的抽象地址空间，提供对事务中本地和远程对象的透明访问。应用程序线程可以随时启动事务，而后会成为事务的协调者。在事务执行期间，线程可以执行任何逻辑，包括读取，写入，分配和释放对象。在执行结束时，线程调用FaRM提交事务。</p>
+<p>FaRM事务使用乐观并发控制，更新在执行期间会缓冲在本地，并且仅在成功提交后才对其他事务可见，FaRM对成功提交的事务提供了严格的串行性。至于读，FaRM保证对单个对象操作的原子性，每次读总能返回最新的值。不同对象间的读取不保证原子性，但保证严格串行。</p>
+<p>下图显示了具有四台计算机的FaRM实例和机器A的内部组成。每台机器在用户进程中运行FaRM，且内核线程固定在每个硬件线程上。每个内核线程运行一个事件循环，该循环执行应用程序代码并轮询RDMA完成队列。</p>
+<p><img src="https://pic.downk.cc/item/5fa03c371cd1bbb86b8e1d77.png" alt></p>
+<p>扩缩容的时候，FaRM实例会随着时间推移逐步进行一系列配置，配置是⟨i, S, F , CM⟩，其中i是唯一单调递增的64位配置id，S是配置的机器集合，F是Pair&lt;机器, 独立故障域&gt;，CM是配置管理机器。FaRM使用Zookeeper来确保机器就当前配置达成一致并进行存储，但是它不像通常那样依靠Zookeeper来管理租约，检测故障或协调恢复。 而是使用配置管理器通过RDMA快速恢复来负责。</p>
+<p>FaRM的全局内存以2GB进行划分，每个2GB称为一个region，每个region保存在1个primary和f个backups上，每个region存储在非易失内存中，能够被其他机器通过RMDA直接读取。一般会先读primary，如果在本地有就读本地内存，远程有就读RDMA。region到primary-backups的映射关系信息则是保存在CM上。</p>
+<p>机器可以与CM联系分配新区域。CM从单调递增的计数器分配region id，为该区域选择副本，并尽可能平衡各个机器的region数。与一致性哈希的方法相比，这种集中式方法提供了更大的灵活性来满足故障独立性和局部性约束。它还使平衡机器之间的负载和接近容量运行变得更加容易。</p>
+<p>每台机器还存储基于FIFO队列的环形缓冲区，用于事务日志或消息队列。每个发送方-接收方对都有自己的日志和消息队列，但物理上位于接收方处。发送方通过RDMA直接写到尾部，然后NIC直接回ACK，接收方则周期性的从头部读取数据处理。</p>
+<h2 id="Distributed-transactions-and-replication"><a href="#Distributed-transactions-and-replication" class="headerlink" title="Distributed transactions and replication"></a>Distributed transactions and replication</h2><p>FaRM结合了事务协议和副本协议来提高性能，并利用单端RDMA读写来提高cpu的有效性和低延迟。FaRM在非易失的内存中使用主备副本协议来存储数据和事务日志，协调器没有副本，并且协调器会直接和主备副本进行通信。在执行阶段，事务使用单面RDMA（如果与协调器在同一个机器则使用本地内存）读取对象，并且它们在本地缓冲写操作，下图是FaRM事务的执行时间表：</p>
+<p><img src="https://pic.downk.cc/item/5fa803141cd1bbb86b451dff.png" alt></p>
+<p>执行结束后，通过以下步骤进行提交：</p>
+<ol>
+<li>lock：协调器将LOCK记录（版本、新值和region列表）写入所有被修改对象的primary中。然后primary会使用CAS尝试锁住这些对象的指定版本，返回是否锁成功的消息。如果自从事务读取对象以来发生任何对象版本的更改，或者当前对象已被另一个事务锁定，则锁定可能失败，协调器终止事务；</li>
+<li>Validate：协调器对事务内所有的只读对象进行读校验，从这些只读对象的primary发起RMDA读或RPC读。默认情况下使用单面RDMA读取，只读对象的数量超过4个，则使用RPC。如果版本号变更了，事务就被终止；</li>
+<li>Commit backups：通过RDMA写log到所有backups，等待网卡的确认；</li>
+<li>Commit primaries：在确认所有COMMIT-BACKUP写入之后，协调器将Commit primaries记录写入每个primary的日志中，收到至少一个响应，协调器马上返回给应用成功。primary通过更新对象，增加其版本并对其进行解锁来处理这些记录，从而完成了事务所提交的写入；</li>
+<li>Truncate：协调器在收到来自所有primary的确认后，会延迟地truncate事务内的primary和backup的日志；</li>
+</ol>
+<p>正确性；</p>
+<p>在获取所有写锁时，已提交的读写事务是串行的，这是在串行点上所有读取和写入对象的版本与执行期间看到的版本相同。锁阶段保证了写对象的串行性，而校验阶段保证了只读对象的串行性，在没有失败的情况下，这等效于在串行点原子地执行和提交整个事务。 </p>
+<p>为了确保故障时的串行性，必须在写入COMMIT-PRIMARY之前等待所有backup的确认。否则当某些COMMIT-BACKUP失败，且协调器故障了，就会丢失记录。</p>
+<p>由于读的集合只保存在协调器中，一旦协调器挂了就没有commit记录可以证明验证成功了，这样就会导致事务abort。所以协调器等待一个primary的提交成功才会响应给client成功。这样能避免f个backup和coordinator一起挂了使得锁记录保存但丢失校验没成功的记录。</p>
+<p>传统的二阶段提交协议，可以在准备阶段去检查有没有资源。但FaRM因为只用单边RDMA，无法使用远程CPU，因此必须要保留空间去记录所有的提交协议记录，包括在开始commit之前截断primary和backup的记录。日志保留是协调器上的本地操作，因为协调器会将记录写入其在每个参与者处拥有的日志中，写完相应记录之后会释放保留空间。</p>
+<h3 id="Failure-detection"><a href="#Failure-detection" class="headerlink" title="Failure detection"></a>Failure detection</h3><p>FaRM使用租约机制来检测故障。除CM之外，每台机器都在CM处拥有租约，而CM则对其他所有机器拥有租约，这是一个双向租约的机制。租约使用三次握手的方式授权，每台机器向CM发送一个租约请求，CM返回的响应消息即代表对机器的授权，也是CM对该机器的租约请求，最后该机器授权租约给CM。</p>
+<p>FaRM租期非常短，这是高可用性的关键。在高负载下，FaRM可以为90台计算机群集使用5毫秒的租约，而不会产生误报。</p>
+<p>为了在高负载的情况下获得短期租约，FaRM使用专门的队列来支持租约，这样就能避免租约消息的延迟。另外为了避免性能的影响，FaRM的租约管理器通过无连接的不可靠数据包去发送和接收租约。默认情况下，租约的延续一般是租约超时周期的五分之一。</p>
+<p>续租还必须及时在CPU上定时调度，FaRM使用专用的租约管理器线程，该线程以最高的用户空间优先级运行，并且租约管理器线程没有固定到任何的硬件线程，它使用中断而不是轮询来避免在每个硬件线程上定期运行的关键OS任务饿死，导致误报租约过期。虽然增加了几毫秒的消息延迟，但对于租约来说不是问题。</p>
+<p>最后，在初始化期间预先分配租约管理器使用的所有内存，然后分页并固定其使用的所有代码，以避免由于内存管理而造成的延迟。</p>
+<h3 id="Reconfiguration"><a href="#Reconfiguration" class="headerlink" title="Reconfiguration"></a>Reconfiguration</h3><p>重新配置协议将FaRM实例从一种配置移到另一种，FaRM使用了RDMA操作来保证极高的性能，因为缺少CPU的使用，因此无法利用租约机制来实现一致性。FaRM使用的是精确的成员身份来实现这个问题，发生故障后，采用新配置的所有计算机必须先同意其成员身份，然后才能进行对象更改。这就允许了在客户端做检查而不是服务端。配置中的计算机不会向不在其中的计算机发出RDMA请求，并且也会忽略配置中不再存在的计算机做回应。</p>
+<p><img src="https://pic.downk.cc/item/5fb00c44ef76db7fe8909662.png" alt></p>
+<ol>
+<li>猜测：当CM上的一个机器租约过期时，CM会猜测那个机器挂了，并初始化重新配置，这个时间点开始阻塞所有外部客户端的请求。如果一个非CM机器上的租约过期了，它会推断CM挂了，这个非CM租约上的机器会尝试请求少量的CM备机去初始化配置。如果超时后配置未更改，则它将尝试重新配置自身。这种设计避免了在CM故障时会有大量机器同时尝试重新配置，在所有情况下，启动重新配置的机器都将尝试成为新的CM，作为重新配置的一部分。</li>
+<li>探测：新的CM向配置中的所有机器发出RDMA读取，除了前面猜测故障的机器和读失败的机器，这些读取探测允许通过一次重新配置来处理影响多台机器的相关故障，例如电源和开关故障。新CM仅在获得大多数响应后才继续进行重新配置。这样可以确保如果网络已分区，则CM不会位于较小的分区中。</li>
+<li>更新配置：CM尝试更新zk的配置为 ⟨c + 1, S, F , CM(id)⟩，c是当前的配置版本号id，S是探测有返回的机器列表，F是故障域映射，CM(id)是自己的id。FaRM使用zk的znode序列号去实现原子的CAS，只有当前配置的的版本仍然是c是，CAS才成功。</li>
+<li>重新映射区域：新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f + 1。它尝试平衡负载并满足容量和故障独立性约束的应用程序指定的局部性提示。对于失败的主数据库，它会将尚存的备份升级为新的主数据库，以减少恢复时间。如果它检测到丢失了所有副本的区域，或者没有空间可以重新复制区域，则会发出错误消息。</li>
+<li>发送新配置：重新映射区域后，CM会使用配置标识符，其自身的标识符，配置中其他机器的标识符以及区域到机器的所有新映射，向配置中的所有机器发送NEW-CONFIG消息。并根据需要重置租约或者进行租约交换；</li>
+<li>应用新配置：当机器收到配置标识符大于其自身配置的NEW-CONFIG时，它将更新其当前配置标识符及其区域映射的缓存副本，并分配空间以容纳分配给它的所有新区域副本。同时还会给CM进行租约的授权。</li>
+<li>提交新配置：一旦CM从配置中的所有计算机接收到NEW-CONFIG-ACK消息，它会等待所有不在新配置中的机器的租约过期。然后CM向所有配置成员发送NEW-CONFIG-COMMIT，和第6步租约申请的授权，最后所有成员解锁外部客户端请求；</li>
+</ol>
+<h3 id="Transaction-state-recovery"><a href="#Transaction-state-recovery" class="headerlink" title="Transaction state recovery"></a>Transaction state recovery</h3><p>在配置更改后，FaRM使用事务修改的对象副本之间的日志来恢复事务状态。这涉及到事务修改的对象副本和协调器恢复状态，以决定事务的结果。</p>
+<p><img src="https://pic.downk.cc/item/5fb016c63e3fc2acb7182059.png" alt></p>
+<ol>
+<li>阻塞访问正在恢复的region：当一个primary的region挂了，其中一个备份就会被提升为primary，在所有更新该region的操作都反映到该primary之前都不允许访问该region；</li>
+<li>清除日志：单面RDMA写一般会和故障恢复冲突，FaRM无法通过网卡来拒绝来自旧配置的消息，只能在收到NEW-CONFIG-COMMIT消息时清除所有的日志记录，然后拒绝新来的日志；</li>
+<li>找到正在恢复的日志：</li>
+<li>锁定恢复：region的每个primary会等本地机器日志被排出，并且从所有backup中收到NEED-RECOVERY消息，然后primary并行地从backup中拉取任意的、本地没有存储的事务日志记录，并对任何被恢复事务修改的对象进行锁定。当锁定恢复完成了一个region时，这个region就可以被本地或远程的coordinator获得本地指针和RDMA引用；</li>
+<li>备份日志记录：在primary中的线通过发送REPLICATE-TX-STATE消息给backup来备份日志记录；</li>
+<li>投票：恢复事务的coordinator基于每个被该事务修改的region的投票决定是否提交或abort事务；</li>
+<li>决定：如果从所有region收到了commit-primary，coordinator就会决定提交事务；如果至少有一个region投票了commit-backup并且所有其他的被事务修改的region提交了lock或commit-backup或truncated，则等待所有region去投票和提交；其他情况会abort；</li>
+</ol>
+<h3 id="Recovering-data"><a href="#Recovering-data" class="headerlink" title="Recovering data"></a>Recovering data</h3><p>FaRM一定会将region数据复制数据到新的backup上，以便将来能容忍f个故障。一个region的一个新的backup初始化空间为0。region被划分给worker线程并行地恢复数据。每一个线程发出一个单端RDMA操作去读primary的一个block。每个恢复对象被复制到backup之前都会做版本检查，然后使用CAS更新对象状态。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/21/Spanner-Google’s-Globally-Distributed-Database——MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1885,164 +2069,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/17/redis设计与实现——数据库/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/09/17/redis设计与实现——数据库/" itemprop="url">redis设计与实现——数据库</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-17T01:04:50+08:00">
-                2019-09-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="redis设计与实现——数据库"><a href="#redis设计与实现——数据库" class="headerlink" title="redis设计与实现——数据库"></a>redis设计与实现——数据库</h1><h2 id="服务器中的数据库"><a href="#服务器中的数据库" class="headerlink" title="服务器中的数据库"></a>服务器中的数据库</h2><p>redis服务器将所有的数据库都保存在服务器状态redis.h/redisServer结构的db数组里，每一个redisDb代表一个数据库，redis默认创建16个数据库。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">	redisDb *db; <span class="comment">// 保存着服务器中所有的数据库</span></span><br><span class="line">  <span class="keyword">int</span> dbnum;   <span class="comment">/* Total number of configured DBs */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化db配置</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CONFIG_DEFAULT_DBNUM     16</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">initServerConfig</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  server.dbnum = CONFIG_DEFAULT_DBNUM;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="切换数据库"><a href="#切换数据库" class="headerlink" title="切换数据库"></a>切换数据库</h2><p>由于每个Redis客户端都有自己的目标数据库，客户端通过SELECT命令来切换目标数据库。而server.h的结构体client中就有一个指向redisDb的指针。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 同样client会含有指向db的指针</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">client</span> &#123;</span></span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  redisDb *db; <span class="comment">/*指向当前被选中的db */</span></span><br><span class="line">&#125; client;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过select命令切换数据库</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">selectDb</span><span class="params">(client *c, <span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (id &lt; <span class="number">0</span> || id &gt;= server.dbnum)</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    c-&gt;db = &amp;server.db[id];</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>目前没有命令可以获取当前db的index，但可以通过设置唯一名字并获取clientInfo的方法动态获取index：<a href="https://stackoverflow.com/questions/50534492/redis-how-to-get-current-database-name" target="_blank" rel="noopener">https://stackoverflow.com/questions/50534492/redis-how-to-get-current-database-name</a></p>
-</blockquote>
-<h2 id="数据库键空间"><a href="#数据库键空间" class="headerlink" title="数据库键空间"></a>数据库键空间</h2><p>Redis是一个键值对数据库服务器，由上面可知每个数据库都由一个redisDb结构表示，其中redisDb的dict字段保存了数据库中的所有键值对。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">redisDb</span> &#123;</span></span><br><span class="line">    dict *dict;                 <span class="comment">/* key空间 */</span></span><br><span class="line">    dict *expires;              <span class="comment">/* 国企高管时间 */</span></span><br><span class="line">    dict *blocking_keys;        <span class="comment">/* 客户端正在等待数据的key*/</span></span><br><span class="line">    dict *ready_keys;           <span class="comment">/* 接受了push命令的key */</span></span><br><span class="line">    dict *watched_keys;         <span class="comment">/* 被监控的key*/</span></span><br><span class="line">    <span class="keyword">int</span> id;                     <span class="comment">/* Database ID */</span></span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> avg_ttl;          <span class="comment">/* 用来做统计，平均ttl */</span></span><br><span class="line">    <span class="built_in">list</span> *defrag_later;         <span class="comment">/* List of key names to attempt to defrag one by one, gradually. */</span></span><br><span class="line">&#125; redisDb;</span><br></pre></td></tr></table></figure>
-<h3 id="添加新键"><a href="#添加新键" class="headerlink" title="添加新键"></a>添加新键</h3><p>添加新键值对，实际上就是将键值对添加到键空间字段中，key为字符串对象，值为任意一种类型的redis对象。</p>
-<p>以set命令为例：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setGenericCommand</span><span class="params">(client *c, <span class="keyword">int</span> flags, robj *key, robj *val, robj *expire, <span class="keyword">int</span> unit, robj *ok_reply, robj *abort_reply)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> milliseconds = <span class="number">0</span>; <span class="comment">/* initialized to avoid any harmness warning */</span></span><br><span class="line">		<span class="comment">// 如果设置了国旗时间则校验expire是否为数字</span></span><br><span class="line">    <span class="keyword">if</span> (expire) &#123;</span><br><span class="line">        <span class="keyword">if</span> (getLongLongFromObjectOrReply(c, expire, &amp;milliseconds, <span class="literal">NULL</span>) != C_OK)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span> (milliseconds &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            addReplyErrorFormat(c,<span class="string">"invalid expire time in %s"</span>,c-&gt;cmd-&gt;name);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (unit == UNIT_SECONDS) milliseconds *= <span class="number">1000</span>;</span><br><span class="line">    &#125;</span><br><span class="line">		<span class="comment">// 实现NX和XX两种添加方式</span></span><br><span class="line">  	<span class="comment">// #define OBJ_SET_NX (1&lt;&lt;0)     /* Set if key not exists. */	</span></span><br><span class="line">		<span class="comment">//#define OBJ_SET_XX (1&lt;&lt;1)     /* Set if key exists. */</span></span><br><span class="line">    <span class="keyword">if</span> ((flags &amp; OBJ_SET_NX &amp;&amp; lookupKeyWrite(c-&gt;db,key) != <span class="literal">NULL</span>) ||</span><br><span class="line">        (flags &amp; OBJ_SET_XX &amp;&amp; lookupKeyWrite(c-&gt;db,key) == <span class="literal">NULL</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        addReply(c, abort_reply ? abort_reply : shared.null[c-&gt;resp]);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    setKey(c-&gt;db,key,val);<span class="comment">// 设置key</span></span><br><span class="line">    server.dirty++;</span><br><span class="line">    <span class="keyword">if</span> (expire) setExpire(c,c-&gt;db,key,mstime()+milliseconds);<span class="comment">//设置国旗时间</span></span><br><span class="line">    notifyKeyspaceEvent(NOTIFY_STRING,<span class="string">"set"</span>,key,c-&gt;db-&gt;id);</span><br><span class="line">    <span class="keyword">if</span> (expire) notifyKeyspaceEvent(NOTIFY_GENERIC,</span><br><span class="line">        <span class="string">"expire"</span>,key,c-&gt;db-&gt;id);</span><br><span class="line">    addReply(c, ok_reply ? ok_reply : shared.ok);</span><br></pre></td></tr></table></figure>
-<p>在设置过期时间的操作中，可以看到，虽然key和expire是分开存放在redisDb结构体中的，但实际上两者指向了同一个对象。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setExpire</span><span class="params">(redisDb *db, robj *key, <span class="keyword">long</span> <span class="keyword">long</span> when)</span> </span>&#123;    <span class="comment">// 设置过期时间</span></span><br><span class="line">    dictEntry *kde, *de;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Reuse the sds from the main dict in the expire dict */</span></span><br><span class="line">    kde = dictFind(db-&gt;dict,key-&gt;ptr);  <span class="comment">// 找到对应的字典节点</span></span><br><span class="line">    serverAssertWithInfo(<span class="literal">NULL</span>,key,kde != <span class="literal">NULL</span>);</span><br><span class="line">    de = dictReplaceRaw(db-&gt;expires,dictGetKey(kde));   <span class="comment">// 将过期时间expire加入到dict，其中共用同一个字符串对象实例</span></span><br><span class="line">    dictSetSignedIntegerVal(de,when);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>其他的删改查操作，都是在dict字段上面封装了一层。</p>
-<h2 id="设置键的生存时间或过期时间"><a href="#设置键的生存时间或过期时间" class="headerlink" title="设置键的生存时间或过期时间"></a>设置键的生存时间或过期时间</h2><h3 id="设置过期时间"><a href="#设置过期时间" class="headerlink" title="设置过期时间"></a>设置过期时间</h3><p>通过EXPIRE或PEXPIRE命令可以为key设置秒级或毫秒级的生存时间（Time To Live，TTL）。也可以用EXPRIEAT或者PEXPIREAT设置一个过期时间戳。事实上，这三个命令的底层实现都是通过时间戳的设置方式来完成过期时间设置的。</p>
-<p>参考源码，这个函数是EXPIRE, PEXPIRE, EXPIREAT和PEXPIREAT四个命令的底层实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">expireGenericCommand</span><span class="params">(client *c, <span class="keyword">long</span> <span class="keyword">long</span> basetime, <span class="keyword">int</span> unit)</span> </span>&#123;</span><br><span class="line">    robj *key = c-&gt;argv[<span class="number">1</span>], *param = c-&gt;argv[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> when; <span class="comment">/* 毫秒级别的unix时间戳 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (getLongLongFromObjectOrReply(c, param, &amp;when, <span class="literal">NULL</span>) != C_OK)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (unit == UNIT_SECONDS) when *= <span class="number">1000</span>;</span><br><span class="line">    when += basetime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* No key, return zero. */</span></span><br><span class="line">    <span class="keyword">if</span> (lookupKeyWrite(c-&gt;db,key) == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        addReply(c,shared.czero);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="保存过期时间"><a href="#保存过期时间" class="headerlink" title="保存过期时间"></a>保存过期时间</h3><p>redisDb结构的expires字段保存了数据库中所有key的过期时间，这是一个字典，其key是一个指向某个键对象的指针，而value则是一个long long类型的整数，一个毫秒级别的unix时间戳。</p>
-<h3 id="移除过期时间"><a href="#移除过期时间" class="headerlink" title="移除过期时间"></a>移除过期时间</h3><p>使用PERSIST命令可以移除一个键的过期时间，实际上就是删除expires字段中该键与过期时间的项。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">persistCommand</span><span class="params">(client *c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (lookupKeyWrite(c-&gt;db,c-&gt;argv[<span class="number">1</span>])) &#123;</span><br><span class="line">      	<span class="comment">// 调用 dictDelete(db-&gt;expires,key-&gt;ptr)  删除</span></span><br><span class="line">        <span class="keyword">if</span> (removeExpire(c-&gt;db,c-&gt;argv[<span class="number">1</span>])) &#123;</span><br><span class="line">            addReply(c,shared.cone);</span><br><span class="line">            server.dirty++;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            addReply(c,shared.czero);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addReply(c,shared.czero);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="计算并返回剩余生存时间"><a href="#计算并返回剩余生存时间" class="headerlink" title="计算并返回剩余生存时间"></a>计算并返回剩余生存时间</h3><p>TTL和PTTL命令则是返回以秒为单位或者毫秒为单位的键剩余时间，实现比较简单，就是计算键的过期时间与当前时间之间的差。</p>
-<h2 id="过期键删除策略"><a href="#过期键删除策略" class="headerlink" title="过期键删除策略"></a>过期键删除策略</h2><p>Redis采用了两种删除策略：惰性删除和定期删除。其中，惰性删除是一种对CPU时间最友好的策略，程序只会在取出键时才会对键进行过期检查。</p>
-<h3 id="惰性删除策略的实现"><a href="#惰性删除策略的实现" class="headerlink" title="惰性删除策略的实现"></a>惰性删除策略的实现</h3><p>过期键的惰性删除策略都必须要经常函数db.c/expireIfNeeded函数实现。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">expireIfNeeded</span><span class="params">(redisDb *db, robj *key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!keyIsExpired(db,key)) <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// key不存在，什么都不处理</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.masterhost != <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="number">1</span>; <span class="comment">// 只对master库进行删除</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 删除key */</span></span><br><span class="line">    server.stat_expiredkeys++;</span><br><span class="line">  	<span class="comment">// 当一个主库key被删除时，会向从库发一条del命令和被启动的AOF文件追加del</span></span><br><span class="line">    propagateExpire(db,key,server.lazyfree_lazy_expire);</span><br><span class="line">    notifyKeyspaceEvent(NOTIFY_EXPIRED,</span><br><span class="line">        <span class="string">"expired"</span>,key,db-&gt;id);</span><br><span class="line">    <span class="keyword">return</span> server.lazyfree_lazy_expire ? dbAsyncDelete(db,key) :</span><br><span class="line">                                         dbSyncDelete(db,key);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dbAsyncDelete</span><span class="params">(redisDb *db, robj *key)</span> </span>&#123;</span><br><span class="line">    <span class="comment">/* 删除expire字段的dict不会释放空间，因为该字典与主字典是共享内存 */</span></span><br><span class="line">    <span class="keyword">if</span> (dictSize(db-&gt;expires) &gt; <span class="number">0</span>) dictDelete(db-&gt;expires,key-&gt;ptr);</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 如果对象很小，以惰性删除的方式实际上更慢</span></span><br><span class="line">    dictEntry *de = dictUnlink(db-&gt;dict,key-&gt;ptr);</span><br><span class="line">    <span class="keyword">if</span> (de) &#123;</span><br><span class="line">        robj *val = dictGetVal(de);</span><br><span class="line">        <span class="keyword">size_t</span> free_effort = lazyfreeGetFreeEffort(val);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 创建一个后台任务，添加对象到lazy free list里 */</span></span><br><span class="line">        <span class="keyword">if</span> (free_effort &gt; LAZYFREE_THRESHOLD &amp;&amp; val-&gt;refcount == <span class="number">1</span>) &#123;</span><br><span class="line">            atomicIncr(lazyfree_objects,<span class="number">1</span>);</span><br><span class="line">            bioCreateBackgroundJob(BIO_LAZY_FREE,val,<span class="literal">NULL</span>,<span class="literal">NULL</span>);</span><br><span class="line">            dictSetVal(db-&gt;dict,de,<span class="literal">NULL</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 释放键值对 */</span></span><br><span class="line">    <span class="keyword">if</span> (de) &#123;</span><br><span class="line">        dictFreeUnlinkedEntry(db-&gt;dict,de);</span><br><span class="line">        <span class="keyword">if</span> (server.cluster_enabled) slotToKeyDel(key);<span class="comment">//集群删除</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>调用dictDelete的时候不会删除dict对象，只会删除expires对象，尽管它们公用key对象。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 同步删除，通过调用dictDelte实现</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dbSyncDelete</span><span class="params">(redisDb *db, robj *key)</span> </span>&#123;</span><br><span class="line">    <span class="comment">/* Deleting an entry from the expires dict will not free the sds of</span></span><br><span class="line"><span class="comment">     * the key, because it is shared with the main dictionary. */</span></span><br><span class="line">    <span class="keyword">if</span> (dictSize(db-&gt;expires) &gt; <span class="number">0</span>) dictDelete(db-&gt;expires,key-&gt;ptr);</span><br><span class="line">    <span class="keyword">if</span> (dictDelete(db-&gt;dict,key-&gt;ptr) == DICT_OK) &#123;</span><br><span class="line">        <span class="keyword">if</span> (server.cluster_enabled) slotToKeyDel(key);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在实现删除expire字段，但不删除共享key的实现上，主要利用了dict底层结构中的dictType字段，该字段定义了dict的各种操作。</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictType</span> &#123;</span>   <span class="comment">// 各种字典操作</span></span><br><span class="line">    <span class="function"><span class="keyword">unsigned</span> <span class="title">int</span> <span class="params">(*hashFunction)</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *key)</span></span>;  <span class="comment">// 计算hash值的函数</span></span><br><span class="line">    <span class="keyword">void</span> *(*keyDup)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *key);   <span class="comment">// 键复制</span></span><br><span class="line">    <span class="keyword">void</span> *(*valDup)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *obj);   <span class="comment">// 值复制</span></span><br><span class="line">    <span class="keyword">int</span> (*keyCompare)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *key1, <span class="keyword">const</span> <span class="keyword">void</span> *key2);  <span class="comment">// 键比较</span></span><br><span class="line">    <span class="keyword">void</span> (*keyDestructor)(<span class="keyword">void</span> *privdata, <span class="keyword">void</span> *key);   <span class="comment">// 键销毁</span></span><br><span class="line">    <span class="keyword">void</span> (*valDestructor)(<span class="keyword">void</span> *privdata, <span class="keyword">void</span> *obj);   <span class="comment">// 值销毁</span></span><br><span class="line">&#125; dictType;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 而在初始化expires时，则将keyDestructor和valDestructor设置为了NULL</span></span><br></pre></td></tr></table></figure>
-<h3 id="定期删除策略的实现"><a href="#定期删除策略的实现" class="headerlink" title="定期删除策略的实现"></a>定期删除策略的实现</h3><p>过期键的定期删除策略时由expire.c/activeExpireCycle()实现的，它会在规定的时间内，多次去遍历服务器中的各个数据库，从数据库的expires字段中随机抽查一部分键的过期时间。</p>
-<h2 id="AOF、ROB和复制功能对过期键的处理"><a href="#AOF、ROB和复制功能对过期键的处理" class="headerlink" title="AOF、ROB和复制功能对过期键的处理"></a>AOF、ROB和复制功能对过期键的处理</h2><ul>
-<li>产生的新RDB文件和重写的AOF文件都不会包含已过期的键；</li>
-<li>当主服务器删除一个键之后，会向所有从服务器发del命令；</li>
-<li>当一个过期键被删除之后，服务器会追加一条del命令到现有AOF文件的末尾；</li>
-<li>从服务器即使发现过期键也不删除，而是等待master节点发来del命令；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2086,7 +2117,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">240</span>
+                <span class="site-state-item-count">241</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

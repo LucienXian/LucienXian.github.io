@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance%E2%80%94%E2%80%94MIT6-824-1/</loc>
+    
+    <lastmod>2020-11-14T17:44:27.460Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/08/21/Spanner-Google%E2%80%99s-Globally-Distributed-Database%E2%80%94%E2%80%94MIT6-824/</loc>
     
     <lastmod>2020-08-20T16:51:30.071Z</lastmod>

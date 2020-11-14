@@ -265,6 +265,146 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/遇到多个构造器参数时要考虑使用builder/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/16/遇到多个构造器参数时要考虑使用builder/" itemprop="url">遇到多个构造器参数时要考虑使用builder</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:10:58+08:00">
+                2018-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="遇到多个构造器参数时要考虑使用builder"><a href="#遇到多个构造器参数时要考虑使用builder" class="headerlink" title="遇到多个构造器参数时要考虑使用builder"></a>遇到多个构造器参数时要考虑使用builder</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>静态工厂和构造函数都不能很好地扩展到大量的可选参数。</p>
+<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><p>考虑这样一个类——营养成分标签，其中有几个field时必需的，其他则是可选的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NutritionFactsOne</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> servingSize; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> servings; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> calorries;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> fat;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> sodium;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> carbohydrate;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">NutritionFactsOne</span><span class="params">(<span class="keyword">int</span> servingSize, <span class="keyword">int</span> servings)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>(servingSize, servings, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">NutritionFactsOne</span><span class="params">(<span class="keyword">int</span> servingSize, <span class="keyword">int</span> servings, <span class="keyword">int</span> calorries)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>(servingSize, servings, calorries, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">NutritionFactsOne</span><span class="params">(<span class="keyword">int</span> servingSize, <span class="keyword">int</span> servings, <span class="keyword">int</span> calorries, <span class="keyword">int</span> fat)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>(servingSize, servings, calorries, fat, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">NutritionFactsOne</span><span class="params">(<span class="keyword">int</span> servingSize, <span class="keyword">int</span> servings, <span class="keyword">int</span> calorries, <span class="keyword">int</span> fat, <span class="keyword">int</span> sodium, <span class="keyword">int</span> carbohydrate)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.servingSize = servingSize;</span><br><span class="line">		<span class="keyword">this</span>.servings = servings;</span><br><span class="line">        <span class="keyword">this</span>.calorries = calorries;</span><br><span class="line">        <span class="keyword">this</span>.fat = fat;</span><br><span class="line">		<span class="keyword">this</span>.sodium = sodium;</span><br><span class="line">        <span class="keyword">this</span>.carbohydrate = carbohydrate;</span><br><span class="line">	&#125;	</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样，我们创建一个实例时，就很不容易阅读：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NutritionFactsOne n = <span class="keyword">new</span> NutritionFactsOne(<span class="number">240</span>, <span class="number">8</span>, <span class="number">100</span>, <span class="number">0</span>, <span class="number">35</span>, <span class="number">27</span>);</span><br></pre></td></tr></table></figure>
+<p>当然，也可以考虑用java beans的模式，然后调用setter设置每个必要的参数，已经相关的可选参数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NutritionFactsTwo</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> servingSize; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> servings; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> calorries;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> fat;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> sodium;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> carbohydrate;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServingSize</span><span class="params">(<span class="keyword">int</span> servingSize)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.servingSize = servingSize;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServings</span><span class="params">(<span class="keyword">int</span> servings)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.servings = servings;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCalorries</span><span class="params">(<span class="keyword">int</span> calorries)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.calorries = calorries;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFat</span><span class="params">(<span class="keyword">int</span> fat)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.fat = fat;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSodium</span><span class="params">(<span class="keyword">int</span> sodium)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.sodium = sodium;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCarbohydrate</span><span class="params">(<span class="keyword">int</span> carbohydrate)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.carbohydrate = carbohydrate;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>紧接着</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NutritionFactsTwo n = <span class="keyword">new</span> NutritionFactsTwo();</span><br><span class="line">n.setServingSize(<span class="number">240</span>);</span><br><span class="line">n.setServings(<span class="number">8</span>);</span><br><span class="line">n.setCalorries(<span class="number">100</span>);</span><br><span class="line">n.setFat(<span class="number">35</span>);</span><br></pre></td></tr></table></figure>
+<p>但这个使用方式，在多线程的环境下有着致命的缺点，因为这有可能使得对象处于一个不一致的状态。</p>
+<p>因此，我们可以使用builder的一种模式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NutritionFactsThree</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servingSize; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servings; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> calorries;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> fat;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> sodium;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> carbohydrate;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servingSize; <span class="comment">//require</span></span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servings; <span class="comment">//require</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> calorries = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> fat = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> sodium = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> carbohydrate = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Builder</span><span class="params">(<span class="keyword">int</span> servingSize, <span class="keyword">int</span> servings)</span> </span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.servingSize = servingSize;</span><br><span class="line">			<span class="keyword">this</span>.servings = servings;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> Builder <span class="title">calorries</span><span class="params">(<span class="keyword">int</span> calorries)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.calorries = calorries;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> Builder <span class="title">fat</span><span class="params">(<span class="keyword">int</span> fat)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.fat = fat;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> Builder <span class="title">sodium</span><span class="params">(<span class="keyword">int</span> sodium)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.sodium = sodium;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> Builder <span class="title">carbohydrate</span><span class="params">(<span class="keyword">int</span> carbohydrate)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.carbohydrate = carbohydrate;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> NutritionFactsThree <span class="title">build</span><span class="params">()</span></span>&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> NutritionFactsThree(<span class="keyword">this</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">NutritionFactsThree</span><span class="params">(Builder builder)</span></span>&#123;</span><br><span class="line">		servingSize = builder.servingSize;</span><br><span class="line">		servings = builder.servings;</span><br><span class="line">		calorries = builder.calorries;</span><br><span class="line">		fat = builder.fat;</span><br><span class="line">		sodium = builder.sodium;</span><br><span class="line">		carbohydrate = builder.carbohydrate;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>builder的setter方法返回builder本身，这样就可以把调用链给连接起来：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NutritionFactsThree n = <span class="keyword">new</span> NutritionFactsThree.Builder(<span class="number">240</span>, <span class="number">8</span>)</span><br><span class="line">.calorries(<span class="number">0</span>)</span><br><span class="line">.sodium(<span class="number">35</span>)</span><br><span class="line">.carbohydrate(<span class="number">27</span>)</span><br><span class="line">.build();</span><br></pre></td></tr></table></figure>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
+<li>客户端代码易于理解</li>
+<li>可以对参数施加约束条件</li>
+<li>builder有多个可变参数</li>
+<li>builder相比javabeans更加安全</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>如果类的构造器或者静态工厂中具有多个参数，设计类的时候，builder模式应该优先被选择，特别是大多数参数都optional的时候。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/避免使用终结方法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1485,176 +1625,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/30/redis的字典/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/30/redis的字典/" itemprop="url">redis的字典</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-30T01:14:27+08:00">
-                2018-08-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h1><p>字典在redis中的应用比较广泛，比如redis的数据库，哈希键的底层实现等等</p>
-<h2 id="字典的实现"><a href="#字典的实现" class="headerlink" title="字典的实现"></a>字典的实现</h2><p>redis的字典用哈希表表示，一个哈希表有多个哈希表结点，每个结点保存一个键值对。</p>
-<h3 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">    dictEntry **table;<span class="comment">//哈希表数组，每个元素为指向dictEntry的指针</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> size;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> sizemask;<span class="comment">//等于size-1，与哈希值一起决定key应该放在哪个索引</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> used;</span><br><span class="line">&#125; dictht;</span><br></pre></td></tr></table></figure>
-<h3 id="哈希表结点"><a href="#哈希表结点" class="headerlink" title="哈希表结点"></a>哈希表结点</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> &#123;</span></span><br><span class="line">    <span class="keyword">void</span> *key;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        <span class="keyword">void</span> *val;</span><br><span class="line">        <span class="keyword">uint64_t</span> u64;</span><br><span class="line">        <span class="keyword">int64_t</span> s64;</span><br><span class="line">    &#125; v;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span><span class="comment">//可用于解决哈希冲突</span></span><br><span class="line">&#125;dictEntry;</span><br></pre></td></tr></table></figure>
-<h3 id="字典-1"><a href="#字典-1" class="headerlink" title="字典"></a>字典</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">    dictType *type;</span><br><span class="line">    <span class="keyword">void</span>* privdata;</span><br><span class="line">    dictht ht[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">int</span> trehashidx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>type属性是一个指向dictType的指针，dictType结构保存了一组用于操作特定类型键值对的函数，实现多台。</p>
-<p>pricdata则保存了需要传给那些类型特定参数的可选参数。</p>
-<p>ht保存了两个dictht，一般只是用第一个，第二个会在第一个rehash的时候被使用。</p>
-<p>trehashidx则是记录了目前是否在进行rehash。</p>
-<h2 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h2><p>当添加一个新的键值对到字典的时候，程序依次计算出哈希值和索引值，再根据索引值把包含新键值对的哈希表结点加到哈希数组指定索引上面</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hash = dict-&gt;type-&gt;hashFunction(key);</span><br><span class="line">index = hash &amp; dict-&gt;ht[x].sizemask;</span><br></pre></td></tr></table></figure>
-<p>ht[x]是因为有可能在第一个字典或者第二个。</p>
-<p>另外，redis使用murmurhash2算法来计算哈希值。</p>
-<h2 id="解决键冲突"><a href="#解决键冲突" class="headerlink" title="解决键冲突"></a>解决键冲突</h2><p>redis解决hash冲突的方法是链地址法，则产生冲突时使用next指针将索引值相同的结点连起来。</p>
-<h2 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h2><blockquote>
-<p>哈希表的负载因子=哈希表已保存的结点数量/哈希表大小</p>
-</blockquote>
-<p>为了使得哈希表的负载因子维持在一个合理的范围内，哈希表需要扩展或者缩小。</p>
-<p>步骤为</p>
-<ol>
-<li>为ht[1]分配空间，大小取决于：</li>
-</ol>
-<ul>
-<li>扩展：大小为 大于或等于ht[0].used*2 = 2^n</li>
-<li>收缩：大小为 大于或等于ht[0].used = 2^n</li>
-</ul>
-<ol start="2">
-<li>将保存在ht[0]的所有键值对rehash到ht[1]上，重新计算哈希值和索引值；</li>
-<li>释放ht[0]，将ht[1]设置为ht[0]，并新创建一个空白ht[1]，为下次rehash做准备</li>
-</ol>
-<p>另外，当下列条件满足时，会进行扩展：</p>
-<ul>
-<li>服务器目前没有执行BGSAVE或者BGREWRITEAOF，并且哈希表负载因子大于等于1；</li>
-<li>服务器目前正在执行BGSAVE或者BGREWRITEAOF，并且哈希表负载因子大于等于5；</li>
-</ul>
-<p>这是因为这些命令执行时，子进程会运行中，由于写时复制的操作系统特性，过多或者过快地扩展会带来过多的内存写入操作；</p>
-<p>当哈希表负载因子小于0.1时，执行收缩。</p>
-<h2 id="渐进式rehash"><a href="#渐进式rehash" class="headerlink" title="渐进式rehash"></a>渐进式rehash</h2><p>由于哈希表可能非常大，所以不能一次性rehash成功，而是使用渐进式的方法。</p>
-<p>步骤如下：</p>
-<ol>
-<li>为ht[1]分配号空间后，dict结构体同时持有两个哈希表；</li>
-<li>然后dict结构的rehashidx记为0，开始rehash；</li>
-<li>进行期间，会逐个将ht[0]的结点rehash到ht[1]，每次成功都会使rehashidx递增一；</li>
-<li>直到rehash完全，rehashidx设为-1，表示完成；</li>
-</ol>
-<p>如果此时有新增的键值对，一律保存到ht[1]中。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1698,7 +1673,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">240</span>
+                <span class="site-state-item-count">241</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
