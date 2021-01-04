@@ -265,6 +265,307 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/20/Python中的repr与的str/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/20/Python中的repr与的str/" itemprop="url">Python中的repr与的str</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-20T20:45:28+08:00">
+                2017-08-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在学习UCB的CS61a时遇到了一个新的知识点，就是python中repr与str的区别：</p>
+<blockquote>
+<p>总体上来说，这两者在性能和表现上非常相似；</p>
+<p>repr返回的是一个对象的更加明确的字符串表示；</p>
+<p>str则致力于返回一个通读易懂的字符串表示；</p>
+</blockquote>
+<ul>
+<li>借用stackoverflow的一句话：<strong>My rule of thumb: <code>__repr__</code> is for developers, <code>__str__</code> is for customers.</strong></li>
+</ul>
+<h1 id="str-与repr"><a href="#str-与repr" class="headerlink" title="str()与repr()"></a>str()与repr()</h1><p>首先来看内置函数str()与repr()，str()致力于为用户的最终输出，而repr()则经常用来调试和开发。repr()计算一个对象的“官方”的字符串表示（一个具有关于该对象的所有信息的表示），而str()用于计算一个对象的“非正式”字符串表示形式（用于打印目的）。</p>
+<p>举个例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>s = <span class="string">'Hello, world.'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>str(s)</span><br><span class="line"><span class="string">'Hello, world.'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>repr(s)</span><br><span class="line"><span class="string">"'Hello, world.'"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>str(str(s))</span><br><span class="line"><span class="string">'Hello, world.'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>repr(repr(s))</span><br><span class="line"><span class="string">'"\'Hello, world.\'"'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>eval(eval(repr(repr(s))))</span><br></pre></td></tr></table></figure>
+<p>eval()可以执行repr返回字符串里面的对象。</p>
+<p><br></p>
+<h1 id="类中的str与repr"><a href="#类中的str与repr" class="headerlink" title="类中的str与repr"></a>类中的<strong>str</strong>与<strong>repr</strong></h1><p>我们先来测试一下，可见在这种情况，打印出来的类信息都是一样的，除了object的id之外别无它物。而且类中也有内置的method——repr和str。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Test</span><span class="params">(object)</span>:</span> <span class="keyword">pass</span></span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(str(Test()))</span><br><span class="line">&lt;__main__.Test object at <span class="number">0x000000BD373D86A0</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(repr(Sic()))</span><br><span class="line">&lt;__main__.Test object at <span class="number">0x000000BD373D86A0</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = Test()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a.__repr__()</span><br><span class="line">&lt;__main__.Test object at <span class="number">0x000000BD373D86A0</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a.__str__()</span><br><span class="line">&lt;__main__.Test object at <span class="number">0x000000BD373D86A0</span>&gt;</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>接下来我根据课程上展示的代码来重载<strong>repr</strong>和<strong>str</strong>两个方法，输出结果如注释所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bear</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="string">"""docstring for Bear"""</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  a bear</span></span><br><span class="line"><span class="string">  a bear</span></span><br><span class="line"><span class="string">  Bear()</span></span><br><span class="line"><span class="string">  my str</span></span><br><span class="line"><span class="string">  my repr</span></span><br><span class="line"><span class="string">  [Finished in 0.1s]</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">      self.__repr__ = <span class="keyword">lambda</span>: <span class="string">'my repr'</span></span><br><span class="line">      self.__str__ = <span class="keyword">lambda</span>: <span class="string">'my str'</span></span><br><span class="line">   </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">'Bear()'</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">      <span class="keyword">return</span> <span class="string">'a bear'</span></span><br><span class="line">oski = Bear()</span><br><span class="line"></span><br><span class="line">print(oski)</span><br><span class="line">print(str(oski))</span><br><span class="line">print(repr(oski))</span><br><span class="line">print(oski.str())</span><br><span class="line">print(oski.repr())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>通过对比发现，在只重载repr这个方法的时候，str()这个函数返回的也是类内置的方法repr的内容；</p>
+<p>如果重载了str这个方法，str()函数返回的才是类内置方法str的内容；</p>
+<p>也就是str中包含了repr的内容，也就是覆盖了str的表达，使其表达更为易懂；</p>
+<p>大致使用方法如下：</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">repr</span><span class="params">(x)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> type(x).__repr__(x)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">str</span><span class="params">(x)</span>:</span></span><br><span class="line">    t = type(x)</span><br><span class="line">    <span class="keyword">if</span> hasattr(t, <span class="string">'__str__'</span>):</span><br><span class="line">        <span class="keyword">return</span> t.__str__(x)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> repr(x)</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>尽量在类中实现重载repr的方法，使其成为继init之后的第二个性质，以便开发者明白这是怎么实现的；如果你希望在面对用户而不是开发人员时使用更为pretty的表达，就实现str的方法，这是可选的。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/09/python的函数装饰器（UCB-cs61a）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/09/python的函数装饰器（UCB-cs61a）/" itemprop="url">python的函数装饰器（UCB cs61a）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-09T15:33:35+08:00">
+                2017-08-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="深入学习装饰器"><a href="#深入学习装饰器" class="headerlink" title="深入学习装饰器"></a>深入学习装饰器</h1><p>在学习UCB的cs61a的时候，遇到了一个之前学python没有认真了解过的知识点，因此这回花了一点时间去认真学习它。<br></p>
+<p>Python编程语言有一个有趣的句法功能，称为装饰器。 让我们用一个例子来说明如何以及为什么要使用Python装饰器。这也是CS61a中使用的例子。<br></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">(n)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> n <span class="keyword">in</span> (<span class="number">0</span>, <span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> n</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> fib(n - <span class="number">1</span>) + fib(n - <span class="number">2</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fib(<span class="number">0</span>)</span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fib(<span class="number">1</span>)</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fib(<span class="number">4</span>)</span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fib(<span class="number">10</span>)</span><br><span class="line"><span class="number">55</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fib(<span class="number">30</span>)</span><br><span class="line"><span class="number">832040</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fib(<span class="number">35</span>)</span><br><span class="line"><span class="number">9227465</span></span><br></pre></td></tr></table></figure>
+<p>经过测试，我们可以发现，当n越大的时候，计算斐波那契数列的时间就越长。原因我们可以用一个树递归来看看计算fib(5)的时候，发生了什么？</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/tree_fib.png" alt="image"></p>
+<p>不难发现，在计算fib(5)的时候，fib(0)计算了三次，fib(1)计算了五次等等。简而言之，就是在计算fib)(5)的时候出现了大量计算。为了使其运行速度更快，我们可以使用一种名为<strong>memoization</strong>的技术。<strong>memoization</strong>在缓存中存储与某些特定输入集相对应的结果。 在以后再对其进行调用时，将使用以前存储在缓存中的结果，从而避免重新计算。 这意味着调用具有某些参数的斐波那契数列的主要成本是在第一次调用所花费的，<br></p>
+<p>以下就是我们使用的memorization结果：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">memoize</span><span class="params">(f)</span>:</span></span><br><span class="line">    cache = &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">helper</span><span class="params">(x)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> x <span class="keyword">not</span> <span class="keyword">in</span> cache:            </span><br><span class="line">            cache[x] = f(x)</span><br><span class="line">        <span class="keyword">return</span> cache[x]</span><br><span class="line">    <span class="keyword">return</span> helper</span><br></pre></td></tr></table></figure>
+<p>memoize函数将返回另一个函数，称为helper，helper将为通过参数f接收的函数提供附加功能。helper在创建时将范围内的变量绑定记录了下来，即计算过的斐波那契数列将会被记录在缓存中，下次调用的时候不需要再次计算，而是直接从cache中取出来。</p>
+<p>再次调用fib，计算fib(100)的值，可以看到它将迅速计算出结果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;fib = memoize(fib)</span><br><span class="line">&gt;&gt;&gt;fib(<span class="number">100</span>)</span><br><span class="line"><span class="number">354224848179261915075</span></span><br></pre></td></tr></table></figure>
+<p><strong>fib = memoize(fib)</strong>可以理解成，fib函数被memoize修饰了。在python语法中，有一种简便的使用方式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@some_decorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">some_function</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># function body...</span></span><br><span class="line"><span class="comment">#等同于</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">some_function</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># function body...</span></span><br><span class="line">some_function = some_decorator(some_function)</span><br></pre></td></tr></table></figure>
+<p>因此，本质上，decorator就是一个返回函数的高阶函数。</p>
+<p><br></p>
+<ul>
+<li>另一个非常有趣的是，在python装饰器中，我们可以链接多个装饰器在一起。借此，我们来扩展我们的例子来打印我们的调用日志：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">memoize</span><span class="params">(f)</span>:</span></span><br><span class="line">    <span class="comment"># Same code as before...</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">trace</span><span class="params">(f)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">helper</span><span class="params">(x)</span>:</span></span><br><span class="line">        call_str = <span class="string">"&#123;0&#125;(&#123;1&#125;)"</span>.format(f.__name__, x)</span><br><span class="line">        print(<span class="string">"Calling &#123;0&#125; ..."</span>.format(call_str))</span><br><span class="line">        result = f(x)</span><br><span class="line">        print(<span class="string">"... returning from &#123;0&#125; = &#123;1&#125;"</span>.format(</span><br><span class="line">              call_str, result))</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line">    <span class="keyword">return</span> helper</span><br><span class="line"> </span><br><span class="line"><span class="meta">@memoize</span></span><br><span class="line"><span class="meta">@trace</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">(n)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> n <span class="keyword">in</span> (<span class="number">0</span>, <span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> n</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> fib(n - <span class="number">1</span>) + fib(n - <span class="number">2</span>)</span><br><span class="line">    </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fib(<span class="number">5</span>)</span><br><span class="line">Calling fib(<span class="number">5</span>) ...</span><br><span class="line">Calling fib(<span class="number">4</span>) ...</span><br><span class="line">Calling fib(<span class="number">3</span>) ...</span><br><span class="line">Calling fib(<span class="number">2</span>) ...</span><br><span class="line">Calling fib(<span class="number">1</span>) ...</span><br><span class="line"><span class="meta">... </span>returning <span class="keyword">from</span> fib(<span class="number">1</span>) = <span class="number">1</span></span><br><span class="line">Calling fib(<span class="number">0</span>) ...</span><br><span class="line"><span class="meta">... </span>returning <span class="keyword">from</span> fib(<span class="number">0</span>) = <span class="number">0</span></span><br><span class="line"><span class="meta">... </span>returning <span class="keyword">from</span> fib(<span class="number">2</span>) = <span class="number">1</span></span><br><span class="line"><span class="meta">... </span>returning <span class="keyword">from</span> fib(<span class="number">3</span>) = <span class="number">2</span></span><br><span class="line"><span class="meta">... </span>returning <span class="keyword">from</span> fib(<span class="number">4</span>) = <span class="number">3</span></span><br><span class="line"><span class="meta">... </span>returning <span class="keyword">from</span> fib(<span class="number">5</span>) = <span class="number">5</span></span><br><span class="line"><span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<ul>
+<li>还有一个，decorator本身也可以传入参数。</li>
+</ul>
+<p>在这里,我借用的<a href="https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014318435599930270c0381a3b44db991cd6d858064ac0000#0" target="_blank" rel="noopener">例子</a>来解释一下。原因是，如果装饰器本身需要参数的话，decorator也会变得复杂。因此，我写了一个装饰器，既支持带参数的@log，也支持不带参数的@log</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> functools</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log2</span><span class="params">(*args)</span>:</span></span><br><span class="line">    text = args[<span class="number">0</span>] <span class="keyword">if</span> isinstance(args[<span class="number">0</span>],str) <span class="keyword">else</span> <span class="string">'without_var'</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(func)</span>:</span></span><br><span class="line"><span class="meta">        @functools.wraps(func)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">            print(<span class="string">'%s, before calling %s():'</span> % (text, func.__name__))</span><br><span class="line">            result = func(*args, **kw)</span><br><span class="line">            print(<span class="string">'%s, after calling %s():'</span> % (text, func.__name__))</span><br><span class="line">            <span class="keyword">return</span> result</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator <span class="keyword">if</span> isinstance(args[<span class="number">0</span>],str) <span class="keyword">else</span> decorator(args[<span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="meta">@log2</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">now1</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'2017-08-09'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@log2('with_var')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">now2</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'2017-08-09'</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string"><span class="meta">&gt;&gt;&gt; </span>now1()</span></span><br><span class="line"><span class="string"><span class="meta">&gt;&gt;&gt; </span>now2()</span></span><br><span class="line"><span class="string">without_var, before calling now1():</span></span><br><span class="line"><span class="string">2017-08-09</span></span><br><span class="line"><span class="string">without_var, after calling now1():</span></span><br><span class="line"><span class="string">with_var, before calling now2():</span></span><br><span class="line"><span class="string">2017-08-09</span></span><br><span class="line"><span class="string">with_var, after calling now2():</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p>不难发现，带参数的装饰器，实则是一个三层嵌套的装饰器。因此调用本质是这样的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>now2 = log(<span class="string">'with_var'</span>)(now2)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>now1 = log(now1)</span><br></pre></td></tr></table></figure>
+<p>解释一下：</p>
+<p>如果是带参数的log，如上所示，首先log(‘with_var’)返回了decorator函数，再将now2传进去，返回的则是wrapper函数；</p>
+<p>如果是不带参数的log，log(‘without_var’)返回的decorator(args[0])，也就是wrapper函数，此时args[0]是now1函数。</p>
+<p>至于，为什么在wrapper前使用@functools.wraps(func)，是因为，函数作为一个对象，它的<strong>name</strong>属性在被装饰器修饰过之后，已经从now2和now1都变为了wrapper。@functools.wraps(func)的功能就是还原这一个属性，避免依赖函数签名的代码在执行时出错。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>decorator对于扩展函数的功能非常有用，虽然有时在定义的时候非常复杂，需要对高阶函数有一定的熟悉，但当你真正使用起来会发现其具有非常好的便利性。Python直接从语法层次支持decorator，这也是我对python极其喜爱的一大原因。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><br></p>
+<p><a href="http://programmingbits.pythonblogs.com/27_programmingbits/archive/50_function_decorators.html" target="_blank" rel="noopener">http://programmingbits.pythonblogs.com/27_programmingbits/archive/50_function_decorators.html</a><br></p>
+<p><a href="https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014318435599930270c0381a3b44db991cd6d858064ac0000#0" target="_blank" rel="noopener">https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014318435599930270c0381a3b44db991cd6d858064ac0000#0</a><br></p>
+<p><a href="http://composingprograms.com/pages/17-recursive-functions.html" target="_blank" rel="noopener">http://composingprograms.com/pages/17-recursive-functions.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/05/bomb-lab解题报告-CMU15213/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -462,7 +763,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">241</span>
+                <span class="site-state-item-count">243</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -548,7 +849,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

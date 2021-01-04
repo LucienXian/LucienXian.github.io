@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="分布式,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing 本文提出了一种称之为RDDs的分布式内存抽象，以此解决在大规模集群中以容错的方式提供内存计算的方式。当前的计算框架对于迭代算法和交互式数据挖掘的效率都很低，RDDs通过将数据留在内存来提高性能。本文通过Spark系">
+<meta name="keywords" content="分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6-824">
+<meta property="og:url" content="http://yoursite.com/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824-1/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing 本文提出了一种称之为RDDs的分布式内存抽象，以此解决在大规模集群中以容错的方式提供内存计算的方式。当前的计算框架对于迭代算法和交互式数据挖掘的效率都很低，RDDs通过将数据留在内存来提高性能。本文通过Spark系">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://pic.downk.cc/item/5ff33b793ffa7d37b34abc98.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5ff33b793ffa7d37b34abcd2.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd14.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd29.png">
+<meta property="og:updated_time" content="2021-01-04T16:04:35.440Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6-824">
+<meta name="twitter:description" content="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing 本文提出了一种称之为RDDs的分布式内存抽象，以此解决在大规模集群中以容错的方式提供内存计算的方式。当前的计算框架对于迭代算法和交互式数据挖掘的效率都很低，RDDs通过将数据留在内存来提高性能。本文通过Spark系">
+<meta name="twitter:image" content="https://pic.downk.cc/item/5ff33b793ffa7d37b34abc98.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824-1/">
+
+
+
+
+
+  <title>Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6-824 | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6-824</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-05T00:02:46+08:00">
+                2021-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing"><a href="#Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing" class="headerlink" title="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing"></a>Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1><blockquote>
+<p>本文提出了一种称之为RDDs的分布式内存抽象，以此解决在大规模集群中以容错的方式提供内存计算的方式。当前的计算框架对于迭代算法和交互式数据挖掘的效率都很低，RDDs通过将数据留在内存来提高性能。本文通过Spark系统来实现RDDs。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>诸如MapReduce 和Dryad之类的集群计算框架已被广泛用于大规模数据分析。这些系统使用户可以使用一组高级API来编写并行计算，而不必担心工作分配和容错能力。</p>
+<p>尽管当前的框架为集群的计算资源提供了许多抽象，但它们还是缺乏对利用分布式内存的抽象。这就导致了在多个计算之间复用中间结果时，显得非常低效。数据重用在许多迭代机器学习和图计算中很常见。另外在交互式数据挖掘中，用户会需要对数据的同一子集运行多个临时查询。然而在大多数框架中，在计算之间（例如在两个MapReducce作业之间）重用数据的唯一方法是将其写入外部稳定的存储系统，例如分布式文件系统。由于数据复制，磁盘IO和序列化，这会导致相当大的开销，这可能会影响应用程序的执行时间。</p>
+<p>在这篇论文中提出了一个全新的抽象，叫做RDDs(Resilient Distributed Datasets)，它可以在广泛的应用程序中实现有效的数据重用。RDDs 是一个可以容错且并行的数据结构，它可以让用户显式的将中间结果数据集保存在内中。</p>
+<p>现存的分布式内存抽象系统，都是基于对可变状态的细粒度更新。这种接口保证容错的方式无非是将数据进行多副本备份，需要在机器节点间复制大量的数据，宽带传输数据的速度远远比RAM 内存慢。</p>
+<p>与这些系统相比，RDD提供了基于粗粒度转换的接口（map，reduce，filter）。这些接口可以对多条数据条目应用相同的操作，这样就可以通过记录来生成某个数据集的一系列转换，而不是记录真实的数据。如果RDD丢失，则RDD具有足够的有关如何从其他RDD派生的信息，可以仅重新计算该分区。因此，丢失的数据通常可以很快恢复。</p>
+<h2 id="Resilient-Distributed-Datasets"><a href="#Resilient-Distributed-Datasets" class="headerlink" title="Resilient Distributed Datasets"></a>Resilient Distributed Datasets</h2><p>本章主要介绍RDD和Spark编程接口，并与细粒度共享内存做对比。</p>
+<h3 id="RDD-Abstraction"><a href="#RDD-Abstraction" class="headerlink" title="RDD Abstraction"></a>RDD Abstraction</h3><p>RDD是一个只读的、可分区的数据集，可以通过对稳定的存储系统或者其他的RDD进行操作来创建一个新的RDD，这些操作称之为transformations，比如map，filter 以及join。另外用户可以控制RDD的存储和分区，指定存储策略，也可以根据key做hash来做数据分区。</p>
+<h3 id="Spark-Programming-Interface"><a href="#Spark-Programming-Interface" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h3><p>Spark通过集成编程语言API来表示RDD，每一个数据集就是一个对象，通过对象的方法来操作对象。RDD有两种操作，一种是上面说的transformations，另一种则是action，action操作可以得到应用结果值，比如count可以返回数据集的元素个数、collect返回数据集的所有元素以及save则是将输出结果写入到存储系统中。</p>
+<p>Spark定义RDDs是并不会计算，只是采取lazy特性，可以将transformations组成pipeline，触发了actions操作才会真正计算。用户可以通过RDDs的preset方法来缓存数据，也可以调整缓存策略。</p>
+<h3 id="Advantages-of-the-RDD-Model"><a href="#Advantages-of-the-RDD-Model" class="headerlink" title="Advantages of the RDD Model"></a>Advantages of the RDD Model</h3><p>论文将RDD和分布式共享内存系统DSM做了比较，RDD只能粗粒度的操作转换，而DSM可以在任意内存位置进行写入。这样RDD的容错机制更加高效，不需要发生非常耗时的checkpoint，只需重新计算丢数据的分区。另外一个好处就是任务备份比较简单，因为RDD是不变的。还有就是，RDD可以进行进行任务调度来提高大批量的写入效率，在scan-base的操作中也能根据需要将内存数据写到磁盘中。</p>
+<h3 id="Applications-Not-Suitable-for-RDDs"><a href="#Applications-Not-Suitable-for-RDDs" class="headerlink" title="Applications Not Suitable for RDDs"></a>Applications Not Suitable for RDDs</h3><p>RDD更适合批量的数据处理场景，并不适合于需要异步且细粒度的更新共享状态的应用。</p>
+<h2 id="Spark-Programming-Interface-1"><a href="#Spark-Programming-Interface-1" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h2><p>Spark提供了一个用Scala编写的语言集成API。为了使用Spark，开发者编写了一个driver，该driver会连接workers集群，并定义若干个RDDs，在RDDs上执行action，在driver上的Spark代码会追踪RDDs的lineage。workers是一直运行的进程，能在内存中存储RDD分区。</p>
+<h3 id="RDD-Operations-in-Spark"><a href="#RDD-Operations-in-Spark" class="headerlink" title="RDD Operations in Spark"></a>RDD Operations in Spark</h3><p>下图列出了Spark中RDD的transformations和actions操作。transformations是定义新RDD的lazy操作，而actions才是真正计算结果或者写数据到外部存储；</p>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abc98.png" alt></p>
+<h2 id="Representing-RDDs"><a href="#Representing-RDDs" class="headerlink" title="Representing RDDs"></a>Representing RDDs</h2><p>抽象RDDs会带来一个问题：如何在广泛转换中表示追踪lineage。理想情况下，一个实现RDDs的系统应该能够提供丰富的·转换算子，用户可以以任意方式进行组合。在Spark中则是提出了一个简单的图表示来达到以上目的。</p>
+<p>论文提出了一个通用接口去表示RDD，接口表达了五种信息：</p>
+<ul>
+<li>一组分片（partitions），数据集的原子组成；</li>
+<li>一组父RDDs上的依赖；</li>
+<li>一个基于父数据集计算的函数；</li>
+<li>分片策略元数据，一个分片函数partitioner；</li>
+<li>数据位置策略，存储每个partition的优先位置；</li>
+</ul>
+<p>论文将RDDs之间的依赖分为了两类：</p>
+<ul>
+<li>窄依赖：父RDD的每个分片被子RDD至多一个分片使用；</li>
+<li>宽依赖：多个子分片依赖一个父分片；</li>
+</ul>
+<p>例如，代表HDFS文件的RDD对文件的每个块都有一个分片，并且通过数据位置策略知道每个块在哪台计算机上。</p>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abcd2.png" alt="img"></p>
+<p>窄依赖能在一个节点上流水线执行，节点故障的时候也能高效地通过重新计算父分片来进行恢复；而宽依赖，单一节点故障可能会导致一个RDD的所有祖先分片丢失，需要完全重新执行。</p>
+<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>Spark可以从任何的Hadoop输入源中读取数据，比如HDFS和HBase。本章主要关注下面的几个部分：任务调度、Spark解释器的交互式使用、内存管理和checkpoint。</p>
+<h3 id="Job-Scheduling"><a href="#Job-Scheduling" class="headerlink" title="Job Scheduling"></a>Job Scheduling</h3><p>Spark的调度器与Dryad类似，另外还会考虑持久化了的RDD的哪些分片在内存中可用。任何时候用户在RDD上执行action，调度器就会检查RDD的lineage，建立由stages组成的DAG，然后执行这个图。调度器会使每个stage包含尽可能多的窄依赖，stages的边界是宽依赖shuffle操作，或者任何计算过的分片。</p>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd14.png" alt="img"></p>
+<p>调度器会根据数据存放位置使用延迟调度给机器指派任务。</p>
+<p>若一个任务失败了，只要stage的父分片还在，就可以在另一个节点重新运行。如果一些stages都不可用了，就需要重新提交任务去并行计算丢失分片。</p>
+<h3 id="Interpreter-Integration"><a href="#Interpreter-Integration" class="headerlink" title="Interpreter Integration"></a>Interpreter Integration</h3><p>Scala包含一个类似于Ruby和Python的交互式shell，考虑到内存数据的低延迟，Spark可以让用户在解释器上运行。</p>
+<p>Spark中的编译器相对Scala做了一些改变：</p>
+<ul>
+<li>类传输：通过HTTP传输创建类的字节码；</li>
+<li>代码生成：代码生成的单例对象是通过生成类的静态方法访问的，为了避免序列化一个访问不到前面定义变量的闭包，Spark将代码生成逻辑改成直接引用每行对象的实例；</li>
+</ul>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd29.png" alt="img"></p>
+<h3 id="Memory-Management"><a href="#Memory-Management" class="headerlink" title="Memory Management"></a>Memory Management</h3><p>Spark对RDD的持久化提供了三个选项：</p>
+<ul>
+<li>序列成Java对象，存在内存中；性能最好</li>
+<li>作为序列化数据存在内存中；内存空间有限时使用</li>
+<li>存在硬盘中；RDDs过大无法存入内存</li>
+</ul>
+<p>当计算新的RDD分片后，如果没有足够空间去存储，就会基于LRU的淘汰策略去淘汰一个分片。但如果新旧分片属于同一个RDD，则会将旧的分片写入内存，避免相同RDD的分片循环读写。</p>
+<h3 id="Support-for-Checkpointing"><a href="#Support-for-Checkpointing" class="headerlink" title="Support for Checkpointing"></a>Support for Checkpointing</h3><p>虽然lineage可以帮助恢复RDDs，但如果lineage很长的时候就会变得很耗时，因此RDD可以执行checkpoint存入稳定内存。</p>
+<p>Spark为checkpoint提供了一个API，让用户决定checkpoint哪个数据。同样，Spark的调度器也制定每个数据集大小，了解第一次计算的耗时，因此也会基于一定的策略选择一个优化RDDs集合来执行checkpoint，缩短系统恢复时间。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了一个在集群中共享数据的高效的、具备容错能力的的抽象——RDD。RDD能表达通用的并行应用，提供了一个基于粗粒度转换的API，也能通过lineage来快速恢复数据。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/" rel="next" title="No compromises distributed transactions with consistency, availability, and performance——MIT6-824">
+                <i class="fa fa-chevron-left"></i> No compromises distributed transactions with consistency, availability, and performance——MIT6-824
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/01/05/Scaling-Memcache-at-Facebook——MIT6-824/" rel="prev" title="Scaling Memcache at Facebook——MIT6-824">
+                Scaling Memcache at Facebook——MIT6-824 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">243</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing"><span class="nav-number">1.</span> <span class="nav-text">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resilient-Distributed-Datasets"><span class="nav-number">1.2.</span> <span class="nav-text">Resilient Distributed Datasets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDD-Abstraction"><span class="nav-number">1.2.1.</span> <span class="nav-text">RDD Abstraction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spark-Programming-Interface"><span class="nav-number">1.2.2.</span> <span class="nav-text">Spark Programming Interface</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Advantages-of-the-RDD-Model"><span class="nav-number">1.2.3.</span> <span class="nav-text">Advantages of the RDD Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Applications-Not-Suitable-for-RDDs"><span class="nav-number">1.2.4.</span> <span class="nav-text">Applications Not Suitable for RDDs</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spark-Programming-Interface-1"><span class="nav-number">1.3.</span> <span class="nav-text">Spark Programming Interface</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDD-Operations-in-Spark"><span class="nav-number">1.3.1.</span> <span class="nav-text">RDD Operations in Spark</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Representing-RDDs"><span class="nav-number">1.4.</span> <span class="nav-text">Representing RDDs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Implementation"><span class="nav-number">1.5.</span> <span class="nav-text">Implementation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Job-Scheduling"><span class="nav-number">1.5.1.</span> <span class="nav-text">Job Scheduling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Interpreter-Integration"><span class="nav-number">1.5.2.</span> <span class="nav-text">Interpreter Integration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memory-Management"><span class="nav-number">1.5.3.</span> <span class="nav-text">Memory Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Support-for-Checkpointing"><span class="nav-number">1.5.4.</span> <span class="nav-text">Support for Checkpointing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

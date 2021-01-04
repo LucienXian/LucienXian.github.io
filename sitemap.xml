@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2021/01/05/Scaling-Memcache-at-Facebook%E2%80%94%E2%80%94MIT6-824/</loc>
+    
+    <lastmod>2021-01-04T16:04:47.988Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing%E2%80%94%E2%80%94MIT6-824-1/</loc>
+    
+    <lastmod>2021-01-04T16:04:35.440Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance%E2%80%94%E2%80%94MIT6-824-1/</loc>
     
     <lastmod>2020-11-14T17:44:27.460Z</lastmod>

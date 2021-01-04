@@ -265,6 +265,388 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/10/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/10/10/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824/" itemprop="url">No compromises: distributed transactions with consistency, availability, and performance——MIT6.824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-10T00:24:13+08:00">
+                2019-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="No-compromises-distributed-transactions-with-consistency-availability-and-performance"><a href="#No-compromises-distributed-transactions-with-consistency-availability-and-performance" class="headerlink" title="No compromises: distributed transactions with consistency, availability, and performance"></a>No compromises: distributed transactions with consistency, availability, and performance</h1><h2 id="Abtract"><a href="#Abtract" class="headerlink" title="Abtract"></a>Abtract</h2><p>本文展示了一个名为FaRM的主存分布式计算平台，可以提供强串行化、高性能、高可用和耐用性等特质，为此设计了新的事务，复制和恢复协议。</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>具有高可用性和严格序列化的事务虽然简化了编程，但在一定程度上也影响了系统的性能。因此，像Dynamo或者Memcached之类的系统通过不支持事务或者提供弱一致性来提高性能。有些系统则是仅在所有数据都停留在一台机器中时才提供事务。因此需要程序员费心思去考虑数据分区的问题。</p>
+<p>FaRM提供了分布式的ACID事务，具有严格的可分级性，高可用性，高吞吐量和低延迟。设计的协议则利用数据中心中出现的两种硬件趋势——具有RDMA的快速网络和廉价的DRAM提供，通过在电源故障时将DRAM的内容写入SSD来实现非易失性。FaRM的协议遵循三个原则来解决CPU瓶颈：减少消息计数，使用单向的RDMA读写而不是消息，并有效地利用并行性。</p>
+<p>FaRM通过使用单向RDMA操作进一步降低了CPU开销，因为并不会使用到远程CPU。为了使用单向的RDMA，需要设计新的恢复协议（例如RDMA的数据请求是通过网卡提供的，不能简单地在期限到时拒绝传入请求）。另外，恢复协议借助并行性，在集群中均匀地分配每个状态的恢复，并在每台机器的core之间作并行恢复。</p>
+<h2 id="Hardware-trends"><a href="#Hardware-trends" class="headerlink" title="Hardware trends"></a>Hardware trends</h2><p>前面讲过，FaRM的提出利用了两种硬件趋势——非易失性DRAM和具有RDMA的快速网络。</p>
+<h3 id="RDMA-networking"><a href="#RDMA-networking" class="headerlink" title="RDMA networking"></a>RDMA networking</h3><p>FaRM尽可能使用单向的RDMA操作，这是一种远程直接数据存取，是为了解决网络传输中服务器端数据处理的延迟而产生的。文中的实验发现，RDMA读取比可靠性的RPC执行性能高2倍，而RDMA的性能瓶颈是网卡的消息速率。另外，RDMA和RPC都会受到CPU的限制，因此降低CPU开销才是挖掘硬件潜力的好方法。</p>
+<h2 id="Programming-model-and-architecture"><a href="#Programming-model-and-architecture" class="headerlink" title="Programming model and architecture"></a>Programming model and architecture</h2><p>FaRM为应用程序提供了跨集群机器的全局地址空间的抽象，每个机器都运行独立的应用程序进程并存储对象在地址空间里。FaRM的API提供了对本地或者远程对象的透明访问，应用程序线程可以随时启动事务，在事务执行期间可以执行任意逻辑，随后可以调用FaRM来提交这些逻辑操作。</p>
+<p>FaRM事务使用乐观并发控制，所有更新都被本地缓存，并且仅在成功提交后才对其他事务可见。如果并发事务冲突，事务的提交就会失败。</p>
+<p>FaRM API还提供了无锁读取（优化的单对象只读事务）和位置提示，这样应用程序就可以将相关对象共存于同一组机器上，从而改善性能。</p>
+<p>如下图所示，每台机器在用户进程中固定在每个硬件线程中的内核线程上运行FaRM，，每个内核线程运行一个事件循环，该循环执行应用程序代码并轮询RDMA完成队列。</p>
+<p><img src="https://puui.qpic.cn/fans_admin/0/3_131288061_1569132674961/0" alt></p>
+<p>随着计算机故障或添加新计算机，FaRM实例会随着时间推移逐步进行一系列的配置。配置是元组⟨i，S，F，CM⟩，其中i是唯一的，单调递增的64位配置标识符，S是配置中的一组计算机，F是从计算机到故障域的映射，CM则是配置管理器，FaRM使用Zookeeper来协调服务，确保机器就当前配置达成一致并进行存储。每个配置更改都会由CM调用一次Zookeeper，以更新配置。</p>
+<p>FaRM中的全局地址空间由2GB的Region组成，每个Region都会备份到一个主备份和f个副备份中。每台机器在非易失性DRAM中存储多个Region，其他Region可以使用RDMA读取这些Region。读取对象必须要从包含该Region的主备份中完成，如果该Region位于本机，则使用局部地址空间读取。如果是远程，则使用单面RDMA读取。每个对象都有一个用于并行控制和复制的64位版本。Region标识符，即从主备份和副备份的映射由CM管理，并由线程与将单面RDMA读取发布到主备份所需的RDMA引用一起缓存。</p>
+<p>所有机器都与CM沟通以分配新Region，从单调递增的计数器分配Region标识符，并选择该区域的副本。副本选择需要平衡存储在每台机器上的Region数量，同时受到以下限制：容量足够大，每个副本位于不同的故障域中，并且当应用程序指定位置限制时，该Region与目标Region位于同一位置。CM将准备消息发送给具有Region标识符的所选副本。如果所有副本都报告分配区域成功，则CM向所有副本发送一条提交消息。这是一个两阶段协议。</p>
+<p>每台机器还存储实现FIFO队列的环形缓冲区。它们用作事务日志或消息队列。发送者会使用对尾部进行的单面RDMA写入，将记录追加到日志中。NIC会确认这些写入，但是不会涉及接收方的CPU。接收者定期轮询日志的开头以处理记录。</p>
+<h2 id="Distributed-transactions-and-replication"><a href="#Distributed-transactions-and-replication" class="headerlink" title="Distributed transactions and replication"></a>Distributed transactions and replication</h2><p>FaRM集成了事务和备份的协议可以很好地提高性能，传统协议相比，它使用的消息更少，并且利用单面RDMA读取和写入来提高CPU效率和降低延迟。FaRM使用非易失性DRAM中的主备份复制来存储数据和事务日志，并使用单个事务协调器直接与primary和backup进行通信。</p>
+<p>下图是FaRM事务的timeline。虚线和实线分别表示RDMA的读写，点线表示硬件的响应，矩形是对象数据。</p>
+<p><a href="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0" target="_blank" rel="noopener"><img src="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0" alt></a></p>
+<p>在执行阶段，事务使用单向RDMA读取对象，并且它们在本地缓存写操作。协调器还记录所有访问对象的地址和版本，如果primary和backup与协调器位于同一个机器，对象访问会使用本地内存而不是RDMA来读取和写入日志。</p>
+<p>提交事务：</p>
+<ol>
+<li>Lock：协调器将LOCK记录写入每台机器上的日志，这些机器是写入对象的主要机器。Primary的机器通过锁定特定版本对象的方式来处理这些记录。如果获取到所有的lock，那么将发送一条报告消息，否则会终止事务；</li>
+<li>Validate：协调器对primary机器执行读取验证，主要是读取所有对象的版本号，看是否一致。验证默认是通过单边的RDMA读取完成的；</li>
+<li>Commit backups：协调器在每次备份时将COMMITBACKBACK记录写入非易失性日志，然后等待NIC硬件的确认，而不是中断backup机器的CPU；</li>
+<li>Commit primaries：在COMMITBACKBACK写入backup机器之后，协调器开始对每台机器提交COMMIT-PRIMARY。Primary会更新对象的版本号；</li>
+<li>Truncate：在协调器收到所有主节点的响应之后，就会通过在其他日志记录中附带截断事务的标识符来实现记录的截断；</li>
+</ol>
+<h3 id="正确性"><a href="#正确性" class="headerlink" title="正确性"></a>正确性</h3><p>提交的读写事务在获取所有写锁时是可序列化的，而提交的只读事务在上一次读取时是可序列化的。在没有失败的情况下，这等效于在序列化时间点原子地执行和提交整个事务。</p>
+<p>为了确保跨故障的可序列化性，必须在写入COMMIT-PRIMARY之前等待所有备份硬件的确认。否则一旦主节点在不接收COMMIT-BACKUP记录的情况下挂掉了，那么就可能丢失掉某个region的修改。</p>
+<p>由于读集仅存储在协调器中，因此如果协调器失败并且没有提交记录可以生存以证明验证是成功的，则事务将中止。协调器必须要在其中一个主数据库上等待成功提交，然后再向应用程序报告成功提交。否则，如果协调器和所有相关backup节点都挂掉了，那么事务就会被终止了。因为没有可以用来做验证的记录。</p>
+<h3 id="Performance"><a href="#Performance" class="headerlink" title="Performance"></a>Performance</h3><p>对于FaRM来说，其协议比传统的分布式提交协议具有更多的优势，以带有备份的两阶段提交协议——Spanner的协议为例，Spanner使用Paxos复制事务协调器及其参与者，它们是存储由事务读取数据或写入数据的机器。每个Paxos状态机在传统的两阶段提交协议中都扮演着单独的机器的角色。因此这需要2f +1个副本才能容忍f个故障，每个状态机操作至少需要2f +1个往返消息，则需要4P（2f +1）个消息（其中P是事务参与者的数量）。</p>
+<p>FaRM使用primary-backup复制而不是Paxos状态机复制。这将数据副本的数量减少到f+1，减少了在事务处理期间传输的消息的数量。并且由于协调器直接与主备节点交流，进一步减少了延迟和消息数。此外，通过RDMA进行的读取验证可确保只读参与者主节点不占用CPU，并且对COMMIT-PRIMARY和COMMIT-BACKUP记录使用单向RDMA写操作可减少对远程CPU的等待，另外CPU也可以批处理和懒惰处理。</p>
+<h2 id="Failure-recovery"><a href="#Failure-recovery" class="headerlink" title="Failure recovery"></a>Failure recovery</h2><p>FaRM中的故障恢复有以下五个阶段：故障检测，重新配置，事务状态恢复，批量数据恢复和分配器状态恢复。</p>
+<h3 id="Failure-detection"><a href="#Failure-detection" class="headerlink" title="Failure detection"></a>Failure detection</h3><p>FaRM使用租约来检测故障。除CM之外，每台计算机都在CM上拥有租约，而CM在其他每台计算机上都拥有租约。租约到期就会触发故障恢复，租约是通过3次握手来授予的。每台机器向CM发送一个租赁请求，并以一条消息作为响应，该消息既充当对该计算机的租赁授权，又充当CM的租赁请求。然后非CM的计算机回复该租赁请求就行。</p>
+<p>为了确保高可用性，FaRM的租期非常短。FaRM使用了专门的队列来实现租约，以避免其它消息类型在共享队列中，影响了其的延迟。为了提高性能，避免为每台机器在CM上增加一个队列，FaRM使用无限带宽的技术发送和接受各种操作。</p>
+<p>租约的续期是在CPU上实现的，FaRM使用了专门的租约管理器线程，该线程以最高的用户空间优先级运行。</p>
+<h3 id="Reconfiguration"><a href="#Reconfiguration" class="headerlink" title="Reconfiguration"></a>Reconfiguration</h3><p>重新配置协议将FaRM实例从一种配置移到另一种。以下是重新配置的时间图：</p>
+<p><a href="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0" target="_blank" rel="noopener"><img src="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0" alt></a></p>
+<ol>
+<li>怀疑。当某个机器的租约在CM到期时，它将怀疑该机器发生了故障。然后屏蔽所有外部客户端请求。</li>
+<li>探测。新的CM向配置中的所有机器发出RDMA读取，但被怀疑的机器除外。同时也怀疑任何读取失败的机器，新CM仅在获得大多数探测的响应后才继续进行重新配置，避免CM处于小分区。</li>
+<li>更新配置。在收到对探针的答复后，新的CM尝试将存储在Zookeeper中的配置数据更新为⟨c+ 1，S，F和CMid⟩，其中c是当前配置标识符，S是已回复的探测器，F是计算机到故障域的映射，而CMid是其自身的标识符。</li>
+<li>重新映射区域。新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f+1。</li>
+<li>发送新配置。重新映射区域后，CM将NEW-CONFIG消息发送到配置中的所有计算机，其中包含配置标识符，其自身的标识符，配置中其他计算机的标识符以及区域到计算机的所有新映射。</li>
+<li>应用新配置。当机器收到配置标识符大于其自身配置的NEW-CONFIG时，它将更新其当前配置标识符及其区域映射的缓存副本，并分配空间以容纳分配给它的所有新区域副本。</li>
+<li>提交新配置。一旦CM从配置中的所有计算机接收到NEW-CONFIG-ACK消息，它将等待以确保先前配置中授予该配置中的计算机的租约均已到期。然后，CM将NEW-CONFIG-COMMIT发送给所有配置成员，这些成员拿到了租约的授权；</li>
+</ol>
+<h3 id="Transaction-state-recovery"><a href="#Transaction-state-recovery" class="headerlink" title="Transaction state recovery"></a>Transaction state recovery</h3><p>在配置更改之后，FaRM使用分布在因事务而修改对象副本所产生的日志来恢复事务状态。下图展示了事务恢复状态的timeline，FaRM通过在集群中的线程和机器之间分配工作来实现快速恢复。</p>
+<p><a href="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0" target="_blank" rel="noopener"><img src="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0" alt></a></p>
+<ol>
+<li><em>Block access to recovering regions.</em></li>
+</ol>
+<p>当一个primary挂掉，backup会被配置选举成新的primary，此时所有对相关区域的访问都会被屏蔽，知道上图第四步完成，重新获取读写锁。</p>
+<ol start="2">
+<li><em>Drain logs.</em></li>
+</ol>
+<p>要确保跨配置的一致性，一般是拒绝来自旧配置的消息。但FaRM无法这样做，因为NIC会提交写入事务日志的COMMIT-BACKUP和COMMIT-PRIMARY记录，而不会考虑它们的发布配置。FaRM通过drain日志的方式解决这个问题，即在收到NEW-CONFIGCOMMIT消息时都会处理其日志中的所有记录。完成后，它们会将配置标识符记录在变量LastDrained中，配置标识符小于或等于LastDrained的事务日志记录将会被拒绝。</p>
+<ol start="3">
+<li><em>Find recovering transactions.</em></li>
+</ol>
+<p>所有机器必须就给定事务是否为恢复事务达成一致，FaRM通过在重新配置阶段在通信中附带一些额外的元数据来实现此目的。协调器读取每台计算机上的LastDrained变量，对于自LastDrained之后其映射被更改的每个区域r，CM都会在NEW-CONFIG消息中向该计算机发送两个配置标识符——LastPrimaryChange[r]和LastReplicaChange[r]，分别是r的主备对象更改时的最后一个配置标识符，在配置c-1中开始提交的事务将在配置c中恢复。</p>
+<p>用于恢复事务的记录可以分布在不同主数据库的日志中，以及由事务更新的备份机器中。region的每个备份都将NEED-RECOVERY消息与配置标识符，区域标识符以及更新该区域的恢复事务标识符一起发送给主数据库。</p>
+<ol start="4">
+<li><em>Lock recovery.</em></li>
+</ol>
+<p>每个region的primary都会一直等到本机的日志排干并且等待收到每台backup的NEED-RECOVERY消息，然后才去构建完整的恢复事务集合。然后，它通过其线程上的标识符对事务进行分片，以便每个线程t恢复具有协调器线程标识符t的事务状态。同时，主数据库中的线程并行地从尚未本地存储的备份中获取所有事务日志记录，然后锁定通过恢复事务修改的任何对象。</p>
+<p>当某个区域的锁恢复完成时，该区域就处于活动状态，本地和远程协调器可以获得本地指针和RDMA引用。</p>
+<ol start="5">
+<li><em>Replicate log records.</em></li>
+</ol>
+<p>primary日志中的线程通过向backup发送缺失的事务的REPLICATE-TXSTATE消息来进行记录。该消息包含区域标识符，当前配置标识符以及与LOCK记录相同的数据。</p>
+<ol start="6">
+<li><em>Vote.</em></li>
+</ol>
+<p>正在恢复事务的协调器根据事务更新的每个区域的投票来决定是提交还是中止事务。</p>
+<ol start="7">
+<li><em>Decide.</em> </li>
+</ol>
+<p>如果协调器收到来自任何region的commit-primary投票，则决定进行事务。否则，它将等待所有区域投票，如果至少一个区域对 commit-backup投票，而其他所有区域被事务投票锁定、提交备份或截断，则它将等待提交。</p>
+<h2 id="Recovering-data"><a href="#Recovering-data" class="headerlink" title="Recovering data"></a>Recovering data</h2><p>FaRM必须在某个region的新备份中恢复（重新复制）数据，以确保将来可以容忍复制失败。一个区域的新备份最初具有新分配的零区域副本。它将区域划分为多个工作线程，以并行方式恢复该工作线程。</p>
+<p>在复制到备份之前，必须检查每个恢复的对象。如果对象的版本大于本地版本，则备份将通过比较和交换锁定本地版本，更新对象状态，然后将其解锁。</p>
+<h2 id="Recovering-allocator-state"><a href="#Recovering-allocator-state" class="headerlink" title="Recovering allocator state"></a>Recovering allocator state</h2><p>FaRM分配器将区域划分为块（1 MB），用作分配小对象的slabs。它保留了两个元数据：块标头（包含对象的大小）和slab的空闲列表。</p>
+<p>分配新块时，块头将复制到备份中。这样可确保它们在发生故障后在新的主数据库上可用。slab空闲列表仅保留在primary上，以减少对象分配的开销。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/27/redis设计与实现——RDB持久化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/27/redis设计与实现——RDB持久化/" itemprop="url">redis设计与实现——RDB持久化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-27T01:17:37+08:00">
+                2019-09-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="redis设计与实现——RDB持久化"><a href="#redis设计与实现——RDB持久化" class="headerlink" title="redis设计与实现——RDB持久化"></a>redis设计与实现——RDB持久化</h1><p>由于Redis是内存数据库，在服务器进程退出时，服务器状态也会丢失不见，因此Redis提供了RDB持久化功能，可以帮助把内存中的数据库状态保存到磁盘里面，避免数据丢失。</p>
+<p>RDB持久化既可以手动执行，也可以服务器配置定期执行，执行后会生成一个经过压缩的二进制RDB文件。</p>
+<h2 id="RDB文件的创建与载入"><a href="#RDB文件的创建与载入" class="headerlink" title="RDB文件的创建与载入"></a>RDB文件的创建与载入</h2><p>有两个Redis命令可以生成RDB文件——SAVE和BGSAVE，前者会阻塞Redis服务器进程，直到创建完RDB文件，后者则是fork出一个子进程来负责创建RDB文件。</p>
+<p>在redis/src/rdb.c中存在实际创建RDB文件的函数rdbSave()，SAVE命令和BGSAVE命令都会以不同方式调用这个函数。</p>
+<p>SAVE命令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">saveCommand</span><span class="params">(client *c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (server.rdb_child_pid != <span class="number">-1</span>) &#123; <span class="comment">// 正在执行BGSAVE</span></span><br><span class="line">        addReplyError(c,<span class="string">"Background save already in progress"</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rdbSaveInfo rsi, *rsiptr;</span><br><span class="line">    rsiptr = rdbPopulateSaveInfo(&amp;rsi);</span><br><span class="line">  	<span class="comment">// 调用rdbSave保存文件</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSave(server.rdb_filename,rsiptr) == C_OK) &#123;</span><br><span class="line">        addReply(c,shared.ok);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addReply(c,shared.err);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>redis</em> 的事件循环中会去检测redisServer的saveparams字段，判断是否执行BGSAVE，在执行完之后，子进程调用_exit()退出，避免因为父进程正在对文件进行操作而子进程直接回写文件缓冲区。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSaveBackground</span><span class="params">(<span class="keyword">char</span> *filename, rdbSaveInfo *rsi)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">pid_t</span> childpid;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> start;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.aof_child_pid != <span class="number">-1</span> || server.rdb_child_pid != <span class="number">-1</span>) <span class="keyword">return</span> C_ERR;</span><br><span class="line"></span><br><span class="line">    server.dirty_before_bgsave = server.dirty;</span><br><span class="line">    server.lastbgsave_try = time(<span class="literal">NULL</span>);</span><br><span class="line">    openChildInfoPipe();</span><br><span class="line"></span><br><span class="line">    start = ustime();</span><br><span class="line">    <span class="keyword">if</span> ((childpid = fork()) == <span class="number">0</span>) &#123; <span class="comment">// Fork一个子进程</span></span><br><span class="line">        <span class="keyword">int</span> retval;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Child */</span></span><br><span class="line">        closeListeningSockets(<span class="number">0</span>); <span class="comment">// 关闭子进程的监听</span></span><br><span class="line">        redisSetProcTitle(<span class="string">"redis-rdb-bgsave"</span>);</span><br><span class="line">        retval = rdbSave(filename,rsi); <span class="comment">// 调用rdbSave</span></span><br><span class="line">        <span class="keyword">if</span> (retval == C_OK) &#123;</span><br><span class="line">            <span class="keyword">size_t</span> private_dirty = zmalloc_get_private_dirty(<span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (private_dirty) &#123;</span><br><span class="line">                serverLog(LL_NOTICE,</span><br><span class="line">                    <span class="string">"RDB: %zu MB of memory used by copy-on-write"</span>,</span><br><span class="line">                    private_dirty/(<span class="number">1024</span>*<span class="number">1024</span>));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            server.child_info_data.cow_size = private_dirty;</span><br><span class="line">            sendChildInfo(CHILD_INFO_TYPE_RDB);</span><br><span class="line">        &#125;</span><br><span class="line">        exitFromChild((retval == C_OK) ? <span class="number">0</span> : <span class="number">1</span>); <span class="comment">// 调用_exit(retcode);</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Parent */</span></span><br><span class="line">        <span class="comment">// 父进程会记录一些BGSAVE状态</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> C_OK; <span class="comment">/* unreached */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>无论是SAVE还是BGSAVE，最终都需要调用rdbSave完成工作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSave</span><span class="params">(<span class="keyword">char</span> *filename, rdbSaveInfo *rsi)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span> tmpfile[<span class="number">256</span>];</span><br><span class="line">    <span class="keyword">char</span> cwd[MAXPATHLEN]; <span class="comment">/* Current working dir path for error messages. */</span></span><br><span class="line">    FILE *fp;</span><br><span class="line">    rio rdb;</span><br><span class="line">    <span class="keyword">int</span> error = <span class="number">0</span>;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 创建一个临时的rdb文件 </span></span><br><span class="line">    <span class="built_in">snprintf</span>(tmpfile,<span class="number">256</span>,<span class="string">"temp-%d.rdb"</span>, (<span class="keyword">int</span>) getpid());</span><br><span class="line">    fp = fopen(tmpfile,<span class="string">"w"</span>);</span><br><span class="line">    <span class="keyword">if</span> (!fp) &#123;</span><br><span class="line">        <span class="keyword">char</span> *cwdp = getcwd(cwd,MAXPATHLEN);</span><br><span class="line">        serverLog(LL_WARNING,</span><br><span class="line">            <span class="string">"Failed opening the RDB file %s (in server root dir %s) "</span></span><br><span class="line">            <span class="string">"for saving: %s"</span>,</span><br><span class="line">            filename,</span><br><span class="line">            cwdp ? cwdp : <span class="string">"unknown"</span>,</span><br><span class="line">            strerror(errno));</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    &#125;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 初始化 static const rio rioFileIO</span></span><br><span class="line">    rioInitWithFile(&amp;rdb,fp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.rdb_save_incremental_fsync)</span><br><span class="line">        rioSetAutoSync(&amp;rdb,REDIS_AUTOSYNC_BYTES);</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 保存rdb文件</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSaveRio(&amp;rdb,&amp;error,RDB_SAVE_NONE,rsi) == C_ERR) &#123;</span><br><span class="line">        errno = error;</span><br><span class="line">        <span class="keyword">goto</span> werr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make sure data will not remain on the OS's output buffers */</span></span><br><span class="line">    <span class="keyword">if</span> (fflush(fp) == EOF) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (fsync(fileno(fp)) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (fclose(fp) == EOF) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 使用原子性的重命名操作 */</span></span><br><span class="line">    <span class="keyword">if</span> (rename(tmpfile,filename) == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="keyword">char</span> *cwdp = getcwd(cwd,MAXPATHLEN);</span><br><span class="line">        serverLog(LL_WARNING,</span><br><span class="line">            <span class="string">"Error moving temp DB file %s on the final "</span></span><br><span class="line">            <span class="string">"destination %s (in server root dir %s): %s"</span>,</span><br><span class="line">            tmpfile,</span><br><span class="line">            filename,</span><br><span class="line">            cwdp ? cwdp : <span class="string">"unknown"</span>,</span><br><span class="line">            strerror(errno));</span><br><span class="line">        unlink(tmpfile);</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    serverLog(LL_NOTICE,<span class="string">"DB saved on disk"</span>);</span><br><span class="line">    server.dirty = <span class="number">0</span>; <span class="comment">// 重设dirty属性</span></span><br><span class="line">    server.lastsave = time(<span class="literal">NULL</span>);</span><br><span class="line">    server.lastbgsave_status = C_OK;</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line"></span><br><span class="line">werr:</span><br><span class="line">    serverLog(LL_WARNING,<span class="string">"Write error saving DB on disk: %s"</span>, strerror(errno));</span><br><span class="line">    fclose(fp);</span><br><span class="line">    unlink(tmpfile);</span><br><span class="line">    <span class="keyword">return</span> C_ERR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由此可见，rdbSave的操作主要分为两步：</p>
+<ul>
+<li>先将数据写到一个临时文件——tmp-%d.rdb；</li>
+<li>调用原子性的重命名操作；</li>
+</ul>
+<h2 id="自动间隔保存"><a href="#自动间隔保存" class="headerlink" title="自动间隔保存"></a>自动间隔保存</h2><p>对于BGSAVE命令，Redis支持用户可以通过制定配置文件或者传入启动参数的方式设置save选项。</p>
+<ul>
+<li>save 900 1：服务器在900秒之内，对数据库进行了至少一次修改；</li>
+</ul>
+<p>redis支持多RDB配置，满足任意一个就可以触发BGSAVE。在redisServer结构体中，存在serverparams字段记录了save条件。该字段结构有两个field：时间和修改次数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">saveparam</span> &#123;</span></span><br><span class="line">    <span class="keyword">time_t</span> seconds;</span><br><span class="line">    <span class="keyword">int</span> changes;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">saveparam</span> *<span class="title">saveparams</span>;</span>   <span class="comment">/* Save points array for RDB */</span></span><br><span class="line">  <span class="keyword">int</span> saveparamslen;              <span class="comment">/* Number of saving points */</span></span><br><span class="line">  <span class="keyword">char</span> *rdb_filename;             <span class="comment">/* Name of RDB file */</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Redis的服务器周期性操作函数serverCron默认每100ms执行一次，其中一项工作就是检查save选项设置的保存条件是否满足。除了需要检查是否满足在规定时间内操作数据库的次数，还要检查上一次bgsave是否成功，如果不成功的话，需要等待CONFIG_BGSAVE_RETRY_DELAY秒，默认是5秒。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">serverCron</span><span class="params">(struct aeEventLoop *eventLoop, <span class="keyword">long</span> <span class="keyword">long</span> id, <span class="keyword">void</span> *clientData)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line"> 	<span class="keyword">if</span> (server.rdb_child_pid != <span class="number">-1</span> || server.aof_child_pid != <span class="number">-1</span> ||</span><br><span class="line">      ldbPendingChildren()) &#123;</span><br><span class="line">    <span class="comment">// 检查是否只在bgsave或者存在aof子进程</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; server.saveparamslen; j++) &#123;</span><br><span class="line">            struct saveparam *sp = server.saveparams+j;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 检查多个触发条件</span></span><br><span class="line">      			<span class="comment">// 是否满足操作数和时间</span></span><br><span class="line">      			<span class="comment">// 上一次bgsave是否成功，如果不成功要等待CONFIG_BGSAVE_RETRY_DELAY秒， #define CONFIG_BGSAVE_RETRY_DELAY 5</span></span><br><span class="line">            <span class="keyword">if</span> (server.dirty &gt;= sp-&gt;changes &amp;&amp;</span><br><span class="line">                server.unixtime-server.lastsave &gt; sp-&gt;seconds &amp;&amp;</span><br><span class="line">                (server.unixtime-server.lastbgsave_try &gt;</span><br><span class="line">                 CONFIG_BGSAVE_RETRY_DELAY ||</span><br><span class="line">                 server.lastbgsave_status == C_OK))</span><br><span class="line">            &#123;</span><br><span class="line">                serverLog(LL_NOTICE,<span class="string">"%d changes in %d seconds. Saving..."</span>, sp-&gt;changes, (<span class="keyword">int</span>)sp-&gt;seconds);</span><br><span class="line">                rdbSaveInfo rsi, *rsiptr;</span><br><span class="line">                rsiptr = rdbPopulateSaveInfo(&amp;rsi);</span><br><span class="line">                rdbSaveBackground(server.rdb_filename,rsiptr);<span class="comment">// 调用bdsave</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="RDB文件结构"><a href="#RDB文件结构" class="headerlink" title="RDB文件结构"></a>RDB文件结构</h2><p>本节主要介绍RDB的文件结构，具体的代码实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSaveRio</span><span class="params">(rio *rdb, <span class="keyword">int</span> *error, <span class="keyword">int</span> flags, rdbSaveInfo *rsi)</span> </span>&#123;</span><br><span class="line">    dictIterator *di = <span class="literal">NULL</span>;</span><br><span class="line">    dictEntry *de;</span><br><span class="line">    <span class="keyword">char</span> magic[<span class="number">10</span>]; <span class="comment">// 标识rdb文件</span></span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    <span class="keyword">uint64_t</span> cksum; <span class="comment">// 校验和</span></span><br><span class="line">    <span class="keyword">size_t</span> processed = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.rdb_checksum)</span><br><span class="line">        rdb-&gt;update_cksum = rioGenericUpdateChecksum;</span><br><span class="line">  	<span class="comment">// RDB文件的开头，5字节的REDIS和四字节的RDB文件版本</span></span><br><span class="line">  	<span class="comment">// #define RDB_VERSION 9，当前是9</span></span><br><span class="line">  	<span class="comment">// 当格式更改不再兼容后向时，此数字将递增</span></span><br><span class="line">    <span class="built_in">snprintf</span>(magic,<span class="keyword">sizeof</span>(magic),<span class="string">"REDIS%04d"</span>,RDB_VERSION);</span><br><span class="line">    <span class="keyword">if</span> (rdbWriteRaw(rdb,magic,<span class="number">9</span>) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveInfoAuxFields(rdb,flags,rsi) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveModulesAux(rdb, REDISMODULE_AUX_BEFORE_RDB) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">		<span class="comment">// 遍历数据库，dump数据</span></span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; server.dbnum; j++) &#123;</span><br><span class="line">        redisDb *db = server.db+j;</span><br><span class="line">        dict *d = db-&gt;dict; <span class="comment">// 获取所有的键值对</span></span><br><span class="line">        <span class="keyword">if</span> (dictSize(d) == <span class="number">0</span>) <span class="keyword">continue</span>; <span class="comment">// 保存非空数据库</span></span><br><span class="line">        di = dictGetSafeIterator(d);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// #define RDB_OPCODE_SELECTDB   254。保存一字节长，表示接下来会读入一个数据库号码，该号码可以使得服务器调用SELECT命令切换数据库</span></span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_SELECTDB) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,j) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 写入一个 RESIZE DB 操作码，#define RDB_OPCODE_RESIZEDB   251 </span></span><br><span class="line">        <span class="comment">// 该数字只是一个重建哈希表的大小参考，不限制实际读取</span></span><br><span class="line">        <span class="comment">// 接下来会写入键值对个数</span></span><br><span class="line">        <span class="keyword">uint64_t</span> db_size, expires_size;</span><br><span class="line">        db_size = dictSize(db-&gt;dict);</span><br><span class="line">        expires_size = dictSize(db-&gt;expires);</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_RESIZEDB) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,db_size) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,expires_size) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 遍历该db，写入所有键值对*/</span></span><br><span class="line">        <span class="keyword">while</span>((de = dictNext(di)) != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            sds keystr = dictGetKey(de);</span><br><span class="line">            robj key, *o = dictGetVal(de);</span><br><span class="line">            <span class="keyword">long</span> <span class="keyword">long</span> expire;</span><br><span class="line"></span><br><span class="line">            initStaticStringObject(key,keystr);</span><br><span class="line">            expire = getExpire(db,&amp;key);</span><br><span class="line">          	<span class="comment">// 写入expire time, type, key, value</span></span><br><span class="line">            <span class="keyword">if</span> (rdbSaveKeyValuePair(rdb,&amp;key,o,expire) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> (flags &amp; RDB_SAVE_AOF_PREAMBLE &amp;&amp;</span><br><span class="line">                rdb-&gt;processed_bytes &gt; processed+AOF_READ_DIFF_INTERVAL_BYTES)</span><br><span class="line">            &#123;</span><br><span class="line">                processed = rdb-&gt;processed_bytes;</span><br><span class="line">                aofReadDiffFromParent();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        dictReleaseIterator(di);</span><br><span class="line">        di = <span class="literal">NULL</span>; <span class="comment">/* So that we don't release it again on error. */</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ....其它操作</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 写入EOF #define RDB_OPCODE_EOF        255 /*</span></span><br><span class="line"><span class="comment">    if (rdbSaveType(rdb,RDB_OPCODE_EOF) == -1) goto werr;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    /* CRC64 checksum. It will be zero if checksum computation is disabled, the</span></span><br><span class="line"><span class="comment">     * loading code skips the check in this case. */</span></span><br><span class="line">    cksum = rdb-&gt;cksum;</span><br><span class="line">    memrev64ifbe(&amp;cksum);</span><br><span class="line">  	<span class="comment">// 写入校验和</span></span><br><span class="line">    <span class="keyword">if</span> (rioWrite(rdb,&amp;cksum,<span class="number">8</span>) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line"></span><br><span class="line">werr:</span><br><span class="line">    <span class="keyword">if</span> (error) *error = errno;</span><br><span class="line">    <span class="keyword">if</span> (di) dictReleaseIterator(di);</span><br><span class="line">    <span class="keyword">return</span> C_ERR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因此RDB的文件结构可以总结为五个部分：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">REDIS</th>
+<th style="text-align:center">db_version</th>
+<th style="text-align:center">Databases</th>
+<th style="text-align:center">EOF</th>
+<th style="text-align:center">check_sum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">REDIS</td>
+<td style="text-align:center">0009</td>
+<td style="text-align:center">kv内容</td>
+<td style="text-align:center">255</td>
+<td style="text-align:center">8字节无符号整数</td>
+</tr>
+</tbody>
+</table>
+<p>其中DataBase部分会保存多个非空数据库，总结可以分为三个部分，1字节长的标示码，整数的db序列号和键值对</p>
+<blockquote>
+<p> RDB_OPCODE_SELECTDB | db_number | kv对</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSaveKeyValuePair</span><span class="params">(rio *rdb, robj *key, robj *val, <span class="keyword">long</span> <span class="keyword">long</span> expiretime)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> savelru = server.maxmemory_policy &amp; MAXMEMORY_FLAG_LRU;</span><br><span class="line">    <span class="keyword">int</span> savelfu = server.maxmemory_policy &amp; MAXMEMORY_FLAG_LFU;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 带有过期时间的键值对保存 */</span></span><br><span class="line">    <span class="keyword">if</span> (expiretime != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_EXPIRETIME_MS) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveMillisecondTime(rdb,expiretime) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 保存LRU信息 */</span></span><br><span class="line">    <span class="keyword">if</span> (savelru) &#123;</span><br><span class="line">        <span class="keyword">uint64_t</span> idletime = estimateObjectIdleTime(val);</span><br><span class="line">        idletime /= <span class="number">1000</span>; <span class="comment">/* Using seconds is enough and requires less space.*/</span></span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_IDLE) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,idletime) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 保存LFU信息 */</span></span><br><span class="line">    <span class="keyword">if</span> (savelfu) &#123;</span><br><span class="line">        <span class="keyword">uint8_t</span> buf[<span class="number">1</span>];</span><br><span class="line">        buf[<span class="number">0</span>] = LFUDecrAndReturn(val);</span><br><span class="line">       </span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_FREQ) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">if</span> (rdbWriteRaw(rdb,buf,<span class="number">1</span>) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 保存type，和键值对 */</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSaveObjectType(rdb,val) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveStringObject(rdb,key) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveObject(rdb,val,key) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Delay return if required (for testing) */</span></span><br><span class="line">    <span class="keyword">if</span> (server.rdb_key_save_delay)</span><br><span class="line">        usleep(server.rdb_key_save_delay);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>键值对的保存结构是通过函数rdbSaveKeyValuePair()实现的，并且带有过期时间的键值对和不带有的都混在一起保存。其中如果有过期时间，则通过开头的RDB_OPCODE_EXPIRETIME_MS进行标示。至于保存类型则有其中，都是1字节长。key都是字符串对象。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_STRING 0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_LIST   1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_SET    2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_ZSET   3</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_HASH   4</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_ZSET_2 5 <span class="comment">/* ZSET version 2 with doubles stored in binary. */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_MODULE 6</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_MODULE_2 7</span></span><br><span class="line"><span class="comment">/* Object types for encoded objects. */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_HASH_ZIPMAP    9</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_LIST_ZIPLIST  10</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_SET_INTSET    11</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_ZSET_ZIPLIST  12</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_HASH_ZIPLIST  13</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_LIST_QUICKLIST 14</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_STREAM_LISTPACKS 15</span></span><br></pre></td></tr></table></figure>
+<p>结构就是：</p>
+<blockquote>
+<p>RDB_OPCODE_EXPIRETIME_MS | ms | TYPE | key | value</p>
+</blockquote>
+<p>或者：</p>
+<blockquote>
+<p>TYPE | key | value</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/17/redis设计与实现——数据库/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1655,350 +2037,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/26/redis设计与实现——链表/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/07/26/redis设计与实现——链表/" itemprop="url">redis设计与实现——链表</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-26T01:28:53+08:00">
-                2019-07-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="redis设计与实现——链表"><a href="#redis设计与实现——链表" class="headerlink" title="redis设计与实现——链表"></a>redis设计与实现——链表</h1><p>链表是数据结构中一种很常见的实现类型，redis也不例外，其主要实现在<a href="https://github.com/antirez/redis/blob/unstable/src/adlist.h" target="_blank" rel="noopener">adlist.h</a>和<a href="https://github.com/antirez/redis/blob/unstable/src/adlist.c" target="_blank" rel="noopener">adlist.c</a>里。</p>
-<h2 id="链表与链表节点的实现"><a href="#链表与链表节点的实现" class="headerlink" title="链表与链表节点的实现"></a>链表与链表节点的实现</h2><p>如下所示，每个链表节点都用listNode结构来表示，并且用list来持有整个链表：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span> <span class="comment">// 前置节点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span> <span class="comment">// 后置节点</span></span><br><span class="line">    <span class="keyword">void</span> *value; /节点值</span><br><span class="line">&#125; listNode;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">list</span> &#123;</span></span><br><span class="line">    listNode *head; <span class="comment">// 表头节点</span></span><br><span class="line">    listNode *tail; <span class="comment">// 表尾节点</span></span><br><span class="line">    <span class="keyword">void</span> *(*dup)(<span class="keyword">void</span> *ptr); <span class="comment">// 复制链表节点所包含的值</span></span><br><span class="line">    <span class="keyword">void</span> (*<span class="built_in">free</span>)(<span class="keyword">void</span> *ptr); <span class="comment">// 释放链表节点所包含的值</span></span><br><span class="line">    <span class="keyword">int</span> (*match)(<span class="keyword">void</span> *ptr, <span class="keyword">void</span> *key); <span class="comment">// 对比链表节点所保存的值与另一个输入是否相等</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> len; <span class="comment">// 链表长度</span></span><br><span class="line">&#125; <span class="built_in">list</span>;</span><br></pre></td></tr></table></figure>
-<p>由此可见，redis的链表是一个双端的(具备prev和next指针)、无环的(表头节点的prev和表尾节点的next都指向NULL)、带链表长度计数器(len属性)、多态(使用void*指针来保存节点值)。</p>
-<h2 id="链表和链表节点的API"><a href="#链表和链表节点的API" class="headerlink" title="链表和链表节点的API"></a>链表和链表节点的API</h2><table>
-<thead>
-<tr>
-<th style="text-align:center">函数</th>
-<th style="text-align:center">作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">listEmpty</td>
-<td style="text-align:center">移除链表所有元素，但不销毁list本身</td>
-</tr>
-<tr>
-<td style="text-align:center">listRelease</td>
-<td style="text-align:center">销毁整个链表</td>
-</tr>
-<tr>
-<td style="text-align:center">listAddNodeHead</td>
-<td style="text-align:center">添加一个节点到链表头</td>
-</tr>
-<tr>
-<td style="text-align:center">listAddNodeTail</td>
-<td style="text-align:center">添加一个节点到链表尾</td>
-</tr>
-<tr>
-<td style="text-align:center">listInsertNode</td>
-<td style="text-align:center">可选地将新节点插入到指定节点的前面或者后面</td>
-</tr>
-<tr>
-<td style="text-align:center">listDelNode</td>
-<td style="text-align:center">删除一个节点</td>
-</tr>
-<tr>
-<td style="text-align:center">listGetIterator</td>
-<td style="text-align:center">返回链表头部或者尾部的迭代器</td>
-</tr>
-<tr>
-<td style="text-align:center">listReleaseIterator</td>
-<td style="text-align:center">销毁迭代器</td>
-</tr>
-<tr>
-<td style="text-align:center">listNext</td>
-<td style="text-align:center">返回迭代器的下一个链表节点</td>
-</tr>
-<tr>
-<td style="text-align:center">listDup</td>
-<td style="text-align:center">拷贝整个链表</td>
-</tr>
-<tr>
-<td style="text-align:center">listSearchKey</td>
-<td style="text-align:center">在列表中搜索与给定键匹配的节点。（需要实现定义match函数）</td>
-</tr>
-<tr>
-<td style="text-align:center">listIndex</td>
-<td style="text-align:center">返回链表中特定索引的节点，可以使用负数</td>
-</tr>
-<tr>
-<td style="text-align:center">listRotate</td>
-<td style="text-align:center">反转链表——将尾部节点插入到头部</td>
-</tr>
-<tr>
-<td style="text-align:center">listJoin</td>
-<td style="text-align:center">合并两个链表，并把其中一个置空</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/21/redis设计与实现——字符串/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/07/21/redis设计与实现——字符串/" itemprop="url">redis设计与实现——字符串</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-21T23:24:02+08:00">
-                2019-07-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h1><p>Redis没有使用C语言传统的以空字符结尾的字符串表示，而是自己构造了一种名为简单动态字符串(simple dynamic string，SDS)的抽象类型。</p>
-<p>除了在诸如打印日志等无需对字符串进行修改的地方使用C字符串之外，其它场合一般使用SDS。其优点：</p>
-<ul>
-<li>使用起来更加简单；</li>
-<li>二进制安全；</li>
-<li>计算效率高；</li>
-<li>兼容普通的C字符串函数；</li>
-</ul>
-<h2 id="SDS的定义"><a href="#SDS的定义" class="headerlink" title="SDS的定义"></a>SDS的定义</h2><p>在sds.h/sdshdr的结构中有这么一个值：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> *sds;</span><br><span class="line"><span class="comment">/* Note: sdshdr5 is never used, we just access the flags byte directly.</span></span><br><span class="line"><span class="comment"> * However is here to document the layout of type 5 SDS strings. */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr5</span> &#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, and 5 msb of string length */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr8</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint8_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint8_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr16</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint16_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint16_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr32</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint32_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint32_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr64</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint64_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint64_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>这里flags的低三位表示类型(是sdshdr8还是16)，高五位没被使用；len记录当前字节数组长度，alloc记录当前字节数组分配的内存大小，都不包含’\0’；buf保存真实字符串的值，以及结尾的’\0’。</p>
-<p>这里使用了<strong><strong>attribute</strong> ((<strong>packed</strong>))</strong>，它的作用是编译器取消结构在编译过程中的优化对齐，按照实际占用字节数进行对齐。我们可以打印出字节长度分别为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sizeof</span>(struct sdshdr8)  <span class="comment">// 3-&gt;3, result of llvm</span></span><br><span class="line"><span class="keyword">sizeof</span>(struct sdshdr16) <span class="comment">// 6-&gt;5</span></span><br><span class="line"><span class="keyword">sizeof</span>(struct sdshdr32) <span class="comment">// 12-&gt;9</span></span><br><span class="line"><span class="keyword">sizeof</span>(struct sdshdr64) <span class="comment">// 24-&gt;17</span></span><br></pre></td></tr></table></figure>
-<h2 id="SDS与C字符串的区别"><a href="#SDS与C字符串的区别" class="headerlink" title="SDS与C字符串的区别"></a>SDS与C字符串的区别</h2><h3 id="常数复杂度获取字符串长度"><a href="#常数复杂度获取字符串长度" class="headerlink" title="常数复杂度获取字符串长度"></a>常数复杂度获取字符串长度</h3><p>这一点得益于结构体重的len字段，与C字符串不同，redis获取字符串长度的复杂度从O(N)降到O(1)。</p>
-<h3 id="杜绝缓冲区的溢出"><a href="#杜绝缓冲区的溢出" class="headerlink" title="杜绝缓冲区的溢出"></a>杜绝缓冲区的溢出</h3><p>C库中有一个&lt;string.h&gt;/strcat函数可以将两个字符串进行拼接，但C库中这个函数是假设使用者为目的字符串分配了足够多的内存，否则会产生缓冲区溢出。</p>
-<p>与C字符串不同，SDS使用了另外的拼接函数：<strong>sdscatlen</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Append the specified binary-safe string pointed by 't' of 'len' bytes to the</span></span><br><span class="line"><span class="comment"> * end of the specified sds string 's'.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * After the call, the passed sds string is no longer valid and all the</span></span><br><span class="line"><span class="comment"> * references must be substituted with the new pointer returned by the call. */</span></span><br><span class="line"><span class="function">sds <span class="title">sdscatlen</span><span class="params">(sds s, <span class="keyword">const</span> <span class="keyword">void</span> *t, <span class="keyword">size_t</span> len)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">size_t</span> curlen = sdslen(s);</span><br><span class="line"></span><br><span class="line">    s = sdsMakeRoomFor(s,len);</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">memcpy</span>(s+curlen, t, len);</span><br><span class="line">    sdssetlen(s, curlen+len);</span><br><span class="line">    s[curlen+len] = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里的关键是sdsMakeRoomFor函数，其它部分只是做一些内存拷贝和长度的重新设置。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sds <span class="title">sdsMakeRoomFor</span><span class="params">(sds s, <span class="keyword">size_t</span> addlen)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">void</span> *sh, *newsh;</span><br><span class="line">  	<span class="comment">// sdsavail: 获取可用长度，这里的s是指向buf的，通过buf进行寻址</span></span><br><span class="line">  	<span class="comment">// 获取头部(结构体)指针：#define SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));</span></span><br><span class="line">  	<span class="comment">// sdsavail的计算方式：sh-&gt;alloc - sh-&gt;len;</span></span><br><span class="line">    <span class="keyword">size_t</span> avail = sdsavail(s);</span><br><span class="line">    <span class="keyword">size_t</span> len, newlen;</span><br><span class="line">    <span class="keyword">char</span> type, oldtype = s[<span class="number">-1</span>] &amp; SDS_TYPE_MASK; <span class="comment">// s-1就是flags</span></span><br><span class="line">    <span class="keyword">int</span> hdrlen;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 有足够的空间就可以直接返回 */</span></span><br><span class="line">    <span class="keyword">if</span> (avail &gt;= addlen) <span class="keyword">return</span> s;</span><br><span class="line"></span><br><span class="line">    len = sdslen(s); <span class="comment">// O(1)获取字符串长度</span></span><br><span class="line">    sh = (<span class="keyword">char</span>*)s-sdsHdrSize(oldtype);<span class="comment">// 获取头部(结构体)指针</span></span><br><span class="line">    newlen = (len+addlen);<span class="comment">// 新的字符串使用长度</span></span><br><span class="line">  	<span class="comment">// 新字符串小于1M时，预分配两倍空间</span></span><br><span class="line">  	<span class="comment">// 新字符串大于1M时，预分配多1M的空间</span></span><br><span class="line">    <span class="keyword">if</span> (newlen &lt; SDS_MAX_PREALLOC) <span class="comment">// SDS_MAX_PREALLOC (1024*1024)</span></span><br><span class="line">        newlen *= <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        newlen += SDS_MAX_PREALLOC;</span><br><span class="line"></span><br><span class="line">    type = sdsReqType(newlen); <span class="comment">// 重新计算字符串类型</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Don't use type 5: the user is appending to the string and type 5 is</span></span><br><span class="line"><span class="comment">     * not able to remember empty space, so sdsMakeRoomFor() must be called</span></span><br><span class="line"><span class="comment">     * at every appending operation. */</span></span><br><span class="line">  	<span class="comment">// SDS_TYPE_5直接按SDS_TYPE_8来计算</span></span><br><span class="line">    <span class="keyword">if</span> (type == SDS_TYPE_5) type = SDS_TYPE_8;</span><br><span class="line"></span><br><span class="line">    hdrlen = sdsHdrSize(type);<span class="comment">// 新类型的长度</span></span><br><span class="line">  	</span><br><span class="line">    <span class="keyword">if</span> (oldtype==type) &#123; </span><br><span class="line">      	<span class="comment">// #define s_realloc realloc</span></span><br><span class="line">      	<span class="comment">// 如果类型没变化，直接在原sds上重新分配内存</span></span><br><span class="line">        newsh = s_realloc(sh, hdrlen+newlen+<span class="number">1</span>); </span><br><span class="line">        <span class="keyword">if</span> (newsh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        s = (<span class="keyword">char</span>*)newsh+hdrlen;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Since the header size changes, need to move the string forward,</span></span><br><span class="line"><span class="comment">         * and can't use realloc */</span></span><br><span class="line">      	<span class="comment">// 如果类型发生了变化，则重新malloc分配空间</span></span><br><span class="line">        newsh = s_malloc(hdrlen+newlen+<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (newsh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        <span class="built_in">memcpy</span>((<span class="keyword">char</span>*)newsh+hdrlen, s, len+<span class="number">1</span>);<span class="comment">// 将原字符串内容拷贝到新开辟的内存中</span></span><br><span class="line">        s_free(sh); <span class="comment">// 释放原sds内存</span></span><br><span class="line">      	<span class="comment">// 设置flag，len和alloc等字段</span></span><br><span class="line">        s = (<span class="keyword">char</span>*)newsh+hdrlen;</span><br><span class="line">        s[<span class="number">-1</span>] = type;</span><br><span class="line">        sdssetlen(s, len);</span><br><span class="line">    &#125;</span><br><span class="line">    sdssetalloc(s, newlen);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里的关键策略是针对不同长度的字符串做不同的分配策略：</p>
-<ul>
-<li>新字符串小于1M时，预分配两倍空间</li>
-<li>新字符串大于1M时，预分配多1M的空间</li>
-</ul>
-<p>另外就是不使用SDS5，将其当作SDS8来使用。</p>
-<p>由于redis可能出现频繁修改字符串的场景，这种预分配的策略可以使得SDS将连续增长N次字符串所需要的内存重分配次数从必定N次降低为最多N次。</p>
-<h3 id="减少修改字符串时带来的内存重分配次数"><a href="#减少修改字符串时带来的内存重分配次数" class="headerlink" title="减少修改字符串时带来的内存重分配次数"></a>减少修改字符串时带来的内存重分配次数</h3><h4 id="字符串的创建"><a href="#字符串的创建" class="headerlink" title="字符串的创建"></a>字符串的创建</h4><p>直接看源码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sds <span class="title">sdsnewlen</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *init, <span class="keyword">size_t</span> initlen)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">void</span> *sh;</span><br><span class="line">    sds s;</span><br><span class="line">    <span class="keyword">char</span> type = sdsReqType(initlen);</span><br><span class="line">    <span class="comment">/* Empty strings are usually created in order to append. Use type 8</span></span><br><span class="line"><span class="comment">     * since type 5 is not good at this. */</span></span><br><span class="line">    <span class="keyword">if</span> (type == SDS_TYPE_5 &amp;&amp; initlen == <span class="number">0</span>) type = SDS_TYPE_8;</span><br><span class="line">    <span class="keyword">int</span> hdrlen = sdsHdrSize(type);</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *fp; <span class="comment">/* flags pointer. */</span></span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// +1是因为字符串都以'\0'结尾，但其又是二进制安全的，即字符串中间可以出现字符'\0'，因为sds有长度属性</span></span><br><span class="line">    sh = s_malloc(hdrlen+initlen+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (init==SDS_NOINIT) <span class="comment">// const char *SDS_NOINIT = "SDS_NOINIT";</span></span><br><span class="line">        init = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (!init)</span><br><span class="line">        <span class="built_in">memset</span>(sh, <span class="number">0</span>, hdrlen+initlen+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (sh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>; <span class="comment">// 如果sh是NULL，直接返回NULL</span></span><br><span class="line">    s = (<span class="keyword">char</span>*)sh+hdrlen;</span><br><span class="line">    fp = ((<span class="keyword">unsigned</span> <span class="keyword">char</span>*)s)<span class="number">-1</span>; <span class="comment">// fp就是flag指针</span></span><br><span class="line">    <span class="keyword">switch</span>(type) &#123;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_5: &#123;</span><br><span class="line">          	<span class="comment">// #define SDS_TYPE_BITS 3</span></span><br><span class="line">          	<span class="comment">// flag的前五位保存长度，后三位是类型type，因此结构体中sdshdr5不含有len</span></span><br><span class="line">            *fp = type | (initlen &lt;&lt; SDS_TYPE_BITS);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_8: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">8</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_16: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">16</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_32: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">32</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_64: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">64</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (initlen &amp;&amp; init)</span><br><span class="line">        <span class="built_in">memcpy</span>(s, init, initlen);</span><br><span class="line">    s[initlen] = <span class="string">'\0'</span>; <span class="comment">// 以'\0'结尾</span></span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里有两个特殊的地方：一是sds都以’\0’结尾；二是sdshdr5用flag这个字段可以同时保存type和len。</p>
-<h4 id="惰性空间的释放"><a href="#惰性空间的释放" class="headerlink" title="惰性空间的释放"></a>惰性空间的释放</h4><p>惰性空间的释放主要体现在SDS字符串的缩短操作，redis中的sdstrim提供了这样的一个操作：<code>sdstrim</code> 函数接受一个 SDS 和一个 C 字符串作为参数，<strong>从 SDS 左右两端分别移除所有在 C 字符串中出现过的字符</strong>（《redis设计与实现》一书有误）。源码如下</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sds <span class="title">sdstrim</span><span class="params">(sds s, <span class="keyword">const</span> <span class="keyword">char</span> *cset)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *start, *end, *sp, *ep;</span><br><span class="line">    <span class="keyword">size_t</span> len;</span><br><span class="line"></span><br><span class="line">    sp = start = s;</span><br><span class="line">    ep = end = s+sdslen(s)<span class="number">-1</span>;</span><br><span class="line">  	<span class="comment">// 分别从头尾开始便利，即移除掉cset中的字符</span></span><br><span class="line">    <span class="keyword">while</span>(sp &lt;= end &amp;&amp; <span class="built_in">strchr</span>(cset, *sp)) sp++; </span><br><span class="line">    <span class="keyword">while</span>(ep &gt; sp &amp;&amp; <span class="built_in">strchr</span>(cset, *ep)) ep--;</span><br><span class="line">    len = (sp &gt; ep) ? <span class="number">0</span> : ((ep-sp)+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (s != sp) memmove(s, sp, len); <span class="comment">//内存拷贝，即将中间段的字符串拷贝到头部指针</span></span><br><span class="line">    s[len] = <span class="string">'\0'</span>;</span><br><span class="line">    sdssetlen(s,len);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// s="AA...AA.a.aa.aHelloAWorld     :::" -&gt;sdstrim(s,"Aa. :")-&gt; "HelloAWorld"</span></span><br></pre></td></tr></table></figure>
-<p>由此，可以看到sdstrim并没有释放原空间，即alloc不变，变的是len。这样后续再需要扩展的时候，len后的空间能够再被利用。</p>
-<p>事实上，redis的确提供了释放空间的函数：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Free an sds string. No operation is performed if 's' is NULL. */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sdsfree</span><span class="params">(sds s)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="literal">NULL</span>) <span class="keyword">return</span>;</span><br><span class="line">    s_free((<span class="keyword">char</span>*)s-sdsHdrSize(s[<span class="number">-1</span>])); <span class="comment">// #define s_free free</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="二进制的安全"><a href="#二进制的安全" class="headerlink" title="二进制的安全"></a>二进制的安全</h3><p>这里的关键是SDS是使用len属性的值而不是空字符来判断字符串是否结束，这种二进制安全的做法使得redis不仅可以保存文本数据，还可以保存任意格式的二进制数据。</p>
-<h3 id="兼容部分C字符串的函数"><a href="#兼容部分C字符串的函数" class="headerlink" title="兼容部分C字符串的函数"></a>兼容部分C字符串的函数</h3><p>这是基于SDS遵循了C字符串以空字符串结尾的惯例，这些API都会将SDS保存的又用数据的末尾保存位空字符。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2047,7 +2085,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">241</span>
+                <span class="site-state-item-count">243</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2133,7 +2171,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
