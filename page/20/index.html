@@ -265,6 +265,165 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux系统调用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/10/linux系统调用/" itemprop="url">linux系统调用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:09+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="linux系统调用"><a href="#linux系统调用" class="headerlink" title="linux系统调用"></a>linux系统调用</h1><h2 id="WHY"><a href="#WHY" class="headerlink" title="WHY"></a>WHY</h2><ul>
+<li>系统调用时内核向用户进程服务的唯一方式；</li>
+<li>通过系统调用，用户程序从用户态切换到核心态，从而访问内核资源</li>
+<li>好处：<ul>
+<li>安全，避免访问内核资源</li>
+<li>抽象：使得编程更加方便</li>
+<li>统一：接口统一，便于移植</li>
+</ul>
+</li>
+</ul>
+<h2 id="x86的运行模式、地址空间与上下文"><a href="#x86的运行模式、地址空间与上下文" class="headerlink" title="x86的运行模式、地址空间与上下文"></a>x86的运行模式、地址空间与上下文</h2><ul>
+<li>linux使用了两个运行模式<ul>
+<li>特权级0：内核模式</li>
+<li>特权级3：用户模式</li>
+</ul>
+</li>
+<li>地址空间<ul>
+<li>用户空间</li>
+<li>内核空间：3G~4G</li>
+</ul>
+</li>
+<li>上下文<ul>
+<li>用户级上下文：代码、数据、用户栈、共享存储区</li>
+<li>系统级上下文：PCB（task_struct）、MMU、内核栈</li>
+<li>存储器上下文：各种存储器、栈指针</li>
+</ul>
+</li>
+</ul>
+<h2 id="系统调用、API库和C库"><a href="#系统调用、API库和C库" class="headerlink" title="系统调用、API库和C库"></a>系统调用、API库和C库</h2><ul>
+<li>API是一组函数定义，遵循POSIX标准，说明了如何获取一个特定服务；</li>
+<li>系统调用则是通过软中断向内核发出请求，每个系统调用对应于一个内核函数，系统调用被使用时，会切换到内核态去找内核函数执行；</li>
+<li>C库函数中包含了部分系统调用，实现了linux主要的API；</li>
+<li>操作系统命令则比API更高一层，包含了一个或多个API</li>
+</ul>
+<h2 id="系统调用处理过程"><a href="#系统调用处理过程" class="headerlink" title="系统调用处理过程"></a>系统调用处理过程</h2><ul>
+<li>应用程序调用C库函数</li>
+<li>通过软中断int 0x80进入内核，中断程序将参数，一般是系统调用号放在寄存器eax上传到内核</li>
+<li>调用system_call函数，保存系统调用号和所有需要的寄存器到栈中；保存PCB的地址；检查系统调用号；有效则根据系统调用号表去调用内核函数（特定的服务程序）</li>
+<li>转入ret_from_sys_call例程，返回</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/Virtual-Memory/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1637,170 +1796,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/06/OS结构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/06/OS结构/" itemprop="url">OS结构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-06T23:32:43+08:00">
-                2017-12-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="操作系统结构"><a href="#操作系统结构" class="headerlink" title="操作系统结构"></a>操作系统结构</h1><h2 id="operating-system-services"><a href="#operating-system-services" class="headerlink" title="operating system services"></a>operating system services</h2><ul>
-<li>用户接口</li>
-<li>程序</li>
-<li>IO操作</li>
-<li>文件系统</li>
-<li>通讯</li>
-<li>错误检测</li>
-<li>资源分配</li>
-<li>安全</li>
-</ul>
-<h2 id="User-Operating-System-Interface"><a href="#User-Operating-System-Interface" class="headerlink" title="User Operating System Interface"></a>User Operating System Interface</h2><ul>
-<li>command interface<ul>
-<li>CIL: command-line interface</li>
-<li>GUI: graphics user interface</li>
-</ul>
-</li>
-<li>program interface(System call)</li>
-</ul>
-<h2 id="system-call"><a href="#system-call" class="headerlink" title="system call"></a>system call</h2><ul>
-<li>定义：系统调用是在用户进程和系统内核之间的程序接口</li>
-<li>多数情况下，用户进程通过API而不是系统调用与内核打交道。<ul>
-<li>API是一组函数定义，提供了一个特定的服务；而一个系统调用时通过软中断向内核发送一个请求；</li>
-<li>API可能需要一个或多个系统调用来完成其功能，如果不与内核打交道，则不需要用到系统调用；</li>
-<li>系统调用是在内核态中运行的，而API是在用户态中运行；</li>
-</ul>
-</li>
-<li>系统调用如何传递参数？有三种：<ul>
-<li>在寄存器中传递，适用于参数比较少的，因此会限制参数长度；</li>
-<li>在block、table或者内存中，然后再寄存器存着所在block的地址；</li>
-<li>存在stack中，需要时则pop；</li>
-</ul>
-</li>
-</ul>
-<h2 id="Operating-system-structure"><a href="#Operating-system-structure" class="headerlink" title="Operating system structure"></a>Operating system structure</h2><ul>
-<li>simple structure: MS-DOS</li>
-<li>Microkernel system structure: 由“微”内核和若个个服务组成，基本功能由中央内核提供，其它功能由独立进程提供<ul>
-<li>windows、Macos</li>
-</ul>
-</li>
-<li>Monolithic Kernels: 内核的所有代码，包括子系统都被打包进一个文件中，内核中的每个函数都可以访问内核中所有部分<ul>
-<li>linux</li>
-</ul>
-</li>
-</ul>
-<h2 id="virtual-machines"><a href="#virtual-machines" class="headerlink" title="virtual machines"></a>virtual machines</h2><p>虚拟机是在硬件上的一层服务，物理机的资源被用来创建虚拟机。虚拟机很好地避免了与硬件资源的直接访问</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1849,7 +1844,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">243</span>
+                <span class="site-state-item-count">244</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

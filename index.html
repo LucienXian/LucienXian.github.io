@@ -265,6 +265,262 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/18/Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS——MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/01/18/Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS——MIT6-824/" itemprop="url">Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS——MIT6-824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-18T00:09:57+08:00">
+                2021-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS"><a href="#Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS" class="headerlink" title="Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS"></a>Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS</h1><h2 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h2><p> COPS的KV存储系统，并引出了一种新的一致性模型——具有收敛性冲突处理的因果一致性。</p>
+<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>对于分布式存储系统，论文从CAP转移到关注ALPS——即可用性、低延迟、分区容忍性和扩展性。论文介绍了一个叫COPS的KV存储系统，并实现了一种新的一致性模型causal+ consistency，收敛冲突处理的因果一致性。除此之外还有一个扩展版本——COPS-GT，提供了get事务来保证提供对于多个key的一致性视图，并且是无锁和非阻塞的。</p>
+<ul>
+<li>因果一致性：确保数据存储遵循操作之间的因果依赖关系；</li>
+<li>收敛冲突处理：确保副本永远不会发散，并且在所有节点上对相同key的冲突进行相同的处理；</li>
+</ul>
+<p>两者结合，确保客户端看到因果正确，无冲突且始终在发展的数据存储。</p>
+<h2 id="ALPS-SYSTEMS-AND-TRADE-OFFS"><a href="#ALPS-SYSTEMS-AND-TRADE-OFFS" class="headerlink" title="ALPS SYSTEMS AND TRADE-OFFS"></a>ALPS SYSTEMS AND TRADE-OFFS</h2><p>一个分布式系统主要关注以下几个特性：</p>
+<ul>
+<li>Availability：所有操作不会被永久阻塞或者返回不可用的错误；</li>
+<li>Low Latency：client能快速完成操作；</li>
+<li>Partition Tolerance：在网络分区的情况，数据存储能继续提供服务；</li>
+<li>High Scalability：能做到线性扩展；</li>
+<li>Stronger Consistency：理想的数据存储最好能提供线性化；</li>
+</ul>
+<p>由于CAP的缘故，具备可用性和分区容忍性的分布式系统无法实现强一致性。为了在ALPS系统的要求和易编程之间取得平衡，论文定义了一个中间一致性模型。</p>
+<h2 id="CAUSAL-CONSISTENCY"><a href="#CAUSAL-CONSISTENCY" class="headerlink" title="CAUSAL+ CONSISTENCY"></a>CAUSAL+ CONSISTENCY</h2><p>对于具有收敛冲突处理的因果一致性来说，其抽象模型只有两种操作：put(key,val)和 get(key)=val，即读写。在COPS系统里，单个逻辑副本就是完整的本地集群的所有节点。</p>
+<p>该模型定义了三条规则：</p>
+<ul>
+<li>Execution Thread：如果a和b是单线程内的两个操作，a-&gt;b表示a发生在b之前；</li>
+<li>Gets From：如果a是一个put操作，b是一个获取a写入值的get操作，则是a-&gt;b；</li>
+<li>Transitivity：对于操作a、b、c来说，如果存在a-&gt;b和b-&gt;c，则一定有a-&gt;c；</li>
+</ul>
+<p>下图就是这三条规则的一个样例：</p>
+<p><img src="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png" alt></p>
+<h3 id="Definition"><a href="#Definition" class="headerlink" title="Definition"></a>Definition</h3><p>论文将因果一致性定义为两个属性的组合：因果一致性和收敛性冲突处理。</p>
+<p>所谓的因果一致性就是上图提到的一个操作顺序结果，如果client 2读取x的时候，先读取到4，再读取到1就会违反因果一致性。但如果两个操作a和b没有任何顺序关系，那么因果一致性就会认为这是一个并发操作，不会做任何的约束，提高系统性能。如果a和b都在同一个key上做put操作，就意味着发生冲突。冲突会带来两个问题：冲突的值可能不确定，即不同副本的值可能不一致；冲突可能产生需要特殊处理的特殊情况；</p>
+<p>因此就需要收敛的冲突处理，冲突处理函数必须能在所有副本上以相同的方式进行处理，并且满足交换律和结合律的，即$h(a,h(b,c))=h(c,h(b,a))$，不同的副本以接收到顺序处理冲突，收敛处理的结果。</p>
+<p>COPS可以自定义冲突收敛函数，默认使用last writer wins。</p>
+<h3 id="Causal-vs-Other-Consistency-Models"><a href="#Causal-vs-Other-Consistency-Models" class="headerlink" title="Causal+ vs. Other Consistency Models"></a>Causal+ vs. Other Consistency Models</h3><p>这一章主要介绍各种一致性模型的对比，从约束能力来看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Linearizability &gt; Sequential &gt; Causal+ &gt; Causal &gt; FIFO</span><br><span class="line">																			 &gt; Per-Key Sequential &gt; Eventua</span><br></pre></td></tr></table></figure>
+<p>Causal+提供了比较适中的一致性模型，且能满足ALPS的系统要求。</p>
+<h3 id="Causal-in-COPS"><a href="#Causal-in-COPS" class="headerlink" title="Causal+ in COPS"></a>Causal+ in COPS</h3><p>COPS系统提供了两个抽象：其一是版本号，每个key都有一个版本号；另外就是依赖关系，如果b依赖a，那么在复制的时候，需要先复制a，才能再复制b；</p>
+<h3 id="Scalable-Causality"><a href="#Scalable-Causality" class="headerlink" title="Scalable Causality"></a>Scalable Causality</h3><p>有些类似的因果一致性系统使用的是日志交换的序列化，在扩展性方便表现不好。而COPS则是采用了划分key空间和编码依赖关系到key元数据的方式来提高扩展性。</p>
+<h2 id="SYSTEM-DESIGN-OF-COPS"><a href="#SYSTEM-DESIGN-OF-COPS" class="headerlink" title="SYSTEM DESIGN OF COPS"></a>SYSTEM DESIGN OF COPS</h2><p>COPS是一个实现了causal+一致性的、能满足ALPS的分布式存储系统，论文提及了两个版本：一个是简单版的，支持causal+ 的一致性，另一个则是升级版的，支持get事务，能确保client请求keys的时候，存储系统能提供一个一致的相关values的快照，成为 COPS-GT。</p>
+<h3 id="Overview-of-COPS"><a href="#Overview-of-COPS" class="headerlink" title="Overview of COPS"></a>Overview of COPS</h3><p>如下图，COPS就是一个在若干个数据中心运行着的kv存储系统。每个数据中心都有一个本地的COPS集群，保存着完整的一份数据。Client只与本地的数据中心进行联系，并通过COPS的client库进行调用。</p>
+<p><img src="https://img.imgdb.cn/item/6002872f3ffa7d37b3d238d1.png" alt></p>
+<p>COPS系统主要由两个组件组成的：</p>
+<ul>
+<li>Key-value store：提供了对keys的线性化操作<ul>
+<li>每个key- value对都有对应的元数据。对于COPS，这个元数据是版本号；对于COPS-GT，则是有版本号和一系列的依赖‘</li>
+<li>kv存储提供了三种额外的操作：get by version, put after和dep check这三种操作确保了client库和异步复制进程能够提供Casula+一致性和get事务；</li>
+<li>对于 COPS-GT，系统保存了kv对的一些老版本数据，提供get事务；</li>
+</ul>
+</li>
+<li>client库：主要提供读写操作，COPS的get， COPS-GT的get_trans，还有put。</li>
+</ul>
+<p>另外，COPS为了在确保casual+一致性的时候，能降低资源和性能开销：</p>
+<ul>
+<li>避免检查所有值的依赖关系；</li>
+<li>做垃圾回收，减少存储多版本key和依赖关系元数据的空间开销；</li>
+<li>最多进行两次的get事务，降低延迟；</li>
+</ul>
+<h3 id="The-COPS-Key-Value-Store"><a href="#The-COPS-Key-Value-Store" class="headerlink" title="The COPS Key-Value Store"></a>The COPS Key-Value Store</h3><p>对于COPS，存储元组是&lt;key: {value, version}&gt;，存储的是最新版本的数据；</p>
+<p>对于COPS-GT，存储元组是&lt;key: {value, version, deps}&gt;，deps就是一个链表，链表元素是&lt;key, version&gt;；</p>
+<p>每个COPS集群都持有完整的一份kv存储数据，每个集群节点根据一致性哈希获得一个独立的keys空间。至于容灾，则是通过链式复制来提供的。在每个集群中，每个key都有一个主节点，主节点会复制到集群内的从节点；至于其他集群也有一个对应的主节点；</p>
+<p>集群内的操作是线性化的，本地commit后，跨集群复制时会将数据放到一个队列上异步复制到其他集群的主节点。待其他集群检查完依赖关系后，就会提交该key；</p>
+<h3 id="Client-Library-and-Interface"><a href="#Client-Library-and-Interface" class="headerlink" title="Client Library and Interface"></a>Client Library and Interface</h3><p>COPS的clientAPI主要包含四个步骤：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. ctx id ← createContext()</span><br><span class="line">2. bool ← deleteContext(ctx id)</span><br><span class="line">3. bool ← put (key, value, ctx id)</span><br><span class="line">4. value ← get (key, ctx id) [In COPS]</span><br><span class="line">or</span><br><span class="line">4. hvaluesi ← get trans (hkeysi, ctx id) [In COPS-GT]</span><br></pre></td></tr></table></figure>
+<p>与传统的kv系统API不同，这个client库会有一个针对COPS-GT的get_trans的API，还有就是所有的函数都需要一个context的参数，该参数可以记录每个client操作的因果关系；</p>
+<ul>
+<li>COPS-GT Client Library</li>
+</ul>
+<p>COPS-GT的client库中context存了一组&lt;key, version, deps&gt;，读取时，client会将该key和其依赖关系添加到当前的context里；写入时，client先取出最新版本key的依赖关系，重新计算新依赖D，待写入成功后，则将写入该项&lt;key，返回的version，D&gt;到context；</p>
+<p>下图就是运行过程中的依赖关系变化图：</p>
+<p><img src="https://img.imgdb.cn/item/6002908b3ffa7d37b3d70194.png" alt></p>
+<p>这种依赖关系的设计会嗲来两个问题：空间占用大和检查依赖关系的成本高。</p>
+<p>论文的解决方法是：COPS-GT会在依赖关系被提交后进行垃圾回收，另外就是由于依赖关系具备传递性，一旦依赖项被提交，那么可以确定该依赖项的依赖项也被提交了，所以只需要检查最近依赖；</p>
+<blockquote>
+<p>get_trans需要检查全部的依赖</p>
+</blockquote>
+<ul>
+<li>COPS Client Library</li>
+</ul>
+<p>COPS的client库需要更好的状态，因此读取时只需要将拿到的key和版本号添加到context就好，至于写入，则是先使用context作为最近的依赖项，返回数据后，则用返回的数据去副高context。</p>
+<h3 id="Writing-Values-in-COPS-and-COPS-GT"><a href="#Writing-Values-in-COPS-and-COPS-GT" class="headerlink" title="Writing Values in COPS and COPS-GT"></a>Writing Values in COPS and COPS-GT</h3><p>所有对COPS的写入都分为两步：同步写入本地集群，异步复制到其他集群，并且都通过下面的API去完成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bool,vers&gt; ← put_after (key, val, [deps], nearest, vers=∅)</span><br></pre></td></tr></table></figure>
+<h4 id="写入本地集群"><a href="#写入本地集群" class="headerlink" title="写入本地集群"></a>写入本地集群</h4><p>当client调用put接口时，首先需要计算最近的依赖关系，然后client库会去调用put_after接口，这里COPS不需要传入deps参数。然后该key对应的本地主节点会赋予该key一个版本号。put_after接口可以确保本地集群的commit是强一致性的，至于其他集群的提交在后面叙述。</p>
+<p>主节点使用Lamport时间戳来为每次更新计算一个版本号，其中高位是版本号，低位是节点号，通过比较Lamport时间戳，并应用 last-writer-wins 来检查和解决冲突。Lamport时间戳提供了所有分布式事件的偏序关系，与COPS的因果一致性兼容。</p>
+<h4 id="复制到其他集群"><a href="#复制到其他集群" class="headerlink" title="复制到其他集群"></a>复制到其他集群</h4><p>本地写入提交后，主节点会调用put_after（此时vers参数需要设置为新得到的值）异步复制到其他集群的主节点，主节点进行依赖检查dep_check，一直阻塞直到依赖中的值都写入提交了，参会写入并提交该key值。依赖检查只需要nearest就好。</p>
+<h3 id="Reading-Values-in-COPS"><a href="#Reading-Values-in-COPS" class="headerlink" title="Reading Values in COPS"></a>Reading Values in COPS</h3><p>COPS的读取会通过下面的API完成，并且version会设置为默认的LATEST，并将得的数据按照前面说的添加到context里。COPS-GT可能需要获取非LATEST版本的值；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;value, version, deps&gt; ← get_by_version (key, version=LATEST)</span><br></pre></td></tr></table></figure>
+<h3 id="Get-Transactions-in-COPS-GT"><a href="#Get-Transactions-in-COPS-GT" class="headerlink" title="Get Transactions in COPS-GT"></a>Get Transactions in COPS-GT</h3><p>COPS-GT提供了get_trans接口，以事务的方式返回一对kv，满足因果一致性。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># @param keys list of keys</span></span><br><span class="line"><span class="comment"># @param ctx_id context id</span></span><br><span class="line"><span class="comment"># @return values list of values</span></span><br><span class="line"></span><br><span class="line">function get_trans(keys, ctx_id):</span><br><span class="line">	<span class="comment"># Get keys in parallel (first round)</span></span><br><span class="line">	<span class="keyword">for</span> k <span class="keyword">in</span> keys</span><br><span class="line">  	results[k] = get_by_version(k, LATEST)</span><br><span class="line">    </span><br><span class="line">  <span class="comment"># Calculate causally correct versions (ccv)</span></span><br><span class="line">  <span class="keyword">for</span> k <span class="keyword">in</span> keys</span><br><span class="line">    ccv[k] = max(ccv[k], results[k].vers)</span><br><span class="line">    <span class="keyword">for</span> dep <span class="keyword">in</span> results[k].deps</span><br><span class="line">    	<span class="keyword">if</span> dep.key <span class="keyword">in</span> keys</span><br><span class="line">    		ccv[dep.key] = max(ccv[dep.key], dep.vers)</span><br><span class="line">          </span><br><span class="line">  <span class="comment"># Get needed ccvs in parallel (second round)</span></span><br><span class="line">  <span class="keyword">for</span> k <span class="keyword">in</span> keys</span><br><span class="line">    <span class="keyword">if</span> ccv[k] &gt; results[k].vers</span><br><span class="line">    	results[k] = get_by_version(k, ccv[k])</span><br><span class="line">      </span><br><span class="line">  <span class="comment"># Update the metadata stored in the context</span></span><br><span class="line">  update_context(results, ctx_id)</span><br><span class="line">      </span><br><span class="line">  <span class="comment"># Return only the values to the client</span></span><br><span class="line">  <span class="keyword">return</span> extract_values(results)</span><br></pre></td></tr></table></figure>
+<p>论文举了一个相册例子：A修改相册权限acl为“仅朋友可见”，然后修改相册说明desc，然后添加照片到相册album。</p>
+<p>现在要读取A的相册，如果出现一个这样的顺序：先读取到旧的acl，检查权限，然后acl被修改，最后越权读到了desc和album。为了避免这种问题，使用get_trans就不会有这个问题：</p>
+<ul>
+<li>首先是第一轮并行调用get_by_version，拿到acl，desc和album的值，并获得相应的依赖；</li>
+<li>此时可能读到旧的acl、新的desc和album，然后计算ccv，根据依赖关系可以得知desc和album依赖的acl比读到的acl要更新；</li>
+<li>然后根据前面的计算，得到需要进行第二轮get_by_version的调用，此时获取指定版本的值；（同样是并行调用）；</li>
+<li>此时拿到的acl值就是最新的了；</li>
+</ul>
+<h2 id="GARBAGE-FAULTS-AND-CONFLICTS"><a href="#GARBAGE-FAULTS-AND-CONFLICTS" class="headerlink" title="GARBAGE, FAULTS, AND CONFLICTS"></a>GARBAGE, FAULTS, AND CONFLICTS</h2><h3 id="Garbage-Collection-Subsystem"><a href="#Garbage-Collection-Subsystem" class="headerlink" title="Garbage Collection Subsystem"></a>Garbage Collection Subsystem</h3><p>随着key的更新和插入，系统的空间占用将会无限制增长。COPS的垃圾回收子系统能够删除无用的状态，将系统的空间维持在一个合适的大小。</p>
+<ul>
+<li>Version Garbage Collection. 仅COPS-GT需要</li>
+</ul>
+<p>存储：COPS-GT存储了每个key的多个版本，以便client调用get_by_version；</p>
+<p>get_trans算法会限制完成一个事务需要的版本数，即在第二轮获取所需的旧版本数据，因此使用默认为5s的trans_time限制执行时间，若超时则进行重试。写入新版本的key后，COPS-GT只需要保留一段时间的旧版本数据，在此之后就不再使用旧版本来请求数据，并且GC可以降低删除。</p>
+<ul>
+<li>Dependency Garbage Collection. 仅COPS-GT需要</li>
+</ul>
+<p>存储：存储get事务需要的依赖</p>
+<p>当COPS-GT的get事务不再需要这个依赖的时候，就可以进行GC回收，至于不需要则是指：kv被写入到所有集群后经过了trans_time。此时的回收主要是清楚value的依赖，并且设置一个never-depend的标志。</p>
+<p>清除依赖需要通知其他集群，在其他集群的写提交后trans_time，就需要通知原集群，原集群删除后再通知其他集群也删除。</p>
+<ul>
+<li>Client Metadata Garbage Collection. COPS和COPS-GT</li>
+</ul>
+<p>存储：client存在context里的元数据，包括依赖关系和其他数据。</p>
+<p>COPS清理的方式有两种：</p>
+<ol>
+<li>put_after作用于所有集群后，会对key标记为never- depend，并返回给client，client就可以在context中进行删除；</li>
+<li>COPS节点会从put_after中移除不需要的依赖，这里使用了一个global checkpoint time的概念，版本号比这个小的都移除；global checkpoint time的计算方式：首先是从pending中的put_after里找到最早的Lamport timestamp；然后联系其他集群的等价节点，一对一交换拿到最早的Lamport timestamp，所有数据中心都能知道key范围内最早的Lamport timestamp是什么了；最后数据中心会gossip自己负责的key range的最小时间戳，以找到任何一个节点观测到的最早Lamport timestamp。论文的实现是，每秒执行10次，并且对性能没有明显影响。</li>
+</ol>
+<h3 id="Fault-Tolerance"><a href="#Fault-Tolerance" class="headerlink" title="Fault Tolerance"></a>Fault Tolerance</h3><h4 id="Client-Failures"><a href="#Client-Failures" class="headerlink" title="Client Failures"></a>Client Failures</h4><p>Client出故障意味着不能发送请求，因此不需要做任何处理</p>
+<h4 id="Key-Value-Node-Failures"><a href="#Key-Value-Node-Failures" class="headerlink" title="Key-Value Node Failures"></a>Key-Value Node Failures</h4><p>COPS使用了类似FAWN-KV的设计来做链式复制，从而实现节点容灾。在本地集群中，put_after则是直接作用于链的头节点，然后向后传导，在尾节点commit。读取时get_by_version则是直接读尾节点。跨集群传播，则是源集群尾节点将其传播到其他集群的头部节点，进行dep_check后同样沿着链条将值传播，尾节点commit。</p>
+<h4 id="Datacenter-Failures"><a href="#Datacenter-Failures" class="headerlink" title="Datacenter Failures"></a>Datacenter Failures</h4><p>应对数据中心出故障，COPS能继续对外工作，但可能会有一些key不一致；</p>
+<p>本地集群写入时出错：</p>
+<ul>
+<li>集群宕掉，若没有拷贝，数据丢失；</li>
+<li>网络分区，数据不会丢失，等分区修复则可；</li>
+</ul>
+<p>其他集群写入出错，需要等待管理员解决：</p>
+<ul>
+<li>允许复制队列增长，直到故障修复；</li>
+<li>重配置，去掉失败数据中心；</li>
+</ul>
+<p>数据中心出故障时，COPS-GT无法进行依赖回收，要等到重新配置去掉有问题的数据中心。</p>
+<h3 id="Conflict-Detection"><a href="#Conflict-Detection" class="headerlink" title="Conflict Detection"></a>Conflict Detection</h3><p>多线程并发写同一个key会导致冲突。</p>
+<p>COPS使用的是前文提到过的last- write-win策略来解决冲突，last则是最新的写入版本号。</p>
+<p>COPS也可以自定义冲突检查和解决策略，但需要考虑三个部分的内容：</p>
+<ul>
+<li>所有的写入都需要带上前面的版本元数据，即本地集群看到的最近版本；</li>
+<li>所有的写入都需要带上隐式依赖数据，在写入前进行依赖检查；</li>
+<li>检查出冲突后需要自定义一个收敛的冲突处理函数；</li>
+</ul>
+<p>冲突检查：如果写入的key——new，带有了一个版本号prev，而此时可见的当前版本是curr，如果prev!=curr，则意味着发生冲突。</p>
+<h2 id="CONCLUSION"><a href="#CONCLUSION" class="headerlink" title="CONCLUSION"></a>CONCLUSION</h2><p>本文介绍了一种可扩展的分布式存储系统COPS，可以在不牺牲ALPS属性的情况下提供因果关系+一致性。COPS通过在每个集群的写入之前跟踪并显式检查是否满足因果关系来实现因果一致性。COPS-GT通过在COPS的基础上引入get事务，使client能够获得多个key的一致性视图； COPS-GT进行了优化，减少状态，最小化多轮协议并减少复制开销。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/05/Scaling-Memcache-at-Facebook——MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1883,160 +2139,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/05/redis设计与实现——AOF持久化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/11/05/redis设计与实现——AOF持久化/" itemprop="url">redis设计与实现——AOF持久化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-05T00:54:49+08:00">
-                2019-11-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="AOF持久化"><a href="#AOF持久化" class="headerlink" title="AOF持久化"></a>AOF持久化</h1><p>RDB持久化是通过保存数据库中的键值对来记录数据库状态的，而AOF则是通过保存redis服务器所执行的命令来完成记录的。</p>
-<p>例如执行命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SET msg "hello"</span><br><span class="line">RPUSH numbers 128 256 512</span><br></pre></td></tr></table></figure>
-<p>那么RDB的持久化就是保存msg和numbers的键值对，而AOF则是保存SET和RPUSH的命令。</p>
-<h2 id="AOF持久化的实现"><a href="#AOF持久化的实现" class="headerlink" title="AOF持久化的实现"></a>AOF持久化的实现</h2><p>AOF的持久化功能分为命令追加、文件写入、文件同步三个步骤。</p>
-<h3 id="命令追加"><a href="#命令追加" class="headerlink" title="命令追加"></a>命令追加</h3><p>打开AOF持久化功能后，服务器在执行完一个写命令后，会以redis的协议格式将被执行的命令写到服务器状态的缓冲区，则redisServer结构的aof_buf字段。在大量写请求情况下，利用缓冲区缓存一部分命令，尔后再根据某种策略写入磁盘，减少IO。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line">  sds aof_buf;      <span class="comment">/* AOF buffer, written before entering the event loop */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="AOF文件的写入与同步"><a href="#AOF文件的写入与同步" class="headerlink" title="AOF文件的写入与同步"></a>AOF文件的写入与同步</h3><p>Redis的服务器进程中有一个事件循环，正如注释所说的，每次结束事件循环前都会调用flushAppendOnlyFile()函数，该函数则根据配置选项决定如何写入AOF文件。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">beforeSleep</span><span class="params">(struct aeEventLoop *eventLoop)</span>  </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  flushAppendOnlyFile(<span class="number">0</span>);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __linux__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> redis_fsync fdatasync</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> redis_fsync fsync</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">aof_background_fsync</span><span class="params">(<span class="keyword">int</span> fd)</span> </span>&#123;</span><br><span class="line">    bioCreateBackgroundJob(BIO_AOF_FSYNC,(<span class="keyword">void</span>*)(<span class="keyword">long</span>)fd,<span class="literal">NULL</span>,<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">flushAppendOnlyFile</span><span class="params">(<span class="keyword">int</span> force)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  try_fsync:</span><br><span class="line">    <span class="keyword">if</span> (server.aof_no_fsync_on_rewrite &amp;&amp; hasActiveChildProcess())</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.aof_fsync == AOF_FSYNC_ALWAYS) &#123;</span><br><span class="line">        latencyStartMonitor(latency); <span class="comment">//监控</span></span><br><span class="line">        redis_fsync(server.aof_fd); <span class="comment">/* 同步到磁盘 */</span></span><br><span class="line">        latencyEndMonitor(latency);</span><br><span class="line">        latencyAddSampleIfNeeded(<span class="string">"aof-fsync-always"</span>,latency);</span><br><span class="line">        server.aof_fsync_offset = server.aof_current_size;</span><br><span class="line">        server.aof_last_fsync = server.unixtime;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> ((server.aof_fsync == AOF_FSYNC_EVERYSEC &amp;&amp;</span><br><span class="line">                server.unixtime &gt; server.aof_last_fsync)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!sync_in_progress) &#123;</span><br><span class="line">            aof_background_fsync(server.aof_fd); <span class="comment">// 在额外的线程中开启一个任务去执行fsync()</span></span><br><span class="line">            server.aof_fsync_offset = server.aof_current_size;</span><br><span class="line">        &#125;</span><br><span class="line">        server.aof_last_fsync = server.unixtime;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>force：如果持久化策略为everysec，就有一定的可能延迟flush，因为后台进程可能还在进行fsync()，而如果force设成1，则无论什么情况都会进行写入。</li>
-</ul>
-<p>另外由于在Linux中用户调用write函数时，操作系统会先将写入数据保存在一个内存缓冲区中，redis支持服务器配置appendfsync选项来定义上面的函数行为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Append only defines */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AOF_FSYNC_NO 0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AOF_FSYNC_ALWAYS 1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AOF_FSYNC_EVERYSEC 2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CONFIG_DEFAULT_AOF_FSYNC AOF_FSYNC_EVERYSEC <span class="comment">//默认</span></span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>AOF_FSYNC_ALWAYS：将aof_buf缓冲区的所有内容写入并同步到AOF文件；</li>
-<li>AOF_FSYNC_EVERYSEC：将aof_buf缓冲区的所有内容写入AOF文件，如果上次同步AOF文件的时间距离现在超过1秒，则再次进行同步；</li>
-<li>AOF_FSYNC_NO：写入文件但不同步；</li>
-</ul>
-<h2 id="AOF文件的载入与数据还原"><a href="#AOF文件的载入与数据还原" class="headerlink" title="AOF文件的载入与数据还原"></a>AOF文件的载入与数据还原</h2><p>由于AOF文件包含了重建数据库的所有写命令，因此只需要重读执行一遍，就可以恢复服务器状态了。其实现函数为loadAppendOnlyFile()</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">loadAppendOnlyFile</span><span class="params">(<span class="keyword">char</span> *filename)</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">client</span> *<span class="title">fakeClient</span>;</span> <span class="comment">// 创建一个伪客户端</span></span><br><span class="line">    FILE *fp = fopen(filename,<span class="string">"r"</span>);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">redis_stat</span> <span class="title">sb</span>;</span></span><br><span class="line">    <span class="keyword">int</span> old_aof_state = server.aof_state;</span><br><span class="line">    <span class="keyword">long</span> loops = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">off_t</span> valid_up_to = <span class="number">0</span>; <span class="comment">/* Offset of latest well-formed command loaded. */</span></span><br><span class="line">    <span class="keyword">off_t</span> valid_before_multi = <span class="number">0</span>; <span class="comment">/* Offset before MULTI command loaded. */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fp == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        serverLog(LL_WARNING,<span class="string">"Fatal error: can't open the append log file for reading: %s"</span>,strerror(errno));</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 特殊处理aof文件长度为0的情况 */</span></span><br><span class="line">    <span class="keyword">if</span> (fp &amp;&amp; redis_fstat(fileno(fp),&amp;sb) != <span class="number">-1</span> &amp;&amp; sb.st_size == <span class="number">0</span>) &#123;</span><br><span class="line">        server.aof_current_size = <span class="number">0</span>;</span><br><span class="line">        server.aof_fsync_offset = server.aof_current_size;</span><br><span class="line">        fclose(fp);</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 参数关系aof，避免有新纪录写入同一个文件 */</span></span><br><span class="line">    server.aof_state = AOF_OFF;</span><br><span class="line"></span><br><span class="line">    fakeClient = createAOFClient();</span><br><span class="line">    startLoadingFile(fp, filename); <span class="comment">// 做全局状态的标记，表示正在加载文件</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 如果有RDB前缀，则需要加载RDB文件 */</span></span><br><span class="line">    <span class="keyword">char</span> sig[<span class="number">5</span>]; <span class="comment">/* "REDIS" */</span></span><br><span class="line">    <span class="keyword">if</span> (fread(sig,<span class="number">1</span>,<span class="number">5</span>,fp) != <span class="number">5</span> || <span class="built_in">memcmp</span>(sig,<span class="string">"REDIS"</span>,<span class="number">5</span>) != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 读入AOF文件，一个一个命令执行. */</span></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// ... 读取cmd</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (cmd == server.multiCommand) valid_before_multi = valid_up_to;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 在fake客户端上下文里执行命令 */</span></span><br><span class="line">        fakeClient-&gt;cmd = cmd;</span><br><span class="line">        <span class="keyword">if</span> (fakeClient-&gt;flags &amp; CLIENT_MULTI &amp;&amp;</span><br><span class="line">            fakeClient-&gt;cmd-&gt;proc != execCommand)</span><br><span class="line">        &#123;</span><br><span class="line">            queueMultiCommand(fakeClient);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            cmd-&gt;proc(fakeClient);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 该客户端不作回应 */</span></span><br><span class="line">        serverAssert(fakeClient-&gt;bufpos == <span class="number">0</span> &amp;&amp;</span><br><span class="line">                     listLength(fakeClient-&gt;reply) == <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 客户端不受blocked */</span></span><br><span class="line">        serverAssert((fakeClient-&gt;flags &amp; CLIENT_BLOCKED) == <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li>由代码可见，首先是创建一个不带网络连接，不做回应不受blocked的客户端，因为执行命令只能在客户端上下文执行；</li>
-<li>从AOF文件中分析并读出写命令；</li>
-<li>用伪客户端执行该命令，知道所有命令处理完毕；</li>
-</ol>
-<h2 id="AOF重写"><a href="#AOF重写" class="headerlink" title="AOF重写"></a>AOF重写</h2><p>为了解决AOF文件体积膨胀的问题，Redis提供了AOF文件重写的功能，即Redis服务器会创建一个新的AOF文件来替代现有的AOF文件，并去除任何浪费空间的冗余命令。</p>
-<h3 id="AOF文件重写的实现"><a href="#AOF文件重写的实现" class="headerlink" title="AOF文件重写的实现"></a>AOF文件重写的实现</h3><p>事实上，AOF文件重写并不会对老的AOF文件进行任何读取、分析或者写入操作，而是通过直接读取当前数据库的状态实现的。aof的重写是通过函数rewriteAppendOnlyFileRio实现的</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rewriteAppendOnlyFileRio</span><span class="params">(rio *aof)</span> </span>&#123;</span><br><span class="line">    dictIterator *di = <span class="literal">NULL</span>;</span><br><span class="line">    dictEntry *de;</span><br><span class="line">    <span class="keyword">size_t</span> processed = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 遍历数据库</span></span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; server.dbnum; j++) &#123;</span><br><span class="line">        <span class="keyword">char</span> selectcmd[] = <span class="string">"*2\r\n$6\r\nSELECT\r\n"</span>; <span class="comment">// 写入select命令</span></span><br><span class="line">        redisDb *db = server.db+j;</span><br><span class="line">        dict *d = db-&gt;dict;</span><br><span class="line">        <span class="keyword">if</span> (dictSize(d) == <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">        di = dictGetSafeIterator(d);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 写入select命令，指定数据库号码 */</span></span><br><span class="line">        <span class="keyword">if</span> (rioWrite(aof,selectcmd,<span class="keyword">sizeof</span>(selectcmd)<span class="number">-1</span>) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">        <span class="keyword">if</span> (rioWriteBulkLongLong(aof,j) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* I遍历数据库中的每个key value */</span></span><br><span class="line">        <span class="keyword">while</span>((de = dictNext(di)) != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            sds keystr;</span><br><span class="line">            robj key, *o;</span><br><span class="line">            <span class="keyword">long</span> <span class="keyword">long</span> expiretime;</span><br><span class="line"></span><br><span class="line">            keystr = dictGetKey(de);</span><br><span class="line">            o = dictGetVal(de);</span><br><span class="line">            initStaticStringObject(key,keystr);</span><br><span class="line"></span><br><span class="line">            expiretime = getExpire(db,&amp;key);</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* 根据key的类型进行重写*/</span></span><br><span class="line">            <span class="keyword">if</span> (o-&gt;type == OBJ_STRING) &#123;</span><br><span class="line">                <span class="comment">/* Emit a SET command */</span></span><br><span class="line">                <span class="keyword">char</span> cmd[]=<span class="string">"*3\r\n$3\r\nSET\r\n"</span>;</span><br><span class="line">                <span class="keyword">if</span> (rioWrite(aof,cmd,<span class="keyword">sizeof</span>(cmd)<span class="number">-1</span>) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">                <span class="comment">/* Key and value */</span></span><br><span class="line">                <span class="keyword">if</span> (rioWriteBulkObject(aof,&amp;key) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">                <span class="keyword">if</span> (rioWriteBulkObject(aof,o) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (o-&gt;type == OBJ_LIST) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rewriteListObject(aof,&amp;key,o) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (o-&gt;type == OBJ_SET) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rewriteSetObject(aof,&amp;key,o) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (o-&gt;type == OBJ_ZSET) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rewriteSortedSetObject(aof,&amp;key,o) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (o-&gt;type == OBJ_HASH) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rewriteHashObject(aof,&amp;key,o) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (o-&gt;type == OBJ_STREAM) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rewriteStreamObject(aof,&amp;key,o) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (o-&gt;type == OBJ_MODULE) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rewriteModuleObject(aof,&amp;key,o) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                serverPanic(<span class="string">"Unknown object type"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">/* 如果key带有过期时间，需要保存过期时间 */</span></span><br><span class="line">            <span class="keyword">if</span> (expiretime != <span class="number">-1</span>) &#123;</span><br><span class="line">                <span class="keyword">char</span> cmd[]=<span class="string">"*3\r\n$9\r\nPEXPIREAT\r\n"</span>;</span><br><span class="line">                <span class="keyword">if</span> (rioWrite(aof,cmd,<span class="keyword">sizeof</span>(cmd)<span class="number">-1</span>) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">                <span class="keyword">if</span> (rioWriteBulkObject(aof,&amp;key) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">                <span class="keyword">if</span> (rioWriteBulkLongLong(aof,expiretime) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">/* 从父进程中读取diff的内容 */</span></span><br><span class="line">            <span class="keyword">if</span> (aof-&gt;processed_bytes &gt; processed+AOF_READ_DIFF_INTERVAL_BYTES) &#123;</span><br><span class="line">                processed = aof-&gt;processed_bytes;</span><br><span class="line">                aofReadDiffFromParent();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        dictReleaseIterator(di);</span><br><span class="line">        di = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line"></span><br><span class="line">werr:</span><br><span class="line">    <span class="keyword">if</span> (di) dictReleaseIterator(di);</span><br><span class="line">    <span class="keyword">return</span> C_ERR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外，以写入集合键为例，可以看到为了避免在执行命令时导致客户端输入缓冲区溢出，重写快速链表、哈希表、集合和有序集合这种带有多个元素的key时，会先检查key包含的元素数量。如果超过了AOF_REWRITE_ITEMS_PER_CMD，则会使用多条命令进行重写。默认是64。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AOF_REWRITE_ITEMS_PER_CMD 64</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rewriteListObject</span><span class="params">(rio *r, robj *key, robj *o)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> count = <span class="number">0</span>, items = listTypeLength(o);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (o-&gt;encoding == OBJ_ENCODING_QUICKLIST) &#123;</span><br><span class="line">        <span class="comment">//........</span></span><br><span class="line">        <span class="keyword">while</span> (quicklistNext(li,&amp;entry)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> cmd_items = (items &gt; AOF_REWRITE_ITEMS_PER_CMD) ?</span><br><span class="line">                    AOF_REWRITE_ITEMS_PER_CMD : items; <span class="comment">// 判断key元素是否超过AOF_REWRITE_ITEMS_PER_CMD</span></span><br><span class="line">                <span class="keyword">if</span> (rioWriteBulkCount(r,<span class="string">'*'</span>,<span class="number">2</span>+cmd_items) == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">if</span> (rioWriteBulkString(r,<span class="string">"RPUSH"</span>,<span class="number">5</span>) == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">if</span> (rioWriteBulkObject(r,key) == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 写入value，省略</span></span><br><span class="line">          </span><br><span class="line">            <span class="keyword">if</span> (++count == AOF_REWRITE_ITEMS_PER_CMD) count = <span class="number">0</span>; <span class="comment">// 如果超过了则使用多条RPUSH命令重写</span></span><br><span class="line">            items--;</span><br><span class="line">        &#125;</span><br><span class="line">        quicklistReleaseIterator(li);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="AOF后台重写"><a href="#AOF后台重写" class="headerlink" title="AOF后台重写"></a>AOF后台重写</h3><p>为了避免函数会阻塞服务器处理客户端的请求，Redis将AOF重写放到子进程中执行，同时为了避免在子进程执行AOF重写期间，由于服务器进程在处理新的请求，从而使得现有数据库状态发生改变，Redis设置了一个AOF重写缓冲区，在服务器创建完子进程后开始使用，当Redis执行完一个写命令之后，会同时将写命令发送到AOF缓冲区和AOF重写缓冲区。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">bgrewriteaofCommand</span><span class="params">(client *c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (server.aof_child_pid != <span class="number">-1</span>) &#123;</span><br><span class="line">        addReplyError(c,<span class="string">"Background append only file rewriting already in progress"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (hasActiveChildProcess()) &#123;</span><br><span class="line">        server.aof_rewrite_scheduled = <span class="number">1</span>;</span><br><span class="line">        addReplyStatus(c,<span class="string">"Background append only file rewriting scheduled"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rewriteAppendOnlyFileBackground() == C_OK) &#123;</span><br><span class="line">        addReplyStatus(c,<span class="string">"Background append only file rewriting started"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addReplyError(c,<span class="string">"Can't execute an AOF background rewriting. "</span></span><br><span class="line">                        <span class="string">"Please check the server logs for more information."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>首先判断是否已经存在相关bgrewrite子进程，倘若有会在这些命令完成后执行。否则会fork出子进程。在子进程完成aof重写后，会发一个信号给父进程，父进程会调用backgroundRewriteDoneHandler()将aof重写缓冲区中的所有内容写入到新的aof文件中，然后进行原子性地覆盖旧的aof文件。重写缓冲区的内容是通过aofRewriteBufferWrite写入到新的aof文件中的。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ssize_t</span> aofRewriteBufferWrite(<span class="keyword">int</span> fd) &#123;</span><br><span class="line">    listNode *ln;</span><br><span class="line">    listIter li;</span><br><span class="line">    <span class="keyword">ssize_t</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    listRewind(server.aof_rewrite_buf_blocks,&amp;li);</span><br><span class="line">  	<span class="comment">// 逐个地将aof_rewrite_buf_blocks缓冲区中的内容重写到aof文件</span></span><br><span class="line">    <span class="keyword">while</span>((ln = listNext(&amp;li))) &#123;</span><br><span class="line">        aofrwblock *block = listNodeValue(ln);</span><br><span class="line">        <span class="keyword">ssize_t</span> nwritten;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (block-&gt;used) &#123;</span><br><span class="line">            nwritten = write(fd,block-&gt;buf,block-&gt;used);</span><br><span class="line">            <span class="keyword">if</span> (nwritten != (<span class="keyword">ssize_t</span>)block-&gt;used) &#123;</span><br><span class="line">                <span class="keyword">if</span> (nwritten == <span class="number">0</span>) errno = EIO;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            count += nwritten;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2085,7 +2187,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">243</span>
+                <span class="site-state-item-count">244</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
