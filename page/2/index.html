@@ -265,6 +265,186 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/07/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/12/07/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824/" itemprop="url">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6.824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-07T23:54:18+08:00">
+                2019-12-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing"><a href="#Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing" class="headerlink" title="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing"></a>Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>本文介绍了弹性的分布式数据集，这是一种分布式的内存抽象形式，它可以让程序员以一种容错的方式在大型集群中进行内存计算。</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>尽管想MapReduce之类的框架已经提供了关于访问集群的计算资源的抽象，但仍然缺乏对于分布式内存的抽象，这使得它们在处理需要重用多个计算中中间结果的应用程序上不够高效。像一些机器学习算法、图算法，交互式数据挖掘都需要对数据子集做临时的查询，但那些框架的做法往往是将其写入到外部的存储系统里，这里IO、序列化之类的开销非常大。</p>
+<p>本文提出了一种弹性的分布式数据集的新抽象。其可以将中间结果明确地保存在内存中，控制其分区进行优化放置，并使用一组丰富的运算符进行操作。</p>
+<p>Apache Spark应运而生。</p>
+<h2 id="Resilient-Distributed-Datasets-RDDs"><a href="#Resilient-Distributed-Datasets-RDDs" class="headerlink" title="Resilient Distributed Datasets (RDDs)"></a>Resilient Distributed Datasets (RDDs)</h2><h3 id="RDD-Abstraction"><a href="#RDD-Abstraction" class="headerlink" title="RDD Abstraction"></a>RDD Abstraction</h3><p>所谓的弹性的分布式数据集，这里的弹性指的是在任何时候都可以进行重算，让用户不会感知到某部分内容曾经丢失过，这是Spark的核心抽象，是一种只读的、分区的数据记录集合。RDD的产生，要么通过从确定存储中获取，要么就是通过其它的RDD进行转换获取，这里的转换包括map、filter和join。</p>
+<p>RDD应该有足够的信息，去记录自身是如何从其它数据集派生而来的。用户可以控制RDD的持久化和分区，比如指示重用的RDD和存储策略，也可以命令RDD的元素进行分区。分区依照特定规则将具有相同属性的数据记录放在一起，每个分区相当于一个数据集片段。</p>
+<h3 id="Spark-Programming-Interface"><a href="#Spark-Programming-Interface" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h3><p>Spark会使用集成API的方式暴露RDD，其中每个数据集标示为一个对象，并使用对象上的方法进行调用转换。</p>
+<p>首先是会对稳定存储中的数据通过转换的方式定义一个或多个RDD，然后在操作中使用这些RDD，比如是返回数据给应用程序，还是导出到存储系统。此外，还可以对RDD进行持久化来指示哪些RDD是需要重用的，默认将持久性RDD保存在内存中，在RAM不够的话，将会将其溢出到磁盘，当然还有很多种持久化策略。</p>
+<h3 id="Advantages-of-the-RDD-Model"><a href="#Advantages-of-the-RDD-Model" class="headerlink" title="Advantages of the RDD Model"></a>Advantages of the RDD Model</h3><p>RDD与分布式共享内存最大的区别就是，RDD只能通过粗粒度的转换得来，而DSM则可以读取/写入到每一个内存位置。这样RDD在处理容错时，就不会产生额外的有关checkpoint的开销，如果有分区丢失，RDD可以在不同的节点并行地重建，而不需要回滚整个系统。</p>
+<p>由于RDD的不可变特性，系统可以通过运行较慢的备份副本来缓解慢速节点，而DSM在这种情况会因为多副本访问相同内存位置，而产生干扰更新。</p>
+<h3 id="Applications-Not-Suitable-for-RDDs"><a href="#Applications-Not-Suitable-for-RDDs" class="headerlink" title="Applications Not Suitable for RDDs"></a>Applications Not Suitable for RDDs</h3><p>RDD更适用于在批处理应用程序中对全集数据执行相同的操作，在这种情况下，RDD能够很好地记录每一步的转换，并且能够在分区丢失时快速恢复。</p>
+<p>而对于那些需要对共享状态进行异步更新的应用，RDD则不适合。</p>
+<h2 id="Spark-Programming-Interface-1"><a href="#Spark-Programming-Interface-1" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h2><p>为了使用Spark，开发人员编写了一个驱动程序，用以连接到一组worker，并通过一个或多个RDD来调用action，同时该驱动程序上的Spark代码还可以跟踪RDD的lineage（血统？）。</p>
+<p><img src="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0" alt></p>
+<p>这些worker是一个长期活跃的进程，在内存中存着RDD分区。</p>
+<h3 id="RDD-Operations-in-Spark"><a href="#RDD-Operations-in-Spark" class="headerlink" title="RDD Operations in Spark"></a>RDD Operations in Spark</h3><p>下表列出了Spark中可用的RDD转换和可用操作：</p>
+<p><img src="https://pic1.superbed.cn/item/5de5470ef1f6f81c50404c93.png" alt></p>
+<h2 id="Representing-RDDs"><a href="#Representing-RDDs" class="headerlink" title="Representing RDDs"></a>Representing RDDs</h2><p>论文中提到使用了大约14000行Scala代码实现了Spark，这个系统在Mesos集群上运行。每个Spark程序都作为一个单独的Mesos应用程序，具有独立的驱动程序和worker程序，并且这些应用程序之间的资源共享由Mesos处理。</p>
+<p>论文中提到RDD的表示是一种基于图的表示。因此对于RDD的表示，则是通过暴露5个接口方法来实现的。</p>
+<p><img src="https://pic.superbed.cn/item/5de7e86ff1f6f81c50a2a07f.png" alt></p>
+<ul>
+<li>Partions：数据集的原子结构；</li>
+<li>preferredLocations：能更快访问分区的系列节点；</li>
+<li>dependencies：记录父子RDD的记录；</li>
+<li>iterator：用于从父RDD计算子RDD；</li>
+<li>patitioner：数据分区的元信息；</li>
+</ul>
+<p>至于如何表示RDD的关系，由于RDD在物理上是分区的，散列在集群不同机器的内存上的，文中将其定义为窄依赖（Narrow Dependency）和宽依赖（Wide Dependency）两种。</p>
+<ul>
+<li>宽依赖：父RDD中的分区可能被子RDD中的多个分区所依赖；</li>
+<li>窄依赖：父RDD的每个分区至多被子RDD中的一个分区所依赖；像map/filter这些操作都属于窄依赖；</li>
+</ul>
+<p><img src="https://pic2.superbed.cn/item/5de7ea33f1f6f81c50a2e1cc.png" alt></p>
+<p>这两种依赖的差别在于：窄依赖可以pipeline执行，在失败时只需要重新执行对应的父RDD即可；而宽依赖则需要shuffle，并且如果出现故障恢复则需要重算所有父RDD；</p>
+<h3 id="Job-Scheduling"><a href="#Job-Scheduling" class="headerlink" title="Job Scheduling"></a>Job Scheduling</h3><p>每当用户在RDD执行action的时候，调度器就会检查RDD的谱系图，以构建要执行的DAG（有向无环图）。如下图所示：</p>
+<p><img src="https://pic.superbed.cn/item/5de7edaaf1f6f81c50a37d20.png" alt></p>
+<p>每个stage内部都包含尽可能多的具有窄依赖的操作。这些stage的边界是宽依赖所必需执行的shuffle操作，另外任何已经计算出的分区都可以使父RDD的计算短路。调度程序会集群上启动任务以计算每个阶段中缺少的分区，直到它计算出目标RDD。</p>
+<p>调度器会根据数据局部性的原则来执行delay scheduling算法：</p>
+<ul>
+<li>如果任务需要的数据分区在某节点的内存中，则将任务发送到节点上执行；</li>
+<li>否则，如果该分区有指定的位置，则直接发送给它；</li>
+</ul>
+<p>对于宽依赖，Spark会在存有父分区的节点上暂存shuffle的中间记录，以便做容灾处理，就像mapreduce存下map的输出一样。</p>
+<p>如果任务失败，只要stage的父stage还是可用的，就可以将task调度到另一个节点上重新运行即可。如果父stage也失效了，就会重新提交一个计算父stage数据的Task来并行计算丢失的分区。但论文也提到了Spark没有考虑调度器本身的高可用。</p>
+<h3 id="Interpreter-Integration"><a href="#Interpreter-Integration" class="headerlink" title="Interpreter Integration"></a>Interpreter Integration</h3><p>Scala包含了交互shell，可以让用户从解释器中交互地运行Spark以查询大数据集。</p>
+<p>Scala解释器通常会为用户输入的每一行编译一个类，并将其加载到JVM中通过调用一个函数来进行操作。该类会包含一个单例对象，对象则包含该行上的变量或者函数，并以初始化的方式运行该行代码。</p>
+<p>另外，Spark的解释器还做了两处修改：</p>
+<ol>
+<li>类传递：为了让工作节点能够获取在每一行上创建的类的字节码，解释器会通过HTTP为这些类提供服务；</li>
+<li>修改代码的生成：因为每行代码的单例对象都是通过对应的静态方法访问，这意味着无法引用上一行定义的变量。因此需要修改代码的生成，以便直接引用每行对象的实例，如下图：</li>
+</ol>
+<p><img src="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0" alt></p>
+<h3 id="Memory-Management"><a href="#Memory-Management" class="headerlink" title="Memory Management"></a>Memory Management</h3><p>Spark提供了三种对持久化RDD的存储策略：</p>
+<ul>
+<li>未序列化Java对象存在内存；</li>
+<li>序列化的数据存于内存；</li>
+<li>磁盘存储；</li>
+</ul>
+<p>第一种性能最好，因为可以直接访问在Java虚拟机内存里的RDD对象；第二种性能会降低，在空间有限的情况下可以让用户选择比Java对象图更高效的内存表示方式；第三种则是针对RDD太大无法保留在内存中，但每次使用都需要重新计算开销很大时，这个方法会很有用；</p>
+<p>为了管理可用的有限内存，Spark在RDD级别使用了LRU逐出策略。当计算了一个新的RDD分区但没有足够存储空间时，就会通过LRU的方式逐出一个分区。除非是该RDD便是新分区对应的RDD，在这种情况下，Spark会将旧的分区保留在内存，避免同一个RDD的分区被循环地调进调出。</p>
+<h3 id="Support-for-Checkpointing"><a href="#Support-for-Checkpointing" class="headerlink" title="Support for Checkpointing"></a>Support for Checkpointing</h3><p>虽然lineage机制可以满足失败后RDD的重建恢复，但对于具有很长链条的RDD来说，恢复时间会很长。特别是包含了宽依赖的长lineage的RDD，因此能设置检查点的操作就会非常有用。Spark当前提供了为RDD设置检查点操作的API，可以用一个REPLICATE标志来持久化，用户自行决定使用方式。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/05/redis设计与实现——AOF持久化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1864,154 +2044,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/07/redis设计与实现——跳表/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/08/07/redis设计与实现——跳表/" itemprop="url">redis设计与实现——跳表</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-07T01:23:58+08:00">
-                2019-08-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="redis设计与实现——跳表"><a href="#redis设计与实现——跳表" class="headerlink" title="redis设计与实现——跳表"></a>redis设计与实现——跳表</h1><p>skiplist跳跃表是一种有序数据结构，通过在每个节点中维持多个节点中维持多个指向其他节点的指针。节点查找的时间复杂度，平均是O(logN)，最坏是O(N)，还可以批量操作处理节点。关于skiplist，可以参考<a href="https://epaperpress.com/sortsearch/download/skiplist.pdf" target="_blank" rel="noopener">论文</a>。</p>
-<p>在Redis中，跳跃表是作为有序集合键的底层实现基础。</p>
-<h2 id="跳跃表的实现"><a href="#跳跃表的实现" class="headerlink" title="跳跃表的实现"></a>跳跃表的实现</h2><p>Redis的跳跃表是在server.h/zskiplistNode和server.h/zskiplist两个结构体中定义的，其中前者表示表节点，后者用来保存节点的数量，头部和尾部节点指针等相关信息。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1218999906_1564163295350/0" alt="img"></p>
-<h3 id="跳跃表节点"><a href="#跳跃表节点" class="headerlink" title="跳跃表节点"></a>跳跃表节点</h3><p>跳跃表节点的结构体定义为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* ZSETs use a specialized version of Skiplists */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> &#123;</span></span><br><span class="line">    sds ele;</span><br><span class="line">    <span class="keyword">double</span> score;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">backward</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistLevel</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">forward</span>;</span></span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">long</span> span;</span><br><span class="line">    &#125; level[];</span><br><span class="line">&#125; zskiplistNode;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>level：这是跳跃表节点的level数组，包含了多个元素，每个元素都不包含了一个指向前方其他节点的指针。span则是跨度，如上图所示，箭头上方的就是跨度数值，在查找某个节点的过程中，将沿途访过的所有层的跨度累积起来，就是当前节点所在的排位；</li>
-<li>backward：后退指针，只有一个后退指针意味着每次只能往前一个节点；</li>
-<li>score：跳跃表中所有节点按照分数值从小到大排序；</li>
-<li>ele：指向一个SDS字符对象，ele是唯一的，因此score相同时，需要按照sds在字典序中的大小排序；</li>
-</ul>
-<h3 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h3><p>跳跃表的结构体定义为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplist</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">header</span>, *<span class="title">tail</span>;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> length;</span><br><span class="line">    <span class="keyword">int</span> level;</span><br><span class="line">&#125; zskiplist;</span><br></pre></td></tr></table></figure>
-<p>redis使用zskiplist来管理所有的节点，比如表头节点和表尾节点，跳跃表长度以及level则表示在O(1)复杂度内获取跳跃表中层高最大的那个节点的层数量。</p>
-<p>另外表头节点虽然与其他节点构造一样，但其后退指针、分值和ele等属性都不使用，并且不参与zskiplist中level的计算。</p>
-<h2 id="创建跳跃表"><a href="#创建跳跃表" class="headerlink" title="创建跳跃表"></a>创建跳跃表</h2><p>创建跳跃表的操作主要是完成一些初始化的操作，其时间复杂度为O(1)。创建操作主要依赖两个函数：zslCreate()和zslCreateNode()。其中redis默认跳跃表的最大层级为64。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Should be enough for 2^64 elements */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ZSKIPLIST_MAXLEVEL 64 <span class="comment">// zskiplist的最大层级为64</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Create a new skiplist. */</span></span><br><span class="line"><span class="function">zskiplist *<span class="title">zslCreate</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    zskiplist *zsl;</span><br><span class="line"></span><br><span class="line">    zsl = zmalloc(<span class="keyword">sizeof</span>(*zsl));</span><br><span class="line">    zsl-&gt;level = <span class="number">1</span>;</span><br><span class="line">    zsl-&gt;length = <span class="number">0</span>;</span><br><span class="line">    zsl-&gt;header = zslCreateNode(ZSKIPLIST_MAXLEVEL,<span class="number">0</span>,<span class="literal">NULL</span>);<span class="comment">//创建一个节点</span></span><br><span class="line">  	<span class="comment">// 表头指针的后退指针和分值，ele都不作使用</span></span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; ZSKIPLIST_MAXLEVEL; j++) &#123;</span><br><span class="line">        zsl-&gt;header-&gt;level[j].forward = <span class="literal">NULL</span>;</span><br><span class="line">        zsl-&gt;header-&gt;level[j].span = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    zsl-&gt;header-&gt;backward = <span class="literal">NULL</span>;</span><br><span class="line">    zsl-&gt;tail = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> zsl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Create a skiplist node with the specified number of levels.</span></span><br><span class="line"><span class="comment"> * The SDS string 'ele' is referenced by the node after the call. */</span></span><br><span class="line"><span class="function">zskiplistNode *<span class="title">zslCreateNode</span><span class="params">(<span class="keyword">int</span> level, <span class="keyword">double</span> score, sds ele)</span> </span>&#123;</span><br><span class="line">    zskiplistNode *zn =</span><br><span class="line">        zmalloc(<span class="keyword">sizeof</span>(*zn)+level*<span class="keyword">sizeof</span>(struct zskiplistLevel));</span><br><span class="line">    zn-&gt;score = score;</span><br><span class="line">    zn-&gt;ele = ele;</span><br><span class="line">    <span class="keyword">return</span> zn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="插入新节点"><a href="#插入新节点" class="headerlink" title="插入新节点"></a>插入新节点</h2><p>新节点的插入是通过zslInsert实现的，给定分数值和ele元素则可返回新的跳跃表节点。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">zskiplistNode *<span class="title">zslInsert</span><span class="params">(zskiplist *zsl, <span class="keyword">double</span> score, sds ele)</span> </span>&#123;</span><br><span class="line">    zskiplistNode *update[ZSKIPLIST_MAXLEVEL], *x;</span><br><span class="line">    <span class="comment">// 记录每一层插入节点的前面一个节点在skiplist中的排名</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> rank[ZSKIPLIST_MAXLEVEL];</span><br><span class="line">    <span class="keyword">int</span> i, level;</span><br><span class="line"></span><br><span class="line">    serverAssert(!isnan(score));</span><br><span class="line">    x = zsl-&gt;header;</span><br><span class="line">  	<span class="comment">// 计算待插入点的位置</span></span><br><span class="line">    <span class="keyword">for</span> (i = zsl-&gt;level<span class="number">-1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="comment">/* store rank that is crossed to reach the insert position */</span></span><br><span class="line">        rank[i] = i == (zsl-&gt;level<span class="number">-1</span>) ? <span class="number">0</span> : rank[i+<span class="number">1</span>];</span><br><span class="line">      	<span class="comment">// 先根据score比较，相等即根据sds的字符串字典序比较</span></span><br><span class="line">        <span class="keyword">while</span> (x-&gt;level[i].forward &amp;&amp;</span><br><span class="line">                (x-&gt;level[i].forward-&gt;score &lt; score ||</span><br><span class="line">                    (x-&gt;level[i].forward-&gt;score == score &amp;&amp;</span><br><span class="line">                    sdscmp(x-&gt;level[i].forward-&gt;ele,ele) &lt; <span class="number">0</span>)))</span><br><span class="line">        &#123;</span><br><span class="line">            rank[i] += x-&gt;level[i].span;</span><br><span class="line">            x = x-&gt;level[i].forward;</span><br><span class="line">        &#125;</span><br><span class="line">        update[i] = x;<span class="comment">// 每一个层级的待插入位置，即当前层最后一个小于x的点</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 重复插入相同的元素，这种情况是不会发生的</span></span><br><span class="line"><span class="comment">     * 如果元素在内部，则zslInsert()的调用者应该在哈希表中进行测试是否在里面 */</span></span><br><span class="line">    level = zslRandomLevel();</span><br><span class="line">  	<span class="comment">// 如果计算出来的层级比当前层级高，则重设超出zsl原来层级的指针</span></span><br><span class="line">    <span class="keyword">if</span> (level &gt; zsl-&gt;level) &#123;</span><br><span class="line">        <span class="keyword">for</span> (i = zsl-&gt;level; i &lt; level; i++) &#123;</span><br><span class="line">            rank[i] = <span class="number">0</span>;</span><br><span class="line">            update[i] = zsl-&gt;header;</span><br><span class="line">            update[i]-&gt;level[i].span = zsl-&gt;length;</span><br><span class="line">        &#125;</span><br><span class="line">        zsl-&gt;level = level;</span><br><span class="line">    &#125;</span><br><span class="line">    x = zslCreateNode(level,score,ele); <span class="comment">// 创建新的节点</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; level; i++) &#123;</span><br><span class="line">      	<span class="comment">// 插入到当前位置(update[i]的前面)</span></span><br><span class="line">        x-&gt;level[i].forward = update[i]-&gt;level[i].forward;</span><br><span class="line">        update[i]-&gt;level[i].forward = x;</span><br><span class="line">				</span><br><span class="line">      	<span class="comment">/* rank[0] - rank[i] 是x在第i层的前一个节点与x之间的距离*/</span></span><br><span class="line">        <span class="comment">/* 更新插入点的跨度 */</span></span><br><span class="line">        x-&gt;level[i].span = update[i]-&gt;level[i].span - (rank[<span class="number">0</span>] - rank[i]);</span><br><span class="line">      	<span class="comment">/* 更新插入点前一个节点的跨度 */</span></span><br><span class="line">        update[i]-&gt;level[i].span = (rank[<span class="number">0</span>] - rank[i]) + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 自增没有到达的层级的span */</span></span><br><span class="line">    <span class="keyword">for</span> (i = level; i &lt; zsl-&gt;level; i++) &#123;</span><br><span class="line">        update[i]-&gt;level[i].span++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    x-&gt;backward = (update[<span class="number">0</span>] == zsl-&gt;header) ? <span class="literal">NULL</span> : update[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">if</span> (x-&gt;level[<span class="number">0</span>].forward)</span><br><span class="line">        x-&gt;level[<span class="number">0</span>].forward-&gt;backward = x;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        zsl-&gt;tail = x;</span><br><span class="line">    zsl-&gt;length++;</span><br><span class="line">    <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>其中随机层级的实现如下，<em>redis</em>的跳跃表最大层数为64，能够足够支撑优化2^64个元素的查找。其中获取随机层级时，越高的层级数出现的几率越小，而且每往上一个层级，其概率为1/4。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Returns a random level for the new skiplist node we are going to create.</span></span><br><span class="line"><span class="comment"> * The return value of this function is between 1 and ZSKIPLIST_MAXLEVEL</span></span><br><span class="line"><span class="comment"> * (both inclusive), with a powerlaw-alike distribution where higher</span></span><br><span class="line"><span class="comment"> * levels are less likely to be returned. */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">zslRandomLevel</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> level = <span class="number">1</span>;</span><br><span class="line">  	<span class="comment">// #define ZSKIPLIST_P 0.25      /* Skiplist P = 1/4 */</span></span><br><span class="line">  	<span class="comment">// random()&amp;0xFFFF的结果就是一个0-65535的数</span></span><br><span class="line">    <span class="keyword">while</span> ((random()&amp;<span class="number">0xFFFF</span>) &lt; (ZSKIPLIST_P * <span class="number">0xFFFF</span>))</span><br><span class="line">        level += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> (level&lt;ZSKIPLIST_MAXLEVEL) ? level : ZSKIPLIST_MAXLEVEL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h2><ul>
-<li>跳跃表时有序集合的底层实现之一；</li>
-<li>Redis跳跃表时由在server.h的zskiplistNode和zskiplist实现的；</li>
-<li>每个跳跃表节点层高都是1-64的随机数；</li>
-<li>多个节点可以包含相同的score，但ele时唯一的；</li>
-</ul>
-<h2 id="源码版本"><a href="#源码版本" class="headerlink" title="源码版本"></a>源码版本</h2><p>截至2019/07/27，5.0之后的版本，commitId为：505a855000ef8f1fbea9cb41841fa8708175bba4</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2060,7 +2092,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">244</span>
+                <span class="site-state-item-count">245</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

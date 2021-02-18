@@ -265,6 +265,157 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/09/C-11新标准-对象移动和右值引用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/09/C-11新标准-对象移动和右值引用/" itemprop="url">C++11新标准 对象移动和右值引用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-09T19:41:28+08:00">
+                2017-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在看c++ primer的时候，了解到了一个c++11的新标准，故记录一下自己的见解。</p>
+<h1 id="std-move（对象移动）"><a href="#std-move（对象移动）" class="headerlink" title="std::move（对象移动）"></a>std::move（对象移动）</h1><h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>首先，这是C++为了避免copy的一种新做法。</p>
+<ul>
+<li>正如我们之前了解到的，程序运行过程中很多情况下会发生对象拷贝，但如果在某些特殊情况下，object被copy后就开始销毁，那么如果使用对象move就能大幅度提高性能。</li>
+<li>另一个原因则是，像<strong>IO类</strong>或者<strong>unique_ptr类</strong>是不允许共享资源的，因此这些类不可以被copy。由此引发的一个是，在旧标准里面，容器只能保存可以被拷贝的类。而新标准里，可以保存不被拷贝的类，只要该类能被移动即可。</li>
+</ul>
+<h2 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h2><p>举个例子，通过copy constructor，容器vector能将内部指向数据的指针copy起来，原指针则使其为null，这样就避免了对数据内容的copy。</p>
+<p>简单说明一下，copy constructor就是分配新的资源，而move constructor则是接管了原来的资源，获得使用了原来资源的权利。</p>
+<blockquote>
+<p>用c++ primer的说法是“窃取”了资源</p>
+</blockquote>
+<h1 id="rvalue-reference（右值引用）"><a href="#rvalue-reference（右值引用）" class="headerlink" title="rvalue reference（右值引用）"></a>rvalue reference（右值引用）</h1><h2 id="需求-1"><a href="#需求-1" class="headerlink" title="需求"></a>需求</h2><p>为了支持move操作，c++11新标准引进了一个新的引用类型——<strong>rvalue reference</strong>。</p>
+<h2 id="含义-1"><a href="#含义-1" class="headerlink" title="含义"></a>含义</h2><p>顾名思义，右值引用则是绑定到右值得引用，这其中就涉及到了一个非常有用的性质——右值引用只能绑定到一个将要销毁的对象。只有这样，我们才能将原对象资源move到新的对象当中去。</p>
+<ul>
+<li>我们把常规的引用叫做左值引用，通过&amp;来取得；不能将其绑定到需要转换的表达式，字面常量和返回右值得表达式</li>
+<li>而通过&amp;&amp;则可以获得右值引用；同理，右值引用则有着相反的性质，不能将右值应用绑定到左值上；</li>
+</ul>
+<p>举个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;r = i; <span class="comment">// lvalue reference</span></span><br><span class="line"><span class="keyword">int</span> &amp;&amp;rr = i; <span class="comment">// rvalue reference (Error: i is a lvalue)</span></span><br><span class="line"><span class="keyword">int</span> &amp;r2 = i*<span class="number">42</span>; <span class="comment">// lvalue reference (Error: i*42 is a rvalue)</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r3 = i*<span class="number">42</span>; <span class="comment">// reference to const (bind to a rvalue)</span></span><br><span class="line"><span class="keyword">int</span> &amp;&amp;rr2 = i*<span class="number">42</span>; <span class="comment">// rvalue reference</span></span><br><span class="line"><span class="comment">/*****************************************************/</span></span><br><span class="line"><span class="keyword">int</span> &amp;&amp;rr1 = <span class="number">42</span> <span class="comment">// rvalue reference (Error: 42 is a lvalue)</span></span><br><span class="line"><span class="keyword">int</span> &amp;&amp;rr2 = rr1 <span class="comment">// rvalue reference (Error: rr1 is a lvalue)</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意一下，我们可以将一个<strong>const的左值引用或右值引用绑定到右值表达式上</strong></p>
+</blockquote>
+<p>总结一下，左值是持久的，右值是短暂的；因为只有将要被销毁的对象，我们才可以从绑定到右值引用的对象上获取其状态。</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>这里先借用一下stackoverflow某位答主的话：</p>
+<blockquote>
+<p><code>std::move()</code> is a cast that produces an rvalue-reference to an object, to enable moving from it</p>
+</blockquote>
+<p>为了我们可以将右值引用直接绑定到左值上，我们可以利用<strong>std::move</strong>这个标准库函数来获得绑定到左值上的右值引用。该函数定义在头文件<strong>utility</strong>中。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> &amp;&amp;rr2 = <span class="built_in">std</span>::move(rr1); <span class="comment">// ok</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>tips:由于move的名字冲突比其他标准库函数要频繁得多，因此最好加上限定语，不适用using。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/27/MyLove-Diesel/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -888,7 +1039,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">244</span>
+                <span class="site-state-item-count">245</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
