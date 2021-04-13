@@ -265,6 +265,153 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/09/Linux内核学习——进程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/09/Linux内核学习——进程/" itemprop="url">Linux内核学习——进程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-09T13:26:47+08:00">
+                2018-07-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a>进程管理</h1><h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>进程是处于执行器的程序和资源总称。而线程是进程中活动的对象，拥有独立的pc（程序计数器），进程栈和一组寄存器集。内核调度的对象是线程，而不是进程。</p>
+<p>进程提供了虚拟机制——虚拟处理器和虚拟内存。这使得进程虽然可能是在共享一个处理器，但看起来像是拥有独立的内存地址和处理器。</p>
+<p>在Linux中，进程通过fork创建一个新的进程，而fork又是clone()系统调用的结果。fork()系统调用从内核返回两次，一次回到父进程，一次回到子进程。然后可以调用exec()这组函数载入新的程序，创建新的地址空间，执行程序。</p>
+<p>程序可以通过exit()系统调用退出，释放掉该进行所占有的资源。</p>
+<p>父进程可以通过wait()查询子进程是否终结，终结的进程处于僵死状态，直到父进程调用wait()相关的系统调用。</p>
+<h2 id="进程描述符及任务结构"><a href="#进程描述符及任务结构" class="headerlink" title="进程描述符及任务结构"></a>进程描述符及任务结构</h2><p>内核把进程的列表存放在task list的双向循环链表中，链表中每个结点类型为task_struct，该结构比较大，包含了一个进程所有信息。打个比方：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">// ...  </span></span><br><span class="line">    <span class="keyword">void</span> *<span class="built_in">stack</span>;    <span class="comment">//  指向内核栈的指针  </span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="分配进程描述符"><a href="#分配进程描述符" class="headerlink" title="分配进程描述符"></a>分配进程描述符</h3><p>使用slab分配器动态生成task_struct，并且在堆栈的低地址区创建一个新的结构<strong>struct thread_info</strong>，该结构用来存放特定体系结构的汇编代码段需要访问的那部分进程的数据，这是因为Linux内核是支持不同体系的。然后在thread_info中嵌入指向task_struct的指针。</p>
+<h3 id="进程描述符的存放"><a href="#进程描述符的存放" class="headerlink" title="进程描述符的存放"></a>进程描述符的存放</h3><p>内核通过一个唯一的进程描述符来标识每个进程——PID，最大值默认设置为32768，也就是允许同时存在进程的最大数目。</p>
+<p>有些体系结构会把当前的task_struct放在特定寄存器里，有些体系结构则是通过thread_info，然后计算偏移间接查找task_struct，比如x86</p>
+<h3 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h3><p>系统进程必然属于以下五种状态之中：</p>
+<ul>
+<li>TASK_RUNNING：该状态的进程可以在CPU上运行，或正在执行，或是在运行队列中等待执行，合并了常见操作系统书中——running和ready的两种状态</li>
+<li>TASK_INTERRUPTIPLE：该进程被阻塞，正在等待某些条件达成，比如等待socket的连接，某些信号的接收</li>
+<li>TASK_UNINTERRUPTIPLE：在该状态下，即便是接收到某些信号（比如kill ），该进程也不会被中断。这种状态用的比较少，一般用在不想被干扰的进程。比如内核的某些处理流程是不应该被中断，或者在进行硬件操作的时候，一旦进程被中断，就可能造成设备不可控</li>
+<li>__TASK_TRACED：被其它进程跟踪的进程，例如调用ptrace或者gdb进行调试的时候</li>
+<li>__TASK_STOPPED：进程停止执行，这种情况发送在接收到SIGSTOP,SIGTSTP,SIGTTIN,SIGTTOU等信号的时候</li>
+</ul>
+<h3 id="设置当前进程状态"><a href="#设置当前进程状态" class="headerlink" title="设置当前进程状态"></a>设置当前进程状态</h3><p>使用该函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;linux/sched.h&gt;</span></span></span><br><span class="line">set_task_state(task, state);</span><br></pre></td></tr></table></figure>
+<h3 id="进程家族树"><a href="#进程家族树" class="headerlink" title="进程家族树"></a>进程家族树</h3><p>Unix的进程之间存在着继承关系，所有进程都是PID为1的init进程的后代</p>
+<h2 id="进程创建"><a href="#进程创建" class="headerlink" title="进程创建"></a>进程创建</h2><p>进程创建主要是先在新的地址空间里创建进程，然后读入可执行文件。一般可以将这些步骤分解到fork()和exec()两个函数去做。</p>
+<h3 id="写时拷贝"><a href="#写时拷贝" class="headerlink" title="写时拷贝"></a>写时拷贝</h3><p>为了提高效率，内核在创建进程的时候采用的是<strong>写时拷贝</strong>，这种方法共享父进程的数据，在没有发生写入的时候，是不会复制数据，拥有新的拷贝。</p>
+<h2 id="线程在Linux中的实现"><a href="#线程在Linux中的实现" class="headerlink" title="线程在Linux中的实现"></a>线程在Linux中的实现</h2><p>其实在Linux中是没有线程这一概念的，Linux把所有线程当做进程来实现，所以每个线程都会有自己的task_struct，只是线程之间会共享某些资源。</p>
+<h3 id="线程创建"><a href="#线程创建" class="headerlink" title="线程创建"></a>线程创建</h3><p>线程的创建和进程类似，只是在线程创建的时候提供某些标识参数，以确保它们共享某些资源。</p>
+<h3 id="内核线程"><a href="#内核线程" class="headerlink" title="内核线程"></a>内核线程</h3><p>内核线程可以用来执行某些内核在后台的工作，内核线程是没有独立的地址空间的，它只在内核空间运行，不会被切换到用户空间。</p>
+<h2 id="进程终结"><a href="#进程终结" class="headerlink" title="进程终结"></a>进程终结</h2><p>进程的终结可能是显式调用exit系统调用，也可能是从程序主函数返回。然后进程会调用do_exit()去释放相关资源，进程进入EXIT_ZOMBIE状态，该状态的目的就是向父进程提供信息，由父进程检索或者通知内核后，释放进程的剩余内存，归还给系统。</p>
+<p>如果子进程处于zombie状态，但是父进程已经退出了，会给子进程在当然的线程组中找一个线程作为父亲，或者使用init进程作为父亲。一旦找到了新的父进程，就不会有zombie进程占用内存的问题了，init进程会例行调用wait()来检查子进程，清除zombie进程。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/07/Redis学习《一》/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1621,197 +1768,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/05/语法分析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/05/语法分析/" itemprop="url">语法分析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T15:20:27+08:00">
-                2018-05-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="语法分析"><a href="#语法分析" class="headerlink" title="语法分析"></a>语法分析</h1><blockquote>
-<p>语法(syntax)：组合token以形成phrases，clauses和sentences</p>
-</blockquote>
-<p>对于某些式子的表示，比如带有嵌套深度比较大的括号时，有限自动机并不能识别出括号配对的情况，这是因为状态数为N的有限自动机无法记忆嵌套深度大于N的括号。</p>
-<h2 id="上下文无关文法"><a href="#上下文无关文法" class="headerlink" title="上下文无关文法"></a>上下文无关文法</h2><p>上下文无关文法就是说这个文法中所有的产生式左边只有一个非终结符，例如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">S-&gt;aSb</span><br><span class="line">S-&gt;ab</span><br></pre></td></tr></table></figure>
-<p>这个文法的两个production的左边都只有一个非终结符，那么只需要找到符合production右边的字符串，就可以对其进行规约。</p>
-<p>然而</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aSb-&gt;aaSbb</span><br><span class="line">S-&gt;ab</span><br></pre></td></tr></table></figure>
-<p>这就是上下文相关文法，因为第一个production的左边不止一个终结符，所以在匹配的时候必须要确保S有正确的“上下文”。</p>
-<h3 id="推导"><a href="#推导" class="headerlink" title="推导"></a>推导</h3><p>为了证明某个文法的类型，我们必须要进行推导（derivation），即从开始符号出发，对其右部的每一个非终止符，用该非终止符production的任一个右部替代它。</p>
-<ul>
-<li>最左推导：总是扩展最左边的非终止符；</li>
-<li>最右推导：总是扩展最右边的非终止符；</li>
-</ul>
-<h3 id="语法分析树"><a href="#语法分析树" class="headerlink" title="语法分析树"></a>语法分析树</h3><p>parse tree就是将一个推导中的各个符号连接到从它推导出来的符号而形成的。不同的推导可以得到相同的parse tree。</p>
-<h3 id="二义性文法"><a href="#二义性文法" class="headerlink" title="二义性文法"></a>二义性文法</h3><p>如果一个文法能够推导出两颗不同的parse tree，则认为该文法具有二义性。这种情况下，编译器就无法利用parse tree去解析语义。以下就是一个二义性文法的例子：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3.png" alt="img"></p>
-<p>但是二义性的文法是可以通过某些转换来消除，一般来说引入一些新的非终止符，来提高某些表达式的优先级。</p>
-<h3 id="文件结束符"><a href="#文件结束符" class="headerlink" title="文件结束符"></a>文件结束符</h3><p>语法分析器会读入文件结束符号，一般来说我们使用<strong>$符号</strong>表示文件的结束。</p>
-<h2 id="预测分析"><a href="#预测分析" class="headerlink" title="预测分析"></a>预测分析</h2><p>使用一种叫做梯度下降(recursive descent)的简单算法可以对grammar进行分析，它只适用于每个子表达式的第一个终结符号能够为production提供足够的信息的情况。其中每个非终结符对应的，都有一个函数。</p>
-<h3 id="FIRST集合和FOLLOW集合"><a href="#FIRST集合和FOLLOW集合" class="headerlink" title="FIRST集合和FOLLOW集合"></a>FIRST集合和FOLLOW集合</h3><p>FIRST(S)是从S可以推导出的任意字符串中的开头终结符组成的集合，因此如果两个production有着相同的左部符号，但它们的右部有着重叠的FIRST集合，那么该文法不能使用预测分析。</p>
-<p>能产生空字符串的符号，称呼为<strong>nullable</strong>。</p>
-<p>记住下列结论：</p>
-<ul>
-<li>若X可以推导出空字符串，那么nullable(X)为真；</li>
-<li>FIRST(S)是从S可以推导出的任意字符串中的开头终结符组成的集合；</li>
-<li>FOLLOW(X)是可以直接跟随于X之后的终结符集合；</li>
-</ul>
-<h3 id="构造一个预测分析器"><a href="#构造一个预测分析器" class="headerlink" title="构造一个预测分析器"></a>构造一个预测分析器</h3><p>由于非终结符X的分析函数对X的每个产生式都有一个子句，因此该函数必须根据下一个输入来选择其中的一个子句。我们需要的所有信息可以用一个二维表来表示，该表以文法的非终结符X和终结符T作为索引。</p>
-<p>对于每个属于FIRST(X)的T，在表的X行T列填入该production X-&gt;y；如果y为nullable，那么对于每个属于FOLLOW(X)的T，在表的X行T列填入该production X-&gt;y。</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-6.png" alt="img"></p>
-<p>像上图这种情况，一个表项里有多个表达式，就会产生二义性的文法。若一个文法的预测分析表不含有多重定义的项，则称为LL(1)文法。</p>
-<blockquote>
-<p>LL(1): Left to right parse; Leftmost derivation; 1-symbol lookhead</p>
-</blockquote>
-<h3 id="消除左递归"><a href="#消除左递归" class="headerlink" title="消除左递归"></a>消除左递归</h3><p>看这样的文法：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;E+T</span><br><span class="line">E-&gt;T</span><br></pre></td></tr></table></figure>
-<p>在这种情况下，将会导致LL(1)的分析表中出现了双重定义的登记项，因此任何属于FIRST(T)的tokens必然属于FIRST(E+T)，这就是左递归。</p>
-<p>为了消除左递归，我们可以这样重写：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;TE'</span><br><span class="line">E'-&gt;+TE'</span><br><span class="line">E'-&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="LR分析"><a href="#LR分析" class="headerlink" title="LR分析"></a>LR分析</h2><p>LL(k)的一个弱点就是，在我们仅仅看到右边的k个tokens时就需要做出预测。相比而言，LR(k)分析是一种更好的选择。</p>
-<blockquote>
-<p>LR(k): Left to right parse; Rightmost derivation; k-token lookhead</p>
-</blockquote>
-<p>来看一个典型的例子：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-7.png" alt="img"></p>
-<ul>
-<li>shift：将第一个token压进栈；</li>
-<li>reduce：选择文法规则：X-&gt;ABC，依次将C,B,A从栈中弹出来，将X压进栈；</li>
-</ul>
-<h3 id="LR分析引擎"><a href="#LR分析引擎" class="headerlink" title="LR分析引擎"></a>LR分析引擎</h3><p>LR分析器是通过DFA作用于栈，来实现reduce和shift操作的。转换操作主要有以下4种：</p>
-<ul>
-<li>sn: shift into state n</li>
-<li>gn: goto state n</li>
-<li>rk: reduce by rule k</li>
-<li>a: accept</li>
-</ul>
-<h3 id="LR-0-分析器"><a href="#LR-0-分析器" class="headerlink" title="LR(0)分析器"></a>LR(0)分析器</h3><blockquote>
-<p>LR(0)是一种只需要分析查看栈就可以进行分析的文法，它的shift、reduce操作不需要进行任何超前判断</p>
-</blockquote>
-<h3 id="SLR分析器"><a href="#SLR分析器" class="headerlink" title="SLR分析器"></a>SLR分析器</h3><p>如果用LR(0)去构造分析表：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-9.png" alt="img"></p>
-<p>在状态3的时候，遇到符号+，就会出现多重定义的项，分析器既需要shift到状态4，也需要对production2进行reduce。这是一个reduce-shift冲突。</p>
-<p>因此我们可以构造SLR分析器来解决这个问题。</p>
-<p>SLR的构造与LR(0)基本一样，除了它只在FOLLOW集指定的地方放置规约操作。</p>
-<h3 id="LR-1-项和LR-1-分析表"><a href="#LR-1-项和LR-1-分析表" class="headerlink" title="LR(1)项和LR(1)分析表"></a>LR(1)项和LR(1)分析表</h3><p>之所以使用LR(1)，是因为即便使用了SLR(0)，还是不能完美地解决所有的冲突。考虑αF.β，我们知道，F的follow集合包含字符串β的first集合。因此我们在SLR（0）中使用的follow集合不一定能正确的预测出产生式。</p>
-<p>因此，我们重新定义了项，它包含产生式，标记状态的点，超前查看符号集合。</p>
-<p>我们可以使用下面的算法计算一个状态中每一项的具体内容：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3-4-1.png" alt="img"></p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3-4-2.png.png" alt="img"></p>
-<h3 id="LALR-1-分析表"><a href="#LALR-1-分析表" class="headerlink" title="LALR(1)分析表"></a>LALR(1)分析表</h3><p>由于LR(1)的状态可能太多了，因此我们可以合并那些除了超前查看的符号集合外都相同的两个状态。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1860,7 +1816,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">247</span>
+                <span class="site-state-item-count">248</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1873,7 +1829,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-count">26</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

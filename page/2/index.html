@@ -265,6 +265,170 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/04/Golang内存模型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/04/04/Golang内存模型/" itemprop="url">Golang内存模型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-04T22:36:02+08:00">
+                2020-04-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Golang内存模型"><a href="#Golang内存模型" class="headerlink" title="Golang内存模型"></a>Golang内存模型</h1><blockquote>
+<p>参考自：<a href="https://golang.org/ref/mem" target="_blank" rel="noopener">https://golang.org/ref/mem</a></p>
+</blockquote>
+<p>Golang的内存模型描述了这样的一种场景：在一个goroutine中对一个变量的读取能保证是由不同gorountine写入相同变量所产生的。</p>
+<h2 id="Happens-Before"><a href="#Happens-Before" class="headerlink" title="Happens Before"></a>Happens Before</h2><p>在单个goroutine中，只有在满足不改变语言规范所定义的行为时，编译器才能对单个goroutine所执行的读写进行重新排序。但由于重新排序，一个goroutine所观察到的执行顺序可能与另一个goroutine察觉到的执行顺序不同。</p>
+<p>为了指定读写要求，在go程序中定义了一个叫Happens Before的偏序关系——如果事件e1发生在事件e2之前，那么我们说e2发生在e1之后。同样，如果e1不在e2之前发生并且在e2之后也没有发生，那么我们说e1和e2同时发生。</p>
+<p>在单个goroutine中，Happens Before的顺序就是程序所表现出来的顺序。</p>
+<p>为了保证对变量的读取R可以读取到由特定的对变量的写入W，即W是R可以观察到的唯一写入，必须要满足以下两个条件：</p>
+<ol>
+<li>W发生到R之前；</li>
+<li>任何对变量的其他写入要么发生在w之前，要么发生在r之后；</li>
+</ol>
+<p>变量的初始化为零值，其实也是内存模型中的零值写入。</p>
+<h2 id="Synchronization"><a href="#Synchronization" class="headerlink" title="Synchronization"></a>Synchronization</h2><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>程序的初始化是在单个goroutine中进行的，但goroutine可以创建其他goroutine，这是并发的。</p>
+<p>如果一个package引入了另一个package，即被引入的package会先初始化。</p>
+<p>main.main的开始必须要在所有init函数完成之后。</p>
+<h3 id="Goroutine的创建"><a href="#Goroutine的创建" class="headerlink" title="Goroutine的创建"></a>Goroutine的创建</h3><p>以下面的为例子，f()打印出hello world可能会在hello()结束后才打印。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">hello</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">"hello, world"</span></span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Goroutine的销毁"><a href="#Goroutine的销毁" class="headerlink" title="Goroutine的销毁"></a>Goroutine的销毁</h3><p>无法保证goroutine的退出在程序中的任何其他事件发生之前发生。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">hello</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; a = <span class="string">"hello"</span> &#125;()</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对a的赋值很可能在下面的print中看不到，因为缺乏同步。</p>
+<h3 id="Channel的同步"><a href="#Channel的同步" class="headerlink" title="Channel的同步"></a>Channel的同步</h3><p>通道通信是goroutine之间同步的主要方法。channel的发送必定发生在该channel接受完成之前。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">10</span>)</span><br><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">"hello, world"</span></span><br><span class="line">	c &lt;- <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	&lt;-c</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就能保证打印出hello, world。</p>
+<p>另外，channel的关闭会发生在返回零值的接收之前，这样用close(c)替代c&lt;-0也可以产生相同的保证行为。</p>
+<p>而对于缺乏buffer的channel，其接收会发生在该channel的发送完成之前，例如这样也可以保证打印出正确的hello world，这里的发送和接收顺序与上面的例子相反。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">"hello, world"</span></span><br><span class="line">	&lt;-c</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	c &lt;- <span class="number">0</span></span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但如果channel是带有buffer，就无法保证打印出hello world了。</p>
+<p>在容量为C的通道上的第k个接收发生在该通道的第k + C个发送完成之前，因为不从channel接收数据就无法继续写入。</p>
+<p>该规则将前一个规则推广到缓冲通道。 它允许通过缓冲的通道对计数信号量进行建模：channel中的项目数量对应于活动使用的数量，channel的容量对应于同时使用的最大数量，发送一个项目获取信号量，接收项目则会释放信号量。通过这种操作就可以限制其并发。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> limit = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> work &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(w <span class="keyword">func</span>()</span>)</span> &#123;</span><br><span class="line">			limit &lt;- <span class="number">1</span></span><br><span class="line">			w() <span class="comment">// 不处理完成，无法释放该信号量</span></span><br><span class="line">			&lt;-limit</span><br><span class="line">		&#125;(w)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">select</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Locks"><a href="#Locks" class="headerlink" title="Locks"></a>Locks</h3><p>sync包里实现了两种锁相关的数据类型：sync.Mutex和sync.RWMutex。通过锁的使用，我们可以在goroutine中保证同步。这样的一个程序就可以顺利打印出hello world。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> l sync.Mutex</span><br><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">"hello, world"</span></span><br><span class="line">	l.Unlock()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	l.Lock()</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	l.Lock()</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Once"><a href="#Once" class="headerlink" title="Once"></a>Once</h3><p>sync包还提供了一种初始化的安全机制，通过使用Once数据类型，多个线程都可以执行once.Do(f)，但只有一个会运行f()，其他的调用将会block直接f()返回。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"><span class="keyword">var</span> once sync.Once</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setup</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">"hello, world"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">doprint</span><span class="params">()</span></span> &#123;</span><br><span class="line">	once.Do(setup)</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">twoprint</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> doprint()</span><br><span class="line">	<span class="keyword">go</span> doprint()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这种机制下，a的赋值将会在打印之前执行。</p>
+<h3 id="Incorrect-synchronization"><a href="#Incorrect-synchronization" class="headerlink" title="Incorrect synchronization"></a>Incorrect synchronization</h3><p>需要注意的是读取R可能会观察到与R同时发生的写入W所写入的值，但这并不意味着在R之后的读取会观察到在W之前所发生的写入。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a, b <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="number">1</span></span><br><span class="line">	b = <span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">g</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="built_in">print</span>(b)</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	g()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里可能发生的情况是g()打印出了2和0，也就是即便g()已经读取了f()里面对b的写入，但这不意味着g()里面的a能够读取到f()中在b写入之前的a。</p>
+<p>同理，类似的错误也会发生在同步的使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"><span class="keyword">var</span> done <span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setup</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">"hello, world"</span></span><br><span class="line">	done = <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">doprint</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> !done &#123;</span><br><span class="line">		once.Do(setup)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">twoprint</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> doprint()</span><br><span class="line">	<span class="keyword">go</span> doprint()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里并不意味着能够观察到done设置为true，就隐式地说明a已经被初始化。</p>
+<p>另一种典型错误则是忙等，这种情况下并不意味着done被设置为true后，能够表示a已经被初始化，可以跳出for循环。真实情况是，此时print(a)，a可能还是空字符串。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a <span class="keyword">string</span></span><br><span class="line"><span class="keyword">var</span> done <span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setup</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">"hello, world"</span></span><br><span class="line">	done = <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> setup()</span><br><span class="line">	<span class="keyword">for</span> !done &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>应对这些问题也很简单，使用显式地同步。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/20/decltype-in-c-11/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1864,162 +2028,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/18/Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/08/18/Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824/" itemprop="url">Atomicity All-or-Nothing and Before-or-After——MIT6.824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-18T01:12:19+08:00">
-                2019-08-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824"><a href="#Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824" class="headerlink" title="Atomicity: All-or-Nothing and Before-or-After——MIT6.824"></a>Atomicity: All-or-Nothing and Before-or-After——MIT6.824</h1><blockquote>
-<p>《Principles Computer System Design Introduction》</p>
-</blockquote>
-<h2 id="Before-or-After-Atomicity-Coordinating-Concurrent-Threads"><a href="#Before-or-After-Atomicity-Coordinating-Concurrent-Threads" class="headerlink" title="Before-or-After Atomicity: Coordinating Concurrent Threads"></a>Before-or-After Atomicity: Coordinating Concurrent Threads</h2><p>并发操作中经常会出现data race condition，从程序员的角度看，有两种不同的并发协调做法：序列协调和原子性（<em>sequence coordina­tion</em> and <em>before-or-after atomicity</em>）。序列协调指的是约束”动作W必须在动作X之前发生”，而原子性则是一种更普遍的约束，即同时对同一个数据进行操作的若干动作不会相互干扰。我们对Before-or-after atomicity的定义是：</p>
-<blockquote>
-<p>Concurrent actions have the <em>before-or-afte</em>r property if their effect from the point of view of their invokers is the same as if the actions occurred either <em>completely before</em> or <em>completely after</em> one another.</p>
-</blockquote>
-<p>与序列协调不同，before-or-after原子性对于程序员来说无法知道共享变量的所有其他动作的ID。程序员需要的是一种自动的隐式机制，可确保正确处理每个共享变量。举个例子，在操作系统中，几个并发线程可能决定在某个时间使用共享打印机。而且，哪个线程首先使用打印机并不重要，重要的是是打印机的一次使用在下一次开始之前必须要完成。</p>
-<p>否则，多个线程交叉发生很可能引起最终的结果不一致，如图，如果两个线程对这个操作交叉执行，就会产生不一致的行为，原子性要保证的就是两个线程对B的操作必须是原子操作。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0" alt="img"></p>
-<h2 id="Correctness-and-Serialization"><a href="#Correctness-and-Serialization" class="headerlink" title="Correctness and Serialization"></a>Correctness and Serialization</h2><p>我们的目标是对before-or-after原子性进行正确性的验证，而不会涉及使用该机制的应用程序是否正确的问题。此正确性标准意味着如果并发操作的结果是通过某些纯串行应用的相同操作获得的结果，则算正确协调并发操作。</p>
-<p>因此我们对before-or-after原子性的定义就是每个before-or-after的行为都表现得是执行之前或者完全执行之后的效果。</p>
-<h2 id="Simple-Locking"><a href="#Simple-Locking" class="headerlink" title="Simple Locking"></a>Simple Locking</h2><p>simple locking有两个规则，首先是每个事务必须在执行任何实际读取和写入之前为其操作的所有共享对象获取锁；其次是必须事务完成上次更新并提交或者重新加载数据并终止后才会释放锁。</p>
-<p>simple locking能有效地协调并发事务，在该规则下一个事务必须在前一个事务完成之后进行、在后一个事务开始之前进行，并且进行中的事务不会拥有共同的数据。并发事务产生的结果就像是按照序列化顺序进行的一样。</p>
-<p>但是simple locking也会因为性能问题影响其并发过程，因为它要求事务获取它将要读取或写入的每个共享对象的锁，如果其需要读取的锁数量大于当前的数量，那么就会在一定程度上影响其并发性能。</p>
-<h2 id="Two-Phase-Locking"><a href="#Two-Phase-Locking" class="headerlink" title="Two-Phase Locking"></a>Two-Phase Locking</h2><p>两阶段锁协议整个过程分为两个阶段：一是加锁，二是释放锁。加锁过程中事务只能加锁或者操作数据，在其通过某个锁定点之前都不能释放锁。而释放锁的过程中事务只能解锁或者操作数据，而不能再重新上锁了。</p>
-<p>虽然两阶段锁协议比简单的锁定具有更好的并发性能，例如假设事务T1读取X，接着写Y，而事务T2只执行写入Y。在两阶段锁协议下，T2只能在T1两个动作之前或者之后发生。但事实上T2在T1两个动作中间进行与T2完全在T1之前进行的效果是一样的。允许所有可能的并发性同时确保的before-or-after atomicity规则很难设计。</p>
-<p>锁与日志之间的关系有两点是需要考虑的：单个的中止事务和系统恢复。对于前者，协议要求中止事务在释放任何锁之前将其更改的数据对象恢复为原始值，因此不需要对中止的事务采取特殊的计算。至于后者，锁不是在非易失性存储中，因此在系统的恢复过程中必须将锁捕获以释放锁。然而我们还需要考虑的是，基于日志的恢复算法是否构建了正确的系统状态，因为系统崩溃可能是由于在崩溃之前提交的那些事务的串行排序引起的。</p>
-<p>假设锁是在易失性存储器中，在系统崩溃的瞬间所有锁的记录都丢失。某些事务（记录BEGIN记录但尚未记录END记录的事务）可能尚未完成。但由于在那一瞬间所有事物的锁集合都是不重叠的，因此在恢复过程中可以不加锁地通过执行恢复算法重建系统状态，当然这一恢复过程中不能有新的事务产生。</p>
-<h2 id="Multiple-Site-Atomicity-Distributed-Two-Phase-Commit"><a href="#Multiple-Site-Atomicity-Distributed-Two-Phase-Commit" class="headerlink" title="Multiple-Site Atomicity: Distributed Two-Phase Commit"></a>Multiple-Site Atomicity: Distributed Two-Phase Commit</h2><p>如果事务需要在分布式的环境下执行，则需要使用结合了persis­tent senders, duplicate suppression和single-site transactions的两阶段提交协议。</p>
-<p>这是因为分布式架构中，不同的节点之间只能知道自己的操作是否成功，而无法知道其他节点的操作的成功或失败。为了保证事务的特性，需要引入一个作为<strong>协调者</strong>的组件来统一掌控所有节点（<strong>参与者</strong>）的操作结果并最终指示这些节点的最终提交。</p>
-<p>第一阶段：提交请求的投票阶段</p>
-<ol>
-<li>协调者向所有参与者节点发起是否可以提交事务的询问；</li>
-<li>参与者执行相关的事务操作，并记录Undo和Redo日志；</li>
-<li>各个参与对询问进行响应，同意或者终止；</li>
-</ol>
-<p>第二阶段：提交执行的完成阶段</p>
-<ol>
-<li>协调者节点向所有参与者节点发出”正式提交”/“回滚操作”的请求；</li>
-<li>参与者节点正式完成操作/参与者利用Undo信息进行回滚，并释放在整个事务期间内占用的资源；</li>
-<li>参与者响应完成信息；</li>
-<li>协调者收到所有信息后，完成事务；</li>
-</ol>
-<p>通信流程参考：</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0" alt="img"></p>
-<p>2PC也存在一些缺点，其中一个就是执行过程中，节点处于阻塞状态；另一个就是出现节点崩溃时，只能依赖协调者去进行回滚；并且协调者还存在单点故障的问题。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2068,7 +2076,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">247</span>
+                <span class="site-state-item-count">248</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2081,7 +2089,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-count">26</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

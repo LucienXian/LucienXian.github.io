@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2021-03-20T15:36:48.577Z</updated>
+  <updated>2021-04-13T16:17:45.360Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>《UCB cs294》Required Reading 2</title>
+    <link href="http://yoursite.com/2021/04/14/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-2/"/>
+    <id>http://yoursite.com/2021/04/14/《UCB-cs294》Required-Reading-2/</id>
+    <published>2021-04-13T16:16:18.000Z</published>
+    <updated>2021-04-13T16:17:45.360Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="《UCB-AI-Sys-cs294》Required-Reading-2"><a href="#《UCB-AI-Sys-cs294》Required-Reading-2" class="headerlink" title="《UCB AI-Sys cs294》Required Reading 2"></a>《UCB AI-Sys cs294》Required Reading 2</h1><h2 id="论文一"><a href="#论文一" class="headerlink" title="论文一"></a>论文一</h2><p>课程推荐的第一篇文章《SysML: The New Frontier of Machine Learning Systems》，这其实一个会议的白皮书，主要的研究方向是设计实现一类系统，来满足支持部署机器学习模型，这是一个计算机系统和机器学习交叉的会议。</p><p>白皮书里将机器学习系统遇到的问题分为两种：一种是高层次的问题，主要解决的是算法、接口的设计实现；另一种则是低层次问题，主要关注的是硬件、调度等底层优化。该文也仔细分析了机器学习系统中遇到的瓶颈，比如部署相关的设计、成本问题以及实用性是否合适。</p><h2 id="论文二"><a href="#论文二" class="headerlink" title="论文二"></a>论文二</h2><p>第二篇论文是《A Few Useful Things to Know About Machine Learning》，这是一片机器学习领域的经典论文，总结了机器学习相关的12个重点实践，并以分类器来举例。</p><ol><li>Learning = Representation + Evaluation + Optimization</li></ol><p>所有的机器学习算法都是由三个部分组成：</p><ul><li>Representation：表现数据的方式，比如用距离表现数据的knn、svm，用数表现数据的决策树；</li><li>Evaluation：用来评估分类器好坏的函数；</li><li>Optimization：用来搜索得分最高分类器的方法；</li></ul><ol start="2"><li>It’s Generalization that Counts</li></ol><p>泛化能力是很重要的，在使用分类器数据时，需要留出部分数据来做测试，避免过拟合。</p><ol start="3"><li>Data Alone Is Not Enough</li></ol><p>将泛化能力作为一个指标，仅仅有数据是不够的，还需要大量的编程工作，例如选择合适的模型，合适的评估函数、损失函数。</p><ol start="4"><li>Overfitting Has Many Faces</li></ol><p>过拟合有很多种，主要需要关注的是偏差和方差，偏差是指模型往着相同的错误方向训练，方差则是模型有学习随机信号的倾向。解决过拟合的方法一般有交叉验证、增加正则化项、进行类似卡方检验的统计显著性检验。</p><ol start="5"><li>Intuition Fails in High Dimensions</li></ol><p>一般来说，特征维度越高，就更好表达数据，但也可以引发curse of dimensionality，即样本数量相对不足，难以覆盖其输入空间，并且也难以从直觉上找出不同类别样本之间的合理边界，最终导致bias和variance的增加。</p><ol start="6"><li>Theoretical Guarantees Are Not What They Seem</li></ol><p>机器学习论文中充斥着理论保证，其存在的意义不仅在于作为评断实际决策的标准，还是设计算法的来源动力。但机器学习是一个复杂的工程，理论上可行不代表实践也是可行的。</p><ol start="7"><li>Feature Engineering Is The Key</li></ol><p>这一点主要是将特征工程的重要性，机器学习不单单是构建数据跑一次就足够了，还需要有分析结果、根据结果修改数据集的迭代过程。</p><ol start="8"><li>More Data Beats a Cleverer Algorithm</li></ol><p>数据量非常重要，数据量的增多会导致某些模型的表征能力也随之增强。</p><ol start="9"><li>Learn Many Models, Not Just One</li></ol><p>机器学习中每个模型都有其适用范围，因此模型的集成如bagging、boosting、stacking等算法就会得到很好的结果。</p><ol start="10"><li>Simplicity Does Not Imply Accuracy</li></ol><p>这里主要是Occam’s razor的一个修正，即简单的模型不一定就能很好避免过拟合或者得到很好的效果。</p><ol start="11"><li>Representable Does Not Imply Learnable</li></ol><p>机器学习具备局限性，不是所有的模型都可以学习的。另外，如果评估函数在假设空间内具备多个局部最优点，模型可能会找不到最优函数。</p><ol start="12"><li>Correlation Does Not Imply Causation</li></ol><p>机器学习只能发觉特征的相关性，但相关性并不等于因果性。</p><h2 id="论文三"><a href="#论文三" class="headerlink" title="论文三"></a>论文三</h2><p>第三篇文章《A Berkeley View of Systems Challenges for AI》是伯克利从计算机系统对机器学习的支持中，总结出来的一篇文章。</p><p>该文章将AI飞速发展的原因归结为：大数据、高扩展性的计算机系统和开源软件技术的流行。</p><p>文章还提出了机器学习相关的趋势与挑战：</p><ol><li>Mission-critical AI：人工智能开始设计一些与人类生命安全相关的领域，需要为这些机器学习任务设计更加稳定安全的决策；</li><li>Personalized AI：提供更加个性化的人工智能系统，同时需要注意用户隐私安全；</li><li>AI across organizations：每个机构、企业都有自己独特的数据，如何提供数据共享的机制，支持跨组织的人工智能系统，也是一个需要注意的挑战；</li><li>AI demands outpacing the Moore’s Law：后摩尔定律时期的AI发展需要更加关注与人工智能适配的硬件架构与系统；</li></ol><p>接下来的介绍就是关于解决上述挑战亟需深入研究的方向：</p><ol><li>Acting in dynamic environments：动态环境下的技术表现，人工智能需要在复杂性动态性更强的环境工作，能够应对突发的、不可预测的事件，并快速做出响应。这包括了Continual learning、Reinforcement learninig等系统的构建；作出更鲁棒的决策（Robust decisions）和可解释的决策（Explainable decisions）</li><li>Secure AI：这里的安全分为两个部分，一是攻击影响系统作出决策的正确性、而是攻击者获取AI训练的影响数据、破解AI加密模型。这种方向包括了构建 Secure enclaves，提供一个安全的硬件执行环境；进行对抗学习避免推理阶段和训练阶段引入了恶意的数据；构建更安全的共享数据系统；</li><li>AI-specic architectures：随着AI的发展，硬件系统架构的迭代显得越来越来重要。这包括了 Domain specic hardware，设计专用的硬件架构来提升系统性能和安全能力；Composable AI systems，为AI系统做定制的的模块化、组件化，进行模型的组合、操作行为的组合；Cloud-edge systems，设计合适的连接云端与边缘设备的AI系统，降低边缘设备的延时，充分利用云端的能力来提供更复杂的计算模型和高效的决策。</li></ol><p>下图就是上面四大趋势与九大研究方向的关联关系：</p><p><img src="https://img.imgdb.cn/item/6075c41e8322e6675cebd742.png" alt></p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这是这个课程的week2内容，主要是介绍了一些机器学习系统的研究方法和关注的趋势挑战。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;《UCB-AI-Sys-cs294》Required-Reading-2&quot;&gt;&lt;a href=&quot;#《UCB-AI-Sys-cs294》Required-Reading-2&quot; class=&quot;headerlink&quot; title=&quot;《UCB AI-Sys cs294》Re
+      
+    
+    </summary>
+    
+    
+      <category term="AiSys" scheme="http://yoursite.com/tags/AiSys/"/>
+    
+  </entry>
   
   <entry>
     <title>Paxos Made Simple——论文阅读</title>
@@ -451,29 +474,6 @@
     
     
       <category term="Redis" scheme="http://yoursite.com/tags/Redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Atomicity All-or-Nothing and Before-or-After——MIT6.824</title>
-    <link href="http://yoursite.com/2019/08/18/Atomicity-All-or-Nothing-and-Before-or-After%E2%80%94%E2%80%94MIT6-824/"/>
-    <id>http://yoursite.com/2019/08/18/Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824/</id>
-    <published>2019-08-17T17:12:19.000Z</published>
-    <updated>2019-08-19T17:10:11.199Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824"><a href="#Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824" class="headerlink" title="Atomicity: All-or-Nothing and Before-or-After——MIT6.824"></a>Atomicity: All-or-Nothing and Before-or-After——MIT6.824</h1><blockquote><p>《Principles Computer System Design Introduction》</p></blockquote><h2 id="Before-or-After-Atomicity-Coordinating-Concurrent-Threads"><a href="#Before-or-After-Atomicity-Coordinating-Concurrent-Threads" class="headerlink" title="Before-or-After Atomicity: Coordinating Concurrent Threads"></a>Before-or-After Atomicity: Coordinating Concurrent Threads</h2><p>并发操作中经常会出现data race condition，从程序员的角度看，有两种不同的并发协调做法：序列协调和原子性（<em>sequence coordina­tion</em> and <em>before-or-after atomicity</em>）。序列协调指的是约束”动作W必须在动作X之前发生”，而原子性则是一种更普遍的约束，即同时对同一个数据进行操作的若干动作不会相互干扰。我们对Before-or-after atomicity的定义是：</p><blockquote><p>Concurrent actions have the <em>before-or-afte</em>r property if their effect from the point of view of their invokers is the same as if the actions occurred either <em>completely before</em> or <em>completely after</em> one another.</p></blockquote><p>与序列协调不同，before-or-after原子性对于程序员来说无法知道共享变量的所有其他动作的ID。程序员需要的是一种自动的隐式机制，可确保正确处理每个共享变量。举个例子，在操作系统中，几个并发线程可能决定在某个时间使用共享打印机。而且，哪个线程首先使用打印机并不重要，重要的是是打印机的一次使用在下一次开始之前必须要完成。</p><p>否则，多个线程交叉发生很可能引起最终的结果不一致，如图，如果两个线程对这个操作交叉执行，就会产生不一致的行为，原子性要保证的就是两个线程对B的操作必须是原子操作。</p><p><img src="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0" alt="img"></p><h2 id="Correctness-and-Serialization"><a href="#Correctness-and-Serialization" class="headerlink" title="Correctness and Serialization"></a>Correctness and Serialization</h2><p>我们的目标是对before-or-after原子性进行正确性的验证，而不会涉及使用该机制的应用程序是否正确的问题。此正确性标准意味着如果并发操作的结果是通过某些纯串行应用的相同操作获得的结果，则算正确协调并发操作。</p><p>因此我们对before-or-after原子性的定义就是每个before-or-after的行为都表现得是执行之前或者完全执行之后的效果。</p><h2 id="Simple-Locking"><a href="#Simple-Locking" class="headerlink" title="Simple Locking"></a>Simple Locking</h2><p>simple locking有两个规则，首先是每个事务必须在执行任何实际读取和写入之前为其操作的所有共享对象获取锁；其次是必须事务完成上次更新并提交或者重新加载数据并终止后才会释放锁。</p><p>simple locking能有效地协调并发事务，在该规则下一个事务必须在前一个事务完成之后进行、在后一个事务开始之前进行，并且进行中的事务不会拥有共同的数据。并发事务产生的结果就像是按照序列化顺序进行的一样。</p><p>但是simple locking也会因为性能问题影响其并发过程，因为它要求事务获取它将要读取或写入的每个共享对象的锁，如果其需要读取的锁数量大于当前的数量，那么就会在一定程度上影响其并发性能。</p><h2 id="Two-Phase-Locking"><a href="#Two-Phase-Locking" class="headerlink" title="Two-Phase Locking"></a>Two-Phase Locking</h2><p>两阶段锁协议整个过程分为两个阶段：一是加锁，二是释放锁。加锁过程中事务只能加锁或者操作数据，在其通过某个锁定点之前都不能释放锁。而释放锁的过程中事务只能解锁或者操作数据，而不能再重新上锁了。</p><p>虽然两阶段锁协议比简单的锁定具有更好的并发性能，例如假设事务T1读取X，接着写Y，而事务T2只执行写入Y。在两阶段锁协议下，T2只能在T1两个动作之前或者之后发生。但事实上T2在T1两个动作中间进行与T2完全在T1之前进行的效果是一样的。允许所有可能的并发性同时确保的before-or-after atomicity规则很难设计。</p><p>锁与日志之间的关系有两点是需要考虑的：单个的中止事务和系统恢复。对于前者，协议要求中止事务在释放任何锁之前将其更改的数据对象恢复为原始值，因此不需要对中止的事务采取特殊的计算。至于后者，锁不是在非易失性存储中，因此在系统的恢复过程中必须将锁捕获以释放锁。然而我们还需要考虑的是，基于日志的恢复算法是否构建了正确的系统状态，因为系统崩溃可能是由于在崩溃之前提交的那些事务的串行排序引起的。</p><p>假设锁是在易失性存储器中，在系统崩溃的瞬间所有锁的记录都丢失。某些事务（记录BEGIN记录但尚未记录END记录的事务）可能尚未完成。但由于在那一瞬间所有事物的锁集合都是不重叠的，因此在恢复过程中可以不加锁地通过执行恢复算法重建系统状态，当然这一恢复过程中不能有新的事务产生。</p><h2 id="Multiple-Site-Atomicity-Distributed-Two-Phase-Commit"><a href="#Multiple-Site-Atomicity-Distributed-Two-Phase-Commit" class="headerlink" title="Multiple-Site Atomicity: Distributed Two-Phase Commit"></a>Multiple-Site Atomicity: Distributed Two-Phase Commit</h2><p>如果事务需要在分布式的环境下执行，则需要使用结合了persis­tent senders, duplicate suppression和single-site transactions的两阶段提交协议。</p><p>这是因为分布式架构中，不同的节点之间只能知道自己的操作是否成功，而无法知道其他节点的操作的成功或失败。为了保证事务的特性，需要引入一个作为<strong>协调者</strong>的组件来统一掌控所有节点（<strong>参与者</strong>）的操作结果并最终指示这些节点的最终提交。</p><p>第一阶段：提交请求的投票阶段</p><ol><li>协调者向所有参与者节点发起是否可以提交事务的询问；</li><li>参与者执行相关的事务操作，并记录Undo和Redo日志；</li><li>各个参与对询问进行响应，同意或者终止；</li></ol><p>第二阶段：提交执行的完成阶段</p><ol><li>协调者节点向所有参与者节点发出”正式提交”/“回滚操作”的请求；</li><li>参与者节点正式完成操作/参与者利用Undo信息进行回滚，并释放在整个事务期间内占用的资源；</li><li>参与者响应完成信息；</li><li>协调者收到所有信息后，完成事务；</li></ol><p>通信流程参考：</p><p><img src="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0" alt="img"></p><p>2PC也存在一些缺点，其中一个就是执行过程中，节点处于阻塞状态；另一个就是出现节点崩溃时，只能依赖协调者去进行回滚；并且协调者还存在单点故障的问题。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824&quot;&gt;&lt;a href=&quot;#Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824&quot; class=&quot;hea
-      
-    
-    </summary>
-    
-    
-      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     
   </entry>
   

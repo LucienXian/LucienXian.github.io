@@ -265,6 +265,162 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Golang实现Json序列化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/Golang实现Json序列化/" itemprop="url">Golang实现Json序列化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:14:28+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Golang实现Json序列化"><a href="#Golang实现Json序列化" class="headerlink" title="Golang实现Json序列化"></a>Golang实现Json序列化</h1><p>学习自：<a href="https://golang.org/pkg/encoding/json/#Marshal" target="_blank" rel="noopener">https://golang.org/pkg/encoding/json/#Marshal</a></p>
+<p>先来看看api的使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Marshal</span><span class="params">(v <span class="keyword">interface</span>&#123;&#125;)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span></span><br></pre></td></tr></table></figure>
+<p>基本作用就是返回v的json编码</p>
+<h2 id="作用过程"><a href="#作用过程" class="headerlink" title="作用过程"></a>作用过程</h2><p>Marshal递归地遍历v，如果遇到实现了Marshaler接口的值并且不是nil指针，Marshal会调用MarshalJSON方法来生成JSON。如果不存在MarshalJSON方法，但该值实现了encoding.TextMarshaler，则Marshal会调用MarshalText方法将结果编码为JSON字符。</p>
+<h2 id="编码结果"><a href="#编码结果" class="headerlink" title="编码结果"></a>编码结果</h2><p>Marshal使用以下类型相关的默认编码：</p>
+<ul>
+<li>bool值编码为JSON的布尔值；</li>
+<li>浮点数、整数和number值编码为JSON数字</li>
+<li>字符串值编码为有效的UTF-8的JSON字符串，并且会用Unicode替换无效字节</li>
+</ul>
+<blockquote>
+<p>为了防止某些浏览器会将JSON输出解析为HTML，尖括号&lt;和&gt;被转义为<strong>\u003c</strong>和<strong>\u003e</strong>。基于相同的原因，符号<strong>&amp;</strong>会被转义为<strong>\u0026</strong></p>
+<p>可以使用调用了SetEscapeHTML(false)的编码器禁止此转义</p>
+</blockquote>
+<ul>
+<li>数组和切片值编码为JSON数组，但了[]字节会被编码为base64编码的字符串，而nil切片编码为空JSON值</li>
+<li>结构体则是编码为JSON对象，每个structure字段都会成为JSON对象的成员，并且会使用该字段名称作为对象值</li>
+</ul>
+<h3 id="关于structure编码为JSON"><a href="#关于structure编码为JSON" class="headerlink" title="关于structure编码为JSON"></a>关于structure编码为JSON</h3><p>在golang的结构体中，每个成员变量都可以附带一个Tag说明，因此每个struct字段的编码可以通过存储在以Json为key的tag进行定制化。比如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    UserId   <span class="keyword">int</span>    <span class="string">`json:"user_id,omitempty" bson:"user_id"`</span></span><br><span class="line">    UserName <span class="keyword">string</span> <span class="string">`json:"user_name" bson:"user_name"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这些格式化字符串给出了字符的名称，还可以通过逗号在后面加上一系列的选项。tag中如果带有”omitempty”选项，那么如果该字段值为空，就不会输出到JSON串中。</p>
+<p>还有一种特别的情况，如果字段标记为“ - ”，则始终省略该字段。请注意，比较特别的是仍然可以使用标记“ - ，”生成名称为“ - ”的字段。比如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Field is ignored by this package.</span></span><br><span class="line">Field <span class="keyword">int</span> <span class="string">`json:"-"`</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Field appears in JSON as key "-".</span></span><br><span class="line">Field <span class="keyword">int</span> <span class="string">`json:"-,"`</span></span><br></pre></td></tr></table></figure>
+<p>“string”选项表示字段在JSON编码的字符串中存储为JSON。它仅适用于字符串，浮点，整数或布尔类型的字段。在与JavaScript程序通信时，有时会使用这种额外的编码级别。</p>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map被编码为JSON对象，而且map的key类型必须是字符串、整数或者实现了encoding.TextMarshaler。其中：</p>
+<ul>
+<li>字符串类型会被直接实现</li>
+<li>encoding.TextMarshaler的会被marshaled</li>
+<li>整数则会转为字符串</li>
+</ul>
+<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><p>接口会被编码为接口中包含的值，nil接口值则被编码为null JSON值</p>
+<p>另外：</p>
+<blockquote>
+<p>Channel, complex, and function values cannot be encoded in JSON. Attempting to encode such a value causes Marshal to return an UnsupportedTypeError.</p>
+</blockquote>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"encoding/json"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">type</span> ColorGroup <span class="keyword">struct</span> &#123;</span><br><span class="line">		ID     <span class="keyword">int</span></span><br><span class="line">		Name   <span class="keyword">string</span></span><br><span class="line">		Colors []<span class="keyword">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	group := ColorGroup&#123;</span><br><span class="line">		ID:     <span class="number">1</span>,</span><br><span class="line">		Name:   <span class="string">"Reds"</span>,</span><br><span class="line">		Colors: []<span class="keyword">string</span>&#123;<span class="string">"Crimson"</span>, <span class="string">"Red"</span>, <span class="string">"Ruby"</span>, <span class="string">"Maroon"</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	b, err := json.Marshal(group)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">"error:"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	os.Stdout.Write(b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Pylint学习/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1688,143 +1844,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/22/Linux内核学习——内核同步介绍/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/22/Linux内核学习——内核同步介绍/" itemprop="url">Linux内核学习——内核同步介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-22T23:24:06+08:00">
-                2018-07-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="内核同步介绍"><a href="#内核同步介绍" class="headerlink" title="内核同步介绍"></a>内核同步介绍</h1><h2 id="临界区和竞争条件"><a href="#临界区和竞争条件" class="headerlink" title="临界区和竞争条件"></a>临界区和竞争条件</h2><p>临界区：访问和操作共享数据的代码段。</p>
-<p>对于单个变量的操作，处理器提供了指令来原子地读变量，修改变量和返回变量。</p>
-<h2 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h2><h3 id="造成并发执行的原因"><a href="#造成并发执行的原因" class="headerlink" title="造成并发执行的原因"></a>造成并发执行的原因</h3><p>用户空间之所以需要同步，是因为用户程序会被调度程序抢占和重新调度。内核造成并发执行的原因：</p>
-<ul>
-<li>中断</li>
-<li>软中断和tasklet</li>
-<li>内核抢占</li>
-<li>睡眠以及用户空间的同步</li>
-<li>对称多处理</li>
-</ul>
-<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>最简单的死锁例子是自死锁：一个执行线程试图去获得一个自己已经持有的锁。一些简单的规则可以帮助避免死锁：</p>
-<ul>
-<li>按顺序加锁；</li>
-<li>防止发送饥饿；</li>
-<li>不重复请求同一个锁；</li>
-</ul>
-<h2 id="争用和扩展性"><a href="#争用和扩展性" class="headerlink" title="争用和扩展性"></a>争用和扩展性</h2><p>锁的争用是指当锁正被使用时，有其它线程试图获得该锁。</p>
-<p>加锁的粒度用来描述加锁保护的数据规模，当锁争用很严重时，加锁太粗会降低可扩展性；当争用不明显时，加锁过细又会加大系统开销。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1873,7 +1892,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">247</span>
+                <span class="site-state-item-count">248</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1886,7 +1905,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-count">26</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
