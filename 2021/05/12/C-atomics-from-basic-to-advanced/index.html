@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="C++,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="C++ atomics, from basic to advanced背景在C++11中引入了对多线程的支持，同时也带来了关于mutex和atomic相关的一些列标准，定义了memory model。这篇文章将关注C++11带来的一个无锁编程工具——atomics。 简介无锁编程在文章开始之前，首先来关注一些无锁编程这个概念（lock free——不使用锁来保持代码同步）。一般人在使用无锁编程或者">
+<meta name="keywords" content="C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ atomics, from basic to advanced">
+<meta property="og:url" content="http://yoursite.com/2021/05/12/C-atomics-from-basic-to-advanced/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="C++ atomics, from basic to advanced背景在C++11中引入了对多线程的支持，同时也带来了关于mutex和atomic相关的一些列标准，定义了memory model。这篇文章将关注C++11带来的一个无锁编程工具——atomics。 简介无锁编程在文章开始之前，首先来关注一些无锁编程这个概念（lock free——不使用锁来保持代码同步）。一般人在使用无锁编程或者">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce263b.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce268d.png">
+<meta property="og:updated_time" content="2021-05-11T17:01:19.589Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++ atomics, from basic to advanced">
+<meta name="twitter:description" content="C++ atomics, from basic to advanced背景在C++11中引入了对多线程的支持，同时也带来了关于mutex和atomic相关的一些列标准，定义了memory model。这篇文章将关注C++11带来的一个无锁编程工具——atomics。 简介无锁编程在文章开始之前，首先来关注一些无锁编程这个概念（lock free——不使用锁来保持代码同步）。一般人在使用无锁编程或者">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce263b.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/05/12/C-atomics-from-basic-to-advanced/">
+
+
+
+
+
+  <title>C++ atomics, from basic to advanced | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/05/12/C-atomics-from-basic-to-advanced/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C++ atomics, from basic to advanced</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-12T01:00:54+08:00">
+                2021-05-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="C-atomics-from-basic-to-advanced"><a href="#C-atomics-from-basic-to-advanced" class="headerlink" title="C++ atomics, from basic to advanced"></a>C++ atomics, from basic to advanced</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在C++11中引入了对多线程的支持，同时也带来了关于mutex和atomic相关的一些列标准，定义了memory model。这篇文章将关注C++11带来的一个无锁编程工具——atomics。</p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p>在文章开始之前，首先来关注一些无锁编程这个概念（lock free——不使用锁来保持代码同步）。一般人在使用无锁编程或者了解这个概念之前，会先入为主地认为无锁编程性能更快，相对使用锁来同步拥有更好的运行速度。</p>
+<p>实际上，无论是lock free还是更严格的wait free都没有直接跟运行速度有直接关系，他们关联的是“steps”，但在程序运行过程中“step”的运行时间不一定是一样的。无锁编程的优势在于通过减少阻塞和等待来提高并发的可能性，消除race condition、死锁等潜在危机。因此在使用无锁编程之前应该先测试程序，观察代码的算法逻辑是否有问题。</p>
+<p>接下来我们开始了解C++的原子操作。</p>
+<h3 id="C-atomics"><a href="#C-atomics" class="headerlink" title="C++ atomics"></a>C++ atomics</h3><h4 id="何谓原子操作"><a href="#何谓原子操作" class="headerlink" title="何谓原子操作"></a>何谓原子操作</h4><p>原子操作是一种以单个事务来执行的操作，这是一个“不可再分且不可并行的”操作，其他线程只能看到操作完成前或者完成后的资源状态，不存在中间状态可视。</p>
+<p>从底层来看，原子操作是一些硬件指令，其原子性是由硬件保证的，C++11对原子操作抽象出统一的接口，避免使用时嵌入平台相关的代码来支持跨平台使用。</p>
+<p>先来看看如果多线程中没有原子操作会发生什么情况：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">0</span>;</span><br><span class="line"><span class="comment">// ===============</span></span><br><span class="line"><span class="comment">// Thread 1</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">int</span> tmp = x; <span class="comment">// 0</span></span><br><span class="line">  ++tmp; <span class="comment">// 1</span></span><br><span class="line">  x = tmp; <span class="comment">// 1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Thread 2</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">int</span> tmp = x; <span class="comment">// 0</span></span><br><span class="line">  ++tmp; <span class="comment">// 1</span></span><br><span class="line">  x = tmp; <span class="comment">// 1!!! What!!!</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是一个很典型的Read-modify-write的递增场景，多线程环境下就会出现data race。为什么会这样，以一个简易的计算机架构图来举例，这里存在三级缓存，变量在内存中初始化好为0，由于这里没有同步机制，每个CPU都从主存中将变量取出来（此时变量都是0），在寄存器中进行递增，最后将递增后的值1写回内存。</p>
+<p><img src="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce263b.png" alt></p>
+<p>那么我们怎么在C++中进行数据共享呢？在C++11之前是没有标准的线程库的，在C++11之后引入了std::atomic模版类来提供原子操作。一个简单例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; x(<span class="number">0</span>); <span class="comment">// Not support std::atomic&lt;int&gt; x = 0</span></span><br><span class="line">++x; <span class="comment">// now atomic operation</span></span><br></pre></td></tr></table></figure>
+<h4 id="std-atomic的使用"><a href="#std-atomic的使用" class="headerlink" title="std::atomic的使用"></a>std::atomic的使用</h4><p>std::atomic是一个模版，那么哪些类型可以实例画该模版呢？按照标准的说法，需要是Trivially Copyable的类型，简单来说就是满足三个条件：</p>
+<ul>
+<li>连续的内存；</li>
+<li>拷贝对象意味着按bit拷贝（memcpy）；</li>
+<li>没有虚函数；</li>
+</ul>
+<p>用代码来表达则是自定义结构满足下面5个条件：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::is_trivially_copyable&lt;T&gt;::value</span><br><span class="line"><span class="built_in">std</span>::is_copy_constructible&lt;T&gt;::value</span><br><span class="line"><span class="built_in">std</span>::is_move_constructible&lt;T&gt;::value</span><br><span class="line"><span class="built_in">std</span>::is_copy_assignable&lt;T&gt;::value</span><br><span class="line"><span class="built_in">std</span>::is_move_assignable&lt;T&gt;::value</span><br></pre></td></tr></table></figure>
+<p>那么对于一个合法的<code>std::atomic&lt;T&gt;</code> 类型来说，它能进行哪些操作？一个是assignment，则读写操作；另一个则是特定的原子操作和跟类型T相关的其他操作。下面几种操作要么编译失败、要么是非原子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; x&#123;<span class="number">0</span>&#125;;</span><br><span class="line">x *= <span class="number">2</span>; <span class="comment">// compile error</span></span><br><span class="line">x = x + <span class="number">1</span>; <span class="comment">// Not atomic: Atomic read followed by atomic write</span></span><br><span class="line">x = x * <span class="number">2</span>; <span class="comment">// Not atomic: Atomic read followed by atomic write</span></span><br></pre></td></tr></table></figure>
+<p>还有一个就是原子自增不支持浮点数。其他的原子操作包括CAS、exchange等等；</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;T&gt; x;</span><br><span class="line">T y = x.load(); <span class="comment">// same sa T y = x</span></span><br><span class="line">x.store(y); <span class="comment">// same as x = y</span></span><br><span class="line">T z = x.exchange(y); <span class="comment">// Atomically: z = x; x = y;</span></span><br><span class="line"><span class="comment">// if x == y, make x=z and return true</span></span><br><span class="line"><span class="comment">// Otherwise, set y=x and return false</span></span><br><span class="line"><span class="comment">// 还有一个compare_exchange_week，x == y也可能会失败，主要是因为某些平台会对锁有类似超时释放的操作，满足其高效调度</span></span><br><span class="line"><span class="keyword">bool</span> success = x.compare_exchange_strong(y, z);</span><br></pre></td></tr></table></figure>
+<p>这里重点看一下CAS的使用，CAS在大多数无锁算法中都有应用，除了原子自增外，CAS还支持递增浮点数，进行乘法运算：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; x&#123;<span class="number">0</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> x0 = x;</span><br><span class="line"><span class="keyword">while</span> (!x.compare_exchange_strong(x0, x0+<span class="number">1</span>)) &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> (!x.compare_exchange_strong(x0, x0*<span class="number">2</span>)) &#123;&#125;</span><br><span class="line"><span class="comment">// fetch_xxx() == some operators</span></span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; x&#123;<span class="number">0</span>&#125;;</span><br><span class="line">x.fetch_add(y); <span class="comment">// same as x += y</span></span><br><span class="line"><span class="keyword">int</span> z = x.fetch_add(y); <span class="comment">// same as z = (x += y) - y;</span></span><br></pre></td></tr></table></figure>
+<h4 id="std-atomic与无锁的关系"><a href="#std-atomic与无锁的关系" class="headerlink" title="std::atomic与无锁的关系"></a>std::atomic与无锁的关系</h4><p>这里有一个关键的信息：std::atomic并不意味着一定是无锁的；首先来看下面的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">long</span> x; <span class="comment">// lock free</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">A</span> &#123;</span> <span class="keyword">long</span> x; &#125;; <span class="comment">// lock free</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">B</span> &#123;</span> <span class="keyword">long</span> x; <span class="keyword">long</span> y; &#125;; <span class="comment">// run-time and platfrom dependent. x86 is lock free</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">C</span> &#123;</span> <span class="keyword">long</span> x; <span class="keyword">long</span> y; <span class="keyword">long</span> z; &#125;; <span class="comment">// &gt; 16 bytes. not lock free</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">D</span> &#123;</span> <span class="keyword">long</span> x; <span class="keyword">int</span> y; &#125;; <span class="comment">// alignment 16 bytes. lock free</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">E</span> &#123;</span> <span class="keyword">long</span> x; <span class="keyword">int</span> y; &#125;; <span class="comment">// 12 bytes. not lock free</span></span><br></pre></td></tr></table></figure>
+<p>判断atomc是否无锁可以通过一个成员函数<code>std::atomic&lt;T&gt;::is_lock_free()</code>，这是一个运行时的判断（C++17提供了编译时判断<code>constexpr is_always_lock_free()</code>），之所以会出现无锁不确定的情况主要是因为对齐alignment。</p>
+<p>假设atomic是无锁的，但也有可能出现两个atomic变量互相等待的情况，假设存在这样的场景，两个atomic变量：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; x[N];</span><br><span class="line"><span class="comment">// thread 1</span></span><br><span class="line">++x[<span class="number">0</span>];</span><br><span class="line"><span class="comment">// thread 2</span></span><br><span class="line">++x[<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+<p>这种情况下就会出现两个atomic变量互相等待的可能性，主要是因为这两个操作都是在同一个cache line，都从主存到CPU来回写入，因为两个CPU可能互斥访问同一个cache line，这就是所谓的false sharing。一个提高性能解决这个问题的方式是将每个线程的数据对齐到充满整个cache line。（NUMA机器上，可能是整个page）</p>
+<p><img src="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce268d.png" alt></p>
+<h4 id="memory-barrier"><a href="#memory-barrier" class="headerlink" title="memory barrier"></a>memory barrier</h4><p>memory barrier控制着某个CPU对内存的修改被另一个CPU可见的方式，这是一个对所有CPU的全局控制。这是通过硬件实现，确定指令的特定操作顺序。简单来说，就是CPU在执行指令的时候不一定按照编写顺序来执行，从而挖掘更多并行能力。</p>
+<p>如果仔细观察std::atomic相关操作的参数，会发现其还接受一个memory_order的枚举作为参数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> memory_order &#123;</span><br><span class="line">	memory_order_relaxed,</span><br><span class="line">	memory_order_consume,</span><br><span class="line">	memory_order_acquire,</span><br><span class="line">	memory_order_release,</span><br><span class="line">	memory_order_acq_rel,</span><br><span class="line">	memory_order_seq_cst</span><br><span class="line">	&#125; memory_order;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>memory_order_relaxed：不对执行顺序做任何保证，即该原子操作指令可以任由编译器重排或者CPU乱序执行；</li>
+<li>memory_order_acquire：当前线程里，所有在该原子操作之后的读操作，都不能重排到该原子操作指令之前执行。原子操作指令先读；</li>
+<li>memory_order_release：当前线程里，所有在该原子操作之前的写操作，都不能重排到该原子操作指令之后执行。原子操作最后写；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Thread1</span><span class="params">(<span class="keyword">int</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> t=<span class="number">1</span>;</span><br><span class="line">    a.store(t,memory_order_relaxed);</span><br><span class="line">    b.store(<span class="number">2</span>,memory_order_release); <span class="comment">// a必须在b之前完成写入</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Thread2</span><span class="params">(<span class="keyword">int</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(b.load(memory_order_acquire)!=<span class="number">2</span>); <span class="comment">// b必须在a之前读 </span></span><br><span class="line">    <span class="built_in">cout</span>＜＜a.load(memory_order_relaxed)＜＜<span class="built_in">endl</span>;<span class="comment">//输出1. </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>memory_order_acq_rel：包含memory_order_acquire和memory_order_release两个标志；</li>
+<li>memory_order_seq_cst：默认标志。顺序一致，确保代码在线程中的执行顺序与顺序看到的代码顺序一致，禁止重拍指令和乱序执行；</li>
+</ul>
+<p>改变memory order参数，在一定程度上可能会提高程序的性能，从代码中表达出程序员的意图。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>C++的atomic操作在一定条件下能很好提高程序的性能，并且也提高了易用性，但也存在很多容易踩坑的地方，因此在使用前仍然需要做详细的设计。使用atomic的时机也需要细细斟酌，对于不适用的地方使用无锁或者atomic操作可能收效甚微。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.infoq.com/news/2014/10/cpp-lock-free-programming/" target="_blank" rel="noopener">https://www.infoq.com/news/2014/10/cpp-lock-free-programming/</a></p>
+<p><a href="https://www.youtube.com/watch?v=ZQFzMfHIxng" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZQFzMfHIxng</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/04/19/Macro-Free-in-C/" rel="next" title="Macro Free in C++">
+                <i class="fa fa-chevron-left"></i> Macro Free in C++
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">250</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-atomics-from-basic-to-advanced"><span class="nav-number">1.</span> <span class="nav-text">C++ atomics, from basic to advanced</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.2.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#无锁编程"><span class="nav-number">1.2.1.</span> <span class="nav-text">无锁编程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#C-atomics"><span class="nav-number">1.2.2.</span> <span class="nav-text">C++ atomics</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#何谓原子操作"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">何谓原子操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#std-atomic的使用"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">std::atomic的使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#std-atomic与无锁的关系"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">std::atomic与无锁的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memory-barrier"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">memory barrier</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.4.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
