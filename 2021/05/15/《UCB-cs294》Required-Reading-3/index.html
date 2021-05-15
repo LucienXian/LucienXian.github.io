@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="AiSys,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="《UCB cs294》Required Reading 3论文一《Hidden Technical Debt in Machine Learning Systems》这篇文章是谷歌基于多年的机器学习系统开发和使用经验总结出来的，着重强调了在机器学习系统中出现的technical debt：  Complex Models Erode Boundaries  在一般的软件开发中，人们会使用封装、模块">
+<meta name="keywords" content="AiSys">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《UCB cs294》Required Reading 3">
+<meta property="og:url" content="http://yoursite.com/2021/05/15/《UCB-cs294》Required-Reading-3/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="《UCB cs294》Required Reading 3论文一《Hidden Technical Debt in Machine Learning Systems》这篇文章是谷歌基于多年的机器学习系统开发和使用经验总结出来的，着重强调了在机器学习系统中出现的technical debt：  Complex Models Erode Boundaries  在一般的软件开发中，人们会使用封装、模块">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce25e3.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/609febea6ae4f77d357d697a.png">
+<meta property="og:updated_time" content="2021-05-15T15:43:47.748Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《UCB cs294》Required Reading 3">
+<meta name="twitter:description" content="《UCB cs294》Required Reading 3论文一《Hidden Technical Debt in Machine Learning Systems》这篇文章是谷歌基于多年的机器学习系统开发和使用经验总结出来的，着重强调了在机器学习系统中出现的technical debt：  Complex Models Erode Boundaries  在一般的软件开发中，人们会使用封装、模块">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce25e3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/05/15/《UCB-cs294》Required-Reading-3/">
+
+
+
+
+
+  <title>《UCB cs294》Required Reading 3 | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/05/15/《UCB-cs294》Required-Reading-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《UCB cs294》Required Reading 3</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-15T23:41:29+08:00">
+                2021-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="《UCB-cs294》Required-Reading-3"><a href="#《UCB-cs294》Required-Reading-3" class="headerlink" title="《UCB cs294》Required Reading 3"></a>《UCB cs294》Required Reading 3</h1><h2 id="论文一"><a href="#论文一" class="headerlink" title="论文一"></a>论文一</h2><p>《Hidden Technical Debt in Machine Learning Systems》这篇文章是谷歌基于多年的机器学习系统开发和使用经验总结出来的，着重强调了在机器学习系统中出现的technical debt：</p>
+<ul>
+<li>Complex Models Erode Boundaries</li>
+</ul>
+<p>在一般的软件开发中，人们会使用封装、模块化等抽象手段，但机器学习系统由于其依赖大量外部数据，特征的改变会影响全局。论文提到的解决方法是模型隔离和监测模型中的变化。</p>
+<ul>
+<li>Data Dependencies Cost More than Code Dependencies</li>
+</ul>
+<p>这个主要是将对数据依赖关系的分析成本比通常的代码依赖关系分析要高，一是因为数据依赖关系不够稳定，可能存在把一个输出当成另一个地方外部输入的使用；二是存在不必要的数据依赖。对于这两个问题，论文的解决方法是做数据输入的版本控制和定期检查去除不必要的依赖。</p>
+<ul>
+<li>Feedback Loops</li>
+</ul>
+<p>机器学习系统的一大特征就是他们未来的更新很可能会影响到自身，导致analysis debt的出现，在模型部署之前很难预测模型的行为。Direct Feedback Loops是指模型直接影响自身的特征选择，Hidden Feedback Loops是指系统之间间接影响对方，这种Feedback Loops的问题更加严重。</p>
+<ul>
+<li>ML-System Anti-Patterns</li>
+</ul>
+<p>在实际的机器学习系统中，仅仅一小部分代码是用于学习和预测的，慢慢地，系统中会出现各种系统设计的Anti-Patterns。比如出现大量的机器学习库代码，论文的建议是使用胶水语言封装API；数据准备阶段积攒了更多的输入信号，混杂着各种数据操作；机器学习实验过程中，代码出现了一些不必要的条件分支，导致技债出现；还有就是一些代码的code smell比较差。</p>
+<ul>
+<li>Configuration Debt</li>
+</ul>
+<p>由于机器学习系统和算法比较复杂，大型的ML系统往往依赖大量的配置，因此需要关注配置的可维护性、易读性、需要做code review提交到库中。</p>
+<ul>
+<li>Dealing with Changes in the External World</li>
+</ul>
+<p>这个指的是ML系统与外部世界有较多的交互，外部世界的变化会影响系统、影响模型等。因此需要高效的监控预警配套。</p>
+<ul>
+<li>Other Areas of ML-related Debt</li>
+</ul>
+<p>Data Testing Debt，提供基本的、完整的代码测试；Reproducibility Debt，真实的ML系统由于外部世界的变化、并行学习中的随机等等难以保持严格的可重复性；Process Management Debt，模型的管理问题，真实的系统可能存在数以百计的模型，如何分配资源、控制优先级等很重要；Cultural Debt，文化问题，研究员和系统工程师可能存在沟通不当的情况。</p>
+<h2 id="论文二"><a href="#论文二" class="headerlink" title="论文二"></a>论文二</h2><p>《TFX: A TensorFlow-Based Production-Scale Machine Learning Platform》这篇论文主要介绍了Google开发的一个机器学习平台TFX。TFX最大的特点就是将机器学习所需的各个组件部分集成在一起，提供训练模型、分析验证模型和模型部署的完整工作流，避免了机器学习pipeline各个部分的割裂。</p>
+<h3 id="platform-overview"><a href="#platform-overview" class="headerlink" title="platform overview"></a>platform overview</h3><p>作为一个机器学习平台，不单单只关注机器学习算法，还需要考虑到依赖分布式系统架构促使数据和模型的并行，机器学习工作流便于搭建，拥有集中的仓库跟踪保存训练过的多模型等等。</p>
+<p>TFX的设计主要考虑了以下几点：</p>
+<ul>
+<li>平台能应对多种学习任务，除了选用tensorflow作为核心算法库，还支持数据验证分析和可视化工具、模型验证评估和推断工具等；</li>
+<li>持续训练，TFX考虑支持多种持续训练策略；</li>
+<li>易用的配置与工具；</li>
+<li>生产级别的可靠性与可扩展性；</li>
+</ul>
+<p>基于上述的特点，把多种组建模块集成在一起，就形成了下图的平台。</p>
+<p><img src="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce25e3.png" alt></p>
+<h3 id="DATA-ANALYSIS-TRANSFORMATION-AND-VALIDATION"><a href="#DATA-ANALYSIS-TRANSFORMATION-AND-VALIDATION" class="headerlink" title="DATA ANALYSIS, TRANSFORMATION, AND VALIDATION"></a>DATA ANALYSIS, TRANSFORMATION, AND VALIDATION</h3><p>对于机器学习来说，了解数据并及时发现异常数据是至关重要的，有利于避免下游数据出错。这一章主要讲TFX将数据分析、转换和验证作为独立又相互关联的部分。</p>
+<p>数据分析的时候，需要对输入的数据集进行统计，输出一系列统计数据，如连续型数据需要分位数、直方图等等，离散数据需要top-K值和频率等等。</p>
+<p>数据转换则是对数据进行格式转换，如将特征转换为特定的整数。这里的关键是保证在训练和推断期间确保转换逻辑的一致性。TFX会将任何数据转换导出为经过训练的模型的一部分，从而避免了不一致的问题。</p>
+<p>数据验证则是使用schema来描述数据规范，每个算法团队维护自己的schema，数据验证时可以快速确认数据集的异常情况，如何进行修正，反映出数据的变化情况。</p>
+<h3 id="MODEL-TRAINING"><a href="#MODEL-TRAINING" class="headerlink" title="MODEL TRAINING"></a>MODEL TRAINING</h3><p>TFX的设计一大核心是尽可能流水线地、自动化地完成训练生产模型，支持训练使用Tensorflow配置的所有模型。TFX使用了warm starting来在模型质量和模型时效性之间达到一个平衡，这是迁移学习使用的技术，讲一个训练好的基准模型应用另一个场景。</p>
+<p>论文另外一点就是TFX用了定义和描述模型的API——model specification API，通过对Tensorflow的封装减少代码冗余，提高开发速度。</p>
+<h3 id="MODEL-EVALUATION-AND-VALIDATION"><a href="#MODEL-EVALUATION-AND-VALIDATION" class="headerlink" title="MODEL EVALUATION AND VALIDATION"></a>MODEL EVALUATION AND VALIDATION</h3><p>模型的评估是模型上线前验证模型有效性的关键步骤，TFX对于好模型的定义主要是：<strong>safe to serve</strong>和<strong>the desired prediction quality</strong>，前者关心的是模型完整性，不会使得推断服务crash，资源使用少，后者则主要是模型预测准确率。</p>
+<p>TFX一方面也使用了各种准确率标准来做AB Test，根据不同的产品团队要求提供告警配置，另一方面也支持对数据集根据feature做slice切分，帮助更好地评估模型在不同feature伤的表现。</p>
+<h3 id="MODEL-SERVING"><a href="#MODEL-SERVING" class="headerlink" title="MODEL SERVING"></a>MODEL SERVING</h3><p>最后则是模型服务，TFX主要依赖Tensorflow serving去做这个事情，通过多用户隔离和快速的训练数据反序列化来满足系统的低时延和高性能要求，总的来说提供了一套工业级的模型上线推断服务。</p>
+<h2 id="论文三"><a href="#论文三" class="headerlink" title="论文三"></a>论文三</h2><p>《Towards Unified Data and Lifecycle Management for Deep Learning》这篇论文主要关注了深度学习中数据和生命周期管理系统的实现，提出了一个modelHub系统，包括了三个部分，一种DSL来帮助泛化对模型的探索、查询，一种新的模型版本管理系统（Dlv）和一种读参数优化的参数归档存储系统（PAS）。</p>
+<p><img src="https://pic.imgdb.cn/item/609febea6ae4f77d357d697a.png" alt></p>
+<p>ModelHub主要分为local组件和远程组件，local functionality包括了一些DNN系统与本地计算机集群的集成，remote functionality则是不同用户组共享模型与其版本。</p>
+<p>DLV是一种通过命令行工具的版本控制系统，可以用来与其他本地或者远程组件进行交互，替代了传统的git/svn可以方便其更好地描述查询建模过程中生成的artifacts内部结构。另外通过DQL模块可以帮助研究员开发新模型。Model Learning模块本质是特定DNN系统的wrapper。</p>
+<p>至于本地仓库的PAS则是用来存储大量的模型学习参数，PAS的目标是在不影响查询性能的情况下，尽可能维护大量学习的模型信息。其中一大特点是使用了一种新的近似模型评估技术，适用于分段存储PAS。由于浮点算数表示中浮点数具备高熵，难以压缩，PAS提供了按字节分割的浮点矩阵存储方案，通过分割高阶和低阶尾数位，浮点数矩阵按块存储，第一个块由8个高位组成，其余的每个块被分割为一个字节，由于高阶位具有低熵，能更好地做压缩。</p>
+<p>这篇论文描述了如何通过ModelHub去解决一些在管理和调整深度学习模型中的关键数据管理挑战：</p>
+<ul>
+<li>通过调整网络结构和超参数，更容易优化潜在的模型效果；</li>
+<li>减少跟踪模型的负担；</li>
+<li>在不影响查询和检索性能的前提下，尽可能多地存储大量模型和构造快照；</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AiSys/" rel="tag"># AiSys</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/05/12/C-atomics-from-basic-to-advanced/" rel="next" title="C++ atomics, from basic to advanced">
+                <i class="fa fa-chevron-left"></i> C++ atomics, from basic to advanced
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">251</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#《UCB-cs294》Required-Reading-3"><span class="nav-number">1.</span> <span class="nav-text">《UCB cs294》Required Reading 3</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#论文一"><span class="nav-number">1.1.</span> <span class="nav-text">论文一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#论文二"><span class="nav-number">1.2.</span> <span class="nav-text">论文二</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#platform-overview"><span class="nav-number">1.2.1.</span> <span class="nav-text">platform overview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DATA-ANALYSIS-TRANSFORMATION-AND-VALIDATION"><span class="nav-number">1.2.2.</span> <span class="nav-text">DATA ANALYSIS, TRANSFORMATION, AND VALIDATION</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MODEL-TRAINING"><span class="nav-number">1.2.3.</span> <span class="nav-text">MODEL TRAINING</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MODEL-EVALUATION-AND-VALIDATION"><span class="nav-number">1.2.4.</span> <span class="nav-text">MODEL EVALUATION AND VALIDATION</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MODEL-SERVING"><span class="nav-number">1.2.5.</span> <span class="nav-text">MODEL SERVING</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#论文三"><span class="nav-number">1.3.</span> <span class="nav-text">论文三</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
