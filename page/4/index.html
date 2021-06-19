@@ -265,6 +265,161 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/21/redis设计与实现——字符串/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/07/21/redis设计与实现——字符串/" itemprop="url">redis设计与实现——字符串</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-21T23:24:02+08:00">
+                2019-07-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h1><p>Redis没有使用C语言传统的以空字符结尾的字符串表示，而是自己构造了一种名为简单动态字符串(simple dynamic string，SDS)的抽象类型。</p>
+<p>除了在诸如打印日志等无需对字符串进行修改的地方使用C字符串之外，其它场合一般使用SDS。其优点：</p>
+<ul>
+<li>使用起来更加简单；</li>
+<li>二进制安全；</li>
+<li>计算效率高；</li>
+<li>兼容普通的C字符串函数；</li>
+</ul>
+<h2 id="SDS的定义"><a href="#SDS的定义" class="headerlink" title="SDS的定义"></a>SDS的定义</h2><p>在sds.h/sdshdr的结构中有这么一个值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> *sds;</span><br><span class="line"><span class="comment">/* Note: sdshdr5 is never used, we just access the flags byte directly.</span></span><br><span class="line"><span class="comment"> * However is here to document the layout of type 5 SDS strings. */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr5</span> &#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, and 5 msb of string length */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr8</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint8_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint8_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr16</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint16_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint16_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr32</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint32_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint32_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr64</span> &#123;</span></span><br><span class="line">    <span class="keyword">uint64_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="keyword">uint64_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这里flags的低三位表示类型(是sdshdr8还是16)，高五位没被使用；len记录当前字节数组长度，alloc记录当前字节数组分配的内存大小，都不包含’\0’；buf保存真实字符串的值，以及结尾的’\0’。</p>
+<p>这里使用了<strong><strong>attribute</strong> ((<strong>packed</strong>))</strong>，它的作用是编译器取消结构在编译过程中的优化对齐，按照实际占用字节数进行对齐。我们可以打印出字节长度分别为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sizeof</span>(struct sdshdr8)  <span class="comment">// 3-&gt;3, result of llvm</span></span><br><span class="line"><span class="keyword">sizeof</span>(struct sdshdr16) <span class="comment">// 6-&gt;5</span></span><br><span class="line"><span class="keyword">sizeof</span>(struct sdshdr32) <span class="comment">// 12-&gt;9</span></span><br><span class="line"><span class="keyword">sizeof</span>(struct sdshdr64) <span class="comment">// 24-&gt;17</span></span><br></pre></td></tr></table></figure>
+<h2 id="SDS与C字符串的区别"><a href="#SDS与C字符串的区别" class="headerlink" title="SDS与C字符串的区别"></a>SDS与C字符串的区别</h2><h3 id="常数复杂度获取字符串长度"><a href="#常数复杂度获取字符串长度" class="headerlink" title="常数复杂度获取字符串长度"></a>常数复杂度获取字符串长度</h3><p>这一点得益于结构体重的len字段，与C字符串不同，redis获取字符串长度的复杂度从O(N)降到O(1)。</p>
+<h3 id="杜绝缓冲区的溢出"><a href="#杜绝缓冲区的溢出" class="headerlink" title="杜绝缓冲区的溢出"></a>杜绝缓冲区的溢出</h3><p>C库中有一个&lt;string.h&gt;/strcat函数可以将两个字符串进行拼接，但C库中这个函数是假设使用者为目的字符串分配了足够多的内存，否则会产生缓冲区溢出。</p>
+<p>与C字符串不同，SDS使用了另外的拼接函数：<strong>sdscatlen</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Append the specified binary-safe string pointed by 't' of 'len' bytes to the</span></span><br><span class="line"><span class="comment"> * end of the specified sds string 's'.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * After the call, the passed sds string is no longer valid and all the</span></span><br><span class="line"><span class="comment"> * references must be substituted with the new pointer returned by the call. */</span></span><br><span class="line"><span class="function">sds <span class="title">sdscatlen</span><span class="params">(sds s, <span class="keyword">const</span> <span class="keyword">void</span> *t, <span class="keyword">size_t</span> len)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">size_t</span> curlen = sdslen(s);</span><br><span class="line"></span><br><span class="line">    s = sdsMakeRoomFor(s,len);</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">memcpy</span>(s+curlen, t, len);</span><br><span class="line">    sdssetlen(s, curlen+len);</span><br><span class="line">    s[curlen+len] = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的关键是sdsMakeRoomFor函数，其它部分只是做一些内存拷贝和长度的重新设置。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sds <span class="title">sdsMakeRoomFor</span><span class="params">(sds s, <span class="keyword">size_t</span> addlen)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">void</span> *sh, *newsh;</span><br><span class="line">  	<span class="comment">// sdsavail: 获取可用长度，这里的s是指向buf的，通过buf进行寻址</span></span><br><span class="line">  	<span class="comment">// 获取头部(结构体)指针：#define SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));</span></span><br><span class="line">  	<span class="comment">// sdsavail的计算方式：sh-&gt;alloc - sh-&gt;len;</span></span><br><span class="line">    <span class="keyword">size_t</span> avail = sdsavail(s);</span><br><span class="line">    <span class="keyword">size_t</span> len, newlen;</span><br><span class="line">    <span class="keyword">char</span> type, oldtype = s[<span class="number">-1</span>] &amp; SDS_TYPE_MASK; <span class="comment">// s-1就是flags</span></span><br><span class="line">    <span class="keyword">int</span> hdrlen;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 有足够的空间就可以直接返回 */</span></span><br><span class="line">    <span class="keyword">if</span> (avail &gt;= addlen) <span class="keyword">return</span> s;</span><br><span class="line"></span><br><span class="line">    len = sdslen(s); <span class="comment">// O(1)获取字符串长度</span></span><br><span class="line">    sh = (<span class="keyword">char</span>*)s-sdsHdrSize(oldtype);<span class="comment">// 获取头部(结构体)指针</span></span><br><span class="line">    newlen = (len+addlen);<span class="comment">// 新的字符串使用长度</span></span><br><span class="line">  	<span class="comment">// 新字符串小于1M时，预分配两倍空间</span></span><br><span class="line">  	<span class="comment">// 新字符串大于1M时，预分配多1M的空间</span></span><br><span class="line">    <span class="keyword">if</span> (newlen &lt; SDS_MAX_PREALLOC) <span class="comment">// SDS_MAX_PREALLOC (1024*1024)</span></span><br><span class="line">        newlen *= <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        newlen += SDS_MAX_PREALLOC;</span><br><span class="line"></span><br><span class="line">    type = sdsReqType(newlen); <span class="comment">// 重新计算字符串类型</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Don't use type 5: the user is appending to the string and type 5 is</span></span><br><span class="line"><span class="comment">     * not able to remember empty space, so sdsMakeRoomFor() must be called</span></span><br><span class="line"><span class="comment">     * at every appending operation. */</span></span><br><span class="line">  	<span class="comment">// SDS_TYPE_5直接按SDS_TYPE_8来计算</span></span><br><span class="line">    <span class="keyword">if</span> (type == SDS_TYPE_5) type = SDS_TYPE_8;</span><br><span class="line"></span><br><span class="line">    hdrlen = sdsHdrSize(type);<span class="comment">// 新类型的长度</span></span><br><span class="line">  	</span><br><span class="line">    <span class="keyword">if</span> (oldtype==type) &#123; </span><br><span class="line">      	<span class="comment">// #define s_realloc realloc</span></span><br><span class="line">      	<span class="comment">// 如果类型没变化，直接在原sds上重新分配内存</span></span><br><span class="line">        newsh = s_realloc(sh, hdrlen+newlen+<span class="number">1</span>); </span><br><span class="line">        <span class="keyword">if</span> (newsh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        s = (<span class="keyword">char</span>*)newsh+hdrlen;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Since the header size changes, need to move the string forward,</span></span><br><span class="line"><span class="comment">         * and can't use realloc */</span></span><br><span class="line">      	<span class="comment">// 如果类型发生了变化，则重新malloc分配空间</span></span><br><span class="line">        newsh = s_malloc(hdrlen+newlen+<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (newsh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        <span class="built_in">memcpy</span>((<span class="keyword">char</span>*)newsh+hdrlen, s, len+<span class="number">1</span>);<span class="comment">// 将原字符串内容拷贝到新开辟的内存中</span></span><br><span class="line">        s_free(sh); <span class="comment">// 释放原sds内存</span></span><br><span class="line">      	<span class="comment">// 设置flag，len和alloc等字段</span></span><br><span class="line">        s = (<span class="keyword">char</span>*)newsh+hdrlen;</span><br><span class="line">        s[<span class="number">-1</span>] = type;</span><br><span class="line">        sdssetlen(s, len);</span><br><span class="line">    &#125;</span><br><span class="line">    sdssetalloc(s, newlen);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的关键策略是针对不同长度的字符串做不同的分配策略：</p>
+<ul>
+<li>新字符串小于1M时，预分配两倍空间</li>
+<li>新字符串大于1M时，预分配多1M的空间</li>
+</ul>
+<p>另外就是不使用SDS5，将其当作SDS8来使用。</p>
+<p>由于redis可能出现频繁修改字符串的场景，这种预分配的策略可以使得SDS将连续增长N次字符串所需要的内存重分配次数从必定N次降低为最多N次。</p>
+<h3 id="减少修改字符串时带来的内存重分配次数"><a href="#减少修改字符串时带来的内存重分配次数" class="headerlink" title="减少修改字符串时带来的内存重分配次数"></a>减少修改字符串时带来的内存重分配次数</h3><h4 id="字符串的创建"><a href="#字符串的创建" class="headerlink" title="字符串的创建"></a>字符串的创建</h4><p>直接看源码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sds <span class="title">sdsnewlen</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *init, <span class="keyword">size_t</span> initlen)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">void</span> *sh;</span><br><span class="line">    sds s;</span><br><span class="line">    <span class="keyword">char</span> type = sdsReqType(initlen);</span><br><span class="line">    <span class="comment">/* Empty strings are usually created in order to append. Use type 8</span></span><br><span class="line"><span class="comment">     * since type 5 is not good at this. */</span></span><br><span class="line">    <span class="keyword">if</span> (type == SDS_TYPE_5 &amp;&amp; initlen == <span class="number">0</span>) type = SDS_TYPE_8;</span><br><span class="line">    <span class="keyword">int</span> hdrlen = sdsHdrSize(type);</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *fp; <span class="comment">/* flags pointer. */</span></span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// +1是因为字符串都以'\0'结尾，但其又是二进制安全的，即字符串中间可以出现字符'\0'，因为sds有长度属性</span></span><br><span class="line">    sh = s_malloc(hdrlen+initlen+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (init==SDS_NOINIT) <span class="comment">// const char *SDS_NOINIT = "SDS_NOINIT";</span></span><br><span class="line">        init = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (!init)</span><br><span class="line">        <span class="built_in">memset</span>(sh, <span class="number">0</span>, hdrlen+initlen+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (sh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>; <span class="comment">// 如果sh是NULL，直接返回NULL</span></span><br><span class="line">    s = (<span class="keyword">char</span>*)sh+hdrlen;</span><br><span class="line">    fp = ((<span class="keyword">unsigned</span> <span class="keyword">char</span>*)s)<span class="number">-1</span>; <span class="comment">// fp就是flag指针</span></span><br><span class="line">    <span class="keyword">switch</span>(type) &#123;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_5: &#123;</span><br><span class="line">          	<span class="comment">// #define SDS_TYPE_BITS 3</span></span><br><span class="line">          	<span class="comment">// flag的前五位保存长度，后三位是类型type，因此结构体中sdshdr5不含有len</span></span><br><span class="line">            *fp = type | (initlen &lt;&lt; SDS_TYPE_BITS);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_8: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">8</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_16: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">16</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_32: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">32</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_64: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">64</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (initlen &amp;&amp; init)</span><br><span class="line">        <span class="built_in">memcpy</span>(s, init, initlen);</span><br><span class="line">    s[initlen] = <span class="string">'\0'</span>; <span class="comment">// 以'\0'结尾</span></span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里有两个特殊的地方：一是sds都以’\0’结尾；二是sdshdr5用flag这个字段可以同时保存type和len。</p>
+<h4 id="惰性空间的释放"><a href="#惰性空间的释放" class="headerlink" title="惰性空间的释放"></a>惰性空间的释放</h4><p>惰性空间的释放主要体现在SDS字符串的缩短操作，redis中的sdstrim提供了这样的一个操作：<code>sdstrim</code> 函数接受一个 SDS 和一个 C 字符串作为参数，<strong>从 SDS 左右两端分别移除所有在 C 字符串中出现过的字符</strong>（《redis设计与实现》一书有误）。源码如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sds <span class="title">sdstrim</span><span class="params">(sds s, <span class="keyword">const</span> <span class="keyword">char</span> *cset)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *start, *end, *sp, *ep;</span><br><span class="line">    <span class="keyword">size_t</span> len;</span><br><span class="line"></span><br><span class="line">    sp = start = s;</span><br><span class="line">    ep = end = s+sdslen(s)<span class="number">-1</span>;</span><br><span class="line">  	<span class="comment">// 分别从头尾开始便利，即移除掉cset中的字符</span></span><br><span class="line">    <span class="keyword">while</span>(sp &lt;= end &amp;&amp; <span class="built_in">strchr</span>(cset, *sp)) sp++; </span><br><span class="line">    <span class="keyword">while</span>(ep &gt; sp &amp;&amp; <span class="built_in">strchr</span>(cset, *ep)) ep--;</span><br><span class="line">    len = (sp &gt; ep) ? <span class="number">0</span> : ((ep-sp)+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (s != sp) memmove(s, sp, len); <span class="comment">//内存拷贝，即将中间段的字符串拷贝到头部指针</span></span><br><span class="line">    s[len] = <span class="string">'\0'</span>;</span><br><span class="line">    sdssetlen(s,len);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// s="AA...AA.a.aa.aHelloAWorld     :::" -&gt;sdstrim(s,"Aa. :")-&gt; "HelloAWorld"</span></span><br></pre></td></tr></table></figure>
+<p>由此，可以看到sdstrim并没有释放原空间，即alloc不变，变的是len。这样后续再需要扩展的时候，len后的空间能够再被利用。</p>
+<p>事实上，redis的确提供了释放空间的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Free an sds string. No operation is performed if 's' is NULL. */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sdsfree</span><span class="params">(sds s)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="literal">NULL</span>) <span class="keyword">return</span>;</span><br><span class="line">    s_free((<span class="keyword">char</span>*)s-sdsHdrSize(s[<span class="number">-1</span>])); <span class="comment">// #define s_free free</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="二进制的安全"><a href="#二进制的安全" class="headerlink" title="二进制的安全"></a>二进制的安全</h3><p>这里的关键是SDS是使用len属性的值而不是空字符来判断字符串是否结束，这种二进制安全的做法使得redis不仅可以保存文本数据，还可以保存任意格式的二进制数据。</p>
+<h3 id="兼容部分C字符串的函数"><a href="#兼容部分C字符串的函数" class="headerlink" title="兼容部分C字符串的函数"></a>兼容部分C字符串的函数</h3><p>这是基于SDS遵循了C字符串以空字符串结尾的惯例，这些API都会将SDS保存的又用数据的末尾保存位空字符。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/22/ZooKeeper-Wait-free-coordination-for-Internet-scale-systems——MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1689,142 +1844,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/05/std-initializer-list/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/05/std-initializer-list/" itemprop="url">std::initializer_list</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-05T11:49:58+08:00">
-                2019-05-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="std-initializer-list"><a href="#std-initializer-list" class="headerlink" title="std::initializer_list"></a>std::initializer_list</h1><p>std::initializer_list\&lt;T>是C++11引入的新特性，在C++11之前我们可以这样初始化一个数组，但要初始化容器类却无法一行代码完成：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> arr[]= &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Old Way to initialize a vector</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; vec1;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">		vec1.push_back(i);</span><br></pre></td></tr></table></figure>
-<p>而在C++11我们可以这样实现：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; vec= &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;; <span class="comment">// Compile Error before C++ 11</span></span><br></pre></td></tr></table></figure>
-<p>对于<strong>std::initializer_list\&lt;T></strong>，我们可以创建一个这样的对象：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::initialzer_list&lt;<span class="keyword">int</span>&gt; data = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
-<p>当编译器看到这样的形式时<strong>{a,b,c}</strong>，它会自动创建一个这样的对象<strong>std::initialzer_list\&lt;T></strong>，另外像vector或者list之类的容器，也实现了一个参数化的构造器：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;T&gt;::<span class="built_in">vector</span>&lt;T&gt;(<span class="built_in">initializer_list</span>&lt;T&gt;  elements)</span><br><span class="line">&#123;</span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Using-std-initializer-list-in-constructors-to-initialize-member-variables"><a href="#Using-std-initializer-list-in-constructors-to-initialize-member-variables" class="headerlink" title="Using std::initializer_list in constructors to initialize member variables"></a>Using std::initializer_list in constructors to initialize member variables</h2><p>我们也可以用<strong>std::initializer_list\&lt;T></strong>去初始化成员变量，假设我们有一个这样的类：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> mX;</span><br><span class="line">    <span class="keyword">int</span> mY;</span><br><span class="line">    <span class="keyword">int</span> mZ;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point(<span class="keyword">int</span> a, <span class="keyword">int</span> b, <span class="keyword">int</span> c) :</span><br><span class="line">        mX(a), mY(b), mZ(c) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      	<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"("</span> &lt;&lt; mX &lt;&lt; <span class="string">","</span> &lt;&lt; mY &lt;&lt; <span class="string">","</span> &lt;&lt; mZ &lt;&lt; <span class="string">")\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>我们可以直接传递一个<strong>initializer_list</strong>作为参数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point <span class="title">pointobj</span><span class="params">(&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]&#125;)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>但如果我们有一个构造器，其参数恰好就是std::initializer_list\&lt;<strong>T</strong>>，那么它就会调用该构造起，而不是调用以上三参数形式的构造起。</p>
-<h2 id="How-to-Initialize-a-map-in-one-line-using-initialzer-list"><a href="#How-to-Initialize-a-map-in-one-line-using-initialzer-list" class="headerlink" title="How to Initialize a map in one line using initialzer_list ?"></a>How to Initialize a map in one line using initialzer_list ?</h2><p>同样的，我们也可以用<strong>std::initialzer_list\&lt;T></strong>初始化一个map：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">int</span>&gt; mapOfMarks = &#123;</span><br><span class="line">		&#123;<span class="string">"Riti"</span>,<span class="number">2</span>&#125;,</span><br><span class="line">		&#123;<span class="string">"Jack"</span>,<span class="number">4</span>&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>相对应的，编译器会在内部创建这样的一个对象：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">int</span>&gt; &gt; = &#123;</span><br><span class="line">		&#123;<span class="string">"Riti"</span>,<span class="number">2</span>&#125;,</span><br><span class="line">		&#123;<span class="string">"Jack"</span>,<span class="number">4</span>&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1873,7 +1892,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">251</span>
+                <span class="site-state-item-count">252</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

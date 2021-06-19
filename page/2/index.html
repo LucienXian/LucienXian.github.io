@@ -265,6 +265,181 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824-1/" itemprop="url">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6-824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-05T00:02:46+08:00">
+                2021-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing"><a href="#Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing" class="headerlink" title="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing"></a>Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1><blockquote>
+<p>本文提出了一种称之为RDDs的分布式内存抽象，以此解决在大规模集群中以容错的方式提供内存计算的方式。当前的计算框架对于迭代算法和交互式数据挖掘的效率都很低，RDDs通过将数据留在内存来提高性能。本文通过Spark系统来实现RDDs。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>诸如MapReduce 和Dryad之类的集群计算框架已被广泛用于大规模数据分析。这些系统使用户可以使用一组高级API来编写并行计算，而不必担心工作分配和容错能力。</p>
+<p>尽管当前的框架为集群的计算资源提供了许多抽象，但它们还是缺乏对利用分布式内存的抽象。这就导致了在多个计算之间复用中间结果时，显得非常低效。数据重用在许多迭代机器学习和图计算中很常见。另外在交互式数据挖掘中，用户会需要对数据的同一子集运行多个临时查询。然而在大多数框架中，在计算之间（例如在两个MapReducce作业之间）重用数据的唯一方法是将其写入外部稳定的存储系统，例如分布式文件系统。由于数据复制，磁盘IO和序列化，这会导致相当大的开销，这可能会影响应用程序的执行时间。</p>
+<p>在这篇论文中提出了一个全新的抽象，叫做RDDs(Resilient Distributed Datasets)，它可以在广泛的应用程序中实现有效的数据重用。RDDs 是一个可以容错且并行的数据结构，它可以让用户显式的将中间结果数据集保存在内中。</p>
+<p>现存的分布式内存抽象系统，都是基于对可变状态的细粒度更新。这种接口保证容错的方式无非是将数据进行多副本备份，需要在机器节点间复制大量的数据，宽带传输数据的速度远远比RAM 内存慢。</p>
+<p>与这些系统相比，RDD提供了基于粗粒度转换的接口（map，reduce，filter）。这些接口可以对多条数据条目应用相同的操作，这样就可以通过记录来生成某个数据集的一系列转换，而不是记录真实的数据。如果RDD丢失，则RDD具有足够的有关如何从其他RDD派生的信息，可以仅重新计算该分区。因此，丢失的数据通常可以很快恢复。</p>
+<h2 id="Resilient-Distributed-Datasets"><a href="#Resilient-Distributed-Datasets" class="headerlink" title="Resilient Distributed Datasets"></a>Resilient Distributed Datasets</h2><p>本章主要介绍RDD和Spark编程接口，并与细粒度共享内存做对比。</p>
+<h3 id="RDD-Abstraction"><a href="#RDD-Abstraction" class="headerlink" title="RDD Abstraction"></a>RDD Abstraction</h3><p>RDD是一个只读的、可分区的数据集，可以通过对稳定的存储系统或者其他的RDD进行操作来创建一个新的RDD，这些操作称之为transformations，比如map，filter 以及join。另外用户可以控制RDD的存储和分区，指定存储策略，也可以根据key做hash来做数据分区。</p>
+<h3 id="Spark-Programming-Interface"><a href="#Spark-Programming-Interface" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h3><p>Spark通过集成编程语言API来表示RDD，每一个数据集就是一个对象，通过对象的方法来操作对象。RDD有两种操作，一种是上面说的transformations，另一种则是action，action操作可以得到应用结果值，比如count可以返回数据集的元素个数、collect返回数据集的所有元素以及save则是将输出结果写入到存储系统中。</p>
+<p>Spark定义RDDs是并不会计算，只是采取lazy特性，可以将transformations组成pipeline，触发了actions操作才会真正计算。用户可以通过RDDs的preset方法来缓存数据，也可以调整缓存策略。</p>
+<h3 id="Advantages-of-the-RDD-Model"><a href="#Advantages-of-the-RDD-Model" class="headerlink" title="Advantages of the RDD Model"></a>Advantages of the RDD Model</h3><p>论文将RDD和分布式共享内存系统DSM做了比较，RDD只能粗粒度的操作转换，而DSM可以在任意内存位置进行写入。这样RDD的容错机制更加高效，不需要发生非常耗时的checkpoint，只需重新计算丢数据的分区。另外一个好处就是任务备份比较简单，因为RDD是不变的。还有就是，RDD可以进行进行任务调度来提高大批量的写入效率，在scan-base的操作中也能根据需要将内存数据写到磁盘中。</p>
+<h3 id="Applications-Not-Suitable-for-RDDs"><a href="#Applications-Not-Suitable-for-RDDs" class="headerlink" title="Applications Not Suitable for RDDs"></a>Applications Not Suitable for RDDs</h3><p>RDD更适合批量的数据处理场景，并不适合于需要异步且细粒度的更新共享状态的应用。</p>
+<h2 id="Spark-Programming-Interface-1"><a href="#Spark-Programming-Interface-1" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h2><p>Spark提供了一个用Scala编写的语言集成API。为了使用Spark，开发者编写了一个driver，该driver会连接workers集群，并定义若干个RDDs，在RDDs上执行action，在driver上的Spark代码会追踪RDDs的lineage。workers是一直运行的进程，能在内存中存储RDD分区。</p>
+<h3 id="RDD-Operations-in-Spark"><a href="#RDD-Operations-in-Spark" class="headerlink" title="RDD Operations in Spark"></a>RDD Operations in Spark</h3><p>下图列出了Spark中RDD的transformations和actions操作。transformations是定义新RDD的lazy操作，而actions才是真正计算结果或者写数据到外部存储；</p>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abc98.png" alt></p>
+<h2 id="Representing-RDDs"><a href="#Representing-RDDs" class="headerlink" title="Representing RDDs"></a>Representing RDDs</h2><p>抽象RDDs会带来一个问题：如何在广泛转换中表示追踪lineage。理想情况下，一个实现RDDs的系统应该能够提供丰富的·转换算子，用户可以以任意方式进行组合。在Spark中则是提出了一个简单的图表示来达到以上目的。</p>
+<p>论文提出了一个通用接口去表示RDD，接口表达了五种信息：</p>
+<ul>
+<li>一组分片（partitions），数据集的原子组成；</li>
+<li>一组父RDDs上的依赖；</li>
+<li>一个基于父数据集计算的函数；</li>
+<li>分片策略元数据，一个分片函数partitioner；</li>
+<li>数据位置策略，存储每个partition的优先位置；</li>
+</ul>
+<p>论文将RDDs之间的依赖分为了两类：</p>
+<ul>
+<li>窄依赖：父RDD的每个分片被子RDD至多一个分片使用；</li>
+<li>宽依赖：多个子分片依赖一个父分片；</li>
+</ul>
+<p>例如，代表HDFS文件的RDD对文件的每个块都有一个分片，并且通过数据位置策略知道每个块在哪台计算机上。</p>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abcd2.png" alt="img"></p>
+<p>窄依赖能在一个节点上流水线执行，节点故障的时候也能高效地通过重新计算父分片来进行恢复；而宽依赖，单一节点故障可能会导致一个RDD的所有祖先分片丢失，需要完全重新执行。</p>
+<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>Spark可以从任何的Hadoop输入源中读取数据，比如HDFS和HBase。本章主要关注下面的几个部分：任务调度、Spark解释器的交互式使用、内存管理和checkpoint。</p>
+<h3 id="Job-Scheduling"><a href="#Job-Scheduling" class="headerlink" title="Job Scheduling"></a>Job Scheduling</h3><p>Spark的调度器与Dryad类似，另外还会考虑持久化了的RDD的哪些分片在内存中可用。任何时候用户在RDD上执行action，调度器就会检查RDD的lineage，建立由stages组成的DAG，然后执行这个图。调度器会使每个stage包含尽可能多的窄依赖，stages的边界是宽依赖shuffle操作，或者任何计算过的分片。</p>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd14.png" alt="img"></p>
+<p>调度器会根据数据存放位置使用延迟调度给机器指派任务。</p>
+<p>若一个任务失败了，只要stage的父分片还在，就可以在另一个节点重新运行。如果一些stages都不可用了，就需要重新提交任务去并行计算丢失分片。</p>
+<h3 id="Interpreter-Integration"><a href="#Interpreter-Integration" class="headerlink" title="Interpreter Integration"></a>Interpreter Integration</h3><p>Scala包含一个类似于Ruby和Python的交互式shell，考虑到内存数据的低延迟，Spark可以让用户在解释器上运行。</p>
+<p>Spark中的编译器相对Scala做了一些改变：</p>
+<ul>
+<li>类传输：通过HTTP传输创建类的字节码；</li>
+<li>代码生成：代码生成的单例对象是通过生成类的静态方法访问的，为了避免序列化一个访问不到前面定义变量的闭包，Spark将代码生成逻辑改成直接引用每行对象的实例；</li>
+</ul>
+<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd29.png" alt="img"></p>
+<h3 id="Memory-Management"><a href="#Memory-Management" class="headerlink" title="Memory Management"></a>Memory Management</h3><p>Spark对RDD的持久化提供了三个选项：</p>
+<ul>
+<li>序列成Java对象，存在内存中；性能最好</li>
+<li>作为序列化数据存在内存中；内存空间有限时使用</li>
+<li>存在硬盘中；RDDs过大无法存入内存</li>
+</ul>
+<p>当计算新的RDD分片后，如果没有足够空间去存储，就会基于LRU的淘汰策略去淘汰一个分片。但如果新旧分片属于同一个RDD，则会将旧的分片写入内存，避免相同RDD的分片循环读写。</p>
+<h3 id="Support-for-Checkpointing"><a href="#Support-for-Checkpointing" class="headerlink" title="Support for Checkpointing"></a>Support for Checkpointing</h3><p>虽然lineage可以帮助恢复RDDs，但如果lineage很长的时候就会变得很耗时，因此RDD可以执行checkpoint存入稳定内存。</p>
+<p>Spark为checkpoint提供了一个API，让用户决定checkpoint哪个数据。同样，Spark的调度器也制定每个数据集大小，了解第一次计算的耗时，因此也会基于一定的策略选择一个优化RDDs集合来执行checkpoint，缩短系统恢复时间。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了一个在集群中共享数据的高效的、具备容错能力的的抽象——RDD。RDD能表达通用的并行应用，提供了一个基于粗粒度转换的API，也能通过lineage来快速恢复数据。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1889,186 +2064,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/27/redis设计与实现——RDB持久化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/09/27/redis设计与实现——RDB持久化/" itemprop="url">redis设计与实现——RDB持久化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-27T01:17:37+08:00">
-                2019-09-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="redis设计与实现——RDB持久化"><a href="#redis设计与实现——RDB持久化" class="headerlink" title="redis设计与实现——RDB持久化"></a>redis设计与实现——RDB持久化</h1><p>由于Redis是内存数据库，在服务器进程退出时，服务器状态也会丢失不见，因此Redis提供了RDB持久化功能，可以帮助把内存中的数据库状态保存到磁盘里面，避免数据丢失。</p>
-<p>RDB持久化既可以手动执行，也可以服务器配置定期执行，执行后会生成一个经过压缩的二进制RDB文件。</p>
-<h2 id="RDB文件的创建与载入"><a href="#RDB文件的创建与载入" class="headerlink" title="RDB文件的创建与载入"></a>RDB文件的创建与载入</h2><p>有两个Redis命令可以生成RDB文件——SAVE和BGSAVE，前者会阻塞Redis服务器进程，直到创建完RDB文件，后者则是fork出一个子进程来负责创建RDB文件。</p>
-<p>在redis/src/rdb.c中存在实际创建RDB文件的函数rdbSave()，SAVE命令和BGSAVE命令都会以不同方式调用这个函数。</p>
-<p>SAVE命令：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">saveCommand</span><span class="params">(client *c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (server.rdb_child_pid != <span class="number">-1</span>) &#123; <span class="comment">// 正在执行BGSAVE</span></span><br><span class="line">        addReplyError(c,<span class="string">"Background save already in progress"</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rdbSaveInfo rsi, *rsiptr;</span><br><span class="line">    rsiptr = rdbPopulateSaveInfo(&amp;rsi);</span><br><span class="line">  	<span class="comment">// 调用rdbSave保存文件</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSave(server.rdb_filename,rsiptr) == C_OK) &#123;</span><br><span class="line">        addReply(c,shared.ok);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addReply(c,shared.err);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><em>redis</em> 的事件循环中会去检测redisServer的saveparams字段，判断是否执行BGSAVE，在执行完之后，子进程调用_exit()退出，避免因为父进程正在对文件进行操作而子进程直接回写文件缓冲区。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSaveBackground</span><span class="params">(<span class="keyword">char</span> *filename, rdbSaveInfo *rsi)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">pid_t</span> childpid;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> start;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.aof_child_pid != <span class="number">-1</span> || server.rdb_child_pid != <span class="number">-1</span>) <span class="keyword">return</span> C_ERR;</span><br><span class="line"></span><br><span class="line">    server.dirty_before_bgsave = server.dirty;</span><br><span class="line">    server.lastbgsave_try = time(<span class="literal">NULL</span>);</span><br><span class="line">    openChildInfoPipe();</span><br><span class="line"></span><br><span class="line">    start = ustime();</span><br><span class="line">    <span class="keyword">if</span> ((childpid = fork()) == <span class="number">0</span>) &#123; <span class="comment">// Fork一个子进程</span></span><br><span class="line">        <span class="keyword">int</span> retval;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Child */</span></span><br><span class="line">        closeListeningSockets(<span class="number">0</span>); <span class="comment">// 关闭子进程的监听</span></span><br><span class="line">        redisSetProcTitle(<span class="string">"redis-rdb-bgsave"</span>);</span><br><span class="line">        retval = rdbSave(filename,rsi); <span class="comment">// 调用rdbSave</span></span><br><span class="line">        <span class="keyword">if</span> (retval == C_OK) &#123;</span><br><span class="line">            <span class="keyword">size_t</span> private_dirty = zmalloc_get_private_dirty(<span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (private_dirty) &#123;</span><br><span class="line">                serverLog(LL_NOTICE,</span><br><span class="line">                    <span class="string">"RDB: %zu MB of memory used by copy-on-write"</span>,</span><br><span class="line">                    private_dirty/(<span class="number">1024</span>*<span class="number">1024</span>));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            server.child_info_data.cow_size = private_dirty;</span><br><span class="line">            sendChildInfo(CHILD_INFO_TYPE_RDB);</span><br><span class="line">        &#125;</span><br><span class="line">        exitFromChild((retval == C_OK) ? <span class="number">0</span> : <span class="number">1</span>); <span class="comment">// 调用_exit(retcode);</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Parent */</span></span><br><span class="line">        <span class="comment">// 父进程会记录一些BGSAVE状态</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> C_OK; <span class="comment">/* unreached */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>无论是SAVE还是BGSAVE，最终都需要调用rdbSave完成工作。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSave</span><span class="params">(<span class="keyword">char</span> *filename, rdbSaveInfo *rsi)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span> tmpfile[<span class="number">256</span>];</span><br><span class="line">    <span class="keyword">char</span> cwd[MAXPATHLEN]; <span class="comment">/* Current working dir path for error messages. */</span></span><br><span class="line">    FILE *fp;</span><br><span class="line">    rio rdb;</span><br><span class="line">    <span class="keyword">int</span> error = <span class="number">0</span>;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 创建一个临时的rdb文件 </span></span><br><span class="line">    <span class="built_in">snprintf</span>(tmpfile,<span class="number">256</span>,<span class="string">"temp-%d.rdb"</span>, (<span class="keyword">int</span>) getpid());</span><br><span class="line">    fp = fopen(tmpfile,<span class="string">"w"</span>);</span><br><span class="line">    <span class="keyword">if</span> (!fp) &#123;</span><br><span class="line">        <span class="keyword">char</span> *cwdp = getcwd(cwd,MAXPATHLEN);</span><br><span class="line">        serverLog(LL_WARNING,</span><br><span class="line">            <span class="string">"Failed opening the RDB file %s (in server root dir %s) "</span></span><br><span class="line">            <span class="string">"for saving: %s"</span>,</span><br><span class="line">            filename,</span><br><span class="line">            cwdp ? cwdp : <span class="string">"unknown"</span>,</span><br><span class="line">            strerror(errno));</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    &#125;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 初始化 static const rio rioFileIO</span></span><br><span class="line">    rioInitWithFile(&amp;rdb,fp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.rdb_save_incremental_fsync)</span><br><span class="line">        rioSetAutoSync(&amp;rdb,REDIS_AUTOSYNC_BYTES);</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 保存rdb文件</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSaveRio(&amp;rdb,&amp;error,RDB_SAVE_NONE,rsi) == C_ERR) &#123;</span><br><span class="line">        errno = error;</span><br><span class="line">        <span class="keyword">goto</span> werr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make sure data will not remain on the OS's output buffers */</span></span><br><span class="line">    <span class="keyword">if</span> (fflush(fp) == EOF) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (fsync(fileno(fp)) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (fclose(fp) == EOF) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 使用原子性的重命名操作 */</span></span><br><span class="line">    <span class="keyword">if</span> (rename(tmpfile,filename) == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="keyword">char</span> *cwdp = getcwd(cwd,MAXPATHLEN);</span><br><span class="line">        serverLog(LL_WARNING,</span><br><span class="line">            <span class="string">"Error moving temp DB file %s on the final "</span></span><br><span class="line">            <span class="string">"destination %s (in server root dir %s): %s"</span>,</span><br><span class="line">            tmpfile,</span><br><span class="line">            filename,</span><br><span class="line">            cwdp ? cwdp : <span class="string">"unknown"</span>,</span><br><span class="line">            strerror(errno));</span><br><span class="line">        unlink(tmpfile);</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    serverLog(LL_NOTICE,<span class="string">"DB saved on disk"</span>);</span><br><span class="line">    server.dirty = <span class="number">0</span>; <span class="comment">// 重设dirty属性</span></span><br><span class="line">    server.lastsave = time(<span class="literal">NULL</span>);</span><br><span class="line">    server.lastbgsave_status = C_OK;</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line"></span><br><span class="line">werr:</span><br><span class="line">    serverLog(LL_WARNING,<span class="string">"Write error saving DB on disk: %s"</span>, strerror(errno));</span><br><span class="line">    fclose(fp);</span><br><span class="line">    unlink(tmpfile);</span><br><span class="line">    <span class="keyword">return</span> C_ERR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>由此可见，rdbSave的操作主要分为两步：</p>
-<ul>
-<li>先将数据写到一个临时文件——tmp-%d.rdb；</li>
-<li>调用原子性的重命名操作；</li>
-</ul>
-<h2 id="自动间隔保存"><a href="#自动间隔保存" class="headerlink" title="自动间隔保存"></a>自动间隔保存</h2><p>对于BGSAVE命令，Redis支持用户可以通过制定配置文件或者传入启动参数的方式设置save选项。</p>
-<ul>
-<li>save 900 1：服务器在900秒之内，对数据库进行了至少一次修改；</li>
-</ul>
-<p>redis支持多RDB配置，满足任意一个就可以触发BGSAVE。在redisServer结构体中，存在serverparams字段记录了save条件。该字段结构有两个field：时间和修改次数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">saveparam</span> &#123;</span></span><br><span class="line">    <span class="keyword">time_t</span> seconds;</span><br><span class="line">    <span class="keyword">int</span> changes;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">saveparam</span> *<span class="title">saveparams</span>;</span>   <span class="comment">/* Save points array for RDB */</span></span><br><span class="line">  <span class="keyword">int</span> saveparamslen;              <span class="comment">/* Number of saving points */</span></span><br><span class="line">  <span class="keyword">char</span> *rdb_filename;             <span class="comment">/* Name of RDB file */</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Redis的服务器周期性操作函数serverCron默认每100ms执行一次，其中一项工作就是检查save选项设置的保存条件是否满足。除了需要检查是否满足在规定时间内操作数据库的次数，还要检查上一次bgsave是否成功，如果不成功的话，需要等待CONFIG_BGSAVE_RETRY_DELAY秒，默认是5秒。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">serverCron</span><span class="params">(struct aeEventLoop *eventLoop, <span class="keyword">long</span> <span class="keyword">long</span> id, <span class="keyword">void</span> *clientData)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line"> 	<span class="keyword">if</span> (server.rdb_child_pid != <span class="number">-1</span> || server.aof_child_pid != <span class="number">-1</span> ||</span><br><span class="line">      ldbPendingChildren()) &#123;</span><br><span class="line">    <span class="comment">// 检查是否只在bgsave或者存在aof子进程</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; server.saveparamslen; j++) &#123;</span><br><span class="line">            struct saveparam *sp = server.saveparams+j;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 检查多个触发条件</span></span><br><span class="line">      			<span class="comment">// 是否满足操作数和时间</span></span><br><span class="line">      			<span class="comment">// 上一次bgsave是否成功，如果不成功要等待CONFIG_BGSAVE_RETRY_DELAY秒， #define CONFIG_BGSAVE_RETRY_DELAY 5</span></span><br><span class="line">            <span class="keyword">if</span> (server.dirty &gt;= sp-&gt;changes &amp;&amp;</span><br><span class="line">                server.unixtime-server.lastsave &gt; sp-&gt;seconds &amp;&amp;</span><br><span class="line">                (server.unixtime-server.lastbgsave_try &gt;</span><br><span class="line">                 CONFIG_BGSAVE_RETRY_DELAY ||</span><br><span class="line">                 server.lastbgsave_status == C_OK))</span><br><span class="line">            &#123;</span><br><span class="line">                serverLog(LL_NOTICE,<span class="string">"%d changes in %d seconds. Saving..."</span>, sp-&gt;changes, (<span class="keyword">int</span>)sp-&gt;seconds);</span><br><span class="line">                rdbSaveInfo rsi, *rsiptr;</span><br><span class="line">                rsiptr = rdbPopulateSaveInfo(&amp;rsi);</span><br><span class="line">                rdbSaveBackground(server.rdb_filename,rsiptr);<span class="comment">// 调用bdsave</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="RDB文件结构"><a href="#RDB文件结构" class="headerlink" title="RDB文件结构"></a>RDB文件结构</h2><p>本节主要介绍RDB的文件结构，具体的代码实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSaveRio</span><span class="params">(rio *rdb, <span class="keyword">int</span> *error, <span class="keyword">int</span> flags, rdbSaveInfo *rsi)</span> </span>&#123;</span><br><span class="line">    dictIterator *di = <span class="literal">NULL</span>;</span><br><span class="line">    dictEntry *de;</span><br><span class="line">    <span class="keyword">char</span> magic[<span class="number">10</span>]; <span class="comment">// 标识rdb文件</span></span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    <span class="keyword">uint64_t</span> cksum; <span class="comment">// 校验和</span></span><br><span class="line">    <span class="keyword">size_t</span> processed = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.rdb_checksum)</span><br><span class="line">        rdb-&gt;update_cksum = rioGenericUpdateChecksum;</span><br><span class="line">  	<span class="comment">// RDB文件的开头，5字节的REDIS和四字节的RDB文件版本</span></span><br><span class="line">  	<span class="comment">// #define RDB_VERSION 9，当前是9</span></span><br><span class="line">  	<span class="comment">// 当格式更改不再兼容后向时，此数字将递增</span></span><br><span class="line">    <span class="built_in">snprintf</span>(magic,<span class="keyword">sizeof</span>(magic),<span class="string">"REDIS%04d"</span>,RDB_VERSION);</span><br><span class="line">    <span class="keyword">if</span> (rdbWriteRaw(rdb,magic,<span class="number">9</span>) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveInfoAuxFields(rdb,flags,rsi) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveModulesAux(rdb, REDISMODULE_AUX_BEFORE_RDB) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">		<span class="comment">// 遍历数据库，dump数据</span></span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; server.dbnum; j++) &#123;</span><br><span class="line">        redisDb *db = server.db+j;</span><br><span class="line">        dict *d = db-&gt;dict; <span class="comment">// 获取所有的键值对</span></span><br><span class="line">        <span class="keyword">if</span> (dictSize(d) == <span class="number">0</span>) <span class="keyword">continue</span>; <span class="comment">// 保存非空数据库</span></span><br><span class="line">        di = dictGetSafeIterator(d);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// #define RDB_OPCODE_SELECTDB   254。保存一字节长，表示接下来会读入一个数据库号码，该号码可以使得服务器调用SELECT命令切换数据库</span></span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_SELECTDB) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,j) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 写入一个 RESIZE DB 操作码，#define RDB_OPCODE_RESIZEDB   251 </span></span><br><span class="line">        <span class="comment">// 该数字只是一个重建哈希表的大小参考，不限制实际读取</span></span><br><span class="line">        <span class="comment">// 接下来会写入键值对个数</span></span><br><span class="line">        <span class="keyword">uint64_t</span> db_size, expires_size;</span><br><span class="line">        db_size = dictSize(db-&gt;dict);</span><br><span class="line">        expires_size = dictSize(db-&gt;expires);</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_RESIZEDB) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,db_size) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,expires_size) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 遍历该db，写入所有键值对*/</span></span><br><span class="line">        <span class="keyword">while</span>((de = dictNext(di)) != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            sds keystr = dictGetKey(de);</span><br><span class="line">            robj key, *o = dictGetVal(de);</span><br><span class="line">            <span class="keyword">long</span> <span class="keyword">long</span> expire;</span><br><span class="line"></span><br><span class="line">            initStaticStringObject(key,keystr);</span><br><span class="line">            expire = getExpire(db,&amp;key);</span><br><span class="line">          	<span class="comment">// 写入expire time, type, key, value</span></span><br><span class="line">            <span class="keyword">if</span> (rdbSaveKeyValuePair(rdb,&amp;key,o,expire) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> (flags &amp; RDB_SAVE_AOF_PREAMBLE &amp;&amp;</span><br><span class="line">                rdb-&gt;processed_bytes &gt; processed+AOF_READ_DIFF_INTERVAL_BYTES)</span><br><span class="line">            &#123;</span><br><span class="line">                processed = rdb-&gt;processed_bytes;</span><br><span class="line">                aofReadDiffFromParent();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        dictReleaseIterator(di);</span><br><span class="line">        di = <span class="literal">NULL</span>; <span class="comment">/* So that we don't release it again on error. */</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ....其它操作</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 写入EOF #define RDB_OPCODE_EOF        255 /*</span></span><br><span class="line"><span class="comment">    if (rdbSaveType(rdb,RDB_OPCODE_EOF) == -1) goto werr;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    /* CRC64 checksum. It will be zero if checksum computation is disabled, the</span></span><br><span class="line"><span class="comment">     * loading code skips the check in this case. */</span></span><br><span class="line">    cksum = rdb-&gt;cksum;</span><br><span class="line">    memrev64ifbe(&amp;cksum);</span><br><span class="line">  	<span class="comment">// 写入校验和</span></span><br><span class="line">    <span class="keyword">if</span> (rioWrite(rdb,&amp;cksum,<span class="number">8</span>) == <span class="number">0</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line"></span><br><span class="line">werr:</span><br><span class="line">    <span class="keyword">if</span> (error) *error = errno;</span><br><span class="line">    <span class="keyword">if</span> (di) dictReleaseIterator(di);</span><br><span class="line">    <span class="keyword">return</span> C_ERR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因此RDB的文件结构可以总结为五个部分：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">REDIS</th>
-<th style="text-align:center">db_version</th>
-<th style="text-align:center">Databases</th>
-<th style="text-align:center">EOF</th>
-<th style="text-align:center">check_sum</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">REDIS</td>
-<td style="text-align:center">0009</td>
-<td style="text-align:center">kv内容</td>
-<td style="text-align:center">255</td>
-<td style="text-align:center">8字节无符号整数</td>
-</tr>
-</tbody>
-</table>
-<p>其中DataBase部分会保存多个非空数据库，总结可以分为三个部分，1字节长的标示码，整数的db序列号和键值对</p>
-<blockquote>
-<p> RDB_OPCODE_SELECTDB | db_number | kv对</p>
-</blockquote>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rdbSaveKeyValuePair</span><span class="params">(rio *rdb, robj *key, robj *val, <span class="keyword">long</span> <span class="keyword">long</span> expiretime)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> savelru = server.maxmemory_policy &amp; MAXMEMORY_FLAG_LRU;</span><br><span class="line">    <span class="keyword">int</span> savelfu = server.maxmemory_policy &amp; MAXMEMORY_FLAG_LFU;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 带有过期时间的键值对保存 */</span></span><br><span class="line">    <span class="keyword">if</span> (expiretime != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_EXPIRETIME_MS) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveMillisecondTime(rdb,expiretime) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 保存LRU信息 */</span></span><br><span class="line">    <span class="keyword">if</span> (savelru) &#123;</span><br><span class="line">        <span class="keyword">uint64_t</span> idletime = estimateObjectIdleTime(val);</span><br><span class="line">        idletime /= <span class="number">1000</span>; <span class="comment">/* Using seconds is enough and requires less space.*/</span></span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_IDLE) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">if</span> (rdbSaveLen(rdb,idletime) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 保存LFU信息 */</span></span><br><span class="line">    <span class="keyword">if</span> (savelfu) &#123;</span><br><span class="line">        <span class="keyword">uint8_t</span> buf[<span class="number">1</span>];</span><br><span class="line">        buf[<span class="number">0</span>] = LFUDecrAndReturn(val);</span><br><span class="line">       </span><br><span class="line">        <span class="keyword">if</span> (rdbSaveType(rdb,RDB_OPCODE_FREQ) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">if</span> (rdbWriteRaw(rdb,buf,<span class="number">1</span>) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 保存type，和键值对 */</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSaveObjectType(rdb,val) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveStringObject(rdb,key) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> (rdbSaveObject(rdb,val,key) == <span class="number">-1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Delay return if required (for testing) */</span></span><br><span class="line">    <span class="keyword">if</span> (server.rdb_key_save_delay)</span><br><span class="line">        usleep(server.rdb_key_save_delay);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>键值对的保存结构是通过函数rdbSaveKeyValuePair()实现的，并且带有过期时间的键值对和不带有的都混在一起保存。其中如果有过期时间，则通过开头的RDB_OPCODE_EXPIRETIME_MS进行标示。至于保存类型则有其中，都是1字节长。key都是字符串对象。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_STRING 0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_LIST   1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_SET    2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_ZSET   3</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_HASH   4</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_ZSET_2 5 <span class="comment">/* ZSET version 2 with doubles stored in binary. */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_MODULE 6</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_MODULE_2 7</span></span><br><span class="line"><span class="comment">/* Object types for encoded objects. */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_HASH_ZIPMAP    9</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_LIST_ZIPLIST  10</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_SET_INTSET    11</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_ZSET_ZIPLIST  12</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_HASH_ZIPLIST  13</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_LIST_QUICKLIST 14</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RDB_TYPE_STREAM_LISTPACKS 15</span></span><br></pre></td></tr></table></figure>
-<p>结构就是：</p>
-<blockquote>
-<p>RDB_OPCODE_EXPIRETIME_MS | ms | TYPE | key | value</p>
-</blockquote>
-<p>或者：</p>
-<blockquote>
-<p>TYPE | key | value</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2117,7 +2112,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">251</span>
+                <span class="site-state-item-count">252</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

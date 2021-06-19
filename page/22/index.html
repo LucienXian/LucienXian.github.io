@@ -265,6 +265,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/04/Effective-cpp-13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/04/Effective-cpp-13/" itemprop="url">Effective-cpp-#13</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-04T23:22:19+08:00">
+                2017-12-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Use-objects-to-manage-resources"><a href="#Use-objects-to-manage-resources" class="headerlink" title="Use objects to manage resources"></a>Use objects to manage resources</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>内存管理在C++中是非常重要而且常见的，往往会因为管理不当而出现灾难性的内存泄漏情况。首先来看一个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Investment</span>;</span></span><br><span class="line"><span class="function">Investment* <span class="title">createInvestment</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Investment* pInv = createInvestment();</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">delete</span> pInv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的例子中，乍一看很好地管理分配的资源，但闻题在<strong>…</strong>这里，如果在delete之前函数提前返回，或者发生了异常被抛出来，那么就会导致delete语句没有被访问到，也就是发生了内存泄漏的情况。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>因此为了确保createInvestment()分配的资源被正确释放，可以把资源放到对象中进行管理，从而控制其在离开区块时因为调用析构函数而释放资源。</p>
+<ul>
+<li>auto_ptr<ul>
+<li>auto_ptr是一个智能指针，该指针管理的对象在析构函数时会调用delete;</li>
+<li>这是一种RAII的使用方法，即获得资源的第一时间则将其用来初始化某个对象；</li>
+<li>但这个智能指针有两个特点：<ul>
+<li>会转移控制权，若通过copy构造函数或者copy赋值函数取赋值该指针，原指针会指向一个null；</li>
+<li>不能有多个auto_ptr指向同一个对象，因为这样容易导致多次delete或者未定义行为；</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">auto_ptr</span>&lt;Investment&gt; pInv(createInvestment());</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">auto_ptr</span>&lt;Investment&gt; pInv1(pInv);<span class="comment">//pInv指向null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>share_ptr<ul>
+<li>这类智能指针允许对象被多个指针指向，并维持一个引用计数，具体使用参考：<a href="http://www.lucienxian.top/2017/11/16/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E7%9A%84%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94CPP/" target="_blank" rel="noopener">http://www.lucienxian.top/2017/11/16/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E7%9A%84%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94CPP/</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>为防止资源泄漏，应使用RAII对象，在构造函数中获得资源，在析构函数中释放资源；</li>
+<li>两个常用的RAII类是：auto_ptr和shared_ptr;</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/03/Adapter-DesignPattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1549,143 +1695,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/Effective-cpp-6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/24/Effective-cpp-6/" itemprop="url">Effective_cpp-#6</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T23:42:22+08:00">
-                2017-11-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Explicitly-disallow-the-use-of-complier-generated-functions-you-do-not-want"><a href="#Explicitly-disallow-the-use-of-complier-generated-functions-you-do-not-want" class="headerlink" title="Explicitly disallow the use of complier-generated functions you do not want"></a>Explicitly disallow the use of complier-generated functions you do not want</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>在某些时候，我们不希望某个对象能被拷贝或者赋值，因此我们需要某些方法来阻止对象被拷贝或复制。</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
-<li>将成员函数定义为private，并且不去具体实现它们；这样可以避免friend函数和member函数取调用它们；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myClass</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	...</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	...</span><br><span class="line">  	myClass(<span class="keyword">const</span> myClass&amp;);</span><br><span class="line">  	myClass&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> myClass&amp;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>此时如果client试图拷贝类对象，编译器会报错；而当friend函数和member函数试图去调用，链接器则会报错；</p>
-</blockquote>
-<ul>
-<li>另一种方法则是定义一个uncopyable的基类，让那些不希望被拷贝的类继承该基类</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">unCopyable</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	unCopyable();</span><br><span class="line">  	~unCopyable();<span class="comment">//允许派生对象去构造和析构</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	...</span><br><span class="line">  	unCopyable(<span class="keyword">const</span> unCopyable&amp;);</span><br><span class="line">  	unCopyable&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> unCopyable&amp;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myClass</span> :</span> <span class="keyword">private</span> unCopyable&#123;</span><br><span class="line">  ... <span class="comment">//不再声明copy构造函数和copy赋值函数</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>这种操作可以使得任何调用（包括member函数和friend函数）尝试去拷贝的都会被编译器驳回，因为这种函数的“编译器生成版本”在尝试调用其基类的对应生成时发现基类的拷贝构造和拷贝赋值都是private的</p>
-</blockquote>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>为驳回编译自动生成的函数，可以将相应的成员函数声明为private并且不予实现；或者继承一个如上的unCopyable的基类；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1734,7 +1743,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">251</span>
+                <span class="site-state-item-count">252</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

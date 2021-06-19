@@ -265,6 +265,143 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/清理过期的对象引用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/16/清理过期的对象引用/" itemprop="url">清理过期的对象引用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:11:27+08:00">
+                2018-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="清理过期的对象引用"><a href="#清理过期的对象引用" class="headerlink" title="清理过期的对象引用"></a>清理过期的对象引用</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在使用具备垃圾自动回收功能的编程语言时，可能会对不需要手动管理内存感到不可思议，以为不再需要考虑内存管理的事情。其实不然</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><p>如果一个程序使用栈的时候先增长，后收缩，那么弹出来的对象将不会被当作垃圾回收，这是栈对对象的过期引用，虽然下标已经发生了改变，但对象应用却被无意识地保留了起来。</p>
+<p>要解决这个问题，可以清空这些引用即可：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (size == <span class="number">0</span>) <span class="keyword">throw</span> <span class="keyword">new</span> EmptyStackException();</span><br><span class="line">	Object result = elements[--size];</span><br><span class="line">	elements[size] = <span class="keyword">null</span>;</span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样做还有一个好处，一旦被错误地引用，会抛出NullPointerException。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><ul>
+<li>清空对象引用应该是一种例外，而不是一种规范行为；</li>
+<li>只要类是自己管理内存的，程序员应该警惕内存泄漏问题</li>
+</ul>
+<h2 id="内存泄漏来源"><a href="#内存泄漏来源" class="headerlink" title="内存泄漏来源"></a>内存泄漏来源</h2><ol>
+<li>缓存</li>
+</ol>
+<p>如果对象引用被放到缓存中，很可能被遗忘掉，以至于很长一段时间内都留在缓存中；</p>
+<p>比如好的解决方法是用WeakHashMap代表缓存，但只有当所要的缓存项的生命周期是由key的外部引用而不是value决定时，才有用。tomcat的源码里，实现缓存时会用到WeakHashMap</p>
+<ol start="2">
+<li>监听器和其他回调</li>
+</ol>
+<p>客户端在Api中注册了回调，却没有显式地取消回调。那么这时最好的解决方法是，将它们保存为WeakHashMap的key，即保存它们的弱引用。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/遇到多个构造器参数时要考虑使用builder/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1478,153 +1615,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/29/cs231n-lecture10/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/29/cs231n-lecture10/" itemprop="url">cs231n@lecture10</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-29T23:27:11+08:00">
-                2018-10-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Recurrent-Nerual-Networks"><a href="#Recurrent-Nerual-Networks" class="headerlink" title="Recurrent Nerual Networks"></a>Recurrent Nerual Networks</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>相比较于CNN，RNN能够更好地序列的信息。比如理解一句话的意思，根据视频输出行为，判断文本的情感等等。前后的输入是有关联的。</p>
-<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>RNN的结构中有一个内部状态值$h_t$，这个值取决于输入的x和上一次的内部状态值$h_{t-1}$。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值$Y_t$</p>
-<p>结构图如下：</p>
-<p><img src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg" alt="img"></p>
-<p>RNN的公式如下：<br>$$<br>Y_t = g(V h_t) \<br>h_t = f(UX_t+Wh_{t-1})<br>$$</p>
-<h2 id="truncated-backprop"><a href="#truncated-backprop" class="headerlink" title="truncated backprop"></a>truncated backprop</h2><p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final states作为后一个序列的initial states。</p>
-<p><img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png" alt="img"></p>
-<h2 id="vanilla-RNN"><a href="#vanilla-RNN" class="headerlink" title="vanilla RNN"></a>vanilla RNN</h2><p>只有一层隐藏层的RNN</p>
-<h1 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h1><p>用来缓解梯度消失和梯度爆炸。</p>
-<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell state，即c，让它保存长期的状态。</p>
-<p>LSTM将隐藏状态和输入拼接在一起，然后乘以一个巨大的矩阵，得到四个门向量。</p>
-<ul>
-<li>i：input gate，whether to write to cell；</li>
-</ul>
-<p>$$<br>i_t = \sigma  (W_i [h_{t-1},x_t] + b_i)<br>$$</p>
-<ul>
-<li>f：forget gate，how much do we want to forget；</li>
-</ul>
-<p>$$<br>f_t = \sigma (W_f [h_{t-1},x_t] + b_f)<br>$$</p>
-<ul>
-<li>o：output gate，how much to reveal cell；</li>
-</ul>
-<p>$$<br>o_t = \sigma (W_o [h_{t-1}, x_t] + b_o)<br>$$</p>
-<ul>
-<li>g：gate gate，how much to write to cell；</li>
-</ul>
-<p>$$<br>g_t = tanh(W_g [h_{t-1}, x_t] + b_g)<br>$$</p>
-<p>cell state的计算公式为：(注意是按元素相乘)<br>$$<br>c_t = f_t \circ c_{t-1} + i_t \circ g_t<br>$$<br>至于隐藏状态：<br>$$<br>h_t = o_t \circ tanh(c_t)<br>$$</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1673,7 +1663,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">251</span>
+                <span class="site-state-item-count">252</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
