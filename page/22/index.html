@@ -265,6 +265,170 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/06/I-O复用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/06/I-O复用/" itemprop="url">I/O复用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-06T23:32:12+08:00">
+                2017-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="IO复用：select和poll函数"><a href="#IO复用：select和poll函数" class="headerlink" title="IO复用：select和poll函数"></a>IO复用：select和poll函数</h1><h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>当一个TCP客户同时处理两个输入：标准输入和套接字时，由于客户端阻塞于标准输入，此时服务端进程可能会被杀死。那是因为此时虽然服务端给客户端发了一个FIN，但由于客户端正在阻塞于标准输入，没看到EOF。这样的进程需要一种能力，告知内核一旦发现一个或者多个IO条件准备就绪的话，内核就要通知进程；</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ul>
+<li>客户处理多个描述符（网络套接字和交互式输入），必须使用；</li>
+<li>既要处理监听套接字又要处理已连接套接字；</li>
+<li>既要处理TCP又要处理UDP；</li>
+<li>处理多个协议；</li>
+</ul>
+<h2 id="模型描述"><a href="#模型描述" class="headerlink" title="模型描述"></a>模型描述</h2><p>IO多路复用模型是单个线程，通过追踪每个IO流(socket)的状态，从而达到管理多个IO流。有了这个模型，我们可以通过select或poll来具体实现这个模型，这样我们只会阻塞在这些函数的调用上，而不会阻塞在真正的IO上。</p>
+<h3 id="select"><a href="#select" class="headerlink" title="select"></a>select</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">select</span><span class="params">(<span class="keyword">int</span> maxfdpl, fd_set* readset, fd_set* writeset, fd_set* exceptset, <span class="keyword">const</span> struct timeval&amp; timeout)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>timeout:告诉内核等待指定描述符中任意一个就绪的最长等待时间；</li>
+<li>中间三个指定我们让内核测试读写和异常的文件描述符；可以通过宏来设置；</li>
+<li>maxfdpl则是指定待测试的文件描述符个数，选取的值是待测试的文件描述符加一；</li>
+</ul>
+<p>描述符的就绪条件</p>
+<ul>
+<li>可读<ul>
+<li>该套接字的接收缓冲区中的字节数大于等于套接字接收缓冲区低水位标记的当前大小。TCP和UDP中默认为1；</li>
+<li>该套接字是一个监听套接字，且连接数不为0；</li>
+<li>该连接的读半部关闭（即接收了FIN的TCP连接）；</li>
+<li>有一个套接字错误在等待处理；</li>
+</ul>
+</li>
+<li>可写<ul>
+<li>该套接字的发送缓冲区中的字节数大于等于套接字发送缓冲区低水位标记的当前大小。TCP和UDP中默认为2048；</li>
+<li>写半部关闭；</li>
+<li>使用非阻塞connect的套接字已经建立了连接，或者connect失败；</li>
+<li>有一个套接字错误待处理；</li>
+</ul>
+</li>
+</ul>
+<h3 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">poll</span><span class="params">(struct pollfd* fdarray, <span class="keyword">unsigned</span> <span class="keyword">long</span> nfds, <span class="keyword">int</span> timeout)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span>&#123;</span></span><br><span class="line">  <span class="keyword">int</span> fd;</span><br><span class="line">  <span class="keyword">short</span> events;<span class="comment">//指定测试条件</span></span><br><span class="line">  <span class="keyword">short</span> revents;<span class="comment">//返回描述符的状态</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>以下条件引起poll返回特定的revent:</p>
+<ul>
+<li>所有正规TCP和UDP数据都被认为普通数据；</li>
+<li>TCP的带外数据被认为是优先级带数据；</li>
+<li>TCP连接的读半部关闭，即接收了对端的FIN，普通数据；</li>
+<li>TCP存在错误时可以认为是普通数据，也可以是错误；</li>
+<li>在监听套接字上有新的连接可用，可认为是普通数据或者错误；</li>
+<li>非阻塞connect的完成；</li>
+</ul>
+<p>poll识别三类数据：normal、priority band和high priority</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>IO复用模型中最常用的函数是select，我们告知select函数就读写和异常三种条件所关心的描述符、最长等待时间和最大描述符号。缺点是单个进程能够监管的文件描述符数量较少，一般为1024；</p>
+<p>poll函数提供类似于select的功能，不过能为流设备提供额外信息。</p>
+<p>目前来说，select函数会更加频繁。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/04/Effective-cpp-13/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1558,143 +1722,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/25/Effective-cpp-7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/25/Effective-cpp-7/" itemprop="url">Effective-cpp-#7</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-25T23:40:36+08:00">
-                2017-11-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Declare-destructions-virtual-in-polymorphic-base-classes"><a href="#Declare-destructions-virtual-in-polymorphic-base-classes" class="headerlink" title="Declare destructions virtual in polymorphic base classes"></a>Declare destructions virtual in polymorphic base classes</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>在某些情况下，当一个derived class对象是经由一个base class指针被删除时，而base class着一个non-virtual 的析构函数。此时实际执行的效果是，对象的derived成分并有被销毁，销毁的是base成分。这种局部销毁会造成资源泄漏。</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
-<li>一个意图被用作base class的class，应该令其析构函数为virtual。</li>
-</ul>
-<blockquote>
-<p>具体用法和原因参考：<a href="http://www.lucienxian.top/2017/11/15/%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0-2-%E2%80%94%E2%80%94CPP/" target="_blank" rel="noopener">虚函数的学习</a></p>
-</blockquote>
-<ul>
-<li>另外需要注意的是，一个不打算被用作base class的class，不应该令其析构函数为virtual。原因是：<ul>
-<li>实现virtual函数的类的体积往往会增大50%到100%，这就造成一个问题是，该类的对象不能被塞到一个预先定义好的缓冲器里面，并传给其它语言的函数，也不能和其他语言（如C）的相同声明有着同样的结构；</li>
-<li>因此往往是只有当class内至少包含一个virtual函数，才为其声明virtual析构函数；</li>
-</ul>
-</li>
-</ul>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>多态性质的基类应该声明virtual 函数；</li>
-<li>不作为基类使用的类，就不应该声明virtual函数；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1743,7 +1770,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">252</span>
+                <span class="site-state-item-count">253</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1756,7 +1783,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-count">27</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -265,6 +265,146 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/11/std-bind/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/11/std-bind/" itemprop="url">std::bind</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-11T11:58:05+08:00">
+                2019-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="std-bind"><a href="#std-bind" class="headerlink" title="std::bind"></a>std::bind</h1><p>std::bind是一个标准的函数对象，它就像一个功能适配器，接受一个函数作为输入，并返回一个新函数对象作为输出。另外还附带若干个传递进函数的参数。</p>
+<p>假设存在这样一个函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> first, <span class="keyword">int</span> second)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> first + second;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>bind函数的第一个参数就是函数指针，后面的参数则是该函数的参数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> add_func = <span class="built_in">std</span>::bind(&amp;add, _1, _2);</span><br></pre></td></tr></table></figure>
+<p>这里add_func是一个函数对象，我们可以这样调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add_func(<span class="number">4</span>,<span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+<p>它将在内部调用add()函数，并在_1的位置传递第一个参数，在_2的位置传递第二个参数。</p>
+<p>现在假设我们想在一个特殊场景中使用这个add函数，我们应该将第一个参数始终固定为12，并让第二个参数由用户传递，即：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> new_add_func = <span class="built_in">std</span>::bind(&amp;add, <span class="number">12</span>, _1);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x = new_add_func(<span class="number">5</span>);</span><br><span class="line"><span class="comment">// Will return 17</span></span><br></pre></td></tr></table></figure>
+<p>我们也可以使用std :: bind()重新排列参数，即_1和_2等决定要传递的参数的位：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> mod_add_func = <span class="built_in">std</span>::bind(&amp;add, _2, _1);</span><br><span class="line"></span><br><span class="line"><span class="comment">// mod_add_func(12,15) === add(15, 12).</span></span><br></pre></td></tr></table></figure>
+<h2 id="Use-of-std-bind-in-STL-algorithms"><a href="#Use-of-std-bind-in-STL-algorithms" class="headerlink" title="Use of std::bind in STL algorithms"></a>Use of std::bind in STL algorithms</h2><p>由于std :: bind充当功能适配器并提供新的函数对象，因此它对于许多STL算法非常有用。</p>
+<p>例如，<br>我们有一个数字列表，我们想要计算5的倍数。要实现这一点，我们有一个现有的函数，即:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">divisible</span><span class="params">(<span class="keyword">int</span> num , <span class="keyword">int</span> den)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(num % den == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一般的算法是遍历判断，但我们可以使用std :: count_if这一个STL算法，即：</p>
+<p><strong><em>count_if (InputIterator firstValue, InputIterator lastValue, UnaryPredicate predFunctionObject);</em></strong></p>
+<p>通过bind函数，我们就可以将divisible转换为一元参数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">approach_2</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[<span class="number">10</span>] = &#123;<span class="number">1</span>,<span class="number">20</span>,<span class="number">13</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">10</span>,<span class="number">28</span>,<span class="number">19</span>,<span class="number">15</span>&#125;;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::count_if(arr, arr + <span class="keyword">sizeof</span>(arr)/<span class="keyword">sizeof</span>(<span class="keyword">int</span>) , <span class="built_in">std</span>::bind(&amp;divisible, _1, <span class="number">5</span>));</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="What-std-bind-returns"><a href="#What-std-bind-returns" class="headerlink" title="What std::bind returns ?"></a>What std::bind returns ?</h2><p>除了auto，我们也可以使用std:;function Function对象存储它们，即</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::function&lt;<span class="keyword">int</span> (<span class="keyword">int</span>) &gt; mod_add_funcObj = <span class="built_in">std</span>::bind(&amp;add, <span class="number">20</span>, _1);</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/10/C-11-‘delete’-keyword-and-deleted-functions/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1954,144 +2094,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/26/列表优先于数组/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/26/列表优先于数组/" itemprop="url">列表优先于数组</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-26T18:36:37+08:00">
-                2019-02-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="列表优先于数组"><a href="#列表优先于数组" class="headerlink" title="列表优先于数组"></a>列表优先于数组</h1><h2 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h2><ol>
-<li>数组和泛型的不同首先体现在数组是covariant的，所以如果Sub是Super的一个子类型，那么数组类型Sub[]也是数组类型Super[]的子类型。相反，泛型列表对此则有限制。这意味着：</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Object[] objectArray = <span class="keyword">new</span> Long[<span class="number">1</span>];</span><br><span class="line">objectArray[<span class="number">0</span>] = <span class="string">"I don't fit in"</span>; <span class="comment">//在运行时会报错</span></span><br></pre></td></tr></table></figure>
-<p>但如果使用列表：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt; ol = <span class="keyword">new</span> ArrayList&lt;Long&gt;(); <span class="comment">// Incompatible types</span></span><br><span class="line">ol.add(<span class="string">"I don't fit in"</span>);</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>数组是具化的，数组只有在运行时才能直到并检查元素类型，而泛型是通过擦除来实现的，这意味着泛型只在编译时进行类型约束的检查，而运行时是忽略元素类型的。因此无法混合使用数组和泛型，以下的操作都是不合法的：</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> List&lt;E&gt;[], <span class="keyword">new</span> List&lt;String&gt;[], <span class="keyword">new</span> E[]</span><br></pre></td></tr></table></figure>
-<h2 id="优先使用列表"><a href="#优先使用列表" class="headerlink" title="优先使用列表"></a>优先使用列表</h2><p>当你强转成数组类型时，若得到一个泛型数组创建错误或者未检查强转警告，最好的解决办法是，总是优先采用集合类型List\<e>，而不是数组类型E[]。</e></p>
-<p>考虑这样一个类，构造器接受一个集合：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Chooser</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object[] choiceArray;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Chooser</span><span class="params">(Collection choices)</span> </span>&#123;</span><br><span class="line">        choiceArray = choices.toArray();</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">choose</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Random rnd = ThreadLocalRandom.current();</span><br><span class="line">        <span class="keyword">return</span> choiceArray[rnd.nextInt(choiceArray.length)];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>那么在使用时，我们每次都要在调用choose方法之后，将Object类型转换为需要的类型，有可能强转失败，如果我们使用泛型：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Chooser</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> T[] choiceArray;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Chooser</span><span class="params">(Collection&lt;T&gt; choices)</span> </span>&#123;</span><br><span class="line">        choiceArray = choices.toArray();</span><br><span class="line">    &#125;<span class="comment">// choose method unchanged</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这样会编译报错，除非我们强制换位Object数组：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">choiceArray = (T[]) choices.toArray();</span><br></pre></td></tr></table></figure>
-<p>这样只会产生一个警告，因为编译器无法保证运行时强转的安全性。当然，我们可以消除warning，但最佳的做法还是使用泛型列表：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Chooser</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;T&gt; choiceList;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Chooser</span><span class="params">(Collection&lt;T&gt; choices)</span> </span>&#123; </span><br><span class="line">        choiceList = <span class="keyword">new</span> ArrayList&lt;&gt;(choices);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">choose</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Random rnd = ThreadLocalRandom.current();</span><br><span class="line">        <span class="keyword">return</span> choiceList.get(rnd.nextInt(choiceList.size()));</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2140,7 +2142,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">252</span>
+                <span class="site-state-item-count">253</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2153,7 +2155,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-count">27</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

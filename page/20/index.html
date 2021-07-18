@@ -265,6 +265,136 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-28/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-28/" itemprop="url">Effective-cpp-#28</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T02:07:48+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Avoid-returning-“handles”-to-object-internals"><a href="#Avoid-returning-“handles”-to-object-internals" class="headerlink" title="Avoid returning “handles” to object internals"></a>Avoid returning “handles” to object internals</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>先来看一个例子：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span>...&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">RectData</span>&#123;</span></span><br><span class="line">    Point ulhc;</span><br><span class="line">    Point lrhc;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rectangle</span>&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::trl::<span class="built_in">shared_ptr</span>&lt;RectData&gt; pData;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function">Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>使用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">const</span> Rectangle <span class="title">rec</span><span class="params">(point1, point2)</span></span>;</span><br><span class="line">rec.upperLeft().setX(<span class="number">50</span>);</span><br></pre></td></tr></table></figure></p>
+<p>其实，这样使用编译器是不会报错的，但其出现了矛盾的情况，原因是我们在该函数后面指定了const，则希望rec是不变的。但我们可以看到，由于我们返回的是一个引用，则可以通过引用去修改对象内部的成员。<br><br><br>同理，返回指针或者迭代器这些<strong>handles</strong>，也会出现这种情况。<br><br></p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>为了解决这个问题，我们可以这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rectangle</span>&#123;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">const</span> Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">const</span> Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>通过这种做法，用户可以读取对象的points，但不能修改它们。</p>
+<p>但这种用法同样会有一些问题，那就是有可能会出现<strong>dangling handles</strong>。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GUIObj</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="function"><span class="keyword">const</span> Rectangle <span class="title">boudingBox</span><span class="params">(<span class="keyword">const</span> GUIObj&amp; obj)</span></span>;</span><br><span class="line"></span><br><span class="line">GUIObj* obj;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">const</span> Point* p = &amp;(boudingBox(*p).upperLeft());</span><br></pre></td></tr></table></figure></p>
+<p>这里的问题是，由于这里够早的是一个临时Rectangle对象，也就是说，当这个语句结束时候临时对象就会被销毁，那么p所指向的Point也会被析构。也就是会发生<strong>dangling handles</strong>。</p>
+<p>这是因为<strong>返回一个handle代表对象内部成员</strong>的话，不管这个handle是指针还是引用，也不管是不是const，这里的关键是一旦这个handle传出去了，你就得承受一个风险——handle可能会比其所指向的对象有着更长的声明周期。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>避免返回任何handles指向对象的内部。另外，还要使得const成员函数的行为像个const，并且尽量避免发生<em>dangling handles</em>。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/Effective-cpp-27/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1662,256 +1792,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/Virtual-Memory/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/20/Virtual-Memory/" itemprop="url">Virtual Memory</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-20T23:47:54+08:00">
-                2017-12-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="virtual-memory"><a href="#virtual-memory" class="headerlink" title="virtual memory"></a>virtual memory</h1><h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><p>执行一个只有部分大小在物理内存中的程序，好处是：</p>
-<ul>
-<li>程序不受物理内存限制，用户能够随意地在虚拟内存中编写程序</li>
-<li>因为用户程序使用了更少的物理内存，因此有更多程序同时运行，提高CPU利用率</li>
-<li>I/O的操作更少了</li>
-</ul>
-<p>虚拟内存允许文件共享：</p>
-<ul>
-<li>系统库能被多个进程共享，尽管每个进程都视系统库为自己的部分，但实际上系统库是在物理内存上的一块空间中；</li>
-<li>多个进程能够共享数据，某个进程能在真实的物理内存中开辟一块空间与其它进程共享；</li>
-<li>pages在进程创建时能被共享，提高创建进程效率</li>
-</ul>
-<h2 id="demand-paging"><a href="#demand-paging" class="headerlink" title="demand paging"></a>demand paging</h2><p>一个程序在被加载进内存时有两种方法：一个是整个装载进去，一个是当你有需要的时候再从disk读到memory，而后者就是demand paging。</p>
-<p>为了实现这个方法，我们需要硬件来支持该页是否在内存中，因此可以在page table中设置一个有效位。</p>
-<p>访问到一个标记为invalid的页，则叫page fault。此时系统中断，操作系统去从disk中加载该页进内存中。</p>
-<h3 id="performance-of-demand-paging"><a href="#performance-of-demand-paging" class="headerlink" title="performance of demand paging"></a>performance of demand paging</h3><ul>
-<li>p：page fault的概率</li>
-<li>ma：访问内存的时间</li>
-<li>pft：发生page fault需要处理的时间（主要是读取page）</li>
-</ul>
-<p>有效访问时间 = (1-p) <em> ma + p</em>pft</p>
-<h2 id="copy-on-write"><a href="#copy-on-write" class="headerlink" title="copy-on-write"></a>copy-on-write</h2><p>这个方法的提出是基于系统调用fork()导致的性能下降。在子进程fork一个父进程之后，如果直接将父进程的内存复制一份，考虑到子进程与父进程之间有不少数据内容是一样的，因此可以共享这部分数据，这就是copy-on-write。</p>
-<p>步骤如下：</p>
-<ul>
-<li>子进程从父进程fork出来，此时两个进程共享同一份内存；</li>
-<li>当子进程要修改该共享内存的内容时，则先copy需要修改的页，接着修改复制出来的page；</li>
-</ul>
-<p>如下图，当process1要修改pageC的内容时，会先复制一份pageC</p>
-<p><img src alt="img"></p>
-<blockquote>
-<p>由于copy-on-write需要找到一个可用的page，所以操作系统的做法是维护一个pool，随时取出来；</p>
-<p>linux系统下提供了vfork()，这个系统调用并不会copy-on-write，而只是共享内存，因此要保证子系统不会轻易修改数据；</p>
-</blockquote>
-<h2 id="page-replacement"><a href="#page-replacement" class="headerlink" title="page replacement"></a>page replacement</h2><blockquote>
-<p>当一个进程在执行时发生了page fault，当此时没有可用的内存，那么操作系统需要决定去替换一个页，至于替换方法有两种：</p>
-</blockquote>
-<p>一种是直接terminate那个进程，但这不是一个好的方法，因为分页操作应该对用户是透明的（不懂？）</p>
-<p>另一种则是交换进程，先把某个进程所有的frame释放了，降低cpu利用率</p>
-<p>现在我们来考虑第三种方法<strong>page replacement</strong></p>
-<h3 id="basic-page-replacement"><a href="#basic-page-replacement" class="headerlink" title="basic page replacement"></a>basic page replacement</h3><p>发送basic page replacement时，操作系统会做以下操作：</p>
-<ul>
-<li><p>在disk发现自己想要的page；</p>
-</li>
-<li><p>如果内存中没有可用frame，则用replacement 算法去置换一个frame；</p>
-</li>
-<li><p>将内存中选中的victim frame写进disk</p>
-</li>
-<li><p>修改page和frame的表内容</p>
-</li>
-<li><p>将disk中想要的page写进空出来的frame</p>
-</li>
-<li><p>重启进程</p>
-<blockquote>
-<p>但这里会有一个问题：每次发生置换都需要两个pages的传送，需要大量的IO操作，因此为了提高效率，可以在page中增加一个<strong>modify bit(dirty page)</strong></p>
-<p>这个bit用来指示，该page在上一次从disk都出来之后有没有被修改过</p>
-<p>因此就可以在replacement时检测这个bit，只有dirty的才会需要被写回disk，否则直接从disk读取想要的pages覆盖那个frame即可；</p>
-</blockquote>
-</li>
-</ul>
-<p>reference string</p>
-<ul>
-<li>这个概念是用来评估replacement算法效率的（还需要知道内存的frame大小），用来记录每次对memory的引用</li>
-<li>通常是page number</li>
-<li>例如访问的地址为0100, 0432, 0101, 0612, 0102, 0103, 0104, 0101, 0611, 0102, 0103,<br>0104, 0101, 0610, 0102, 0103, 0104, 0101, 0609, 0102, 0105</li>
-<li>reference string就是1, 4, 1, 6, 1, 6, 1, 6, 1, 6, 1</li>
-</ul>
-<h3 id="FIFO-page-replacement"><a href="#FIFO-page-replacement" class="headerlink" title="FIFO page replacement"></a>FIFO page replacement</h3><p>这是最基本的置换算法，很简单，就是维护一个队列，队列按时间连接，即最新的frame在队列尾。每次置换队列头的frame；</p>
-<p>但这个算法有一个bug，具体可以参考<strong>Belady’s anomaly</strong>。即它可能会随着分配的内存即frame增多，它的page fault rate反而增大。</p>
-<h3 id="optimal-page-replacement"><a href="#optimal-page-replacement" class="headerlink" title="optimal page replacement"></a>optimal page replacement</h3><p>这是效率最高的算法，也是发送page fault可能性最小的一个算法。简单概括就是：</p>
-<p><strong>置换内存中某个frame，该frame在这时候很久才会被再次引用，这里的很久指的是相对其它frame要久</strong></p>
-<blockquote>
-<p>但这个算法不好实现，因为很难去判断未来在什么时候才会再次引用该frame</p>
-</blockquote>
-<h3 id="LRU-page-replacement"><a href="#LRU-page-replacement" class="headerlink" title="LRU page replacement"></a>LRU page replacement</h3><ul>
-<li>least recently used algorithm</li>
-</ul>
-<p>这是综合以上两种算法的算法，往前追溯reference string，找到距离现在最久的frame，置换该frame</p>
-<p>这里介绍两种实现方法：</p>
-<ul>
-<li><p>counter</p>
-<ul>
-<li>设置一个时钟，每次内存访问的时候，时钟就会加一；</li>
-<li>所访问的page，就会在page table里面的<strong>time to use</strong>设置时钟值；</li>
-<li>这样，只要每次遍历一下page table，即可找到最小的page，这就是我们要置换出去的frame；</li>
-</ul>
-</li>
-<li><p>stack</p>
-<ul>
-<li>其实是一个双向列表。。</li>
-<li>即维护这样一个stack，每次引用到page时，则从stack中抽取该page放到stack的顶部；</li>
-<li>那样，最下面的page则是要置换出去的frame；</li>
-</ul>
-<p>​</p>
-</li>
-</ul>
-<h3 id="LRU-Approximate-Page-Replacement"><a href="#LRU-Approximate-Page-Replacement" class="headerlink" title="LRU-Approximate Page Replacement"></a>LRU-Approximate Page Replacement</h3><blockquote>
-<p>多数硬件都会提供一个支持——reference bit，用来指示该page是否被使用过（读写）</p>
-</blockquote>
-<h4 id="Additional-Reference-Bits-Algorithm"><a href="#Additional-Reference-Bits-Algorithm" class="headerlink" title="Additional-Reference-Bits Algorithm"></a>Additional-Reference-Bits Algorithm</h4><p>假设reference有8位，每个时钟周期该8位reference bit就右移一次，如果该周期内内存有被引用，则设最高位为1，否则设为0。这样，将8位reference bit转换成无符号整数，最小的page则为LRU page</p>
-<h4 id="second-chance-algorithm"><a href="#second-chance-algorithm" class="headerlink" title="second-chance algorithm"></a>second-chance algorithm</h4><p>实现这个算法的基础是维护一个循环队列和一个指针，队列中的page都有一位reference bit，指针指向要替换的page</p>
-<ul>
-<li>检查reference bit，如果该位为1；</li>
-<li>指针下移，直到找到reference bit为0的page；</li>
-<li>做替换</li>
-</ul>
-<p>在最坏的情况下，指针会遍历一遍，将所有page的reference bit清零</p>
-<h4 id="enhanced-second-chance-algorithm"><a href="#enhanced-second-chance-algorithm" class="headerlink" title="enhanced second-chance algorithm"></a>enhanced second-chance algorithm</h4><p>相对second-chance algorithm，这个算法添加了1bit，作为检查该bit是否被修改，即modified bit。</p>
-<p>这样就将pages分为了四类：</p>
-<ul>
-<li>(0, 0)：最好的选择，最近没有用过，并且没有修改过；</li>
-<li>(0, 1)：次好的选择，最近没有用过，但修改过；</li>
-<li>(1, 0)：次差选择；</li>
-<li>(1, 1)：最差的选择</li>
-</ul>
-<p>这种算法有一个好处，就是前面提过的modified bit的好处，减少了I/O的消耗。</p>
-<h3 id="counting-based-page-replacement"><a href="#counting-based-page-replacement" class="headerlink" title="counting-based page replacement"></a>counting-based page replacement</h3><ul>
-<li>LFU</li>
-<li>MFU</li>
-</ul>
-<p>做一个计数，选择使用过最多次的/最少次的page。一个too expensive的算法~~</p>
-<h3 id="page-buffering-algorithm"><a href="#page-buffering-algorithm" class="headerlink" title="page buffering algorithm"></a>page buffering algorithm</h3><p>系统维护一个free frames pool，在要被写出的帧写回disk之前，首先将想要的frame写进free frame，然后再把victim frame写回disk，据说？这样进程就能快速重启</p>
-<h2 id="allocation-of-frame"><a href="#allocation-of-frame" class="headerlink" title="allocation of frame"></a>allocation of frame</h2><p>分配给每个进程的frame数量：</p>
-<ul>
-<li>minimum number of frames：与计算机的体系结构有关</li>
-<li>maximum number of frames：与内存呢大小有关</li>
-</ul>
-<h3 id="Allocation-algorithm"><a href="#Allocation-algorithm" class="headerlink" title="Allocation algorithm"></a>Allocation algorithm</h3><p>主要是两种</p>
-<ul>
-<li>平均分配</li>
-<li>按权重分配：根据可用frame和进程大小和数量分配</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1960,7 +1840,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">252</span>
+                <span class="site-state-item-count">253</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1973,7 +1853,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-count">27</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
