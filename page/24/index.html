@@ -265,6 +265,288 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/18/Abstract-Factory-DesignPattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/18/Abstract-Factory-DesignPattern/" itemprop="url">Abstract Factory(DesignPattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-18T13:25:57+08:00">
+                2017-11-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Abstract-Factory"><a href="#Abstract-Factory" class="headerlink" title="Abstract Factory"></a>Abstract Factory</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>提供一个创建一系列相关对象的接口，无需为它们指定具体的类</p>
+<h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>假设有一个支持多种风格的界面工具包，此时不应该为每一种特定风格的组件进行硬编码。因此我们可以定一个WidgetFactory的抽象类，提供返回窗口组件，门组件等接口。这样，用户程序就只用与抽象类定义的接口进行交互，而不用与具体的类进行交互。</p>
+<h2 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h2><ul>
+<li>一个系统要独立于它的产品创建、组合和创建；</li>
+<li>一个系统由多个产品系列中的一个来配置；</li>
+<li>强调一系列相关产品对象的设计以便进行联合使用；</li>
+<li>提供一个产品类库，但只想显示接口而不是实现；</li>
+</ul>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><ul>
+<li>分离了具体的类：由factory去帮助你控制一个应用创建的对象的类；</li>
+<li>易于变换产品系列：只需要变换factory即可；</li>
+<li>有利于产品的一致性：当一个应用只使用一个factory提供的产品即可实现；</li>
+<li>难以支持新种类的产品<strong>(缺点)</strong>：当扩展一个factory的新产品时，此时子类也必须全部发生变化；</li>
+</ul>
+<h2 id="源代码示范"><a href="#源代码示范" class="headerlink" title="源代码示范"></a>源代码示范</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Abstract_Factory.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">virtual</span> ~Product() &#123; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">produce</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DerivedproductA</span> :</span> <span class="keyword">public</span> Product &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">produce</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Product produceA..."</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DerivedproductB</span> :</span> <span class="keyword">public</span> Product &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">produce</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Product produceB..."</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractFactory</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">virtual</span> ~AbstractFactory() &#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createproductA</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createproductB</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteFactory</span> :</span> <span class="keyword">public</span> AbstractFactory &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">createproductA</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> DerivedproductA();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function">Product* <span class="title">createproductB</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> DerivedproductB();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	AbstractFactory *factory = <span class="keyword">new</span> ConcreteFactory();<span class="comment">//virtual 具有封装功能</span></span><br><span class="line">	Product* productA = factory-&gt;createproductA();</span><br><span class="line">	Product* productB = factory-&gt;createproductB();</span><br><span class="line">	productA-&gt;produce();</span><br><span class="line">	productB-&gt;produce();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">delete</span> factory;</span><br><span class="line">	<span class="keyword">delete</span> productA;</span><br><span class="line">	<span class="keyword">delete</span> productB;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/16/四种类型转换——CPP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/16/四种类型转换——CPP/" itemprop="url">四种类型转换——CPP</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-16T19:49:20+08:00">
+                2017-11-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="C-的四种类型转换"><a href="#C-的四种类型转换" class="headerlink" title="C++的四种类型转换"></a>C++的四种类型转换</h1><h2 id="static-cast-lt-T-gt-e"><a href="#static-cast-lt-T-gt-e" class="headerlink" title="static_cast&lt; T *&gt;(e)"></a>static_cast&lt; T *&gt;(e)</h2><ul>
+<li>静态转换，在编译期间进行处理；</li>
+<li>常用：<ul>
+<li>在C++中内置的基本数据类型之间进行转换；</li>
+<li>在基类和子类之间的指针或引用进行转换，基类指针或引用转换成子类的是不安全的，相反则是安全的；</li>
+<li>把void类型指针转换成目标类型；（不安全）</li>
+<li>把任何类型的表达式转换成void类型；</li>
+</ul>
+</li>
+</ul>
+<h2 id="const-cast-lt-T-gt-e"><a href="#const-cast-lt-T-gt-e" class="headerlink" title="const_cast&lt; T*&gt;(e)"></a>const_cast&lt; T*&gt;(e)</h2><ul>
+<li>作用于<strong>同一个类型</strong>之间的去常和添常属性的转换；</li>
+<li>可以在添加常量属性或者去除常量属性；</li>
+</ul>
+<h2 id="dynamic-cast-lt-T-gt-e"><a href="#dynamic-cast-lt-T-gt-e" class="headerlink" title="dynamic_cast&lt; T * &gt;(e)"></a>dynamic_cast&lt; T * &gt;(e)</h2><ul>
+<li>在运行期进行类型转换；</li>
+<li>如果转换成功则返回指针或者引用，失败则返回NULL(指针)或者抛出异常std::cast（引用）；</li>
+<li>通常情况，转换时基类要有虚函数;</li>
+</ul>
+<h2 id="reinterpret-cast-lt-T-gt-e"><a href="#reinterpret-cast-lt-T-gt-e" class="headerlink" title="reinterpret_cast&lt; T*&gt;(e)"></a>reinterpret_cast&lt; T*&gt;(e)</h2><ul>
+<li>执行低级转换，具体结果取决于编译器；</li>
+<li>比如将一个int* 转换成int；</li>
+<li>它的原理是对二进制进行重新的解释；</li>
+</ul>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><ul>
+<li>尽量避免类型转换，在注重效率的代码中尽量避免dynamic_cast；</li>
+<li>如果类型转换时必要的，应该隐藏在某个函数中；</li>
+<li>尽量用上述四种类型转换，不要使用旧式转换；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/16/智能指针的学习——CPP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1472,282 +1754,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/11/static的学习——CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/11/static的学习——CPP/" itemprop="url">static的学习——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-11T22:03:41+08:00">
-                2017-11-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="static的学习——CPP"><a href="#static的学习——CPP" class="headerlink" title="static的学习——CPP"></a>static的学习——CPP</h1><h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><blockquote>
-<ol>
-<li>延长生命周期</li>
-<li>限制作用域</li>
-<li>唯一性</li>
-</ol>
-</blockquote>
-<h2 id="修饰局部变量"><a href="#修饰局部变量" class="headerlink" title="修饰局部变量"></a>修饰局部变量</h2><h3 id="存储区域"><a href="#存储区域" class="headerlink" title="存储区域"></a>存储区域</h3><p>static在修饰局部变量时，被修饰的变量存储在静态存储区（与之对应的非静态局部变量则存储在栈中，栈的分配比静态存储区快）。</p>
-<h3 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h3><p>局部静态变量，即便在退出所在函数之后也不会被销毁。</p>
-<ul>
-<li>在main()之前static变量已经被初始化；</li>
-<li>由系统在程序退出时销毁；</li>
-</ul>
-<h2 id="修饰全局变量"><a href="#修饰全局变量" class="headerlink" title="修饰全局变量"></a>修饰全局变量</h2><h3 id="限制作用域"><a href="#限制作用域" class="headerlink" title="限制作用域"></a>限制作用域</h3><p>对于全局变量，由于全局变量本身就是存储在静态存储区；但是static会限制了它的连接属性。</p>
-<p>打个比方：</p>
-<blockquote>
-<p>假如在头文件中定义了一个全局变量；而一旦这个全局变量被两个.cpp文件include进来了，那么回发送重定义的错误。</p>
-</blockquote>
-<p>这时有两个解决办法：一个是上一次提到过的使用extern，而另一个则是使用static去修饰定义。由于static全局变量只能被包含它的文件定义，也就是说，static修饰的全局变量是不能被其它文件（非包含该变量的文件）访问，这时两个.cpp中static是不一样的。</p>
-<h2 id="修饰函数"><a href="#修饰函数" class="headerlink" title="修饰函数"></a>修饰函数</h2><ul>
-<li>对于静态函数，定义和声明要放在一起，不能一个在头文件中，另一个在.cpp文件中。因此，在多人合作的项目中，可以定义static函数，避免冲突。</li>
-</ul>
-<h2 id="与C的不同"><a href="#与C的不同" class="headerlink" title="与C的不同"></a>与C的不同</h2><p>由于CPP类的出现，如果类中定义static的成员变量和函数，那么所有对象都共享一个实例。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/10/extern的学习——CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/10/extern的学习——CPP/" itemprop="url">extern的学习——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-10T23:24:16+08:00">
-                2017-11-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="extern学习"><a href="#extern学习" class="headerlink" title="extern学习"></a>extern学习</h2><h3 id="变量声明"><a href="#变量声明" class="headerlink" title="变量声明"></a>变量声明</h3><p>由于CPP支持分离式编译，所以如果程序被分成若干个文件，则需要一种方法来保证代码共享。因此，CPP将声明和定义分开，声明使得名字为程序所知，而定义则是创建与该名字相关联的实体。</p>
-<p>因此，如果想要声明一个变量，而不是定义它，则在变量名前加上<strong>extern</strong>关键字。如果extern语句中包含初始值，则不再是声明了，而是定义：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> i; <span class="comment">//声明</span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> i = <span class="number">0</span>; <span class="comment">//定义</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>注意：</p>
-<ol>
-<li>不能在函数里试图初始化一个由extern关键字标记的变量，会造成重定义的错误。</li>
-<li>extern时要严格对应声明时的类型，例如：定义的是数组，不可以extern指针。</li>
-</ol>
-</blockquote>
-<p>用法：通常在模块的头文件中对本模块提供给其它模块引用的的函数和全局变量以extern声明，然后其它的模块在使用时只需要include该头文件即可。</p>
-<h3 id="extern-“c”"><a href="#extern-“c”" class="headerlink" title="extern “c”"></a>extern “c”</h3><p>CPP程序有时需要调用其他语言编写的函数，最常见的就是调用C语言编写的函数，虽然编译器在处理其调用方式上与CPP相同，但生成的代码会有所区别。<strong>例如CPP为了解决多态性的问题，会将函数名字与参数连在一起生成一个中间函数的名称</strong>，而C语言不会，因此这样会造成编译器找不到该函数。</p>
-<p>为了避免这个问题，CPP提供了链接指示，指出如何处理非CPP的语言。常见做法：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span>&#123;</span><br><span class="line">　<span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">　<span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">/* __cplusplus */</span> </span></span><br><span class="line">　…</span><br><span class="line">　…</span><br><span class="line">　<span class="comment">//.h文件结束的地方</span></span><br><span class="line">　<span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></span><br><span class="line">　<span class="meta">#<span class="meta-keyword">if</span> __cplusplus</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">/* __cplusplus */</span></span></span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.cnblogs.com/yc_sunniwell/archive/2010/07/14/1777431.html" target="_blank" rel="noopener">http://www.cnblogs.com/yc_sunniwell/archive/2010/07/14/1777431.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1796,7 +1802,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">253</span>
+                <span class="site-state-item-count">255</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

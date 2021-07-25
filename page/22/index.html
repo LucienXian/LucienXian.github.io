@@ -265,6 +265,309 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/07/Effective-cpp-14/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/07/Effective-cpp-14/" itemprop="url">Effective-cpp-#14</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-07T23:34:28+08:00">
+                2017-12-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Think-carefully-about-copying-behavior-in-resource-managing-classes"><a href="#Think-carefully-about-copying-behavior-in-resource-managing-classes" class="headerlink" title="Think carefully about copying behavior in resource-managing classes"></a>Think carefully about copying behavior in resource-managing classes</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>这是接上一个条款讲述的，当我们用一个对象去管理资源类的时候，我们需要注意该资源是否应该被复制。比如，一个互斥锁，是不应该拥有副本的。因此我们需要某些方法来保证管理这个锁的对象不会被复制，或者我们希望RAII对象被复制时追踪它的使用。</p>
+<h2 id="管理方法"><a href="#管理方法" class="headerlink" title="管理方法"></a>管理方法</h2><ul>
+<li>禁止复制</li>
+</ul>
+<p>使用条款6的方法，即继承一个uncopyable的类。具体可以看<a href="http://www.lucienxian.top/2017/11/24/Effective-cpp-6/" target="_blank" rel="noopener">条款6</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lock</span>:</span> <span class="keyword">private</span> Uncopyable&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">   ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>对底层资源进行“reference-count”（引用计数）</li>
+</ul>
+<p>这种管理方法是因为我们希望保有资源，知道最后一个使用者被销毁时，才销毁资源。这种缘由恰好可以用<strong>shared_ptr</strong>来管理。但有一个问题是，假如我们希望管理的资源是一个互斥锁，那么我们并不希望该资源在引用计数为0时被销毁，而是解锁。</p>
+<p>这时就需要用到删除器了。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lock</span>&#123;</span><span class="comment">//这个类可以不析构，因为非静态变量在对象销毁时被析构函数收回</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	explicit Lock(Mutex* pm):mutexPtr(pm, unlock)&#123;//在引用计数为0时自动调用单参数函数unlock()</span><br><span class="line">      lock(mutexPtr.get());</span><br><span class="line">  	&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="built_in">std</span>::trl::<span class="built_in">shared_ptr</span>&lt;Mutex&gt; mutexPtr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>转移底部资源的控制权</li>
+</ul>
+<p>这里可以使用先前提及的auto_ptr&lt;&gt;</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>复制RAII对象时，必须一并复制它所管理的资源</li>
+<li>RAII class copying的行为通常有：禁止复制，使用引用计数，转移资源的控制</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/06/OS结构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/06/OS结构/" itemprop="url">OS结构</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-06T23:32:43+08:00">
+                2017-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="操作系统结构"><a href="#操作系统结构" class="headerlink" title="操作系统结构"></a>操作系统结构</h1><h2 id="operating-system-services"><a href="#operating-system-services" class="headerlink" title="operating system services"></a>operating system services</h2><ul>
+<li>用户接口</li>
+<li>程序</li>
+<li>IO操作</li>
+<li>文件系统</li>
+<li>通讯</li>
+<li>错误检测</li>
+<li>资源分配</li>
+<li>安全</li>
+</ul>
+<h2 id="User-Operating-System-Interface"><a href="#User-Operating-System-Interface" class="headerlink" title="User Operating System Interface"></a>User Operating System Interface</h2><ul>
+<li>command interface<ul>
+<li>CIL: command-line interface</li>
+<li>GUI: graphics user interface</li>
+</ul>
+</li>
+<li>program interface(System call)</li>
+</ul>
+<h2 id="system-call"><a href="#system-call" class="headerlink" title="system call"></a>system call</h2><ul>
+<li>定义：系统调用是在用户进程和系统内核之间的程序接口</li>
+<li>多数情况下，用户进程通过API而不是系统调用与内核打交道。<ul>
+<li>API是一组函数定义，提供了一个特定的服务；而一个系统调用时通过软中断向内核发送一个请求；</li>
+<li>API可能需要一个或多个系统调用来完成其功能，如果不与内核打交道，则不需要用到系统调用；</li>
+<li>系统调用是在内核态中运行的，而API是在用户态中运行；</li>
+</ul>
+</li>
+<li>系统调用如何传递参数？有三种：<ul>
+<li>在寄存器中传递，适用于参数比较少的，因此会限制参数长度；</li>
+<li>在block、table或者内存中，然后再寄存器存着所在block的地址；</li>
+<li>存在stack中，需要时则pop；</li>
+</ul>
+</li>
+</ul>
+<h2 id="Operating-system-structure"><a href="#Operating-system-structure" class="headerlink" title="Operating system structure"></a>Operating system structure</h2><ul>
+<li>simple structure: MS-DOS</li>
+<li>Microkernel system structure: 由“微”内核和若个个服务组成，基本功能由中央内核提供，其它功能由独立进程提供<ul>
+<li>windows、Macos</li>
+</ul>
+</li>
+<li>Monolithic Kernels: 内核的所有代码，包括子系统都被打包进一个文件中，内核中的每个函数都可以访问内核中所有部分<ul>
+<li>linux</li>
+</ul>
+</li>
+</ul>
+<h2 id="virtual-machines"><a href="#virtual-machines" class="headerlink" title="virtual machines"></a>virtual machines</h2><p>虚拟机是在硬件上的一层服务，物理机的资源被用来创建虚拟机。虚拟机很好地避免了与硬件资源的直接访问</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/06/I-O复用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1446,282 +1749,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/26/Effective-cpp-8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/26/Effective-cpp-8/" itemprop="url">Effective-cpp-#8</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-26T23:41:37+08:00">
-                2017-11-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Prevent-exceptions-from-leaving-destructions"><a href="#Prevent-exceptions-from-leaving-destructions" class="headerlink" title="Prevent exceptions from leaving destructions"></a>Prevent exceptions from leaving destructions</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><ul>
-<li>一种情况下，如果析构函数抛出了异常，则该异常点后面的程序将无法执行，而如果这些对象不能正常释放，则有可能造成内存泄漏的情况；</li>
-<li>另一种情况则是，假设前面有异常被抛出，而后面的对象仍在执行正常的销毁，而此时后面的对象也抛出了异常，在两个异常同时存在的情况下，会导致不明确行为，程序崩溃。</li>
-</ul>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>如果析构函数不得已执行一个有可能抛出异常的动作，那可以用两个方法解决：</p>
-<ul>
-<li>让析构函数自行处理</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DBConn::~DBConn()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">try</span>&#123;db.close();&#125;</span><br><span class="line">  <span class="keyword">catch</span>(...)&#123;</span><br><span class="line">    ....<span class="comment">//处理掉异常，并做记录</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>直接结束程序</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DBConn::~DBConn()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">try</span>&#123;db.close();&#125;</span><br><span class="line">  <span class="keyword">catch</span>(...)&#123;</span><br><span class="line">    ....<span class="comment">//处理掉异常，并做记录</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">abort</span>();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>有时候，析构函数处理掉异常不是一件好事，因为我们不知道“某些行为失败了”；但有时为了让程序忽略掉错误继续运行，这又是一件好事。</p>
-</blockquote>
-<ul>
-<li>也可以重新设计接口，让客户自身去处理异常，比如上面代码的close()函数；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DBConn</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="function"><span class="keyword">void</span> <span class="title">close</span><span class="params">()</span></span>&#123;</span><br><span class="line">      db.close();</span><br><span class="line">      closed = <span class="literal">true</span>;</span><br><span class="line">  	&#125;</span><br><span class="line">  ~DBCconn()&#123;</span><br><span class="line">    <span class="keyword">if</span> (!closed)&#123;</span><br><span class="line">      <span class="keyword">try</span>....</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>析构函数不能抛出异常。如果实在要抛出异常，可以选择让析构函数捕捉该异常，并使其限制在析构函数内或者直接结束函数；</li>
-<li>如果客户需要对某个操作函数的异常做出反应，我们应该为其提供一个普通函数，而不是在析构函数中执行该操作；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/25/Factory-method-DesignPattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/25/Factory-method-DesignPattern/" itemprop="url">Factory method(DesignPattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-25T23:42:48+08:00">
-                2017-11-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Factory-method"><a href="#Factory-method" class="headerlink" title="Factory method"></a>Factory method</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>定义一个用于创建对象的接口，让子类去决定实例化哪一个类</p>
-<h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>一个框架通过抽象类来定义对象之间的关系，并且客户通过子类来定义相关对象的实现。假设有一个应用框架来显示文档，画图框架显示画图文档等，我们需要具体的子类来重定义创建文档的操作，而这个操作就叫做抽象方法。</p>
-<h2 id="使用范围"><a href="#使用范围" class="headerlink" title="使用范围"></a>使用范围</h2><ul>
-<li>当一个类不知道它所创建的对象的类的时候；</li>
-<li>当一个类希望它的子类来指定创建哪个对象的时候；</li>
-</ul>
-<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><ul>
-<li>工厂方法不会将与特定的应用有关的类绑定到代码中，代码仅仅处理product的接口；</li>
-<li>客户为了创建一个product，往往需要创建一个具体的creator；</li>
-</ul>
-<blockquote>
-<p>与abstract factory不同的是，factory method的工厂仅仅是一个方法，而抽象工厂里的工厂是一个类。因此抽象工厂里，客户在使用时，产品本身是固定死的；而工厂方法则需要使用到产品本身（接口）。总结就是，抽象工厂看不到产品，因此需要使用客户端和更换工程，而工厂方法直接使用产品，从而生产产品；</p>
-</blockquote>
-<h2 id="代码示范"><a href="#代码示范" class="headerlink" title="代码示范"></a>代码示范</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Factory_method.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Product() &#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"Product..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"partA..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"partB..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">derivedPro</span> :</span> <span class="keyword">public</span> Product &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	derivedPro() &#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"derived Product..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"derived partA..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"derived partB..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Creator</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">getProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (_product == <span class="number">0</span>) &#123;</span><br><span class="line">			_product = createProduct();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> _product;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Product* _product;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">TheProduct</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">standardCreator</span> :</span><span class="keyword">public</span> Creator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">TheProduct</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">Product</span>* <span class="title">standardCreator</span>&lt;TheProduct&gt;:</span>:createProduct() &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> TheProduct;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	standardCreator&lt;Product&gt; myCreator1;</span><br><span class="line">	Product* p = myCreator1.getProduct();</span><br><span class="line">	p-&gt;partA();</span><br><span class="line">	p-&gt;partB();</span><br><span class="line"></span><br><span class="line">	standardCreator&lt;derivedPro&gt; myCreator2;</span><br><span class="line">	Product* q = myCreator2.getProduct();</span><br><span class="line">	q-&gt;partA();</span><br><span class="line">	q-&gt;partB();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1770,7 +1797,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">253</span>
+                <span class="site-state-item-count">255</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

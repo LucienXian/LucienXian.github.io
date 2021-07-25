@@ -265,6 +265,305 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/11/linux内核分析——页高速缓存和页回写/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/11/linux内核分析——页高速缓存和页回写/" itemprop="url">linux内核分析——页高速缓存和页回写</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T16:47:22+08:00">
+                2018-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="页高速缓存和页回写"><a href="#页高速缓存和页回写" class="headerlink" title="页高速缓存和页回写"></a>页高速缓存和页回写</h1><p>从访问速度来看，内存访问速度高于磁盘访问，而缓存访问速度又高于内存。</p>
+<h2 id="缓存手段"><a href="#缓存手段" class="headerlink" title="缓存手段"></a>缓存手段</h2><p>页高速缓存是由内存中的物理页面组成，对应的是磁盘上的物理块，可以动态扩大缩小。当内核开始读操作时，会先检查数据是否子啊缓存中，不命中采取磁盘找。</p>
+<blockquote>
+<p>现在的缓存一般焊接在CPU上</p>
+</blockquote>
+<h3 id="写缓存"><a href="#写缓存" class="headerlink" title="写缓存"></a>写缓存</h3><p>Linux在调用写操作时，使用的策略是——<strong>回写</strong>。这种策略是直接写到缓存中，而存储不是立刻更新，而是将页高速缓存中被写入的页面标记成<strong>脏页</strong>，表示缓存与磁盘不同步。延迟写磁盘，能方便后续对该页面的操作。</p>
+<h3 id="缓存回收"><a href="#缓存回收" class="headerlink" title="缓存回收"></a>缓存回收</h3><p>Linux实现的是一种改良LRU算法，则使用双链。Linux维护的是两个链表——活跃链表和非活跃链表，非活跃链表的页面是可以被换出的，而两个链表要保持数量平衡。</p>
+<h2 id="Linux页高速缓存"><a href="#Linux页高速缓存" class="headerlink" title="Linux页高速缓存"></a>Linux页高速缓存</h2><p>由于页高速缓存中的页可能包含多个不连续的物理磁盘块。Linux页高速缓存使用一个新的结构来管理缓存项和页面io操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">inode</span>            *<span class="title">host</span>;</span>              <span class="comment">/* owning inode */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">radix_tree_root</span>  <span class="title">page_tree</span>;</span>          <span class="comment">/* radix tree of all pages */</span></span><br><span class="line">        <span class="keyword">spinlock_t</span>              tree_lock;          <span class="comment">/* page_tree lock */</span></span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">int</span>            i_mmap_writable;    <span class="comment">/* VM_SHARED ma count */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">prio_tree_root</span>   <span class="title">i_mmap</span>;</span>             <span class="comment">/* list of all mappings */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">i_mmap_nonlinear</span>;</span>   <span class="comment">/* VM_NONLINEAR ma list */</span></span><br><span class="line">        <span class="keyword">spinlock_t</span>              i_mmap_lock;        <span class="comment">/* i_mmap lock */</span></span><br><span class="line">        <span class="keyword">atomic_t</span>                truncate_count;     <span class="comment">/* truncate re count */</span></span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">long</span>           nrpages;            <span class="comment">/* total number of pages */</span></span><br><span class="line">        <span class="keyword">pgoff_t</span>                 writeback_index;    <span class="comment">/* writeback start offset */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span>   *<span class="title">a_ops</span>;</span>   <span class="comment">/* operations table */</span></span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">long</span>           flags;              <span class="comment">/* gfp_mask and error flags */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">backing_dev_info</span> *<span class="title">backing_dev_info</span>;</span>  <span class="comment">/* read-ahead information */</span></span><br><span class="line">        <span class="keyword">spinlock_t</span>              private_lock;       <span class="comment">/* private lock */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">private_list</span>;</span>       <span class="comment">/* private list */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span>    *<span class="title">assoc_mapping</span>;</span>     <span class="comment">/* associated buffers */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中i_mmap字段是一个优先搜索树，它包含了在该结构体中所有共享的与私有的映射页面。</p>
+<h3 id="address-space-操作"><a href="#address-space-操作" class="headerlink" title="address_space 操作"></a>address_space 操作</h3><p>a_ops域指向地址空间对象中的操作函数表，由adress_space_operations结构体表示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span> &#123;</span></span><br><span class="line">        <span class="keyword">int</span> (*writepage)(struct page *, struct writeback_control *);</span><br><span class="line">        <span class="keyword">int</span> (*readpage) (struct file *, struct page *);</span><br><span class="line">        <span class="keyword">int</span> (*sync_page) (struct page *);</span><br><span class="line">        <span class="keyword">int</span> (*writepages) (struct address_space *, struct writeback_control *);</span><br><span class="line">        <span class="keyword">int</span> (*set_page_dirty) (struct page *);</span><br><span class="line">        <span class="keyword">int</span> (*readpages) (struct file *, struct address_space *,struct list_head *, <span class="keyword">unsigned</span>);</span><br><span class="line">        <span class="keyword">int</span> (*prepare_write) (struct file *, struct page *, <span class="keyword">unsigned</span>, <span class="keyword">unsigned</span>);</span><br><span class="line">        <span class="keyword">int</span> (*commit_write) (struct file *, struct page *, <span class="keyword">unsigned</span>, <span class="keyword">unsigned</span>);</span><br><span class="line">        <span class="keyword">sector_t</span> (*bmap)(struct address_space *, <span class="keyword">sector_t</span>);</span><br><span class="line">        <span class="keyword">int</span> (*invalidatepage) (struct page *, <span class="keyword">unsigned</span> <span class="keyword">long</span>);</span><br><span class="line">        <span class="keyword">int</span> (*releasepage) (struct page *, <span class="keyword">int</span>);</span><br><span class="line">        <span class="keyword">int</span> (*direct_IO) (<span class="keyword">int</span>, struct kiocb *, <span class="keyword">const</span> struct iovec *,<span class="keyword">loff_t</span>, <span class="keyword">unsigned</span> <span class="keyword">long</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这里面最重要的是读写——readpage()和writepage()。</p>
+<p>对于readpage，Linux内核试图在页高速缓存中使用<strong>find_get_page(mapping, index)</strong>找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
+<p>对于writepage，首先在cache中搜索需要的页，如果需要的页不在，则新分配一个空闲项；下一步，内核会创建一个写请求，接着数据被从用户空间拷贝到内核缓冲，最后写入磁盘。</p>
+<h3 id="基树"><a href="#基树" class="headerlink" title="基树"></a>基树</h3><p>每个address_page对象都有唯一的基树，保存在page_tree结构体中。只要指定了文件偏移量，就可以在基树中迅速检索到希望的页面。</p>
+<h2 id="flusher线程"><a href="#flusher线程" class="headerlink" title="flusher线程"></a>flusher线程</h2><p>在内存中累积起来的脏页最终会被写回磁盘，当下列3种情况发生时，脏页被写回磁盘：</p>
+<ul>
+<li>当空闲内存低于阈值时；</li>
+<li>当脏页在内存中驻留时间过长；</li>
+<li>当用户进程调用sync()和fsync()时；</li>
+</ul>
+<p>在Linux内核中由一群flusher线程执行这三种工作，flusher线程会被周期性唤醒，或者因为空闲内存过低被唤醒。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/07/Golang测试覆盖率/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/07/Golang测试覆盖率/" itemprop="url">Golang测试覆盖率</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-07T00:02:03+08:00">
+                2018-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Golang测试覆盖率"><a href="#Golang测试覆盖率" class="headerlink" title="Golang测试覆盖率"></a>Golang测试覆盖率</h1><blockquote>
+<p>最近实习在做一些CI/CD的工作，用到了go的一些测试工具，学习记录一下。都是官网博客找的来源：<a href="https://blog.golang.org/cover" target="_blank" rel="noopener">https://blog.golang.org/cover</a></p>
+</blockquote>
+<p>golang1.2引进了一种新的测试覆盖工具，采用一种特别的方法来生成覆盖率统计数据。</p>
+<h2 id="覆盖率测试"><a href="#覆盖率测试" class="headerlink" title="覆盖率测试"></a>覆盖率测试</h2><p>代码覆盖率测试是指，通过运行一个测试来查看有多少代码被执行了。如果使用的测试样例导致80%的源代码语句运行，我们就认为代码覆盖率为80%。</p>
+<p>go语言引进了一个轻量级的测试框架<strong>testing</strong>和自带的<strong>go test</strong>命令来实现单元测试和性能测试。这套框架的原理很简单，就是在2变异之前重写package的源代码以添加检测、编译和运行修改后的源代码，并且将统计信息转移。</p>
+<h2 id="golang的覆盖率测试"><a href="#golang的覆盖率测试" class="headerlink" title="golang的覆盖率测试"></a>golang的覆盖率测试</h2><p>假设有这样一个源代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="keyword">int</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"negative"</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"zero"</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"small"</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"big"</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"huge"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"enormous"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和这样的一个测试样例：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"testing"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Test <span class="keyword">struct</span> &#123;</span><br><span class="line">    in  <span class="keyword">int</span></span><br><span class="line">    out <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> tests = []Test&#123;</span><br><span class="line">    &#123;<span class="number">-1</span>, <span class="string">"negative"</span>&#125;,</span><br><span class="line">    &#123;<span class="number">5</span>, <span class="string">"small"</span>&#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSize</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i, test := <span class="keyword">range</span> tests &#123;</span><br><span class="line">        size := Size(test.in)</span><br><span class="line">        <span class="keyword">if</span> size != test.out &#123;</span><br><span class="line">            t.Errorf(<span class="string">"#%d: Size(%d)=%s; want %s"</span>, i, test.in, size, test.out)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后使用go test命令加上<strong>-cover</strong>选项来测试代码覆盖率，产生结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok  	_/Users/lucien/Study/gosrc	0.006s</span><br></pre></td></tr></table></figure>
+<ul>
+<li>由于go test命令只能在一个相应的目录下执行所有文件，注意这两个文件需要在同一个目录下。</li>
+<li>另外测试文件必须要以_test.go结尾，这样在执行go test的时候才能执行到相应的代码。</li>
+<li>在测试文件中必须要import testing这个包，另外所有测试函数都以Test开头，并且参数是testing.T，用来记录错误或者测试状态；格式为：</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestXxx</span> <span class="params">(t *testing.T)</span> //<span class="title">Xxx</span>开头必须大写</span></span><br></pre></td></tr></table></figure>
+<p>上面的结果显示，我们代码的测试覆盖率为42.9%，这个数字怎么来的呢？当启用测试覆盖的时候，go test会用cover工具在编译之前重写源代码，在原始代码中寻找分支，然后在每个分支”种下”锚点。 等所有的case都跑完后，通过统计执行锚点的数量来计算覆盖率。比如变成这样：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="keyword">int</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">    GoCover.Count[<span class="number">0</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">2</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"negative"</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">3</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"zero"</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        GoCover.Count[<span class="number">4</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"small"</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        GoCover.Count[<span class="number">5</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"big"</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        GoCover.Count[<span class="number">6</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"huge"</span></span><br><span class="line">    &#125;</span><br><span class="line">    GoCover.Count[<span class="number">1</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"enormous"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>虽然这样重写代码的方式开销看起来比较昂贵，但实际上它会被编译为单个的move指令，在实际测试时开销仅仅增加3%。</p>
+<blockquote>
+<p>Although that annotating assignment might look expensive, it compiles to a single “move” instruction. Its run-time overhead is therefore modest, adding only about 3% when running a typical (more realistic) test. That makes it reasonable to include test coverage as part of the standard development pipeline.</p>
+</blockquote>
+<h2 id="查看结果"><a href="#查看结果" class="headerlink" title="查看结果"></a>查看结果</h2><p>实际上，刚刚那种测试结果看起来比较简陋，我们需要了解更加详细的测试内容，因此我们可以使用go test来输出一个<strong>coverage profile</strong>，该文件保存着收集的统计信息的文件，使得我们研究它们更加方便。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span> go test -coverprofile=coverage.out </span><br><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok      size    0.030s</span><br><span class="line"><span class="meta">%</span></span><br></pre></td></tr></table></figure>
+<p>输出结果为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mode: set</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:3.25,4.12 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:16.5,16.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:5.16,6.26 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:7.17,8.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:9.17,10.23 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:11.18,12.21 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:13.19,14.22 1 0</span><br></pre></td></tr></table></figure>
+<p>有了这么一个文件，我们可以不进行测试，直接查看测试结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span> go tool cover -func=coverage.out</span><br><span class="line">size.go:    Size          42.9%</span><br><span class="line">total:      (statements)  42.9%</span><br><span class="line"><span class="meta">%</span></span><br></pre></td></tr></table></figure>
+<h2 id="热图"><a href="#热图" class="headerlink" title="热图"></a>热图</h2><p>我们可以以多种方式来检测代码覆盖率，go test接受-covermode标志来将覆盖模式设置为以下三种：</p>
+<ul>
+<li>set：每个语句都运行了吗</li>
+<li>count：每个语句运行了多少次</li>
+<li>atomic：跟count一样，但能平行程序中精确计算（使用了来自sync/atomic的原子操作）</li>
+</ul>
+<p>运行这样一行命令，会打开一个浏览器，注意查看绿色的强度如何变化。更明亮的绿色表示具有更高的执行次数。将鼠标停留在语句上，会显示具体的执行次数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go tool cover -html=count.out</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/04/Linux内核学习——进程地址空间/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1520,468 +1819,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/19/Tensorflow安装指南/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/19/Tensorflow安装指南/" itemprop="url">Tensorflow安装指南</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-19T14:11:38+08:00">
-                2018-07-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Tensorflow安装指南"><a href="#Tensorflow安装指南" class="headerlink" title="Tensorflow安装指南"></a>Tensorflow安装指南</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>当然你可以<a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-metas" target="_blank" rel="noopener">查看</a></p>
-<p>因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0</p>
-<p>我的电脑显卡为：GeForce GTX 850M</p>
-<p>硬件支持：</p>
-<table>
-<thead>
-<tr>
-<th>Distribution</th>
-<th>Kernel</th>
-<th>GCC</th>
-<th>GLIBC</th>
-<th>ICC</th>
-<th>PGI</th>
-<th>XLC</th>
-<th>CLANG</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>x86_64</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>RHEL 7.x</td>
-<td>3.10.0</td>
-<td>4.8.5</td>
-<td>2.17</td>
-<td>17.0</td>
-<td>18.x</td>
-<td>NO</td>
-<td>5.0.0</td>
-</tr>
-<tr>
-<td>RHEL 6.x</td>
-<td>2.6.32</td>
-<td>4.4.7</td>
-<td>2.12</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>CentOS 7.x</td>
-<td>3.10.0</td>
-<td>4.8.5</td>
-<td>2.17</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>CentOS 6.x</td>
-<td>2.6.32</td>
-<td>4.4.7</td>
-<td>2.12</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Fedora 27</td>
-<td>4.15.x</td>
-<td>7.3.1</td>
-<td>2.26</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>OpenSUSE Leap 42.3</td>
-<td>4.4.120</td>
-<td>4.8.5</td>
-<td>2.22</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>SLES 12 SP3</td>
-<td>4.4.120</td>
-<td>4.8.5</td>
-<td>2.22</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Ubuntu 17.10</td>
-<td>4.13</td>
-<td>7.2.0</td>
-<td>2.26</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Ubuntu 16.04.4(**)</td>
-<td>4.4.0</td>
-<td>5.4.0</td>
-<td>2.23</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>POWER8(***)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>RHEL 7.x</td>
-<td>3.10.0</td>
-<td>4.8.5</td>
-<td>2.17</td>
-<td>NO</td>
-<td>18.x</td>
-<td>13.1.6</td>
-<td>5.0.0</td>
-</tr>
-<tr>
-<td>Ubuntu 16.04.4</td>
-<td>4.4.0</td>
-<td>5.4.0</td>
-<td>2.23</td>
-<td>NO</td>
-<td>18.x</td>
-<td>13.1.6</td>
-<td>5.0.0</td>
-</tr>
-<tr>
-<td>POWER9(<em>**</em>)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>RHEL 7.5 IBM Power LE</td>
-<td>4.14.0</td>
-<td>4.8.5</td>
-<td>2.17</td>
-<td>NO</td>
-<td>18.x</td>
-<td>13.1.6</td>
-<td>5.0.0</td>
-</tr>
-</tbody>
-</table>
-<h2 id="安装CUDA"><a href="#安装CUDA" class="headerlink" title="安装CUDA"></a>安装CUDA</h2><p>我这里选择的是<a href="https://developer.nvidia.com/cuda-90-download-archive" target="_blank" rel="noopener">9.0</a></p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/CUDA9.0.png" alt="img"></p>
-<p>下载完之后，一次输入以下指令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i cuda-repo-ubuntu1604-9-0-local_9.0.176-1_amd64.deb</span><br><span class="line">sudo apt-key add /var/cuda-repo-&lt;version&gt;/7fa2af80.pub</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install cuda</span><br></pre></td></tr></table></figure>
-<p>在下载安装过程中非常慢，因此我换了阿里云的源（不一定需要换源，如果速度够快的话）：</p>
-<ol>
-<li>备份原来的源</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp /etc/apt/sources.list /etc/apt/sources.list_backup.list</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>更换源</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gedit /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-<p>复制以下的源地址：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">deb-src http://archive.ubuntu.com/ubuntu xenial main restricted #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial main restricted multiverse universe #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted multiverse universe #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial universe</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates universe</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse #Added by software-properties</span><br><span class="line">deb http://archive.canonical.com/ubuntu xenial partner</span><br><span class="line">deb-src http://archive.canonical.com/ubuntu xenial partner</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted multiverse universe #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security universe</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security multiverse</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>更新</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
-<p>安装CUDA之后，需要添加环境变量：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/usr/local/cuda-9.0/bin$&#123;PATH:+:$&#123;PATH&#125;&#125;</span><br><span class="line"><span class="meta">#</span> 64bit</span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br><span class="line"><span class="meta">#</span> 32bit</span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="安装cuDNN"><a href="#安装cuDNN" class="headerlink" title="安装cuDNN"></a>安装cuDNN</h2><p>在<a href="https://developer.nvidia.com/cudnn" target="_blank" rel="noopener">这里</a>注册一下，要做一个下的问卷调查。</p>
-<p>进入<a href="https://developer.nvidia.com/rdp/cudnn-download" target="_blank" rel="noopener">download界面</a></p>
-<p>勾选<strong>I Agree To the Terms of the cuDNN Software License Agreement</strong></p>
-<p>我选择的是v7.0.5版本的，记得Runtime Library和Developer Library都要下载，即：</p>
-<ul>
-<li><a href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7_7.0.5.15-1+cuda9.0_amd64" target="_blank" rel="noopener">cuDNN v7.0.5 Runtime Library for Ubuntu16.04 (Deb)</a></li>
-<li><a href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7-dev_7.0.5.15-1+cuda9.0_amd64" target="_blank" rel="noopener">cuDNN v7.0.5 Developer Library for Ubuntu16.04 (Deb)</a></li>
-</ul>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/cudnn.png" alt="img"></p>
-<p>一开始我只下载了<strong>Developer Library</strong> ，在安装的时候出现了这样的错误：</p>
-<blockquote>
-<p>Package libcudnn7 is not installed.</p>
-</blockquote>
-<p>两个都下载完之后，进入deb包目录，打开终端，输入：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i libcudnn7*.deb</span><br></pre></td></tr></table></figure>
-<p>输入nvidia-smi，看到：</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/nvidia-smi.png" alt="img"></p>
-<blockquote>
-<p>如果显示报错，建议重启一下</p>
-</blockquote>
-<h2 id="安装TensorFlow"><a href="#安装TensorFlow" class="headerlink" title="安装TensorFlow"></a>安装TensorFlow</h2><p>可以查看官网，选择一种<a href="https://www.tensorflow.org/install/install_linux#determine_which_tensorflow_to_install" target="_blank" rel="noopener">安装方式</a>。建议使用 Virtualenv 进行<a href="https://www.tensorflow.org/install/install_linux#installing_with_virtualenv" target="_blank" rel="noopener">安装</a></p>
-<h2 id="验证安装"><a href="#验证安装" class="headerlink" title="验证安装"></a>验证安装</h2><p>进入交互界面，输入以下代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">hello = tf.constant(<span class="string">'Hello, TensorFlow!'</span>)</span><br><span class="line">sess = tf.Session()</span><br><span class="line">print(sess.run(hello))</span><br></pre></td></tr></table></figure>
-<p>如果显示了显卡信息，就基本没有问题了，我的显示如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Python 3.5.2 (default, Nov 23 2017, 16:37:01) </span><br><span class="line">[GCC 5.4.0 20160609] on linux</span><br><span class="line">Type "help", "copyright", "credits" or "license" for more information.</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; import tensorflow as tf</span><br><span class="line">/home/lucienxian/Study/cs231n/assignment2/tensorflow/lib/python3.5/site-packages/h5py/__init__.py:34: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.</span><br><span class="line">  from ._conv import register_converters as _register_converters</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; hello = tf.constant('Hello,world!')</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; sess = tf.Session()</span><br><span class="line">2018-07-19 14:08:56.590394: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA</span><br><span class="line">2018-07-19 14:08:56.675095: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:897] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero</span><br><span class="line">2018-07-19 14:08:56.675799: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1392] Found device 0 with properties: </span><br><span class="line">name: GeForce GTX 850M major: 5 minor: 0 memoryClockRate(GHz): 0.8625</span><br><span class="line">pciBusID: 0000:01:00.0</span><br><span class="line">totalMemory: 1.96GiB freeMemory: 1.73GiB</span><br><span class="line">2018-07-19 14:08:56.675820: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1471] Adding visible gpu devices: 0</span><br><span class="line">2018-07-19 14:09:14.060705: I tensorflow/core/common_runtime/gpu/gpu_device.cc:952] Device interconnect StreamExecutor with strength 1 edge matrix:</span><br><span class="line">2018-07-19 14:09:14.060759: I tensorflow/core/common_runtime/gpu/gpu_device.cc:958]      0 </span><br><span class="line">2018-07-19 14:09:14.060766: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971] 0:   N </span><br><span class="line">2018-07-19 14:09:14.060961: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1084] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 1489 MB memory) -&gt; physical GPU (device: 0, name: GeForce GTX 850M, pci bus id: 0000:01:00.0, compute capability: 5.0)</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; result = sess.run(hello)</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; sess.close()</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; print(result)</span><br><span class="line">b'Hello,world!'</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; exit()</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/18/Linux内核学习——数据结构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/18/Linux内核学习——数据结构/" itemprop="url">Linux内核学习——数据结构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-18T15:26:39+08:00">
-                2018-07-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="内核数据结构"><a href="#内核数据结构" class="headerlink" title="内核数据结构"></a>内核数据结构</h1><h2 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">next</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">prev</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>在linux中，链表的实现是非常特别的——<strong>它不是把数据结构塞进链表里，而是将链表塞进数据结构里</strong>。这样就可以重用定义好的struct结构了。比如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fox</span>&#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> tail_length;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> weight;</span><br><span class="line">    <span class="keyword">bool</span> is_fantastic;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>但这样怎么找到结构体foo的其它变量呢，方法很简单，由于结构体的偏移量在编译时已经确定下来了，使用宏定义container_of()我们就可以找到父结构的任何变量。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> container_of(ptr, type, member) (&#123;				\</span></span><br><span class="line">	<span class="function"><span class="keyword">const</span> <span class="title">typeof</span><span class="params">(((type *)<span class="number">0</span>)-&gt;member)</span> * __mptr </span>= (ptr);	\</span><br><span class="line">	(type *) ( (<span class="keyword">char</span>*)__mptr - offsetof(type,member));	\</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>在linux中的通用队列为kfifo，在文件kernel/kfifo.c中实现。提供了两个主要的操作：入列和出队。另外，kfifo对象还维护了两个偏移量：入口偏移和出口偏移。</p>
-<p>enqueue操作会拷贝数据到队列中的入口偏移位置，然后入口偏移位置会增加元素数目的值。dequeue操作则是相反的操作。</p>
-<h2 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h2><p>linux的映射不是一个通用的映射，它将一个唯一的标识树(UID)映射到一个指针</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2030,7 +1867,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">253</span>
+                <span class="site-state-item-count">255</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

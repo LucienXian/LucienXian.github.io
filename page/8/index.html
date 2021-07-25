@@ -265,6 +265,440 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/18/GFS-MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/18/GFS-MIT6-824/" itemprop="url">GFS--MIT6.824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-18T12:03:39+08:00">
+                2019-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="The-Google-File-System"><a href="#The-Google-File-System" class="headerlink" title="The Google File System"></a><strong>The Google File System</strong></h1><blockquote>
+<p><a href="https://static.googleusercontent.com/media/research.google.com/zh-CN//archive/gfs-sosp2003.pdf" target="_blank" rel="noopener">论文《The Google File System》</a></p>
+</blockquote>
+<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>Google File System (GFS)是谷歌提出的一种快速处理数据的文件系统，与传统的分布式文件系统一样，对于性能，可扩展性，可靠性和可用性都有一定的需求。但通过与传统的分布式文件系统相比较，Google认为：</p>
+<ul>
+<li>组件故障是常态的而非例外；</li>
+<li>传统标准意义的文件很大；</li>
+<li>大多数文件在发生变更时，是通过添加新的数据，而不是覆盖原有数据；</li>
+<li>通过提高我们的灵活性，共同设计应用程序和文件系统API有益于整个系统；</li>
+</ul>
+<h2 id="DESIGN-OVERVIEW"><a href="#DESIGN-OVERVIEW" class="headerlink" title="DESIGN OVERVIEW"></a>DESIGN OVERVIEW</h2><h3 id="Assumptions"><a href="#Assumptions" class="headerlink" title="Assumptions"></a>Assumptions</h3><p>为了设计符合需求的文件系统，有一些细节需要明确的。</p>
+<ul>
+<li>该系统的组成部分容易出故障；</li>
+<li>系统需存储大量的文件；</li>
+<li>在读取时产生workload，主要出现在大型的流式读取和小的随机读取；</li>
+<li>在写入时产生workload，主要出现在顺序的追加写入；</li>
+<li>系统必须为同时附加到同一文件的多个客户端有效地实现明确定义的语义，需要使用原子写入；</li>
+<li>高带宽比低延迟更重要；</li>
+</ul>
+<h3 id="Interface"><a href="#Interface" class="headerlink" title="Interface"></a>Interface</h3><p>GFS提供了熟悉的文件系统接口，但它没有实现POSIX等标准API。</p>
+<p>此外，GFS还实现了快照和记录追加操作，Record append允许多个客户端同时将数据追加到同一文件，同时保证每个客户端追加的原子性。</p>
+<h3 id="Architecture"><a href="#Architecture" class="headerlink" title="Architecture"></a>Architecture</h3><p>一个GFS集群包含了一个master服务器和多个被client访问的chunk服务器，每个chunk服务器都是跑着用户级进程的Linux主机。文件被分成固定大小的块存储在chunkserver上，拥有一个唯一的、由master分配的64位ID。为了可靠性，每个chunkserver都做了多重备份，如三备份。</p>
+<p>master存储着所有的文件元数据信息，并且与chunkserver通过心跳机制进行沟通。</p>
+<p>client和chunkserver都不对文件进行缓存，而是有Linux本身的文件、内存机制进行管理，因为文件太大了。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_Architecture.png" alt="img"></p>
+<h3 id="Single-Master"><a href="#Single-Master" class="headerlink" title="Single Master"></a>Single Master</h3><p>单个master对于我们的设计非常有帮助，为了不使master成为系统的瓶颈，我们需要减少master的IO。因此client不会直接通过master会读写数据，而是向master发送(file name, chunk index)请求，master返回(chunk handle, chunk locations)，这样client就可以通过这个handle和byte range向最近的chunk server获取数据。</p>
+<p>对于相同的chunk的读取，client不会再向master做请求，而是到了cache的信息过期了，或者相关文件重新被打开了，才会去与master交互。</p>
+<h3 id="Chunk-Size"><a href="#Chunk-Size" class="headerlink" title="Chunk Size"></a>Chunk Size</h3><p>chunk size是关键的设计参数，在这里选定了64MB大小，比一般的文件系统的block略大。</p>
+<p>优点：</p>
+<ul>
+<li>减少了与master交互，因为只需要一次初始的请求得知chunk的位置即可；</li>
+<li>client能对chunk做尽可能多的操作，减少了通过TCP连接时的网络负载；</li>
+<li>减少了存在master的元数据信息大小，使得其可以存放在内存；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>对于一个小文件，可能只有一个chunk，这很可能因为client都访问同一个文件，造成hot spot的问题；</li>
+</ul>
+<h3 id="Metedata"><a href="#Metedata" class="headerlink" title="Metedata"></a>Metedata</h3><p>master会保存三种元数据类型：文件和块的命名空间，文件到块的映射，块的位置，所有这些元数据都在master的内存中。</p>
+<h4 id="In-Memory-Data-Structures"><a href="#In-Memory-Data-Structures" class="headerlink" title="In-Memory Data Structures"></a><em>In-Memory Data Structures</em></h4><p>把元数据存储在内存中，提高了master的操作速度，并使得master定期扫描元数据状态变得更加方便。另外，虽然这种方式受制于机器内存，但由于每个文件都会有少数的块是部分满的，对于64MB大小的chunk size，我们会采用64个字节去存储元信息。因此可以用来存储这些小于64个字节的元数据信息。除此之外，必要地增加内存也不是很麻烦的事情。</p>
+<h4 id="Chunk-Locations"><a href="#Chunk-Locations" class="headerlink" title="Chunk Locations"></a><em>Chunk Locations</em></h4><p>master不会拥有chunkserver中关于某个块位置的持久化记录，而是在启动后定期轮询chunkserver（或者有新的GFS chunkserver加入时），获取该信息。因为GFS chunkserver很容易出现宕机，重启等行为，这样GFS master在每次发生这些事件的时候，都要修改持久化存储里面的位置信息的数据。</p>
+<h4 id="Operation-Log"><a href="#Operation-Log" class="headerlink" title="Operation Log"></a><em>Operation Log</em></h4><p>操作日志包含关键元数据更改的历史记录。 它是GFS的核心。它不仅是元数据的唯一持久记录，而且还充当定义并发操作顺序的逻辑时间线。</p>
+<p>在存储时，只有当操作日志被写入到本地master和远程时，master才会对client返回成功。并且，为了提高IO吞吐，master会对日志记录进行批处理。</p>
+<p>关于操作日志，master只有在操作日志达到一定大小时才会进行checkpoint，并且checkpoint以B树的结构在内存中存在，之后则可以通过加载最新的checkpoint来重放这之后的操作日志。因为build checkpoint需要一定的时间，所以master会新开一个线程做checkpoint，从而避免影响到来的请求。</p>
+<h3 id="Consistency-Model"><a href="#Consistency-Model" class="headerlink" title="Consistency Model"></a>Consistency Model</h3><h4 id="Guarantees-by-GFS"><a href="#Guarantees-by-GFS" class="headerlink" title="Guarantees by GFS"></a><em>Guarantees by GFS</em></h4><p>文件命名空间的修改，比如创建文件，都是由master进行的院子操作，master的操作日志定义了一个全局的执行顺序。</p>
+<p>数据修改后，文件区域的状态取决于修改类型，如下图：</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_file_region_state_after_mut.png" alt="img"></p>
+<ul>
+<li>consistent: 所有的client都能看到相同的数据；</li>
+<li>defined: 在文件被修改后，该区域时consistent的并且client能够看到其修改了什么；</li>
+</ul>
+<h4 id="Implications-for-Applications"><a href="#Implications-for-Applications" class="headerlink" title="Implications for Applications"></a><em>Implications for Applications</em></h4><p>事实上，应用在修改文件时往往是追加而不是覆盖，典型的，一个writer创建文件后从头到尾追加。追加文件的操作相对于随机写，其效率更高，并且更容易应对应用失败，只需要使用checkpoint重启增量写即可，还可以避免reader读到不完整的数据。</p>
+<p>除此之外，还会经常出现的场景是，多个writers并发地追加到一个文件，以作归并输出。readers通过辨识writer留下的检验信息，可以认出并去除额外的对齐和记录碎片，还可以用唯一的ID去除重复的记录。</p>
+<h2 id="SYSTEM-INTERACTIONS"><a href="#SYSTEM-INTERACTIONS" class="headerlink" title="SYSTEM INTERACTIONS"></a>SYSTEM INTERACTIONS</h2><blockquote>
+<p>所有的操作都应该尽量减少与master的交互</p>
+</blockquote>
+<h3 id="Leases-and-Mutation-Order"><a href="#Leases-and-Mutation-Order" class="headerlink" title="Leases and Mutation Order"></a>Leases and Mutation Order</h3><p>由于master对于后续的数据流操作是不作控制的，因此需要一种机制保证，多副本以相同的操作顺序写入。GFS会从chunk选定一个chunk server，发送lease，称作primary。由这个primary chunkServer控制写入的顺序。</p>
+<p>lease的初始超时为60秒，这些lease是搭载在HeartBeat信息上的，当master与primary失去连接，也可以在旧lease过期重新选择primary。</p>
+<p>下图为该控制流程：</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_F2.png" alt="img"></p>
+<ol>
+<li>client向master请求当前lease是哪个chunk，和所有的相关副本。如果还没有lease，master则分配一个；</li>
+<li>master返回primary的id和其副本的所在位置给client。client会缓存这些信息，只有当无法连上primary或者其不再持有lease，才会重新联系master；</li>
+<li>client将这些数据信息推送到所有副本，每个chunkserver都会将数据存放在内部的LRU缓存中；</li>
+<li>一旦所有副本都确认收到数据，client会向primary发送写请求，包含之前写的数据的信息。primary会给此次的请求分配一个序列号，保证多客户端并发时能得到唯一的操作顺序；</li>
+<li>primary向所有副本转发写请求，副本以primary的序列号去修改数据；</li>
+<li>副本写成功后向primary确认；</li>
+<li>Primary返回给client。任何副本发生任何错误都会返回给client</li>
+</ol>
+<h3 id="Data-Flow"><a href="#Data-Flow" class="headerlink" title="Data Flow"></a>Data Flow</h3><p>为了尽可能避免网络瓶颈和链路延迟，每台机器都将数据转发到尚未接收到它的网络拓扑中的“最近”的机器，可以通过IP地址估算距离。</p>
+<p>在没有网络拥塞的情况下，将B字节传输到R副本的理想经过时间是<strong>B / T + RL</strong>，其中T是网络吞吐量，L是在两台机器之间传输字节的延迟。</p>
+<h3 id="Atomic-Record-Appends"><a href="#Atomic-Record-Appends" class="headerlink" title="Atomic Record Appends"></a>Atomic Record Appends</h3><p>GFS提供了一个名为record append的原子追加操作，客户端仅指定数据，GFS选择偏移量，然后以原子方式将其附加到文件至少一次，并将该偏移量返回给客户端。</p>
+<p>记录追加与上面的流程有一个额外的逻辑：客户端将数据推送到文件最后一个块的所有副本之后，将其请求发送给primary。primary检查是否将记录附加到当前块将会导致块的大小超过限制（64 MB）。如果是，会把当前的chunk的剩余空间pad起来，然后告诉其他的副本也这么干，最后告诉client这个chunk满了，写入下个chunk。</p>
+<p>如果任何副本上的记录追加失败，则客户端将重试该操作。因此，同一块的副本可能包含不同的数据，但副本必须要与primary对齐，使得下次再追加时，无论哪个副本成为了primary，都能保证所有的操作都从同样的偏移开始追加。</p>
+<h3 id="Snapshot"><a href="#Snapshot" class="headerlink" title="Snapshot"></a>Snapshot</h3><p>我们采用写时拷贝的方法来完成快照操作：</p>
+<ol>
+<li>client向master请求snapshot操作；</li>
+<li>master取消该snapshot涉及到的chunk的所有lease；</li>
+<li>master将该操作持久化到磁盘；</li>
+<li>复制相关chunk的元数据信息到内存中；</li>
+</ol>
+<p>当client要写入相关snapshot的chunk C时：</p>
+<ol>
+<li>client向master请求当前的primary；</li>
+<li>master注意到该chunk的引用计数大于1，然后推迟回复客户端请求，选择一个新的块句柄C’。然后它要求每个具有C的当前副本的块服务器创建一个名为C’的新块；</li>
+<li>master授予其中一个副本在新块C’上的lease并回复客户端；</li>
+</ol>
+<h2 id="MASTER-OPERATION"><a href="#MASTER-OPERATION" class="headerlink" title="MASTER OPERATION"></a>MASTER OPERATION</h2><blockquote>
+<p>The master executes all namespace operations.</p>
+</blockquote>
+<h3 id="Namespace-Management-and-Locking"><a href="#Namespace-Management-and-Locking" class="headerlink" title="Namespace Management and Locking"></a>Namespace Management and Locking</h3><p>由于很多master操作会花费很多时间，为了避免master阻塞，允许多种master操作同时running，我们使用锁保证序列化。</p>
+<p> GFS逻辑上将namespace表示为<strong>完整路径名映射到元数据的查找表</strong>，并且通过前缀压缩保证了其在内存中的使用，namespace树中的每个节点都有一个读写锁。</p>
+<p>每个master操作前都会获取一组锁，如果设计了路径<strong>/d1/d2/…/dn/leaf</strong>，那么就会获得一组关于/d1, /d1/d2, …,<br>/d1/d2/…/dn， /d1/d2/…/dn/leaf的锁。</p>
+<p>举个例子，当/home/user被快照到/save/user的时候，/home/user/foo的创建是被禁止的。因为快照操作获取/home和/save上的读锁，以及/home/user和/save/user上的写锁。文件创建需要/home和/home/user上的读锁，以及/home/user /foo上的写锁。其中，/home/user的锁产生冲突。</p>
+<p>这种方案的一个好处是保障其可以在同一个文件目录并发执行多个文件创建。</p>
+<h3 id="Replica-Placement"><a href="#Replica-Placement" class="headerlink" title="Replica Placement"></a>Replica Placement</h3><p>在GFS集群中，通常有数百个chunk server分布在许多rack上。副本的放置策略有两个目的：最大化数据可靠行和可用性，并最大化网络带宽的利用率。我们必须把chunk的副本分发到不同的rack，这样即使整个rack故障了，这些副本仍然可以存活可用。而且这样在读取的时候也可以利用多个rack的聚合带宽。</p>
+<h3 id="Creation-Re-replication-Rebalancing"><a href="#Creation-Re-replication-Rebalancing" class="headerlink" title="Creation, Re-replication, Rebalancing"></a>Creation, Re-replication, Rebalancing</h3><blockquote>
+<p>Chunk replicas are created for three reasons: chunk creation, re-replication, and rebalancing.</p>
+</blockquote>
+<ol>
+<li>创建chunk</li>
+</ol>
+<p>当chunk server要创建一个chunk时，会考虑以下几种因素：</p>
+<ul>
+<li>希望chunk server低于平均磁盘空间利用率；</li>
+<li>限制每个chunk server最近创建的数量，因为创建chunk往往意味着后续会有大量写入；</li>
+<li>希望在rack上分散chunk的副本；</li>
+</ul>
+<ol start="2">
+<li>重复复制</li>
+</ol>
+<p>一旦可用副本的数量低于用户指定的目标，主服务器就会重新复制一个数据块。需要重新复制的每个块根据几个因素进行优先级排序，一个是它与复制目标的距离（比如优先复制丢失了更多副本的块），另外就是优先重新复制活动文件的块，而不是属于最近删除的文件的块。最后，为了最大限度地减少故障对运行应用程序的影响，我们提高了阻止客户端进度的任何块的优先级。</p>
+<ol start="3">
+<li>重新平衡</li>
+</ol>
+<p>master会定期重新平衡副本，通过检查当前的副本分发并移动副本来获得更好的磁盘空间和负载平衡。同样，对于新加入的的chunk server，master会逐渐填满，而不是用大量的写入流量将其打挂。</p>
+<h3 id="Garbage-Collection"><a href="#Garbage-Collection" class="headerlink" title="Garbage Collection"></a>Garbage Collection</h3><p>文件会删除后，GFS不会立即GC，而且在常规GC时，也只是做了lazy delete。</p>
+<h4 id="Mechanism"><a href="#Mechanism" class="headerlink" title="Mechanism"></a><em>Mechanism</em></h4><p>当应用程序删除文件时，master会立即记录删除，并将文件重命名为包含删除时间戳的隐藏名称。在master定期扫描文件系统的期间，如果发现其存在已经超过一定间隔（三天），它将删除此类隐藏文件。在此之前，我们可以通过重命名的方式取消删除。从命名空间中删除隐藏文件时，将删除其内存中的元数据。在与master定期交换的HeartBeat消息中，每个chunkserver报告它具有的块的子集，并且主服务器回复主服务器元数据中不再存在的所有块的标识。这样chunkserver就可以自由删除了。</p>
+<h4 id="Discussion"><a href="#Discussion" class="headerlink" title="Discussion"></a><em>Discussion</em></h4><p>这种回收方法有许多优势：</p>
+<ul>
+<li>不用担心副本删除信息的丢失，因为heartbeat消息携带了相关信息，可以重试；</li>
+<li>GC被放在master的后台活动中，和定期命名空间扫描等活动一起，使得cost均摊，master可以更加迅速回应其它紧急请求；</li>
+<li>GC的延迟提供了防止意外、不可逆删除的保障；</li>
+</ul>
+<h3 id="Stale-Replica-Detection"><a href="#Stale-Replica-Detection" class="headerlink" title="Stale Replica Detection"></a>Stale Replica Detection</h3><p>当chunkserver失败并且此时错过了chunk的写入变化时，chunk副本很可能会变得过时。</p>
+<p>每当master给chunk授予lease时，它会增加chunk的版本号并作持久化，然后其他副本也会做对应更新，这些操作会在返回给客户端之前完成。当失败的chunkserver重启后，其版本号还是落后的，它会向master汇报版本号和chunk。</p>
+<p>master在其常规垃圾回收中会删除过时的副本，并且当有客户端作请求时，它会认为落后副本不存在。</p>
+<h2 id="FAULT-TOLERANCE-AND-DIAGNOSIS"><a href="#FAULT-TOLERANCE-AND-DIAGNOSIS" class="headerlink" title="FAULT TOLERANCE AND DIAGNOSIS"></a>FAULT TOLERANCE AND DIAGNOSIS</h2><blockquote>
+<p>One of our greatest challenges in designing the system is dealing with frequent component failures.</p>
+</blockquote>
+<h3 id="High-Availability"><a href="#High-Availability" class="headerlink" title="High Availability"></a>High Availability</h3><p>我们通过两种简单而有效的策略保持整个系统的高可用性：快速恢复和复制。</p>
+<h4 id="Fast-Recovery"><a href="#Fast-Recovery" class="headerlink" title="Fast Recovery"></a><em>Fast Recovery</em></h4><p>无论是正常终止还是异常终止，master和chunkserver都被设计为可以在几秒内快速恢复。</p>
+<h4 id="Chunk-Replication"><a href="#Chunk-Replication" class="headerlink" title="Chunk Replication"></a><em>Chunk Replication</em></h4><p>每个chunk都被复制在不同rack的多个chunkserver上，client可以指定其复制级别（默认为3），master则根据需要克隆现有的副本。</p>
+<h4 id="Master-Replication"><a href="#Master-Replication" class="headerlink" title="Master Replication"></a><em>Master Replication</em></h4><p>master的操作日志和checkpoint会在多台计算机上进行复制，只有在其日志记录在本地和所有主副本上刷新到磁盘后，才会认为状态变化已提交。其中，一个master进程仍然在复制所有的修改变化和后台活动。</p>
+<p>当master失败时可以立即重启，而当master所在机器故障时，则在其他位置使用复制的操作日志启动新的主进程。</p>
+<p>新启动的“shadow” masters只提供读服务，因为可能在挂掉的一瞬间，有些日志记录到primary master上，而没有记录到secondary master上。</p>
+<h3 id="Data-Integrity"><a href="#Data-Integrity" class="headerlink" title="Data Integrity"></a>Data Integrity</h3><p>每个chunkserver都使用校验和来检测存储数据是否损坏。</p>
+<p>一个chunk被分成64kb大小的块，每个块都有32位的校验和被存在内存和持久化到日志。</p>
+<p>对于读取的请求，chunkserver会检查数据块的校验和是否正确，如果checksum不正确，chunkserver会报告给client和master，返回错误，让client从其它副本读取数据。而master会clone一个新副本，当新副本clone好后，master会删除掉这个checksum出错的副本。</p>
+<h3 id="Diagnostic-Tools"><a href="#Diagnostic-Tools" class="headerlink" title="Diagnostic Tools"></a>Diagnostic Tools</h3><p>GFS服务器生成诊断日志，记录许多重要事件，比如上下游的chunkservers，RPC的请求和回复。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/27/MapReduce-MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/27/MapReduce-MIT6-824/" itemprop="url">MapReduce--MIT6.824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-27T00:38:31+08:00">
+                2019-02-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h1><blockquote>
+<p><a href="https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf" target="_blank" rel="noopener">论文《MapReduce: Simplified Data Processing on Large Clusters》</a></p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>MapReduce是谷歌提出的一种编程模型，主要目的是为了处理和生成大数据。通过定义map函数来处理key/value对，生成中间键值对，而reduce函数则是用来归并这些中间键值对。</p>
+<p>以这种编程模式来实现的程序会自动在大的集群上并行执行。</p>
+<h2 id="Programming-Model"><a href="#Programming-Model" class="headerlink" title="Programming Model"></a>Programming Model</h2><p>运算时键值对输入，产生另外的一系列键值对。Map函数是用户编写，输入键值对，产生键值对，将具有相同的中间key的值传到reduce函数。</p>
+<p>reduce函数则是接收上面的中间键值对，将那些value合并起来。</p>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>考虑计算文档单词数目的伪代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">map(String key, String value):</span><br><span class="line">    <span class="comment">// key: document name</span></span><br><span class="line">    <span class="comment">// value: document contents</span></span><br><span class="line">    <span class="keyword">for</span> each word w in value:</span><br><span class="line">    	EmitIntermediate(w, <span class="string">"1"</span>);</span><br><span class="line"></span><br><span class="line">reduce(String key, Iterator values):</span><br><span class="line">    <span class="comment">// key: a word</span></span><br><span class="line">    <span class="comment">// values: a list of counts</span></span><br><span class="line">    <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> each v in values:</span><br><span class="line">    	result += ParseInt(v);</span><br><span class="line">    Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+<h3 id="Types"><a href="#Types" class="headerlink" title="Types"></a>Types</h3><p>map和reduce函数都是有类型的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map 	(k1, v1) 		--&gt; list(k2, v2)</span><br><span class="line">reduce	(k2, list(v2))	--&gt; list(v2)</span><br></pre></td></tr></table></figure>
+<h3 id="More-Examples"><a href="#More-Examples" class="headerlink" title="More Examples"></a>More Examples</h3><p>一些应用了mapReduce的例子：</p>
+<ul>
+<li>Distributed Grep</li>
+<li>Count of URL Access Frequency</li>
+<li>Reverse Web-Link Graph</li>
+<li>Term-Vector per Host</li>
+<li>Inverted Index</li>
+<li>Distributed Sort</li>
+</ul>
+<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>论文介绍了谷歌内部的使用。</p>
+<h3 id="Execution-Overview"><a href="#Execution-Overview" class="headerlink" title="Execution Overview"></a>Execution Overview</h3><ol>
+<li>MapReduce库先将input分成M份(16MB-64MB)，然后启动集群上多个机器上的进程；</li>
+<li>其中一个进程是master，其它都是worker；</li>
+<li>分配了map任务的worker会读取那M份输入的一份，解析键值对，将其传到自定义的Map函数中，产生的中间键值对将会缓存起来；</li>
+<li>缓存的内容会被周期性写入到磁盘上，这里磁盘被分成R个区域。写入后的位置信息将会反馈到maser，master再将位置信息传给reduce的worker；</li>
+<li>reduce的worker将会调用RPC去读取缓存，并根据中间结果的key进行排序，使得相同key的键值对分到一个组；</li>
+<li>reduce worker将会遍历键值对，然后将key和相关联的values传到自定义的reduce函数里；</li>
+<li>当所有任务完成后，master将会从MapReduce中返回；</li>
+</ol>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/MapReduceF1.png" alt="img"></p>
+<h3 id="Master-Data-Structures"><a href="#Master-Data-Structures" class="headerlink" title="Master Data Structures"></a>Master Data Structures</h3><p>master保存着多种数据结构，比如worker的状态。</p>
+<p>另外master还是map任务和reduce任务关于文件位置的沟通渠道。</p>
+<h3 id="Fault-Tolerance"><a href="#Fault-Tolerance" class="headerlink" title="Fault Tolerance"></a>Fault Tolerance</h3><h4 id="Worker-Failure"><a href="#Worker-Failure" class="headerlink" title="Worker Failure"></a>Worker Failure</h4><p>master周期性地pingworker，如果没有响应，就认为worker失败了。在失败worker上完成的map任务会设置为idle状态，而还在失败worker上运行的map或者reduce任务都会被设置为idle状态。</p>
+<p>完成的map任务此时还需要重新执行，因为中间结果被存在失败机器的磁盘上；而reduce任务不需要重新运行，因为它的输出存储在全局文件系统。另外，所有的reduce任务都应该知晓任务在重新执行，以便读取到正确磁盘上的中间结果。</p>
+<h4 id="Master-Failure"><a href="#Master-Failure" class="headerlink" title="Master Failure"></a>Master Failure</h4><p>一般情况下，是将master的数据结构持久化。一旦master任务挂了，就从上次的checkpoint点重新起来。</p>
+<h4 id="Semantics-in-the-Presence-of-Failures"><a href="#Semantics-in-the-Presence-of-Failures" class="headerlink" title="Semantics in the Presence of Failures"></a>Semantics in the Presence of Failures</h4><p>当用户的map和reduce函数是确定性的，那么MapReduce产生的结果也是唯一确定的，这是依赖于Map和Reduce任务的原子性提交实现的。</p>
+<p>而对于非确定性的Map或者Reduce操作，单个reduce操作的输出对应于整个程序某次序列化输出的结果。</p>
+<h3 id="Locality"><a href="#Locality" class="headerlink" title="Locality"></a>Locality</h3><p>由于在计算环境中，网络带宽是很重要的资源，所以谷歌文件系统将输入数据平分，存储到本地磁盘上，而且一般会进行3备份。在运行过程中，MapReduce操作会从本地读取。</p>
+<h3 id="Task-Granularity"><a href="#Task-Granularity" class="headerlink" title="Task Granularity"></a>Task Granularity</h3><p>M和R的任务数量应该要比worker机器要多，这样使得worker可以执行多种任务，从而提高负载均衡，也可以在某个worker挂掉的时候快速恢复，因为它已经完成的大量map任务都可以重新分配给其它worker机器上执行。</p>
+<p>因为master进行任务分配决策的复杂度是O(M+R)，并且需要在内存中使用O(M*R)大小的空间来保存之前所说的状态。</p>
+<h3 id="Backup-Tasks"><a href="#Backup-Tasks" class="headerlink" title="Backup Tasks"></a>Backup Tasks</h3><p>因为某些机器磁盘的故障等原因，MapReduce任务会变得特别慢。这时MapReduce采用的机制就是：</p>
+<ul>
+<li>在整个计算快要结束时，将一些还在进行的任务进行backup，当backup任务或者源任务其中一个完成时，我们就任务整个计算完成了</li>
+</ul>
+<h2 id="Refinements"><a href="#Refinements" class="headerlink" title="Refinements"></a>Refinements</h2><h3 id="Partitioning-Function"><a href="#Partitioning-Function" class="headerlink" title="Partitioning Function"></a>Partitioning Function</h3><p>该函数的作用是将中间key结构划分为R部分，默认使用<strong>hash(key) mod R</strong>，但也可以根据需求自定义</p>
+<h3 id="Ordering-Guarantees"><a href="#Ordering-Guarantees" class="headerlink" title="Ordering Guarantees"></a>Ordering Guarantees</h3><p>这个函数主要是对中间结果根据key进行排序</p>
+<h3 id="Combiner-Funct"><a href="#Combiner-Funct" class="headerlink" title="Combiner Funct"></a>Combiner Funct</h3><p>该函数是在执行map任务的机器上操作的，将一些数据合并起来，然后写到中间结果去。</p>
+<h3 id="Input-and-Output-Types"><a href="#Input-and-Output-Types" class="headerlink" title="Input and Output Types"></a>Input and Output Types</h3><p>Mapreduce支持三种文件格式：第一种是逐行读入，key是文件偏移，value是行内容；第二种是key/value读入；第三种是用户自定义reader，可以从文件、数据库或者内存中的数据结构读取。</p>
+<h3 id="Side-effects"><a href="#Side-effects" class="headerlink" title="Side-effects"></a>Side-effects</h3><p>MapReduce允许用户生成额外的输出，但其原子性应该由应用本身来实现</p>
+<h3 id="Skipping-Bad-Records"><a href="#Skipping-Bad-Records" class="headerlink" title="Skipping Bad Records"></a>Skipping Bad Records</h3><p>对于一些不好修复的bug，或者确定性的错误。worker通过一个信号处理器来捕获错误，然后在执行Map或者Reduce操作前，MapReduce会存储一个全局序列号，一旦发现了用户代码的错误，信号处理器就会发一个内含序列号的UDP包给master，如果master发现了特定记录有了多次的失败，就会指示该记录应该跳过，不再重试。</p>
+<h3 id="Local-Execution"><a href="#Local-Execution" class="headerlink" title="Local Execution"></a>Local Execution</h3><p>因为分布式环境调试不方便，MapReduce提供在本机串行化执行MapReduce的接口，方便用户调试。</p>
+<h3 id="Status-Information"><a href="#Status-Information" class="headerlink" title="Status Information"></a>Status Information</h3><p>master把内部的状态通过网页的方式展示出来</p>
+<h3 id="Counters"><a href="#Counters" class="headerlink" title="Counters"></a>Counters</h3><p>MapReduce提供一个计数器来计算各种时间的发生频率。例如这样：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase = GetCounter(<span class="string">"uppercase"</span>);</span><br><span class="line"></span><br><span class="line">map(String name, String contents):</span><br><span class="line">	<span class="keyword">for</span> each word w in contents:</span><br><span class="line">		<span class="keyword">if</span> (IsCapitalized(w)):</span><br><span class="line">			uppercase-&gt;Increment();</span><br><span class="line">		EmitIntermediate(w, <span class="string">"1"</span>);</span><br></pre></td></tr></table></figure>
+<p>计数器的值会周期性传达给master。当MapReduce操作完成时，count值会返回给用户程序，需要注意的是，重复执行的任务的count只会统计一次。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/26/列表优先于数组/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1323,273 +1757,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/11/将源文件限制为单个顶级类/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/11/将源文件限制为单个顶级类/" itemprop="url">将源文件限制为单个顶级类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-11T17:19:53+08:00">
-                2019-02-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="将源文件限制为单个顶级类"><a href="#将源文件限制为单个顶级类" class="headerlink" title="将源文件限制为单个顶级类"></a>将源文件限制为单个顶级类</h1><p>虽然Java编译器能让你在一个源文件里定义多个顶级类，但这种操作风险比较大，因为使用哪个定义将会受到源文件传递给编译器的顺序的影响。</p>
-<p>举个例子，考虑下面这个源文件，它只包含了一个Main类，这个类指向了另外两个顶级类（Utensil和Dessert）的成员：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(Utensil.NAME + Dessert.NAME); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>假设在一个叫Utensil.java的源文件里：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Utensil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"pan"</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dessert</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"cake"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>当然主程序会打印：pancake。</p>
-<p>但如果存在另一个叫Dessert.java的源文件里定义了两个相同的类：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Two classes defined in one file. Don't ever do this!</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Utensil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"pot"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dessert</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String NAME = <span class="string">"pie"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在这个情况，如果编译时使用的命令为<strong>javac Main.java Dessert.java</strong>，会编译失败，因为编译器发现了重复定义。</p>
-<p>如果你用命令<strong>“javac Main.java”</strong>或<strong>“javac Main.java Utensil.java”</strong>来编译程序，它的行为将与你写Dessert.java文件之前的行为一样，打印出“pancake”。</p>
-<p>但如果用命令<strong>“javac Dessert.java Main.java”</strong>来编译程序，它将会打印出“potpie”。</p>
-<p>这种依赖于编译顺序的代码风格不是我们想要的，因此解决方法就是，永远不要将多个顶级类或者接口放到一个源文件里。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/09/优先考虑静态成员类/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/09/优先考虑静态成员类/" itemprop="url">优先考虑静态成员类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-09T01:13:15+08:00">
-                2019-02-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>嵌套类是定义在另一个类中的类，一共有四种嵌套类：静态成员类、非静态成员类、匿名类以及局部类。</p>
-<h2 id="静态成员类"><a href="#静态成员类" class="headerlink" title="静态成员类"></a>静态成员类</h2><p>静态成员类可以看做是一个普通的类，只是这个类恰好在别的类内部被声明，并且它可以访问外围类的所有成员，即便是私有成员。</p>
-<p>静态成员类通用的做法是作为一个公有的辅助类，与它的外围类一起工作。</p>
-<h2 id="非静态成员类"><a href="#非静态成员类" class="headerlink" title="非静态成员类"></a>非静态成员类</h2><p>语法上来说，静态成员类和非静态成员类之间的区别是，静态成员类在声明上有static标识符。非静态成员类与它的外围类的实例关联，并且可以调用外围实例的方法，或者通过标识了this的构造器来获取外围实例的引用。</p>
-<p>在非静态成员类实例被创建时，非静态成员类实例和它的外围实例的关联就被建立了，而且建立后就不能被修改了。</p>
-<p>非静态成员类的一个通常的用法是，定义一个适配器：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Typical use of a nonstatic member class</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">... <span class="comment">// Bulk of the class omitted</span></span><br><span class="line">    <span class="meta">@Override</span> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Iterator&lt;E&gt; <span class="title">iterator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyIterator();</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">MyIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外，<strong>如果你声明了一个不需要访问外围实例的成员类，那你总是应该static修饰符加到声明里去</strong>，这是因为非静态成员类每个实例都会包含一个隐含的外围实例的引用，耗费时间和空间。并且，即便外围实例已经可以被回收，但因为这个非静态的成员类实例，外围实例也会被保留。</p>
-<p>私有静态成员类通常被用来展示代表外围类对象的组件。</p>
-<h2 id="匿名类"><a href="#匿名类" class="headerlink" title="匿名类"></a>匿名类</h2><p>匿名类可以没有名字，它并不是外围类的一个成员。它不仅与其它成员一起被声明，而且它在被使用时同时被声明和初始化。其名称由Java编译器给出，一般是形如：外部类名称+$+匿名类顺序</p>
-<p>当且仅当匿名类出现在非静态的上下文当中时，匿名类才有外围实例。但即使它们出现在静态的上下文当中，也不能拥有除了常量型变量的任何的静态成员，这些常量型变量是final的基本类型，或者初始化常量表达式的字符串属性。</p>
-<h2 id="局部类"><a href="#局部类" class="headerlink" title="局部类"></a>局部类</h2><p>在四种嵌套类里，局部类是最不常用的。在可以声明局部变量的地方就可以声明局部类。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>如果一个嵌套类必须在方法外部可见，或者放在方法内部会显得太长时，就使用成员类；</li>
-<li>如果成员类的实例需要拥有该类的外围类的引用，就将其做成非静态；不然，就将其做成静态；</li>
-<li>假设一个类应当在方法内部，若你需要只从一个地方创建实例而且已经存在一个类型能说明这个类的特征，那么将其做成匿名类；否则，就将其做成局部类；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1638,7 +1805,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">253</span>
+                <span class="site-state-item-count">255</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
