@@ -265,6 +265,216 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux内存管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/10/linux内存管理/" itemprop="url">linux内存管理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:45+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="linux内存管理"><a href="#linux内存管理" class="headerlink" title="linux内存管理"></a>linux内存管理</h1><h2 id="虚拟内存空间的管理"><a href="#虚拟内存空间的管理" class="headerlink" title="虚拟内存空间的管理"></a>虚拟内存空间的管理</h2><ul>
+<li>linux操作系统采用的是<strong>请求式分页虚拟内存管理</strong></li>
+<li>每个进程有独立的4GB的虚拟内存空间</li>
+</ul>
+<blockquote>
+<p>IA32体系结构具有两种内存管理模式：</p>
+<p>实模式</p>
+<p>保护模式</p>
+</blockquote>
+<ul>
+<li>逻辑地址到物理地址的转换：<ul>
+<li>逻辑地址——&gt;线性地址（虚拟地址）——&gt;物理地址</li>
+</ul>
+</li>
+<li>内核空间到物理内存的映射<ul>
+<li>内核空间由所有进程共享，存放着内核代码和数据</li>
+<li>内核空间映射到物理内存总是从最低地址开始，建立线性关系</li>
+<li>系统启动时，内核映像被装载到物理地址1MB开始的地方</li>
+</ul>
+</li>
+</ul>
+<h3 id="进程用户空间"><a href="#进程用户空间" class="headerlink" title="进程用户空间"></a>进程用户空间</h3><p>linux把进程的用户空间划分成一个个区间。</p>
+<ul>
+<li>一个进程的用户进程空间由mm_struct结构描述（对进行的整个用户空间进行描述，memory descriptor）</li>
+<li>vm_area_struct结构是虚存空间的一个连续区域，所有的该结构体组成一个单链表，在这个区域里的信息具有相同的操作和访问特性。vm_mm指针指向mm_struct结构体；vm_strart和vm_end是虚拟区域的开始和终止地址</li>
+</ul>
+<p>创建进程用户空间</p>
+<ul>
+<li>通过fork()系统调用，在创建新进程的同时，也为该进程创建完整的用户空间</li>
+<li>新进程的用户空间——copy_mm()，通过写时复制技术创建的</li>
+</ul>
+<h2 id="linux的分页内存管理机制"><a href="#linux的分页内存管理机制" class="headerlink" title="linux的分页内存管理机制"></a>linux的分页内存管理机制</h2><p>linux总是假定处理器支持三级页表结构（对于IA32，把PGD和PMD合二为一）：</p>
+<ul>
+<li>页目录PGD</li>
+<li>页中间目录PMD</li>
+<li>页表PTE</li>
+</ul>
+<blockquote>
+<p>内核2.6.11之后采用四级页表模型</p>
+</blockquote>
+<ul>
+<li>线性地址到物理地址映射（以IA32为例）<ul>
+<li>页目录：高10位</li>
+<li>页表：中间10位</li>
+<li>偏移：低12位，用来表示在一个页帧中的偏移</li>
+<li>每个进程都有一个页目录。由寄存器CR3指向该页目录的基地址</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>缺页异常：<ul>
+<li>编程错误</li>
+<li>操作系统故意引发的异常</li>
+<li>缺页异常的处理程序是do_page_fault()函数：该函数有两个参数：一个是发送异常地址；一个是错误码；</li>
+<li>do_page_fault()执行过程：从CR2得到发送异常的线性地址；使用LRU去换页，为每个页面设置一个age，年纪越大，越容易被换</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>交换机制：当物理内存小于一个固定的极限时，就会执行换出操作</li>
+</ul>
+<h2 id="物理内存的管理"><a href="#物理内存的管理" class="headerlink" title="物理内存的管理"></a>物理内存的管理</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>页帧：物理内存是以页帧为基本单位的，IA32为4kb</p>
+<p>结点：访问速度相同的一个内存区域，与处理器相关联</p>
+<p>zone：根据用途不同，将不同结点的物理内存分成不同的zone</p>
+<blockquote>
+<p>linux对于zone曹勇buddy system管理</p>
+</blockquote>
+<h3 id="page结构"><a href="#page结构" class="headerlink" title="page结构"></a>page结构</h3><p>页帧是由page结构体表示的。</p>
+<h3 id="物理内存的分配和回收"><a href="#物理内存的分配和回收" class="headerlink" title="物理内存的分配和回收"></a>物理内存的分配和回收</h3><ul>
+<li>buddy分配</li>
+</ul>
+<p>物理内存采用的是buddy分配算法，最小的分配单位是页帧，目的是分配一组连续的物理页帧。</p>
+<p>buddy：两组连续的页帧，满足——大小相同；物理地址连续；第2个页块后面的页帧必须是2n的倍数。</p>
+<p>buddy算法把内存中的所有页帧按照2^n划分，分成1，2，4，8.。。。。1024一共11种页块，每个页块组用一个双向循环链表进行管理，也就是一共有11个链表</p>
+<blockquote>
+<p>比如free_area[0]指向1页帧块的链表</p>
+<p>比如free_area[2]指向4页帧块的链表</p>
+</blockquote>
+<ul>
+<li>内存回收<ul>
+<li>回收时需要检查与该页帧相邻的空闲页块，若存在则需要合成一个连续的空闲区，按buddy算法重新分组</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>slab分配器<ul>
+<li>为了解决buddy算法以页帧为基本分配单位可能造成的内部碎片</li>
+<li>基本思想：为经常使用的小对象建立缓冲，小对象的申请和释放由slab分配器管理，不与buddy系统打交道</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux文件系统/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1650,208 +1860,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/08/Main-Memory/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/08/Main-Memory/" itemprop="url">Main Memory</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-08T23:21:53+08:00">
-                2017-12-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Main-memory"><a href="#Main-memory" class="headerlink" title="Main memory"></a>Main memory</h1><h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>首先提两个概念,这两个寄存器是由操作系统载入的：</p>
-<ul>
-<li>base register：存着最小的合法物理地址</li>
-<li>limit register：存着可用范围</li>
-</ul>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/os_8_1.png" alt="img"></p>
-<ul>
-<li>address binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行</li>
-<li>logical address：由CPU定义的，用户程序生成</li>
-<li>physical address：真实的物理地址</li>
-<li>memory-management unit(MMU)：负责将逻辑地址映射到物理地址</li>
-<li>dynamic loading：为了更好地管理内存，使得进程不受物理内存的限制</li>
-<li>dynamically linked libraries：通常是系统库，在执行前动态链接进来，避免占用太多内存</li>
-</ul>
-<h2 id="swapping"><a href="#swapping" class="headerlink" title="swapping"></a>swapping</h2><p>进程可以在内存和后台存储区（通常是磁盘）中交换。把需要的进程换进来，把暂时不用的进程替换出去</p>
-<ul>
-<li>swapping是非常耗时间的，因为在内存和外存之间的传输非常耗时间</li>
-</ul>
-<h2 id="contiguous-memory-allocation"><a href="#contiguous-memory-allocation" class="headerlink" title="contiguous memory allocation"></a>contiguous memory allocation</h2><p>通常而言，贮存会被分为两部分，一部分是给操作系统，另一部分给用户空间。</p>
-<ul>
-<li>内存保护：limit register有一个地址空间范围，在进程被CPU执行时，这个范围会被加载进去，由操作系统进行验证；</li>
-<li>multiple-partition allocation：给每个进程分一个分区</li>
-<li>fixed partition（固定分区）<ul>
-<li>超过内存大小的进程无法进行</li>
-<li>分区内部无法利用的内存变成内碎片，无法解决</li>
-</ul>
-</li>
-<li>dynamic partition（动态分区）<ul>
-<li>在程序装载进内存时，系统将内存划分一块大小适合的连续区域给进程</li>
-<li>操作系统自行管理已分配和空闲分区</li>
-<li>为了减少碎片：可以通过紧缩和拼接的方法</li>
-<li>三种分配算法：<ul>
-<li>first fit：逐个寻找适合的分区</li>
-<li>best fit：选择剩下内存最小的适合分区</li>
-<li>worst fit：选择剩下内存最大的分区</li>
-<li>next fit：从上次查找结束并内存足够大的区域开始划分</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="paging"><a href="#paging" class="headerlink" title="paging"></a>paging</h2><p>概念先行：</p>
-<ul>
-<li>frames：将物理内存分成帧</li>
-<li>pages：将逻辑地址分为页<ul>
-<li>每个地址被分为了page number(代表着页表的项数)和page offset（代表着页的大小）</li>
-<li>page number构成了page table的索引表，表中存着frame number，对应着内存中的frame</li>
-</ul>
-</li>
-</ul>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/os_8_2.png" alt="img"></p>
-<ul>
-<li>分页不会产生外部碎片，但有可能产生内部碎片，即每一页中的缺失</li>
-</ul>
-<h3 id="TLB"><a href="#TLB" class="headerlink" title="TLB"></a>TLB</h3><p>访问过程：</p>
-<ul>
-<li>传统上需要访问物理内存两次，一次是访问获取页表的内容，另外一次是根据页表的指引去访问内存</li>
-<li>TLB是页表的一部分，只存有页表的部分条目，但不同于页表，TLB一般是存在cache，这样满足快速读取。</li>
-<li>在进程被加载进来时，TLB会被填充，寻找frame时，CPU同时在TLB和page table中寻找。找到则返回frame，找不到则在page table中寻找</li>
-</ul>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/os_8_3.png" alt="img"></p>
-<ul>
-<li>有效访问时间<ul>
-<li>TLB访问时间a</li>
-<li>内存页表访问时间b</li>
-<li>命中率c</li>
-<li>平均访问时间（有TLB）：(a+b)c  + (b+b+a)(1-c)</li>
-<li>没有TLB：2*b</li>
-</ul>
-</li>
-<li>页表有一个有效位，指示该页是否在内存中有映射，否则都需要到磁盘中去找</li>
-</ul>
-<h2 id="structure-of-the-page-table"><a href="#structure-of-the-page-table" class="headerlink" title="structure of the page table"></a>structure of the page table</h2><h3 id="Hierarchical-Paging"><a href="#Hierarchical-Paging" class="headerlink" title="Hierarchical Paging"></a>Hierarchical Paging</h3><blockquote>
-<p>假如有一个32位的系统，页表大小是4KB(2^12)，那么一个页表会含有1MB(2^20)条索引，如果一条索引4个字节，那么会产生4MB大小的页表</p>
-</blockquote>
-<p>因此，我们可以使用二级页表，将页表分页。一个地址将会如下图所示：页目录是页表的索引，页表是进程物理空间本身的索引。</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/os_8_4.png" alt="img"></p>
-<p>(P1是外部表的索引，P2是二级表的索引)</p>
-<h3 id="hashed-page-tables"><a href="#hashed-page-tables" class="headerlink" title="hashed page tables"></a>hashed page tables</h3><p>超过32位地址空间通常是使用哈希页表</p>
-<p>哈希页表的每一条目都包括一个链表的元素，每个元素有三个域：虚拟页码，物理帧号，指向下一个元素的指针。</p>
-<p>通过页码途径哈希函数得到对应的条目，从而获得物理帧号。</p>
-<p><img src="http://ou7boskhm.bkt.clouddn.com/os_8_5.png" alt="img"></p>
-<h3 id="inverted-page-tables"><a href="#inverted-page-tables" class="headerlink" title="inverted page tables"></a>inverted page tables</h3><p>真正被使用的帧才会记录到在反向表的条目中。整个系统只有一张页表，对每个物理内存帧都只有一个条目，包括了逻辑地址和进程号。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1900,7 +1908,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">255</span>
+                <span class="site-state-item-count">256</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1913,7 +1921,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-count">28</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

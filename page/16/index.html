@@ -265,6 +265,168 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/25/DecisionTree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/25/DecisionTree/" itemprop="url">DecisionTree</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-25T23:14:03+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="决策树"><a href="#决策树" class="headerlink" title="决策树"></a>决策树</h1><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><p>决策树是一种常见的机器学习方法，采取的是分而治之的策略。其中每个非叶节点对应于一个属性测试，而叶子节点则对应于决策结果，也就是类别。</p>
+<p><img src="https://pic3.zhimg.com/80/v2-39d109b46ea4f34d5efbf67edc11d57d_hd.jpg" alt="img"></p>
+<p>在生成决策树的过程中，遇到以下三种情况时停止递归：</p>
+<ul>
+<li>当前节点所包含的样本完全属于同一个类别</li>
+<li>当前属性集为空，或是所有样本在所有的属性上取值相同，对于这种情况我们会将当前节点标记为叶节点，并设定类别为该节点所包含样本最多的类别</li>
+<li>当前节点的样本集合为空，同样会将该节点设置为叶节点，类别为父节点中包含样本最多的类别</li>
+</ul>
+<h2 id="划分选择"><a href="#划分选择" class="headerlink" title="划分选择"></a>划分选择</h2><p>决定决策树学习的关键在于如何选择最优的划分属性，保证每个分支节点所包含的样本尽量属于同一个类别，即节点的纯度越高。</p>
+<h3 id="信息增益-information-entropy"><a href="#信息增益-information-entropy" class="headerlink" title="信息增益(information entropy)"></a>信息增益(information entropy)</h3><p>信息熵是度量样本集合纯度的常用指标。假定当前样本集合D中第x类样本所占比例为p(x)，那么D的信息熵就是：</p>
+<p><img src="https://www.zhihu.com/equation?tex=H%28X%29%3D-%5Csum%5Climits_%7Bx%5Cin%5Cmathcal%7BX%7D%7Dp%28x%29%5Clog+p%28x%29" alt="img"></p>
+<p>信息熵的取值范围为[0, log|y|]，y为类别数目</p>
+<p>那么如何去判断某个属性对于样本集信息熵的提升呢，这里就提到了信息增益：</p>
+<p>利用总的熵减去某个分类标准对应的熵，往往我们也可以给某个分支节点赋予权重|Dv|/|D|，Dv就是该分类标准下第v个节点对应的样本</p>
+<p><img src="https://www.zhihu.com/equation?tex=gain%28X%29%3Dinfo%28S%29-info_x+%28S%29" alt="img"></p>
+<p>怎么去理解呢？这里表述的是：原来的总熵为info(S)，在某个划分条件下熵变为了infos(S)，又由于熵是不确定的意思，那么差值越大，就意味着这个划分选择越好。</p>
+<h3 id="增益率"><a href="#增益率" class="headerlink" title="增益率"></a>增益率</h3><p>因为在某些情况下，选择信息增益大的属性，可能会导致泛化能力减弱，比如“编号”属性可能产生n个分支，使得分支节点达到最大，但在这种情况无法进行进一步的划分。</p>
+<p>所以著名的C4.5决策树算法不直接使用信息增益，还是使用增益率：</p>
+<p><strong>Gain_ration(D, a)= Gain(D, a)/IV(a)</strong></p>
+<p>其中IV(a)为：</p>
+<p><img src="https://www.zhihu.com/equation?tex=Info%3D-%5Csum_%7Bv%5Cin+value%28A%29%7D%7B%5Cfrac%7Bnum%28S_%7Bv%7D%29+%7D%7Bnum%28S%29%7Dlog_2%7B%5Cfrac%7Bnum%28S_%7Bv%7D+%29%7D%7Bnum%28S%29%7D+%7D%7D+" alt="img"></p>
+<p>因为这是属性a的固有值，往往属性a的可取值树木越多，那么改值越大。由于该算法可能会倾向于选择可取值树木少的属性，所以它是这样操作的：先根据信息增益选择出高于平均水平的属性，再从其中选出增益率最高的。</p>
+<h3 id="基尼指数"><a href="#基尼指数" class="headerlink" title="基尼指数"></a>基尼指数</h3><p>先来看看基尼指数的公式：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/40658-fb638d3013c6cfa5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/522" alt="img"></p>
+<p>从公式可以看出，基尼指数反映了随机从样本中抽取两个样本，两个样本一致的概率，该概率越小意味着样本集的纯度越高。</p>
+<p>则对于属性a的基尼指数则是：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/40658-7837b7f1610b1c4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/311" alt="img"></p>
+<h2 id="剪枝处理"><a href="#剪枝处理" class="headerlink" title="剪枝处理"></a>剪枝处理</h2><p>剪枝处理的目的是提高决策树的泛化能力，以应对算法出现的过拟合。</p>
+<p>那么如何去评判泛化能力呢？我们可以将样本集分为两类：样本集和检验集，通过计算检验集的准确率来决定决策树的泛化性能</p>
+<p>剪枝分为两种：预剪枝和后剪枝</p>
+<h3 id="预剪枝"><a href="#预剪枝" class="headerlink" title="预剪枝"></a>预剪枝</h3><p>预剪枝是在决策树生成过程中，对每个节点的划分前进行估计，估计其划分是否可以可以带来决策树性能的提升。若不能，则停止划分，并将当前节点标记为叶节点。</p>
+<h3 id="后剪枝"><a href="#后剪枝" class="headerlink" title="后剪枝"></a>后剪枝</h3><p>后剪枝是生成完成的决策树之后，自底向上对节点进行考察，若替换为叶节点后泛化能力有所提升，则进行替换</p>
+<h2 id="连续与缺失值"><a href="#连续与缺失值" class="headerlink" title="连续与缺失值"></a>连续与缺失值</h2><h3 id="连续值处理"><a href="#连续值处理" class="headerlink" title="连续值处理"></a>连续值处理</h3><p>对于连续属性而言，由于可取值数目是无限的，因此我们需要采用连续属性离散化的处理思路。最简单的方法就是采用二分法对属性进行处理。</p>
+<p>给定了样本集D和连续属性a，假设a在D上出现了n个取值，对这些取值进行排序：{a1,a2,…,an}，我们可以得到一个划分点集合，里面有n个元素：</p>
+<p>Ta = {a(i)+a(i+1)/2 | 1&lt;=i&lt;=n-1}</p>
+<p>对这一系列划分点进行考察，计算各个划分点的信息增益，选择信息增益最大对应的划分点。</p>
+<h3 id="缺失值处理"><a href="#缺失值处理" class="headerlink" title="缺失值处理"></a>缺失值处理</h3><p>我们为每个样本取一个权重wx</p>
+<p>将信息增益的计算式更新为以下：</p>
+<p><img src="https://images2015.cnblogs.com/blog/528496/201607/528496-20160720113416326-954203055.png" alt="img"></p>
+<p>若样本在属性的取值已知，则将该样本划入与其取值对应的子节点，并保持权重wx；若属性取值未知，则同时划入所有子节点，并更新权重为~r_v*w_x</p>
+<h2 id="多变量决策树"><a href="#多变量决策树" class="headerlink" title="多变量决策树"></a>多变量决策树</h2><p>如果单纯地使用上面提到的决策树方法，对于多维变量而言，分类边界的每一段都是和属性对应的坐标轴平行的。</p>
+<p>但这样会带来一个问题就是：当学习任务的分类边界比较复杂时，划分的时间成本过高。因此我们考虑多变量决策树，而不是单一的属性，每个叶节点此时就是一个线性的分类器，例如对于西瓜数据集：</p>
+<p>其中一个节点，可以变成：-0.365<em>密度+-0.366</em>含糖度&lt;-0.158?</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/Clustering/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1778,151 +1940,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/20/深度探索C-对象模型-六/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/20/深度探索C-对象模型-六/" itemprop="url">深度探索C++对象模型<六></六></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-20T23:17:05+08:00">
-                2018-03-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Member-Initialization-List"><a href="#Member-Initialization-List" class="headerlink" title="Member Initialization List"></a>Member Initialization List</h1><p>在使用构造函数的时候，你可以用两种方式来设定成员变量的初始值。要么使用initialization list，要么在构造函数内部进行构造。</p>
-<p>首先说明，在以下的情形必须使用初始化列表：</p>
-<ul>
-<li>初始化一个引用变量</li>
-<li>初始化一个常量</li>
-<li>调用基类的constructor，并且它拥有一组参数</li>
-<li>调用成员类对象的constructor，并且它拥有一组参数</li>
-</ul>
-<p>如果是在构造函数体内进行初始化，如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Word</span> &#123;</span></span><br><span class="line">    <span class="built_in">string</span> _name;</span><br><span class="line">    <span class="keyword">int</span> _cnt;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Word() &#123;</span><br><span class="line">        _name = <span class="number">0</span>;</span><br><span class="line">        _cnt = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>它会被编译后修改为：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Word::Word() &#123;</span><br><span class="line">    _name.<span class="built_in">string</span>::<span class="built_in">string</span>();</span><br><span class="line">    <span class="built_in">string</span> tmp = <span class="built_in">string</span>(<span class="number">0</span>);</span><br><span class="line">    _name.<span class="built_in">string</span>::<span class="keyword">operator</span>(temp);</span><br><span class="line">    temp.<span class="built_in">string</span>::~<span class="built_in">string</span>();</span><br><span class="line">    _cnt = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>也就是会定义了一个临时值，降低了效率。</p>
-<p>然而如果是用的初始化列表：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Word::Word: _name(<span class="number">0</span>)&#123;</span><br><span class="line">    _cnt = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//会被扩张成</span></span><br><span class="line"></span><br><span class="line">Word::Word()</span><br><span class="line">&#123;</span><br><span class="line">    _name.<span class="built_in">string</span>::<span class="built_in">string</span>(<span class="number">0</span>);</span><br><span class="line">    _cnt = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="编译器的操作"><a href="#编译器的操作" class="headerlink" title="编译器的操作"></a>编译器的操作</h2><p>编译器会按照<strong>声明</strong>顺序一一地执行initialization list，在constructor安插初始化的操作。</p>
-<p>注意是按照声明的顺序，例如以下的情况会出问题：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">X</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    X(<span class="keyword">int</span> val):j(val), i(j)&#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>由于i先初始化，但j还没初始化，这样就会出现无法预知的值。</p>
-<p>因此，可以这样设置：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="keyword">int</span> val):j(val)&#123;</span><br><span class="line">    i = j;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因为initialization list的初始化操作，编译器会将初始化操作安插在explicit user assignment的操作之前。</p>
-<h2 id="调用member-function设置初始值"><a href="#调用member-function设置初始值" class="headerlink" title="调用member function设置初始值"></a>调用member function设置初始值</h2><p>考虑这样的例子：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="keyword">int</span> val): i(xfoo(val)), j(val)&#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>在这种情况下不会有问题，因为this指针已经构建号，代码会被扩张成：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="keyword">int</span> val)&#123;</span><br><span class="line">    i = <span class="keyword">this</span>-&gt;xfoo(val);</span><br><span class="line">    j = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1971,7 +1988,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">255</span>
+                <span class="site-state-item-count">256</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1984,7 +2001,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-count">28</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

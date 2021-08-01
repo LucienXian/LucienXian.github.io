@@ -265,6 +265,259 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/22/Ensemble-Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/22/Ensemble-Learning/" itemprop="url">Ensemble Learning</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-22T21:38:20+08:00">
+                2019-03-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="集成学习"><a href="#集成学习" class="headerlink" title="集成学习"></a>集成学习</h1><h2 id="个体与集成"><a href="#个体与集成" class="headerlink" title="个体与集成"></a>个体与集成</h2><p>集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，</p>
+<p><img src="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png" alt="img"></p>
+<p>集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。</p>
+<p>假设存在二分类问题和真实函数f，如果基分类器的错误率为$\epsilon$，则对于每个分类器hi有：<br>$$<br>P(h_i(x) \ne f(x)) = \epsilon<br>$$<br>如果基分类器的错误率相互独立，那么集成学习的错误率有：<br>$$<br>P(h_i(x) \ne f(x)) = \sum_{k=0}^{[T/2]} C_T^k (1-\epsilon)^k \epsilon^{T-k} \<br>\leq exp(-1/2T(1-2\epsilon)^2)<br>$$<br>可以看到随着个体学习器数目的增加，集成的错误率降指数下降。</p>
+<p>但往往基学习器的误差不是相互独立的，而且一般准确性很高的话，要增加多样性就必须牺牲准确性，</p>
+<p>目前集成学习中，个体学习强依赖的代表是Boosting，而非强依赖的代表是Bagging和Random Forest。</p>
+<h2 id="Boosting"><a href="#Boosting" class="headerlink" title="Boosting"></a>Boosting</h2><p>Boosting是将弱学习器提升为强学习器的算法：先从初始训练集中训练出一个基学习器，然后根据该学习器的表现对训练样本的分布进行调整，根据调整后的样本分布来训练下一个基学习器。</p>
+<p>Boost的代表是AdaBoost。</p>
+<p>AdaBoost有多种推导方式，我们这里采用基学习器的线性组合：<br>$$<br>H(x) = \sum_{t=1}^T\alpha_th_t(x)<br>$$<br>AdaBoost的算法如下：</p>
+<p>给定一个训练数据集D={(x1,y1), (x2,y2)…(xN,yN)}，yi属于标记集合{-1,+1}。</p>
+<ol>
+<li>$D_1(x) = 1/m$，每一个训练样本最开始时都被赋予相同的权值：1/N；</li>
+<li>进行多轮迭代，假设迭代T次。for t = 1, 2, .. ,T</li>
+</ol>
+<ul>
+<li>$h_t = \xi(D, D_t);$基于分布$D_t$从数据集中训练出分类器$h_t$；</li>
+<li>$\epsilon_{t} = P_{x-D_t}(h_t(x)\ne f(x));$计算分类器的错误率；</li>
+<li>如果错误率比随机猜测还要差，那么意味着当前的基学习器不满足基本条件，放弃该学习器；</li>
+<li>$\alpha_t = 1/2 ln(\frac{1-\epsilon_t}{\epsilon_t})$；确定该分类器的权重；</li>
+<li>$D_{t+1}(x) = \frac{D_t(x) exp(-\alpha_tf(x)h_t(x))}{Z_t}$；更新样本的权重，其中Z是一个规范化因子，以确保$D_{t+1}$是一个分布；每个样本的新权值是变大还是变小，取决于它是被分错还是被分正确；</li>
+</ul>
+<ol start="3">
+<li>输出$H(x)=sign(\sum_{t=1}^T \alpha_th_t(x))$；</li>
+</ol>
+<p>若H(x)能令指数损失函数最小化，可以求偏导：<br>$$<br>\frac {\alpha l_{exp}(H|D)} {\alpha H(x)} = -e^{-H(x)} P(f(x)=1|x) + e^{H(x)}P(f(x)=-1|x)<br>$$<br>令上式为0，可求解：<br>$$<br>H(x) = 1/2 ln \frac{P(f(x)=1|x)}{P(f(x)=-1|x)}<br>$$<br>依赖这个式子，我们可以求得分类器权重的更新公式。</p>
+<p>对于无法重新赋权的训练样本，可以通过重新采样的方法来处理。如上所述，如果初始设置的学习轮数还没到T，可能导致只包含少量基学习器而性能不佳的情况。重采样可以在抛弃不满足基本条件的基学习器之后，根据当前分布重新对样本进行采样，再基于采样结果训练出基学习器，使得学习过程可以在T轮完成。</p>
+<p>Boosting主要关注降低偏差，可以基于泛化能力较弱的学习器构建出强的集成。</p>
+<h2 id="Bagging与随机森林"><a href="#Bagging与随机森林" class="headerlink" title="Bagging与随机森林"></a>Bagging与随机森林</h2><p>为了得到泛化能力强的集成，集成中的个体学习器应该尽可能独立，一种可能的做法是进行随机取样，根据不同的样本训练得到相对独立的基学习器。但这种做法又可能因为数据量不够而导致学习器的准确性不够高。</p>
+<h3 id="Bagging"><a href="#Bagging" class="headerlink" title="Bagging"></a>Bagging</h3><p>bagging是一种并行式的集成学习方法。给定m个样本的数据集，我们每次随机从中抽出一个样本放入采样集中，抽出的样本需要重新放回去。经过m次抽取，我们得到一个m个样本的数据集。其中采样集中有可能存在重复的数据。</p>
+<p>采样了T个含有m个训练样本的数据集，然后基于每个数据集训练出一个基学习器，然后将这些基学习器进行组合，对于分类任务使用简单投票法，而对于回归任务则是使用简单平均法。</p>
+<p>优点：</p>
+<ul>
+<li>Bagging可以应用于多分类、回归等任务；</li>
+<li>由于每个基学习器只用了六成的数据，因此可以用剩下的数据坐泛化能力的”包外预计”；</li>
+</ul>
+<h3 id="随机森林"><a href="#随机森林" class="headerlink" title="随机森林"></a>随机森林</h3><p>随机森林是Bagging的一个扩展变形，在以决策树为基学习器构建Bagging集成的基础上，进一步在决策树的训练过程中引入了随机属性的选择。</p>
+<p>传统决策树在当前节点从d个属性中选择一个最优属性，而在RF中，则是先从该节点的属性集合中随机选择一个包含k个属性的子集，然后再从中选择一个最优属性。</p>
+<p>一般情况下，推荐$k=log_2d$。</p>
+<p>随机森林的泛化误差比Bagging更小。</p>
+<h2 id="结合策略"><a href="#结合策略" class="headerlink" title="结合策略"></a>结合策略</h2><p>学习器结合的优点：</p>
+<ul>
+<li>减小因为单学习器可能带来的误选而导致泛化能力不佳的风险；</li>
+<li>多次运行进行结合，避免陷入局部最小点；</li>
+<li>某些学习任务的真实假设可能并不在单学习器当前学习算法所考虑的假设空间中；</li>
+</ul>
+<h3 id="平均法"><a href="#平均法" class="headerlink" title="平均法"></a>平均法</h3><p>加权平均法：<br>$$<br>H(x) = \sum_{i=1}^Tw_ih_i(w)<br>$$<br>其中，$w_i \ge 0, \sum_{i=1}^Tw_i=1$；简单平均法，则是令$w_i=1/T$的特例。</p>
+<p>一般而言，在个体学习器性能相差较大时宜使用加权平均法，而在个体学习器性能相近时则使用简单平均法。</p>
+<h3 id="投票法"><a href="#投票法" class="headerlink" title="投票法"></a>投票法</h3><p>投票法有几种，假设$h_i^j(x)$是分类器$h_i$在类别标记$c_j$上的输出。</p>
+<ul>
+<li>绝对多数投票法</li>
+</ul>
+<p>$$<br>H(x)=\left{<br>\begin{array}{rcl}<br>c_j       &amp;      &amp; {if \sum_{i=1}^T h_i^j(x) \ge 0.5\sum_{k=1}^T \sum_{i=1}^T h_i^k(x)}\<br>reject     &amp;      &amp; {otherwise}<br>\end{array} \right.<br>$$</p>
+<p>对于可靠性的学习任务中，这个机制提供了拒绝预测的选项</p>
+<ul>
+<li>相对多数投票法</li>
+</ul>
+<p>$$<br>H(x) = c_{arg max <em>j } \sum</em>{i=1}^Th_i^j(x)<br>$$</p>
+<p>若同时有多个类别获得了最高票，则随机选一个。</p>
+<ul>
+<li>加权投票法</li>
+</ul>
+<p>$$<br>H(x) = c_{arg max <em>j } \sum</em>{i=1}^T w_ih_i^j(x)<br>$$</p>
+<p>一般情况下，对于不同的学习器可能会产生不同类型的值，比如类标记和类概率。在这种情况下，类概率输出转化为类标记输出（例如将类概率最大的设置为1，其它为0），然后再投票。</p>
+<h3 id="学习法"><a href="#学习法" class="headerlink" title="学习法"></a>学习法</h3><p>当训练数据很多时，我们可以使用另一种更为强大的结合策略——通过另一个学习器进行结合。</p>
+<p>Stacking是这类策略的代表，其先从初始数据集训练出初级学习器，然后”生成”一个新的数据集用于训练次级学习器。</p>
+<p>为了避免过拟合，一般是采用交叉验证的方式，即用训练初级学习器未使用的样本来产生次级学习器的训练样本。以k折交叉验证为例，初始训练集D被随机划分为k个大小相似的集合$D_1,..,D_k$。令$D_j$和$\overline D_j = D-D_j$分别表示在第j折的测试集和训练集。</p>
+<p>算法的具体过程如下：</p>
+<ul>
+<li>给定T个初级学习算法，初级学习器$h_t^{(j)}$通过在$\overline D_j$上使用第t个学习算法而得；</li>
+<li>对$D_j$中每个样本$x_i$，计算$z_{it}=h_t^{(j)}(x_i)$，则由样本产生的次级训练样例为$z_i=(z_{i1},…,z_{iT})$，标记部分为$y_i$；</li>
+<li>交叉验证结束之后，由初级学习器产生的次级训练集$D’ = {(z_i,y_i)}^m_{i=1}$，并由此训练次级学习器；</li>
+</ul>
+<p>次级学习器的输入属性表示和次级学习算法对stacking集成的泛化性能由很大的影响。</p>
+<h2 id="多样性"><a href="#多样性" class="headerlink" title="多样性"></a>多样性</h2><h3 id="误差——分歧分解"><a href="#误差——分歧分解" class="headerlink" title="误差——分歧分解"></a>误差——分歧分解</h3><p>为了使得泛化能力提高，个体学习器应该”好而不同”。因此我们来做一点理论分析：</p>
+<p>假设对于数据x，定义学习器h得分歧为：<br>$$<br>A(h_i|x) = (h_i(x)-H(x))^2\<br>则集成的分歧为：\overline A(h_i|x) = \sum_{i=1}^Tw_i(h_i(x)-H(x))^2<br>$$<br>而个体学习器和集成学习器的平方误差为：<br>$$<br>E(h_i|x) = (f(x)-h_i(x))^2 \<br>\overline E(h|x) = \sum_{i=1}^T w_i E(h_i|x) \<br>E(H|x) = (f(x)-H(x))^2<br>$$<br>则可以根据上式求得：<br>$$<br>\overline A(h|x) = \overline E(h|x) -E(H|x)<br>$$<br>因此可以求得$E = \overline E - \overline A$，即个体学习器准确性越高，多样性越好，则集成效果越好。</p>
+<h3 id="多样性度量"><a href="#多样性度量" class="headerlink" title="多样性度量"></a>多样性度量</h3><p>多样性度量其实就是度量集成个体分类器的多样性，比较典型的做法是考虑个体分类器的两两相似/不相似性，以两分类为例：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Hi = +1</th>
+<th>Hi = -1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hj = +1</td>
+<td>a</td>
+<td>c</td>
+</tr>
+<tr>
+<td>Hj = -1</td>
+<td>b</td>
+<td>d</td>
+</tr>
+</tbody>
+</table>
+<p>其中，a表示两个分类器都预测为正类的样本数目，a+b+c+d=m。以下是一些常见的多样性度量：</p>
+<ul>
+<li>不合度量</li>
+</ul>
+<p>$$<br>dis_{ij} = \frac{b+c}{m}<br>$$</p>
+<ul>
+<li>相关系数</li>
+</ul>
+<p>$$<br>p_{ij} = \frac{ad-bc}{\sqrt{(a+b)(a+c)(c+d)(b+d)}}<br>$$</p>
+<p>该系数的值域为[-1,1]，若两分类器无关，则值为0.若为正相关，则值为正，否则为负；</p>
+<ul>
+<li>Q-统计量</li>
+</ul>
+<p>$$<br>Q_{ij} = \frac{ad-bc}{ad+bc}<br>$$</p>
+<p>其与上面相关系数符号相同；</p>
+<ul>
+<li>k-统计量</li>
+</ul>
+<p>$$<br>k = \frac{p1-p2}{1-p2}<br>$$</p>
+<p>其中，p1是两个分类器取得一致的概率；p2是两个分类器偶然达成一致的概率：<br>$$<br>p1 = \frac{a+d}{m} \<br>p2 = \frac{(a+b)(a+c)+(c+d)(b+d)}{m^2}<br>$$<br>若分类器在数据集上完全一致，则k=1；若它们仅仅是偶然性达成一致，则k=0；k通常为非负值，仅仅在分类器达成一致的概率比偶然性的情况下还低时取负值。</p>
+<h3 id="多样性增强"><a href="#多样性增强" class="headerlink" title="多样性增强"></a>多样性增强</h3><p>要生成多样性大的个体学习器，比较直接的方法是在学习过程引入随机性。</p>
+<ul>
+<li>数据样本扰动</li>
+</ul>
+<p>基于采样法，对训练样本稍加变化。但有些稳定学习器对数据样本的扰动并不敏感。</p>
+<ul>
+<li>输入属性扰动</li>
+</ul>
+<p>该方法一般是从初始属性集中抽出若干个属性子集，这样做不但能增加多样性，还能减少训练时间。但对于属性较少的样本不适宜。</p>
+<ul>
+<li>输出表示扰动</li>
+</ul>
+<p>此类做法的基本思路是对输出表示进行操纵以增强多样性，可以对训练样本的类标记做少许改动，也可以对输出表示进行转化，还可以将原任务拆解成多个子任务。</p>
+<ul>
+<li>算法参数扰动</li>
+</ul>
+<p>对基学习算法的一些参数进行设置，比较常见的是神经网络的参数设置。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/18/GFS-MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1622,141 +1875,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/13/基于梯度的学习——DeepLearning系列/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/13/基于梯度的学习——DeepLearning系列/" itemprop="url">基于梯度的学习——DeepLearning系列</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-13T00:42:15+08:00">
-                2019-02-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="基于梯度的学习"><a href="#基于梯度的学习" class="headerlink" title="基于梯度的学习"></a>基于梯度的学习</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>普通的线性模型和神经网络的最大区别，在于神经网络的非线性容易使得我们感兴趣的代价函数变得非凸，这样就只能使得代价函数达到一个非常小的值，而不能保证全局收敛。</p>
-<p>除此之外，对于前馈神经网络，将所有权重值随机化为小随机数是非常重要，偏置bias则应该初始为零或者小的正值。</p>
-<h2 id="代价函数"><a href="#代价函数" class="headerlink" title="代价函数"></a>代价函数</h2><p>神经网络的一个重要设计就是代价函数的选择，在大多数情况下，参数模型定义了一个分布式$p(y | x; \theta)$并且我们使用最大似然原理。</p>
-<h3 id="使用最大似然学习条件分布"><a href="#使用最大似然学习条件分布" class="headerlink" title="使用最大似然学习条件分布"></a>使用最大似然学习条件分布</h3><p>如果神经网络使用最大似然来训练，这意味着代价函数就是负的对数似然。<br>$$<br>J(\theta) = - E_{x, y - p_{data} } log _{p_{model} } (y | x)<br>$$<br>代价函数的具体形式随着模型而改变，取决于$log_{Pdata}$的具体形式。</p>
-<p>使用最大似然来导出代价函数的一个好处就是减轻了为每个模型设计代价函数的负担，因为每确定一个模型$p(y|x)$则自动确定了一个代价函数$logp(y|x)$。另外，为了避免代价函数的梯度不够大，使得预测性减弱，我们可以使用负的对数似然来避免这个问题。另外，用于实现最大似然估计的交叉熵代价函数有一个特性，就是它用于实践模型的时候，通常没有最小值。</p>
-<h3 id="学习条件统计量"><a href="#学习条件统计量" class="headerlink" title="学习条件统计量"></a>学习条件统计量</h3><p>有时我们并不是想学习一个完整的概率分布，而是想学习在给定x时y的某个条件统计量。</p>
-<p>我们可以吧代价函数看做是一个泛函而不仅仅是一个函数，泛函是函数到实数的映射，因此我们可以将学习看做是选择一个函数而不仅仅是一组参数。例如我们可以设计一个代价泛函，使得它的最小值处于一个特殊的函数上，这个函数将x映射到给定x时y的期望值。</p>
-<p>对函数求解优化问题需要用到变分法，我们使用变分法导出的第一个结果是解优化问题：<br>$$<br>f^<em> = arg min <em>{f} E</em>{x, y - Pdata} || y - f(x) || ^ 2<br>$$<br>得到<br>$$<br>f^</em>(x) = E_{y - Pdata}(y|x)[y]<br>$$<br>因此可以看到，如果我们最小化均方误差代价函数，将得到一个函数，它可以用来对每个x的值预测出y的均值。</p>
-<p>不同的代价函数给出不同的统计量，例如：<br>$$<br>f^* = arg min <em>{f} E</em>{x, y - Pdata} || y - f(x) || _1<br>$$<br>将得到一个函数可以对每个x预测y取值的中位数，这个代价函数被称为平均绝对误差。</p>
-<h2 id="输出单元"><a href="#输出单元" class="headerlink" title="输出单元"></a>输出单元</h2><p>代价函数的选择与输出单元的选择密切相关，任何可用作输出的神经网络单元，也可以被用作隐藏单元。</p>
-<h3 id="用于高斯输出分布的线性单元"><a href="#用于高斯输出分布的线性单元" class="headerlink" title="用于高斯输出分布的线性单元"></a>用于高斯输出分布的线性单元</h3><p>一种简单的输出单元是基于仿射变换，这些单元是线性单元。</p>
-<p>给定特征h，线性输出单元层产生一个向量$y’= W^Th+b$。线性输出层经常被用来产生条件高斯分布的均值：<br>$$<br>p(y|x) = N (y, y’, I)<br>$$<br>最大化其对数似然此时等价于最小化均方误差。</p>
-<h3 id="用于Bernoulli输出分布的sigmoid单元"><a href="#用于Bernoulli输出分布的sigmoid单元" class="headerlink" title="用于Bernoulli输出分布的sigmoid单元"></a>用于Bernoulli输出分布的sigmoid单元</h3><p>许多任务需要预测二值型变量y的值，此时最大似然的方法是定义y在x条件下的Bernoulli分布。</p>
-<p>为了保证无论何时模型给出错误的答案，总能有一个较大的梯度，而不是梯度为0。因此sigmoid输出单元定义为：<br>$$<br>y’ = \sigma(w^Th+b)<br>$$<br>这里sigmoid输出单元有两个部分，一个是线性层，另一个则是使用sigmoid激活函数将z转换为概率。</p>
-<h3 id="用于Multinoulli输出分布的softmax单元"><a href="#用于Multinoulli输出分布的softmax单元" class="headerlink" title="用于Multinoulli输出分布的softmax单元"></a>用于Multinoulli输出分布的softmax单元</h3><p>任何时候，当我们想要表达一个具有n个可能取值的离散型随机变量的分布时，我们都可以使用softmax函数。</p>
-<p>其形式为：<br>$$<br>softmax(z)_i = \frac{exp(z_i)}{\sum_j exp(z_j)}<br>$$<br>softmax输出的综合为1，所以一个单元的值增加必然对应这其它单元值的减少。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1805,7 +1923,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">255</span>
+                <span class="site-state-item-count">256</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1818,7 +1936,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-count">28</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
