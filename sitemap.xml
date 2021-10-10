@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2021/10/10/Beyond-malloc-efficiency-to-fleet-efficiency/</loc>
+    
+    <lastmod>2021-10-10T14:59:03.477Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2021/08/01/Rocksdb%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E4%B8%80/</loc>
     
     <lastmod>2021-08-01T16:00:48.243Z</lastmod>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2021-08-01T16:00:48.243Z</updated>
+  <updated>2021-10-10T14:59:03.477Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Beyond malloc efficiency to fleet efficiency</title>
+    <link href="http://yoursite.com/2021/10/10/Beyond-malloc-efficiency-to-fleet-efficiency/"/>
+    <id>http://yoursite.com/2021/10/10/Beyond-malloc-efficiency-to-fleet-efficiency/</id>
+    <published>2021-10-10T14:58:29.000Z</published>
+    <updated>2021-10-10T14:59:03.477Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Beyond-malloc-efficiency-to-fleet-efficiency"><a href="#Beyond-malloc-efficiency-to-fleet-efficiency" class="headerlink" title="Beyond malloc efficiency to fleet efficiency"></a>Beyond malloc efficiency to fleet efficiency</h1><blockquote><p>内存分配的优化可以带来巨大的成本效益。一般有两种做法，一是提高分配器的效率，减少分配器代码中的周期；一种是通过数据放置的策略来提高应用的整体性能。这篇文章主要关注的是hugepage，提出了一个叫TEMERAIRE的hugepage机制，以最大化hugapage的覆盖率和最小化碎片开销。</p></blockquote><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>本文主要关注的是通过提高内存分配器的大页面覆盖率来提升应用性能。Cache miss和TLB miss是现代系统中最主要的性能开销，Hugepages的出现可以显著减少TLB未命中的数量，增加大页的大小使得相同数量的TLB条目能够映射更大范围的内存，另外大页还能减少miss+填充的时间，因为页表遍历更快了。论文提出了一种TEMERAIRE 的设计，作为TCMALLOC的一部分减少应用代码的CPU开销，最大化大页覆盖、减少内存碎片。</p><h2 id="The-challenges-of-coordinating-Hugepages"><a href="#The-challenges-of-coordinating-Hugepages" class="headerlink" title="The challenges of coordinating Hugepages"></a>The challenges of coordinating Hugepages</h2><p>虚拟内存是通过TLB来将用户空间地址转换为物理地址的，TLB条目有限，如果使用默认页面大小，整个TLB覆盖的内存范围很小。现代的处理器通过在TLB中支持hugepage来加大覆盖范围，完整的大页（比如X86时2MB）仅仅占用一个条目。</p><p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6c5.png" alt></p><p>传统的分配器以页面大小的块来管理内存，Transparent Huge Pages机制为内核使用大页来覆盖连续页面提供了可能性。但内存的释放面临着更大的挑战，对于非大页区域来说，内存的释放要求内核使用较小的页面来表示剩余的内存。又或者大页的返回需要整个页面都变成空闲状态，这就带来内存碎片的问题。因此对于大页的设计需要在内存碎片和TLB使用率之间权衡。</p><h2 id="Overview-of-TCMALLOC"><a href="#Overview-of-TCMALLOC" class="headerlink" title="Overview of TCMALLOC"></a>Overview of TCMALLOC</h2><p>下图展示了TCMALLOC的内存组织，TCMALLOC将内存按spans分区，并且与页面大小对齐。</p><p>足够大的分配请求由仅仅包含分配对象的spans实现，至于其他的span则会包含多个相同大小的小对象，小对象的边界是256KB，小于这个的请求会四舍五入到100个大小类别中去。TCMALLOC将对象存储在一系列缓存中，如下图所示。span是从一个简单的pageheap分配的，它跟踪所有未使用的页面并进行best fit分配。pageheap还会负责定期释放内存回操作系统，减少过多的系统内存分配。</p><p>TCMALLOC会首先从local cache中分配，这里用的是per-hyperthread local cache，本地缓存会存着不同大小的空闲对象列表。如果请求不能满足要求，会路由到对应大小类别的central cache。这里有两个组件，一个是小的、快速的、互斥保护的transfer cache，另一个则是大的、互斥保护的central列表，包含了该大小对应的每一个span。当一个span的所有对象都返回到central list的一个span时，该span就会返回到pageheap。</p><p>TCMALLOC的pageheap有一些简单的内存接口：New(N)分配一个N页的span；Delete(S)向分配器返回一个新的span；Release(N)将pageheap缓存的&gt;=N个未使用的页返回给操作系统；</p><h2 id="TEMERAIRE’s-approach"><a href="#TEMERAIRE’s-approach" class="headerlink" title="TEMERAIRE’s approach"></a>TEMERAIRE’s approach</h2><p>TEMERAIRE就是基于TCMALLOC提出的大页优化，将分配请求尽可能打包到频繁使用的大页上，同时形成完全未使用的大页面以便遍返回给操作系统。并且根据malloc的使用情况和TCMALLOC的结构制定了一些TEMERAIRE的选择原则：</p><ul><li>总内存的需求随时发生变化，并且是不可预测的；</li><li>将不是几乎为空的大页面返回给操作系统的成本是比较高的，因此其设计必须能够将分配密集地打包到高度使用的区域中；另外虽然我们的目标是专门使用大页大小的二进制，但malloc也必须支持大于单个大页的分配大小；</li><li>当一个大页完全为空时，可以选择是保留它以供将来分配内存，也可以将其返回给操作系统。适应性地做出这个决策非常重要；</li><li>很少有分配请求会直接接触pageheap，但所有分配都通过pageheap支持；</li></ul><p>TCMALLOC分配器通过委托给几个子组件来实现它的接口，如下图所示，每个组件都是根据上述原则构建的，都对最适合它处理的分配类型进行了设计。虽然TEMERAIRE的特定实现与TCMALLOC内部结构相关联，但大多数现代分配器都有类似的大页面分配支持。</p><h3 id="The-overall-algorithm"><a href="#The-overall-algorithm" class="headerlink" title="The overall algorithm"></a>The overall algorithm</h3><p>这一章主要描述各个组件，其主要目标是最小化或重用生成的slack（slack就是大页之间的多余空间区域）。所有组件的背后是HugeAllocator组件，它负责处理虚拟内存和操作系统之间的关系，为其他组件提供了可备份可传递的内存。HugeCache则是一个完全为空的大页缓存。HugeFiller则是一个存着部分填充空间的大页列表。HugeRegion则是用来应对大页边界的分配请求的。TEMERAIRE使用下图算法根据请求大小将分配决策定向到其子组件。</p><p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6d4.png" alt></p><p>为大页面大小的精确倍数，或那些足够大以至于slack无关紧要的分配请求由HugeCache负责；中等大小的分配由HugeCache负责（1MiB到1GiB）；例如，来自HugeCache的4.5MiB分配会产生1.5MiB的slack，这里的开销是比较高的。TEMERAIRE通过假装请求的最后一个大页面有一个单一的“前导”分配，将这个slack交由HugeFiller负责。如下图：</p><p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6dd.png" alt></p><p>对于某些中等分配的请求来说，其往往会产生更多的slack。如下图，例如，许多1.1MiB的分配将产生0.9MiB的每个大页的slack。当检测到这种模式时，HugeRegion分配器会跨越大页边界进行分配，以最大限度地减少这种开销。</p><p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6eb.png" alt></p><p>小请求(&lt;= 1MB的)始终由HugeFiller提供服务。对于1MB和大页之间的分配，TEMERAIRE会评估了几个选项：</p><ul><li>如果有足够的可用空间，就会尽量使用HugeFiller；</li><li>如果HugeFiller不能满足请求，接下来会考虑HugeRegion；如果已分配的HugeRegion能满足要求，TEMERAIRE就会使用它。如果不存在满足要求区域，就会考虑分配一个区域；</li><li>否则就从HugeCache中分配一个完整的大页面，当然这样会产生slack，但预期其会在未来被填平；</li></ul><p>对于TEMERAIRE来说，1个1GB的空闲范围内存和512 个不连续的free大页是被同等对待。</p><h3 id="HugeAllocator"><a href="#HugeAllocator" class="headerlink" title="HugeAllocator"></a>HugeAllocator</h3><p>HugeAllocator会跟踪记录所映射的虚拟内存，所有操作系统的映射都在此进行。</p><h3 id="HugeCache"><a href="#HugeCache" class="headerlink" title="HugeCache"></a>HugeCache</h3><p>HugeCache以完整的大页粒度来追踪返还的内存范围，HugeFiller填充和释放大页后，需要决定何时将大页返回给操作系统，需要权衡后续是否需要使用来做决定。HugeCache的做法是在 2 秒的滑动窗口内跟踪请求的周期性，并计算记录最大值和最小值，每当内存返回到HugeCache时，如果cache此时大于Demand_max-Demand_min，则将大页返回给操作系统。</p><h3 id="HugeFiller"><a href="#HugeFiller" class="headerlink" title="HugeFiller"></a>HugeFiller</h3><p>HugeFiller用来满足较小的分配请求，每个分配请求都尽量在单个大页完成。HugeFiller满足了大部分的分配请求，是真哥哥系统中最重要的组件。对于给定的大页，使用best-fit的算法来进行分配。</p><p>HugeFiller的两个目标，一是使得一部分大页尽可能地满，另一部分大页面尽可能为空；第二个目标是最小化每个大页内的碎片，使得新分配请求尽可能得到满足。因为几乎为空的大页非常宝贵，通过尽可能保留具备最长空闲内存范围的大页来满足上面的目标，将相应的大页组织到一个排序列表中，充分利用每个大页的统计数据。</p><p>在每个的大页中，HugeFiller会记录使用的页面位图。为了填充某个大页的请求，HugeFiller会从该位图进行best-fit的搜索。并且还记录了以下几个数据：尚未分配的连续页数，最长的空闲内存范围L；分配总数A；已使用的页面总数U。</p><p>通过上述三个统计信息来确定分配大页的优先级顺序——选择具有最小的合适L和最大A的大页。这个的决策选择是根据大量实验做出来的。</p><h3 id="HugeRegion"><a href="#HugeRegion" class="headerlink" title="HugeRegion"></a>HugeRegion</h3><p>HugeCache与HugeAllocator足以满足大内存分配，HugeFiller适用于可以打包成单个大页面的小内存分配，HugeRegion则是用来处理两者不好应付的场景。</p><p>考虑对1.1MiB内存的分配请求，这可以通过HugeFiller分配，对于2MiB的大页会留下0.9 MiB未使用的内存：这里会预期slack会被小于1.1MB的分配请求填充。但极限情况下，很可能会有一个二进制只请求1.1MB的请求。</p><p>HugeRegion是一个固定大小的分配（当前为1GB），与HugeFiller使用位图类似，以小页粒度进行追踪。对于内存请求，一样是采用best-fit策略来应对。出于与HugeFiller相同的原因，其保留了这些区域的列表，按最长空闲内存范围进行排序。</p><p>大多数分配不需要HugeRegion，只有积累了大量比程序小分配数量更多的slack，才会分配HugeRegion。对于键值存储来说，它会将一些大块数据加载到内存，并为服务请求进行一些短期分配。如果没有HugeRegion，请求相关的分配很可能产生大量的空缺。</p><h3 id="Memory-Release"><a href="#Memory-Release" class="headerlink" title="Memory Release"></a>Memory Release</h3><p>如上所述，Release(N)由后台线程定期调用。为了实现接口的Release(N)方法，TEMERAIRE通常只是从HugeCache中释放大页的内存范围。释放的页数量超过提示也不会有问题，后台线程会以实际释放的数量作为反馈，并调整未来的调用以达到合适的总体数量。如果HugeCache不能释放N页内存，HugeFiller将会释放最空的大页上的空闲小页。</p><p>从部分填充的大页面中释放小页是减少内存占用的最后手段，因为该过程在很大程度上是不可逆的。通过在大页上返回部分填充的小页，使操作系统用剩余页面的小条目替换跨越整个页面的单页表条目，这会增加TLB的miss概率，减慢对剩余内存的访问，即便后续重新使用前面释放的内存，Linux内核仍然只使用小的页表项。</p><p>HugeFiller会对部分释放的大页有单独的处理，除非没有其他大页可用，否则不会从它们进行分配，直到这些大页完全为空。</p><h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>TEMERAIRE通过更改内存分配器的使用方式来优化TLB的查找性能，从而极大提高了应用程序的性能。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Beyond-malloc-efficiency-to-fleet-efficiency&quot;&gt;&lt;a href=&quot;#Beyond-malloc-efficiency-to-fleet-efficiency&quot; class=&quot;headerlink&quot; title=&quot;Beyo
+      
+    
+    </summary>
+    
+    
+      <category term="OS" scheme="http://yoursite.com/tags/OS/"/>
+    
+  </entry>
   
   <entry>
     <title>RocksDB源码学习一</title>
@@ -455,29 +478,6 @@
     
     
       <category term="Golang" scheme="http://yoursite.com/tags/Golang/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>decltype in c++11</title>
-    <link href="http://yoursite.com/2019/12/20/decltype-in-c-11/"/>
-    <id>http://yoursite.com/2019/12/20/decltype-in-c-11/</id>
-    <published>2019-12-19T17:59:14.000Z</published>
-    <updated>2019-12-19T17:59:45.016Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="decltype"><a href="#decltype" class="headerlink" title="decltype"></a>decltype</h1><p>decltype是c++11引入的类型推导标记符，与auto类似。基本语法比较简单，就是给一个表达式，返回表达式的类型：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">decltype</span> ( expression )</span><br></pre></td></tr></table></figure><p>这里只会查询表达式的返回类型，并不会对表达式进行求值。</p><p>decltype的判断规则是比较复杂的，主要分为以下几类：</p><ul><li>如果参数是无括号的标识表达式或无括号的类成员访问表达式，decltype会返回以该表达式命名的实体类型。但如果参数是一个重载函数，则会编译错误；</li><li>若参数是其他类型为 <code>T</code> 的任何表达式<ul><li>表达式的值类型为临时值/亡值，则会返回T&amp;&amp;；</li><li>表达式的值类型为左值，则会参会T&amp;；</li><li>纯右值，则会返回T；</li></ul></li></ul><p>需要注意的是，如果对象的名字带有括号，则它被当做通常的左值表达式，从而 decltype(x) 和 decltype((x)) 通常是不同的类型。</p><p>举个简单的例子：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">A</span> &#123;</span> <span class="keyword">double</span> x; &#125;;</span><br><span class="line"><span class="keyword">const</span> A* a;</span><br><span class="line"><span class="keyword">int</span> i=<span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(a-&gt;x) y;       <span class="comment">// y 的类型是 double（其声明类型）</span></span><br><span class="line"><span class="keyword">decltype</span>((a-&gt;x)) z = y; <span class="comment">// z 的类型是 const double&amp;（被当作左值表达式）</span></span><br><span class="line"><span class="keyword">decltype</span>((i))b = i;   <span class="comment">// b 的类型是 int&amp;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者用在无名函数的类型推导上</span></span><br><span class="line"><span class="keyword">auto</span> f = [](<span class="keyword">int</span> a, <span class="keyword">int</span> b) -&gt; <span class="keyword">int</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> a * b;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(f) g = f; </span><br><span class="line">i = f(<span class="number">2</span>, <span class="number">2</span>);</span><br><span class="line">j = g(<span class="number">3</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure><p>在日常编程中，用到decltype的情况还是比较少的，我们一般用在模版中，结合auto和尾返回类型，我们可以写出语言级别支持的简洁代码：</p><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt;</span><br><span class="line">auto foo(T t, U u) -&gt; decltype(t + u) &#123; return t + u; &#125;</span><br></pre></td></tr></table></figure><p>另外，要判断是否为左值，可以考虑使用c++11标准库提供的模版类来做检查：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">is_lvalue_reference&lt;<span class="keyword">decltype</span>(++i)&gt;::value;</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;decltype&quot;&gt;&lt;a href=&quot;#decltype&quot; class=&quot;headerlink&quot; title=&quot;decltype&quot;&gt;&lt;/a&gt;decltype&lt;/h1&gt;&lt;p&gt;decltype是c++11引入的类型推导标记符，与auto类似。基本语法比较简单，就是给一
-      
-    
-    </summary>
-    
-    
-      <category term="C++" scheme="http://yoursite.com/tags/C/"/>
     
   </entry>
   

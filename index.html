@@ -265,6 +265,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/10/10/Beyond-malloc-efficiency-to-fleet-efficiency/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/10/10/Beyond-malloc-efficiency-to-fleet-efficiency/" itemprop="url">Beyond malloc efficiency to fleet efficiency</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-10-10T22:58:29+08:00">
+                2021-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Beyond-malloc-efficiency-to-fleet-efficiency"><a href="#Beyond-malloc-efficiency-to-fleet-efficiency" class="headerlink" title="Beyond malloc efficiency to fleet efficiency"></a>Beyond malloc efficiency to fleet efficiency</h1><blockquote>
+<p>内存分配的优化可以带来巨大的成本效益。一般有两种做法，一是提高分配器的效率，减少分配器代码中的周期；一种是通过数据放置的策略来提高应用的整体性能。这篇文章主要关注的是hugepage，提出了一个叫TEMERAIRE的hugepage机制，以最大化hugapage的覆盖率和最小化碎片开销。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>本文主要关注的是通过提高内存分配器的大页面覆盖率来提升应用性能。Cache miss和TLB miss是现代系统中最主要的性能开销，Hugepages的出现可以显著减少TLB未命中的数量，增加大页的大小使得相同数量的TLB条目能够映射更大范围的内存，另外大页还能减少miss+填充的时间，因为页表遍历更快了。论文提出了一种TEMERAIRE 的设计，作为TCMALLOC的一部分减少应用代码的CPU开销，最大化大页覆盖、减少内存碎片。</p>
+<h2 id="The-challenges-of-coordinating-Hugepages"><a href="#The-challenges-of-coordinating-Hugepages" class="headerlink" title="The challenges of coordinating Hugepages"></a>The challenges of coordinating Hugepages</h2><p>虚拟内存是通过TLB来将用户空间地址转换为物理地址的，TLB条目有限，如果使用默认页面大小，整个TLB覆盖的内存范围很小。现代的处理器通过在TLB中支持hugepage来加大覆盖范围，完整的大页（比如X86时2MB）仅仅占用一个条目。</p>
+<p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6c5.png" alt></p>
+<p>传统的分配器以页面大小的块来管理内存，Transparent Huge Pages机制为内核使用大页来覆盖连续页面提供了可能性。但内存的释放面临着更大的挑战，对于非大页区域来说，内存的释放要求内核使用较小的页面来表示剩余的内存。又或者大页的返回需要整个页面都变成空闲状态，这就带来内存碎片的问题。因此对于大页的设计需要在内存碎片和TLB使用率之间权衡。</p>
+<h2 id="Overview-of-TCMALLOC"><a href="#Overview-of-TCMALLOC" class="headerlink" title="Overview of TCMALLOC"></a>Overview of TCMALLOC</h2><p>下图展示了TCMALLOC的内存组织，TCMALLOC将内存按spans分区，并且与页面大小对齐。</p>
+<p>足够大的分配请求由仅仅包含分配对象的spans实现，至于其他的span则会包含多个相同大小的小对象，小对象的边界是256KB，小于这个的请求会四舍五入到100个大小类别中去。TCMALLOC将对象存储在一系列缓存中，如下图所示。span是从一个简单的pageheap分配的，它跟踪所有未使用的页面并进行best fit分配。pageheap还会负责定期释放内存回操作系统，减少过多的系统内存分配。</p>
+<p>TCMALLOC会首先从local cache中分配，这里用的是per-hyperthread local cache，本地缓存会存着不同大小的空闲对象列表。如果请求不能满足要求，会路由到对应大小类别的central cache。这里有两个组件，一个是小的、快速的、互斥保护的transfer cache，另一个则是大的、互斥保护的central列表，包含了该大小对应的每一个span。当一个span的所有对象都返回到central list的一个span时，该span就会返回到pageheap。</p>
+<p>TCMALLOC的pageheap有一些简单的内存接口：New(N)分配一个N页的span；Delete(S)向分配器返回一个新的span；Release(N)将pageheap缓存的&gt;=N个未使用的页返回给操作系统；</p>
+<h2 id="TEMERAIRE’s-approach"><a href="#TEMERAIRE’s-approach" class="headerlink" title="TEMERAIRE’s approach"></a>TEMERAIRE’s approach</h2><p>TEMERAIRE就是基于TCMALLOC提出的大页优化，将分配请求尽可能打包到频繁使用的大页上，同时形成完全未使用的大页面以便遍返回给操作系统。并且根据malloc的使用情况和TCMALLOC的结构制定了一些TEMERAIRE的选择原则：</p>
+<ul>
+<li>总内存的需求随时发生变化，并且是不可预测的；</li>
+<li>将不是几乎为空的大页面返回给操作系统的成本是比较高的，因此其设计必须能够将分配密集地打包到高度使用的区域中；另外虽然我们的目标是专门使用大页大小的二进制，但malloc也必须支持大于单个大页的分配大小；</li>
+<li>当一个大页完全为空时，可以选择是保留它以供将来分配内存，也可以将其返回给操作系统。适应性地做出这个决策非常重要；</li>
+<li>很少有分配请求会直接接触pageheap，但所有分配都通过pageheap支持；</li>
+</ul>
+<p>TCMALLOC分配器通过委托给几个子组件来实现它的接口，如下图所示，每个组件都是根据上述原则构建的，都对最适合它处理的分配类型进行了设计。虽然TEMERAIRE的特定实现与TCMALLOC内部结构相关联，但大多数现代分配器都有类似的大页面分配支持。</p>
+<h3 id="The-overall-algorithm"><a href="#The-overall-algorithm" class="headerlink" title="The overall algorithm"></a>The overall algorithm</h3><p>这一章主要描述各个组件，其主要目标是最小化或重用生成的slack（slack就是大页之间的多余空间区域）。所有组件的背后是HugeAllocator组件，它负责处理虚拟内存和操作系统之间的关系，为其他组件提供了可备份可传递的内存。HugeCache则是一个完全为空的大页缓存。HugeFiller则是一个存着部分填充空间的大页列表。HugeRegion则是用来应对大页边界的分配请求的。TEMERAIRE使用下图算法根据请求大小将分配决策定向到其子组件。</p>
+<p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6d4.png" alt></p>
+<p>为大页面大小的精确倍数，或那些足够大以至于slack无关紧要的分配请求由HugeCache负责；中等大小的分配由HugeCache负责（1MiB到1GiB）；例如，来自HugeCache的4.5MiB分配会产生1.5MiB的slack，这里的开销是比较高的。TEMERAIRE通过假装请求的最后一个大页面有一个单一的“前导”分配，将这个slack交由HugeFiller负责。如下图：</p>
+<p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6dd.png" alt></p>
+<p>对于某些中等分配的请求来说，其往往会产生更多的slack。如下图，例如，许多1.1MiB的分配将产生0.9MiB的每个大页的slack。当检测到这种模式时，HugeRegion分配器会跨越大页边界进行分配，以最大限度地减少这种开销。</p>
+<p><img src="https://pic.imgdb.cn/item/6162ff542ab3f51d9128f6eb.png" alt></p>
+<p>小请求(&lt;= 1MB的)始终由HugeFiller提供服务。对于1MB和大页之间的分配，TEMERAIRE会评估了几个选项：</p>
+<ul>
+<li>如果有足够的可用空间，就会尽量使用HugeFiller；</li>
+<li>如果HugeFiller不能满足请求，接下来会考虑HugeRegion；如果已分配的HugeRegion能满足要求，TEMERAIRE就会使用它。如果不存在满足要求区域，就会考虑分配一个区域；</li>
+<li>否则就从HugeCache中分配一个完整的大页面，当然这样会产生slack，但预期其会在未来被填平；</li>
+</ul>
+<p>对于TEMERAIRE来说，1个1GB的空闲范围内存和512 个不连续的free大页是被同等对待。</p>
+<h3 id="HugeAllocator"><a href="#HugeAllocator" class="headerlink" title="HugeAllocator"></a>HugeAllocator</h3><p>HugeAllocator会跟踪记录所映射的虚拟内存，所有操作系统的映射都在此进行。</p>
+<h3 id="HugeCache"><a href="#HugeCache" class="headerlink" title="HugeCache"></a>HugeCache</h3><p>HugeCache以完整的大页粒度来追踪返还的内存范围，HugeFiller填充和释放大页后，需要决定何时将大页返回给操作系统，需要权衡后续是否需要使用来做决定。HugeCache的做法是在 2 秒的滑动窗口内跟踪请求的周期性，并计算记录最大值和最小值，每当内存返回到HugeCache时，如果cache此时大于Demand_max-Demand_min，则将大页返回给操作系统。</p>
+<h3 id="HugeFiller"><a href="#HugeFiller" class="headerlink" title="HugeFiller"></a>HugeFiller</h3><p>HugeFiller用来满足较小的分配请求，每个分配请求都尽量在单个大页完成。HugeFiller满足了大部分的分配请求，是真哥哥系统中最重要的组件。对于给定的大页，使用best-fit的算法来进行分配。</p>
+<p>HugeFiller的两个目标，一是使得一部分大页尽可能地满，另一部分大页面尽可能为空；第二个目标是最小化每个大页内的碎片，使得新分配请求尽可能得到满足。因为几乎为空的大页非常宝贵，通过尽可能保留具备最长空闲内存范围的大页来满足上面的目标，将相应的大页组织到一个排序列表中，充分利用每个大页的统计数据。</p>
+<p>在每个的大页中，HugeFiller会记录使用的页面位图。为了填充某个大页的请求，HugeFiller会从该位图进行best-fit的搜索。并且还记录了以下几个数据：尚未分配的连续页数，最长的空闲内存范围L；分配总数A；已使用的页面总数U。</p>
+<p>通过上述三个统计信息来确定分配大页的优先级顺序——选择具有最小的合适L和最大A的大页。这个的决策选择是根据大量实验做出来的。</p>
+<h3 id="HugeRegion"><a href="#HugeRegion" class="headerlink" title="HugeRegion"></a>HugeRegion</h3><p>HugeCache与HugeAllocator足以满足大内存分配，HugeFiller适用于可以打包成单个大页面的小内存分配，HugeRegion则是用来处理两者不好应付的场景。</p>
+<p>考虑对1.1MiB内存的分配请求，这可以通过HugeFiller分配，对于2MiB的大页会留下0.9 MiB未使用的内存：这里会预期slack会被小于1.1MB的分配请求填充。但极限情况下，很可能会有一个二进制只请求1.1MB的请求。</p>
+<p>HugeRegion是一个固定大小的分配（当前为1GB），与HugeFiller使用位图类似，以小页粒度进行追踪。对于内存请求，一样是采用best-fit策略来应对。出于与HugeFiller相同的原因，其保留了这些区域的列表，按最长空闲内存范围进行排序。</p>
+<p>大多数分配不需要HugeRegion，只有积累了大量比程序小分配数量更多的slack，才会分配HugeRegion。对于键值存储来说，它会将一些大块数据加载到内存，并为服务请求进行一些短期分配。如果没有HugeRegion，请求相关的分配很可能产生大量的空缺。</p>
+<h3 id="Memory-Release"><a href="#Memory-Release" class="headerlink" title="Memory Release"></a>Memory Release</h3><p>如上所述，Release(N)由后台线程定期调用。为了实现接口的Release(N)方法，TEMERAIRE通常只是从HugeCache中释放大页的内存范围。释放的页数量超过提示也不会有问题，后台线程会以实际释放的数量作为反馈，并调整未来的调用以达到合适的总体数量。如果HugeCache不能释放N页内存，HugeFiller将会释放最空的大页上的空闲小页。</p>
+<p>从部分填充的大页面中释放小页是减少内存占用的最后手段，因为该过程在很大程度上是不可逆的。通过在大页上返回部分填充的小页，使操作系统用剩余页面的小条目替换跨越整个页面的单页表条目，这会增加TLB的miss概率，减慢对剩余内存的访问，即便后续重新使用前面释放的内存，Linux内核仍然只使用小的页表项。</p>
+<p>HugeFiller会对部分释放的大页有单独的处理，除非没有其他大页可用，否则不会从它们进行分配，直到这些大页完全为空。</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>TEMERAIRE通过更改内存分配器的使用方式来优化TLB的查找性能，从而极大提高了应用程序的性能。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/08/01/Rocksdb源码学习一/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1936,178 +2101,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/20/Paxos-Made-Simple——论文阅读/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/03/20/Paxos-Made-Simple——论文阅读/" itemprop="url">Paxos Made Simple——论文阅读</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-20T23:36:18+08:00">
-                2021-03-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Paxos-Made-Simple"><a href="#Paxos-Made-Simple" class="headerlink" title="Paxos Made Simple"></a>Paxos Made Simple</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>Paxos——一个用于实现容错的分布式系统算法，核心是一个一致性算法——“synod”算法。基本上是根据一个一致性算法所必需满足的条件而呈现出来的，完整的Paxos算法会通过作为应用到使用状态机的分布式系统中的一致性实现部分来得出。</p>
-<h2 id="The-Consensus-Algorithm"><a href="#The-Consensus-Algorithm" class="headerlink" title="The Consensus Algorithm"></a>The Consensus Algorithm</h2><h3 id="The-Problem"><a href="#The-Problem" class="headerlink" title="The Problem"></a>The Problem</h3><p>假设存在一个多进程集合，里面每个进程都可以发出提案，那么一致性算法需要保证一个值能够被选定，而且一旦一个值被选定，所有进程都需要能够获知选定值。</p>
-<p>一致性safety的要求就是：</p>
-<ul>
-<li>只有被提出的值能够被选定；</li>
-<li>只能有一个选定值；</li>
-<li>只有一致同意该值，才能周知给集合里的所有进程；</li>
-</ul>
-<p>这里主要关注算法的safety，而不会明确要求liveness。</p>
-<p>在该一致性算法中，有三种角色：proposers，acceptors和learners，实际实现中，一个独立的进程可以充当不止一种角色。论文的假设是基于传统的异步模型，而不是拜占庭问题模型。</p>
-<h3 id="Choosing-a-Value"><a href="#Choosing-a-Value" class="headerlink" title="Choosing a Value"></a>Choosing a Value</h3><p>该算法在提案过程主要包括下面几个步骤</p>
-<p>对于proposer：</p>
-<ul>
-<li>proposer选择一个新的提案编号n，然后向acceptors集合的每个成员发送请求，要求acceptors对请求作出响应：<ul>
-<li>a. 一个承诺，保证不再通过任何编号小于n的提案；</li>
-<li>b. 如果接受过其他提案的话，需要返回当前通过的编号小于n的最大编号提案；</li>
-</ul>
-</li>
-<li>如果proposer从大多数acceptors收到期待的响应，则可以接着提议一个编号为n并且值为v的提案，这里的v要么是自由选择一个值（所有的响应都没接收过任何的提案），要么是从上面b响应中选出最大编号的提案的值；</li>
-</ul>
-<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求， acceptor就可以接受编号为n的提案。</p>
-<p>总结起来，acceptor和proposer的算法操作可以分为两个阶段：</p>
-<ul>
-<li>阶段一</li>
-</ul>
-<p>a. proposer提出一个编号为n的提案，向大多数acceptors发送一个带有编号为n的prepare请求；</p>
-<p>b. 如果acceptors收到了该请求，并且n比它之前响应过的prepare请求编号都大，那么它就会对该请求作出响应，返回一个保证不再通过任何编号小于n的提案的承诺，以及如果存在的话，接受过的最大编号的提案；</p>
-<ul>
-<li>阶段二</li>
-</ul>
-<p>a. 如果proposer从大多数acceptors收到响应，则会提出一个accept请求，内容包括了编号n和值为v，其中v要么是自由选择一个的值，要么是从响应中选出最大编号的提案的值；</p>
-<p>b. 如果acceptors收到该accept请求，并且之前没有响应过大于编号n的prepare请求，那么它就会对接受该请求；</p>
-<h3 id="Learning-a-Chosen-Value"><a href="#Learning-a-Chosen-Value" class="headerlink" title="Learning a Chosen Value"></a>Learning a Chosen Value</h3><p>为了获取到选定的值，learner必须要找出某个以及被大多数acceptors接受的提案。如果是每个acceptors都将通过的提案告知所有的learners，那么通信次数等于两者个数乘积；如果是只告诉一个特定learner，虽然通信次数减少了，但可靠行也降低了；更一般情况是，将它们的通过提案信息发送给一个特定的learners集合，其中的每个learner都可以将该信息告知所有的learners。</p>
-<p>由于信息的丢失，learners可能无法确定一个值是否有一个大多数的acceptors通过了，为了确定选定的值，必须重新发起一次新的提案。</p>
-<h3 id="Progress"><a href="#Progress" class="headerlink" title="Progress"></a>Progress</h3><p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
-<p>为了保证progress的进行，必须选择一个特定proposer来作为唯一一个提议提案的。如果这个proposer可以和半数以上的acceptors通信，同时使用一个比现有通过编号都大的编号作为提案的话，就可以产生一个成功通过的提案。</p>
-<blockquote>
-<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that a reliable algorithm for electing a proposer must use either randomness or real time—for example, by using timeouts. However, safety is ensured regardless of the success or failure of the election.</p>
-</blockquote>
-<p>无论选举是否成功，proposer选举算法的安全性都是可以得到保证的。</p>
-<h3 id="The-Implementation"><a href="#The-Implementation" class="headerlink" title="The Implementation"></a>The Implementation</h3><p>Paxos算法假设了一个多进程网络，在该算法里，每个进程都扮演了proposer，acceptor及learner的角色。Paxos算法通过选定一个leader来扮演上面提到的特定learner和proposer。Paxos一致性算法就是上述所描述的，其中请求和响应都作为普通消息发送。acceptor在发出响应消息之前，会需要可靠性存储来记录信息。</p>
-<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase 1。</p>
-<h2 id="Implementing-a-State-Machine"><a href="#Implementing-a-State-Machine" class="headerlink" title="Implementing a State Machine"></a>Implementing a State Machine</h2><p>实现分布式系统的一种简单方式是由一组客户端向一个中央服务器发出命令请求，该服务器可以看作是一个按顺序执行客户端命令的状态机。但使用单个服务器的可用性较低，因此想到了可以使用一组服务器，每个服务器独立地实现同样的状态机，只要所有服务器都产生一致的状态和输出，那么发出命令的客户端就可以采用任意一个服务器的输出了。</p>
-<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i 个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
-<p>假设服务器的集合是固定的，一般情况下一个独立的服务器被选为了leader，它就会扮演特定的proposer角色，多个客户端发送命令到leader，leader会决定每个命令的顺序。假设存在某条命令的序号为135，那么它就会通过一致性算法的第135个实例来选定一个提案，这里的命令就是提案的值。这个提案可能成功也可能失败，失败的原因可能来自机器故障，或者是存在另一个服务器认为自己是leader，从而判断了135实例存在其他值。但该算法能够保证最多只有一个命令被选定。</p>
-<p>这个策略的关键在于，Paxos算法中被提出的值只有phase 2才能被选定。前面说过的，phase 1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
-<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase 1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase 2，选定135和140的命令。</p>
-<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的”noop”命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140 号命令就可以被执行了。</p>
-<p>由此1-140命令都被选定了，leader就可以继续往下推进所有大于140的实例了。</p>
-<p>接下来讲讲空缺的产生，leader可以在提出命令141被选定之前，先提出命令142，但发送的关于141的信息可能会全部丢失，因此其他服务器可能先知道了142命令的选定，而不知道选择了什么作为命令141。这就产生了空缺。</p>
-<p>由于 leader 的故障以及新 leader 的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase 2的成本。在所有的一致性算法中， paxos一致性算法的phase 2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
-<p>特殊情况下，leader选举失败，导致出现多个“疑似”的leader，但paxos算法的安全性仍然可以保证不会同时有两个命令被选为第i个状态机命令。</p>
-<p>如果服务器的集合是变化的，那么也存在某种方式来决定哪些服务器可以作为这个一致性算法的实力，论文提到的方式是通过状态机自身来实现，即当前的服务器集合作为状态的一部分，比如将在执行完第i个状态机命令后标识的服务器集合，作为一致性算法执行实例i+a的服务器集合。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2156,7 +2149,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">256</span>
+                <span class="site-state-item-count">257</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
