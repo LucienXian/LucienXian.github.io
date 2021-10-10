@@ -265,6 +265,161 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/29/Effective-cpp-10-11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/29/Effective-cpp-10-11/" itemprop="url">Effective-cpp-#10&11</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-29T18:15:28+08:00">
+                2017-11-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Have-assignment-operators-return-a-reference-to-this"><a href="#Have-assignment-operators-return-a-reference-to-this" class="headerlink" title="Have assignment operators return a reference to *this"></a>Have assignment operators return a reference to *this</h1><h2 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h2><p>其实返回void，返回对象本身等都是可以的，返回引用是为了一下两个原因：</p>
+<ul>
+<li>允许连续赋值</li>
+<li>防止返回对象时因为调用拷贝构造函数和析构函数带了不必要的开销（而且如果对象没有自定义拷贝构造函数，可能会产生错误）</li>
+</ul>
+<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><ul>
+<li>连续赋值如下，因此为了实现连续赋值，必须返回一个引用指向自身，这样后面的赋值才能生效；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x, y, z;</span><br><span class="line">x = y = z = <span class="number">15</span>;<span class="comment">//等价于x = (y = (z = 15))</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>有些场景下，必须返回指向自身的引用</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	...</span><br><span class="line">	Widget&amp; <span class="keyword">operator</span>+=(<span class="keyword">const</span> Widget&amp; rhs)&#123;<span class="comment">//此举是因为该操作符本身的意义就是自增，然后返回自身值</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Handle-assignment-to-self-in-operator"><a href="#Handle-assignment-to-self-in-operator" class="headerlink" title="Handle assignment to self in operator="></a>Handle assignment to self in operator=</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>client在操作时很可能会出现，自我赋值的情况，比如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a[i] = a[j]; <span class="comment">// i == j时</span></span><br><span class="line">*px = *py; <span class="comment">//px与py恰好指向同一对象时</span></span><br></pre></td></tr></table></figure>
+<p>这种情况下，往往会出现安全性缺失的问题</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bitmap</span>&#123;</span>&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">      <span class="keyword">delete</span> pb;<span class="comment">//如果是自我赋值，删除pb之后会连rhs里的内容也删除了</span></span><br><span class="line">      pb = <span class="keyword">new</span> Bitmap(*rhs.pb);</span><br><span class="line">      <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">Bitmap* pb;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
+<li>检查合法性</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">  <span class="keyword">if</span> (&amp;rhs == <span class="keyword">this</span>) <span class="keyword">return</span> *<span class="keyword">this</span>;<span class="comment">//如果是自我赋值，不做任何操作</span></span><br><span class="line">  <span class="keyword">delete</span> pb;</span><br><span class="line">  pb = <span class="keyword">new</span> Bitmap(*rhs.pb);</span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但这个版本仍具有安全问题，如果new时抛出了异常，这样this会指向一块被删除了的内存；</p>
+<ul>
+<li>保证异常安全性</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">  Bitmap* temp = pb;</span><br><span class="line">  pb = <span class="keyword">new</span> Bitmap(*rhs.pb);</span><br><span class="line">  <span class="comment">//即便new出现了异常，但由于我们生成了副本指针，因此能够保证this指向有效内存并且影响自我赋值的安全性</span></span><br><span class="line">  <span class="keyword">delete</span> temp;</span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法会降低效率，因为需要拷贝构造的函数</p>
+<ul>
+<li>copy&amp;swap</li>
+</ul>
+<p>这是一种更加高效的做法</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">  Widget temp(rhs);</span><br><span class="line">  swap(temp);<span class="comment">//交换temp与this的指针</span></span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>令赋值操作返回一个reference to *this</li>
+<li>确保自我赋值时的安全性，可以采用比较两个对象的地址是否相同，调整操作里的语句顺序，使用copy&amp;swap的方法</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/28/Prototype-DesignPattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1501,146 +1656,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/Effective-cpp-3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/20/Effective-cpp-3/" itemprop="url">[Effective cpp]-#3</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-20T22:46:12+08:00">
-                2017-11-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="use-const-whenever-possible"><a href="#use-const-whenever-possible" class="headerlink" title="use const whenever possible"></a>use const whenever possible</h1><p>关于const的使用，之前的文章里也做过相似的介绍，但《effective C++》里还是做了一些规则推荐，那就来学习一下。</p>
-<h2 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a>函数声明</h2><p>讲道理，之前对这种用法并不熟悉，但书上做了很详细的介绍。令函数返回一个常量值在某些情况下是非常有用的。举个例子，考虑有理数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</span>&#125;;</span><br><span class="line"><span class="keyword">const</span> Rational <span class="keyword">operator</span>* (<span class="keyword">const</span> Rational&amp; lhs, <span class="keyword">const</span> Rational&amp; rhs);</span><br></pre></td></tr></table></figure>
-<p>这样一个重载函数返回的是一个常量值，倘若不加上const关键字，就有可能发生这种情况：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Rational a, b, c;</span><br><span class="line">(a * b) = c;<span class="comment">//这样做毫无意义</span></span><br><span class="line"><span class="comment">//又或者出现这种情况</span></span><br><span class="line"><span class="keyword">if</span> (a*b = c)<span class="comment">//也许只是写错</span></span><br></pre></td></tr></table></figure>
-<h2 id="const成员函数"><a href="#const成员函数" class="headerlink" title="const成员函数"></a>const成员函数</h2><ul>
-<li>这里需要注意的是如果两个成员函数只是不同，它们是可以被重载的；</li>
-<li>由于这个原因，重载的两个成员函数可能会出现代码重复的情况；</li>
-<li>因此我们可以这样使用：</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TextBlock</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="built_in">std</span>::<span class="keyword">size_t</span> position) <span class="keyword">const</span>&#123;... <span class="keyword">return</span> text[position];&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="built_in">std</span>::<span class="keyword">size_t</span> position)&#123;</span><br><span class="line">      <span class="keyword">return</span> const_char&lt;<span class="keyword">char</span>&amp;&gt;(<span class="keyword">static_cast</span>&lt;<span class="keyword">const</span> TextBlock&gt;(*<span class="keyword">this</span>)[position]);</span><br><span class="line">  	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>通过在non-const operator[]经过两次转换，即可以减少代码量，也可以返回non-const值；<ul>
-<li>non-const转换成const是安全转换；</li>
-</ul>
-</li>
-</ul>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>将某些东西声明为const可以帮助编译器检查出错误的用法；</li>
-<li>当const和non-const有着类似的实现时，可以让non-const调用const来避免代码重复；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1689,7 +1704,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">257</span>
+                <span class="site-state-item-count">258</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

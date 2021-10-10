@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2021/10/10/CockroachDB/</loc>
+    
+    <lastmod>2021-10-10T15:02:16.328Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2021/10/10/Beyond-malloc-efficiency-to-fleet-efficiency/</loc>
     
     <lastmod>2021-10-10T14:59:03.477Z</lastmod>
