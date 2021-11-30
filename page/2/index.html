@@ -265,6 +265,175 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/19/Macro-Free-in-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/04/19/Macro-Free-in-C/" itemprop="url">Macro Free in C++</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-19T00:43:30+08:00">
+                2021-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Macro-Free-In-Cpp"><a href="#Macro-Free-In-Cpp" class="headerlink" title="Macro Free In Cpp"></a>Macro Free In Cpp</h1><blockquote>
+<p>One of C++’s aims is to make C’s preprocessor redundant because I consider its actions inherently error prone</p>
+</blockquote>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>C预处理器本质是一个文本替换工具，用来在实际编译之前进行一定的预处理操作，一般情况下#开头的预处理操作并不认为是语言本身的一部分，因为编译器永远看不到这些宏定义符号。</p>
+<p>以C++来说，用宏的目的并不是出于性能的缘由，更多的只是为了减少重复的代码和进行条件编译。随着modern cpp的发展，越来越的新特性加入使得对宏的使用依赖进一步降低。本文将关注如何使用C++新特性替换C预处理程序。</p>
+<h2 id="如何替代宏的使用"><a href="#如何替代宏的使用" class="headerlink" title="如何替代宏的使用"></a>如何替代宏的使用</h2><ol>
+<li>表达式别名</li>
+</ol>
+<p>有一些宏定义会用在表达式别名，替换后的文本会被识别为C++表达式，对于这种情况比较简单的是使用常量表达式或者lambda替换宏，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PI 3.14</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SEVEN 3 + 4</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FILENAME <span class="meta-string">"header.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SUM a + b</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">summer</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> a = <span class="number">1</span>, b=<span class="number">2</span>;</span><br><span class="line">  <span class="keyword">int</span> c = SUM;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ========================&gt;&gt;&gt;</span></span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> PI = <span class="number">3.14</span>;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> SEVEN = <span class="number">3</span> + <span class="number">4</span>;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> FILENAME = <span class="string">"header.h"</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">summer</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> a = <span class="number">1</span>, b=<span class="number">2</span>;</span><br><span class="line">  <span class="keyword">auto</span> SUM = [&amp;a, &amp;b]() &#123; <span class="keyword">return</span> a + b; &#125;;</span><br><span class="line">  <span class="keyword">int</span> c = SUM();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>类型别名</li>
+</ol>
+<p>类型别名是一个类似于对象的宏，其替换文本可以识别为C ++类型表达式。对于这种，可以使用C++的别名声明来替换：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> A T</span></span><br><span class="line"><span class="comment">// ========================&gt;&gt;&gt;</span></span><br><span class="line"><span class="keyword">using</span> A = T;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>参数表达式</li>
+</ol>
+<p>参数表达式是一种类似于函数的宏，替换文本后会扩展为表达式或语句。对于这种使用，C++中的最佳实践是使用内联模版函数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MIN(A, B) ((A) &lt; (B) ? (A) : (B))</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ASSIGN(A, B) &#123; B = A; &#125;</span></span><br><span class="line"><span class="comment">// ========================&gt;&gt;&gt;</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">auto</span> <span class="title">MIN</span><span class="params">(T1&amp;&amp; A, T2&amp;&amp; B)</span></span></span><br><span class="line">  -&gt; decltype(((A) &lt; (B) ? (A) : (B)))</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> ((A) &lt; (B) ? (A) : (B));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">ASSIGN</span><span class="params">(T1&amp;&amp; A, T2&amp;&amp; B)</span> </span>&#123;</span><br><span class="line">  B = A;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里引入了内联，自动的推导类型和完美转发等modern c++的特性。完美转发使得调用方可以根据需要决定参数传递的类型。</p>
+<ol start="4">
+<li>参数化类型别名</li>
+</ol>
+<p>这种其实就是模版别名，在C++11之前需要用宏去实现。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> AliasMap(T) std::map<span class="meta-string">&lt;std::string, T&gt;;</span></span></span><br><span class="line"><span class="comment">// ========================&gt;&gt;&gt;</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">using</span> AliasMap = <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, T&gt;;</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>条件编译</li>
+</ol>
+<p>目前绝大多数开源的C++项目都会依赖宏来进行条件编译，其本质意义是通过定义宏与否来改变某个定义/声明。</p>
+<p>比如存在一个绘制三角形的API，但其具体实现会根据操作系统而变化，通过预处理器就可以很好地实现类似的兼容：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">draw_triangle</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="meta">#<span class="meta-keyword">if</span> _WIN32</span></span><br><span class="line">    <span class="comment">// Windows triangle drawing code here </span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">    <span class="comment">// Linux triangle drawing code here</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中某个分支的代码会在进行编译之前被去掉，这样编译时就不会出现API未定义的错误。</p>
+<p>在C++17中有了新的语法特性<code>if constexpr</code>，我们可以用来替代一部分<code>#if … #else</code>的使用。以下面的使用为例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">do_sth</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="meta">#<span class="meta-keyword">if</span> DEBUG_MODE</span></span><br><span class="line">    <span class="built_in">log</span>();</span><br><span class="line">  <span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">  <span class="comment">// …</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ========================&gt;&gt;&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">do_sth</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">if</span> <span class="title">constexpr</span> <span class="params">(DEBUG_MODE)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">log</span>(); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">  <span class="comment">// …</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用<code>if constexpr</code>的好处是其只会检查语法错误，像宏那样的使用方式，一旦<code>DEBUG_MODE</code>出现typo的错误，编译器是无法准确辨识的。</p>
+<p>当然<code>if constexpr</code>的使用也是有其不足之处的，以上面的<code>draw_triangle</code>函数为例，即便某个条件分支不会被使用，你仍然需要有相关冗余的声明。所以对于这种情况，个人建议还是不需要使用<code>if constexpr</code>替代宏。</p>
+<ol start="6">
+<li>源码位置</li>
+</ol>
+<p>目前几乎所有的断言或者宏会用到宏，比如需要使用<code>__LINE__, __FILE__, __func__</code> 等定位断言的位置，又或者需要断言开关等等。</p>
+<p>要想替代对这些宏的使用则需要用上C++20的<code>std::source_location</code>，该类可以表示关于源码的具体信息，例如文件名、行号以及函数名。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string_view&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;source_location&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">log</span><span class="params">(<span class="built_in">std</span>::string_view message,</span></span></span><br><span class="line"><span class="function"><span class="params">         <span class="keyword">const</span> <span class="built_in">std</span>::source_location&amp; location = <span class="built_in">std</span>::source_location::current())</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"info:"</span></span><br><span class="line">      				&lt;&lt; __FILE__ &lt;&lt; <span class="string">':'</span></span><br><span class="line">              &lt;&lt; __LINE__ &lt;&lt; <span class="string">' '</span></span><br><span class="line">              &lt;&lt; message &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">  	<span class="comment">// ========================&gt;&gt;&gt;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"info:"</span></span><br><span class="line">              &lt;&lt; location.file_name() &lt;&lt; <span class="string">':'</span></span><br><span class="line">              &lt;&lt; location.line() &lt;&lt; <span class="string">' '</span></span><br><span class="line">              &lt;&lt; message &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这里提供了一些更“现代”的C++写法来替换不够安全的、使用了宏定义的老式代码，事实上C++的发展过程中一直在提出一些减少预处理宏使用依赖的方案。但从目前来看，还是有不少预处理使用无法替换，即便如此，个人认为适当使用宏和合适的，其AST的生成功能是非常强大的工具，并且某种情况下能使得代码更加易读。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li>《cppcon 2019》——<a href="https://www.youtube.com/watch?v=c6NkeF1eChs" target="_blank" rel="noopener">https://www.youtube.com/watch?v=c6NkeF1eChs</a></li>
+<li>《Rejuvenating C++ Programs through Demacrofication》——<a href="https://www.stroustrup.com/icsm-2012-demacro.pdf" target="_blank" rel="noopener">https://www.stroustrup.com/icsm-2012-demacro.pdf</a></li>
+<li>《if statement》——<a href="https://en.cppreference.com/w/cpp/language/if" target="_blank" rel="noopener">https://en.cppreference.com/w/cpp/language/if</a></li>
+<li>《The year is 2017 - Is the preprocessor still needed in C++?》——<a href="https://foonathan.net/2017/05/preprocessor/" target="_blank" rel="noopener">https://foonathan.net/2017/05/preprocessor/</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/14/《UCB-cs294》Required-Reading-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1986,216 +2155,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/22/Object-Storage-on-CRAQ——MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/05/22/Object-Storage-on-CRAQ——MIT6-824/" itemprop="url">Object Storage on CRAQ——MIT6.824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-22T02:03:03+08:00">
-                2020-05-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Object-Storage-on-CRAQ"><a href="#Object-Storage-on-CRAQ" class="headerlink" title="Object Storage on CRAQ"></a>Object Storage on CRAQ</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>该论文描述了一种CRAQ(Chain Replication with Apportioned Queries)的对象存储设计，通过链式备份，能够在保证读取吞吐率的同时维持强一致性。</p>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>对象存储是许多在线服务所需要的，其数据会以一个实体单元来呈现。对象存储支持两种基本原语：读和写。后续，有人开始提出用链式备份的方法来做对象存储，基本思路是将所有存储对象的节点组织在一条链中，其中尾部提供读取请求，而头部则处理所有的写入请求。然后在客户端得到确认之前，写操作会沿着链向后传播。</p>
-<p>但这种思路会有不少局限，比如因为所有的读取都会走到同一个节点。该论文就提出了一种CRAQ的设计，实现了一个能够提供强一致性，并且写入低延迟和高吞吐的对象存储。</p>
-<p>主要的设计如下：</p>
-<ol>
-<li>CARQ所有节点都会处理读请求；</li>
-<li>除了强一致性，CARQ也能为了低延迟对读操作支持最终一致性；</li>
-<li>利用负载均衡特性，提出了一种广域的系统设计，用于跨地理分布的集群来构建CRAQ链，同时保留强大的局部性；</li>
-</ol>
-<h2 id="Basic-System-Model"><a href="#Basic-System-Model" class="headerlink" title="Basic System Model"></a>Basic System Model</h2><p>这一章介绍链式复制模型的主要概念。</p>
-<h3 id="Interface-and-Consistency-Model"><a href="#Interface-and-Consistency-Model" class="headerlink" title="Interface and Consistency Model"></a>Interface and Consistency Model</h3><p>一个对象存储系统主要提供两个基本原语：</p>
-<ul>
-<li>write(objID, V);</li>
-<li>V &lt;—— read(objID);</li>
-</ul>
-<p>另外，论文提及了系统实现的两种一致性类型。</p>
-<ul>
-<li>强一致性：对于一个对象的读写操作会以某个顺序执行，并且读取对象时会看到最近的写入值；</li>
-<li>最终一致性：对于不同的节点的读取可能会返回过时的数据；</li>
-</ul>
-<h3 id="Chain-Replication"><a href="#Chain-Replication" class="headerlink" title="Chain Replication"></a>Chain Replication</h3><p>Chain Replication（CR）是一种在多节点之间备份数据，提供强一致性存储接口的方法。</p>
-<p>简单来说就是，节点组成一个链表，所有的写请求由链表头部接收，然后向后传导，直到到达尾部节点（此时视为committed）。然后尾部节点将会将响应返回到头部，由头部响应成功（因为实际实现使用的是TCP）。</p>
-<p>读请求则是由尾部节点接收。</p>
-<p><img src="https://pic.downk.cc/item/5eaf0238c2a9a83be5078e18.png" alt></p>
-<h3 id="Chain-Replication-with-Apportioned-Queries"><a href="#Chain-Replication-with-Apportioned-Queries" class="headerlink" title="Chain Replication with Apportioned Queries"></a>Chain Replication with Apportioned Queries</h3><p>对于读取请求比较多的场景，CARQ会通过本地读取来尝试提高读取吞吐量。具体设计如下：</p>
-<ol>
-<li>CARQ的节点会存储对象的多个版本，并且会标示每个版本是dirty还是clean；</li>
-<li>当一个节点得到新版本的写入，会追加到版本列表中；<ol>
-<li>如果节点不是尾节点，则标示该版本是dirty的；</li>
-<li>如果是尾节点，则直接标示为clean，然后通过链条去答应通知前面的节点；</li>
-</ol>
-</li>
-<li>前面的节点收到响应后，得知某个版本的节点可以修改为clean；</li>
-<li>如果一个节点得到了对象的读取请求；<ol>
-<li>如果对象最后一个节点是clean的，则马上响应；</li>
-<li>否则，节点会联系尾节点，询问尾部节点最后一个committed版本。</li>
-</ol>
-</li>
-</ol>
-<p>具体效果如图所示：</p>
-<p><img src="https://pic.downk.cc/item/5eafce3cc2a9a83be58fe0d0.png" alt></p>
-<h3 id="Consistency-Models-on-CRAQ"><a href="#Consistency-Models-on-CRAQ" class="headerlink" title="Consistency Models on CRAQ"></a>Consistency Models on CRAQ</h3><p>CRAQ提供了三种一致性模型：</p>
-<ul>
-<li>强一致性（默认的）：如上述所示；</li>
-<li>最终一致性：允许读取时返回本地已知的最新的对象版本；</li>
-<li>最大界限的最终一致性：允许读取请求返回最新的写入对象，即便该对象还没有commit。但会提供一个限制，比如基于特定时间内存的写入，或者某个绝对的版本；</li>
-</ul>
-<h3 id="Failure-Recovery-in-CRAQ"><a href="#Failure-Recovery-in-CRAQ" class="headerlink" title="Failure Recovery in CRAQ"></a>Failure Recovery in CRAQ</h3><p>双向链表的模式，即一个节点可以知道其后继节点和前驱节点，保证在节点失败时，由其周围的节点去接手。</p>
-<h2 id="Scaling-CRAQ"><a href="#Scaling-CRAQ" class="headerlink" title="Scaling CRAQ"></a>Scaling CRAQ</h2><p>在本节中，我们讨论应用程序如何在CRAQ中指定单个数据中心内和多个数据中心内的部署方案</p>
-<h3 id="Chain-Placement-Strategies"><a href="#Chain-Placement-Strategies" class="headerlink" title="Chain Placement Strategies"></a>Chain Placement Strategies</h3><p>一个分布式应用需要面临很多问题，比如对象的大多数写入可能位于同一个数据中心，一些对象只与数据中心的子集有关，重要的对象可能需要不同的副本策略。</p>
-<p>CARQ提供了更加灵活的链式配置策略，对于对象来说，使用的是链表ID和key ID结合的两层命名结构，另外就是配置的策略：</p>
-<ul>
-<li>Implicit Datacenters &amp; Global Chain Size: {num_datacenters, chain_size}</li>
-</ul>
-<p>简单来说，就是定一个存储链的数据中心数量，通过对数据中心ID作一致性哈希来明确标识唯一的数据中心；</p>
-<ul>
-<li>Explicit Datacenters &amp; Global Chain Size: {chain_size, dc1, dc2, …, dcN}</li>
-</ul>
-<p>这个方法是每个数据中心都适用相同大小的链表去存储备份，链表头部位于dc1的节点，链表尾部则在dc2的其中一个节点，以此类推；</p>
-<ul>
-<li>Explicit Datacenter Chain Sizes: {dc1, chain_size1, …, dcN, chain_sizeN}</li>
-</ul>
-<p>与上面的方法类似，但每个数据中心的链表大小不同；</p>
-<h3 id="CRAQ-Across-Multiple-Datacenters"><a href="#CRAQ-Across-Multiple-Datacenters" class="headerlink" title="CRAQ Across Multiple Datacenters"></a>CRAQ Across Multiple Datacenters</h3><p>CRAQ本地读取的方法降低了延迟，client也可以灵活选择距离更近的节点。</p>
-<p>另一方面，通过链优化，应用程序可以选择组成链的数据中心顺序来最大程度降低写入延迟，确保单个链在每个方向上仅仅需要跨越数据中心的网络边界一次。随着节点增加，很可能写延迟也会明显增加，但相比主备的方法，流水线的写操作可以极大地写入吞吐量。</p>
-<h3 id="ZooKeeper-Coordination-Service"><a href="#ZooKeeper-Coordination-Service" class="headerlink" title="ZooKeeper Coordination Service"></a>ZooKeeper Coordination Service</h3><p>CARQ使用zookeeper来追溯成员身份，并存储链元数据。另外就是当添加或者删除节点时，可以确保CARQ节点能够收到通知。</p>
-<p>由于不了解数据中心原始的拓扑结构，因此Zookeeper节点之间的协调消息会在广域网上多次传输。为了消除跨数据中心ZooKeeper冗余的通讯，一个方法是可以构建一个Zookeeper实例的层次结构：每个数据中心可以包含其自己的本地ZooKeeper实例（由多个节点组成），并具有一个参与全局ZooKeeper实例的代表。另一个方法是，修改ZooKeeper本身以使节点知道网络拓扑。</p>
-<h2 id="Extensions"><a href="#Extensions" class="headerlink" title="Extensions"></a>Extensions</h2><p>本章主要讲述了CARQ的一些拓展点</p>
-<h3 id="Mini-Transactions-on-CRAQ"><a href="#Mini-Transactions-on-CRAQ" class="headerlink" title="Mini-Transactions on CRAQ"></a>Mini-Transactions on CRAQ</h3><p>对于某些应用来说，简单的对象存储读写可能比较局限。有些应用可能需要支持批量操作，有些可能需要有权限控制。因此CARQ提供了拓展功能来支持事务操作。</p>
-<h4 id="Single-Key-Operations"><a href="#Single-Key-Operations" class="headerlink" title="Single-Key Operations"></a>Single-Key Operations</h4><p>CRAQ支持几种单key操作：</p>
-<ul>
-<li>Prepend/Append: 在一个对象的当前值上追加data；</li>
-<li>Increment/Decrement: 递增或者递减一个key的对象；</li>
-<li>Test-and-Set: 只有在当前版本与指定版本匹配时才会更新对象；</li>
-</ul>
-<p>对于前面两种操作来说，可以直接对链表的头节点进行apply，而不用管它的节点是clean还是dirty，应用完之后向后传播就行。</p>
-<p>而对于Test-and-Set操作来说，CARQ并不会锁住对象，而是版本不匹配的时候直接返回。</p>
-<h4 id="Single-Chain-Operations"><a href="#Single-Chain-Operations" class="headerlink" title="Single-Chain Operations"></a>Single-Chain Operations</h4><p>Sinfonia最近提出的mini-transactions可以支持对单个链的多个key进行事务操作。它使用了乐观的两阶段提交协议，在prepare阶段会尝试在每个指定的内存地址上获取一个锁。如果可以锁定所有的地址，则协议提交。否则会释放所有的锁并进行充实。在CRAQ中，由于可以指定多个对象存储在同一个链表中，因此这里的两阶段提交减少到单个的交互，即使用单个头部节点则可以接受访问。</p>
-<h4 id="Multi-Chain-Operations"><a href="#Multi-Chain-Operations" class="headerlink" title="Multi-Chain Operations"></a>Multi-Chain Operations</h4><p>对于多链参与多对象更新，优化的两阶段协议提交只需要用多个链表头部节点实现即可，链表锁住所有参与事务的keys，直到满足提交条件。</p>
-<p>当然这个方法没办法pipeline实现，在一定程度上会影响吞吐量。</p>
-<h3 id="Lowering-Write-Latency-with-Multicast"><a href="#Lowering-Write-Latency-with-Multicast" class="headerlink" title="Lowering Write Latency with Multicast"></a>Lowering Write Latency with Multicast</h3><p>CARQ使用多播协议来提高写入性能，由于链的成员资格在节点成员资格改变时是相对文婷的，因此可以为每个链创建一个多播组。然后，不是在整个链上串行传播完整的写入，而是将真实值多播到整个链表，然后紧紧在链上传播少量的元数据信息，以确保所有的副本都在尾部之前收到写操作。</p>
-<p>如果存在节点由于某种原因未接收到多播，则该节点可以在接收到写入提交消息之后，然后进一步传播提交消息之前，从其前任中获取对象。</p>
-<p>另外，当尾部节点接收到传播的写请求时，可以将多播确认消息发送到多播组，而不是将其沿链向后传播。这样既减少了节点对象在写入后重新进入清洁状态所花费的时间，又减少了客户端感知的写入延迟。如果链中的某个节点未收到确认，则当下一个读取操作要求它查询尾部时，它将重新进入clean。</p>
-<h2 id="Management-and-Implementation"><a href="#Management-and-Implementation" class="headerlink" title="Management and Implementation"></a>Management and Implementation</h2><h3 id="Integrating-ZooKeeper"><a href="#Integrating-ZooKeeper" class="headerlink" title="Integrating ZooKeeper"></a>Integrating ZooKeeper</h3><p>CRAQ使用zookeeper的文件结构来维持数据中心中节点列表的成员资格。</p>
-<p>在初始化时，一个CRAQ节点会创建一个临时文件(/nodes/dc_name/node_id)，dc_name就是数据中心的唯一名称，no de_id就是数据中节点的唯一ID。文件内容则是包含了节点的ip地址和端口号。</p>
-<p>CRAQ可以查询/nodes/dc_name，来判断数据中的成员资格，通过添加一个watch到/nodes/dc_name，就可以被通知到节点的添加或者删除。</p>
-<p>/chains/chain_id则是在CRAQ节点收到创建新链表的请求时，会创建一个文件，chain_id是一个160位的唯一标识符，文件内容时链表的配置策略。而节点通过监控链表文件，从而保证在链表元数据改变时得到通知。</p>
-<h3 id="Chain-Node-Functionality"><a href="#Chain-Node-Functionality" class="headerlink" title="Chain Node Functionality"></a>Chain Node Functionality</h3><p>节点在加入系统时会生成一个随机标识符每个数据中心内会使用该标识符作为one-hop DHT。节点之间或者节点与客户端之间的RPC通信都是通过TCP连接进行的。每个节点及其链的前任，后继和尾部维护着一组连接的TCP连接。请求通过这些连接进行管道传输和循环轮询。</p>
-<p>对于跨多个数据中心的链，一个数据中心的最后一个节点保持与其后继数据中心的第一个节点的连接。当外部数据中心中的节点列表发生更改时，订阅更改的节点可以从其本地ZooKeeper中接收通知。</p>
-<h3 id="Handling-Memberships-Changes"><a href="#Handling-Memberships-Changes" class="headerlink" title="Handling Memberships Changes"></a>Handling Memberships Changes</h3><p>对于正常的写传播，CRAQ节点遵循前面的协议。在恢复过程中，有时需要第二种传播方式，即反向传播。例如链表节点可能会在完成向后传播到头部节点之前失败。由于这些可能的故障状况，当新节点加入系统时，新节点会从其前任节点接收传播消息，并从其后继节点接收反向传播消息，以确保其正确性。新节点拒绝客户端对特定对象的读取请求，直到其与后继对象达成协议为止。</p>
-<p>无论是节点添加或者删除，变更的节点对应的后继者或者前驱节点都需要传播足够的信息以确保链表的一致性。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2244,7 +2203,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">258</span>
+                <span class="site-state-item-count">259</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -265,6 +265,148 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/30/redis设计与实现——quicklist/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/08/30/redis设计与实现——quicklist/" itemprop="url">redis设计与实现——quicklist</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-30T01:17:11+08:00">
+                2019-08-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="quicklist"><a href="#quicklist" class="headerlink" title="quicklist"></a>quicklist</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><blockquote>
+<p>A doubly linked list of ziplists</p>
+</blockquote>
+<p>根据quicklist.c的注释，这种数据结构是一个以ziplist为节点的双向链表。在redis3.2之后，quicklist取代了压缩列表和linkedlist，成为了列表对象的唯一编码形式。commit <a href="https://github.com/antirez/redis/commit/5e362b84ab8b769bf2738daea97b45a375d223f1" target="_blank" rel="noopener">记录</a></p>
+<p>之所以这样设计，是因为原先的linkedlist由于各个节点都是单独的内存，很容易造成内存碎片；而对于压缩列表，由于其每次修改都会引发内存的重新分配，导致大量的内存拷贝。经过对时间和空间的折中，选择了quicklist这种方法。</p>
+<h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><p>首先来看节点，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">quicklistNode</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">quicklistNode</span> *<span class="title">prev</span>;</span> <span class="comment">// 前一个节点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">quicklistNode</span> *<span class="title">next</span>;</span> <span class="comment">// 后一个节点</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *zl; <span class="comment">// ziplist结构，压缩的ziplist会指向一个quicklistLZF结构</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> sz;             <span class="comment">/* ziplist的大小 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> count : <span class="number">16</span>;     <span class="comment">/* ziplist的item个数*/</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> encoding : <span class="number">2</span>;   <span class="comment">/* ziplist是否压缩，1没有压缩，2压缩*/</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> container : <span class="number">2</span>;  <span class="comment">/* 目前固定为2，表示使用ziplist作为数据容器 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> recompress : <span class="number">1</span>; <span class="comment">/* 是否压缩，1表示压缩。有些命令需要做解压，因此用该标记以便后续压缩*/</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> attempted_compress : <span class="number">1</span>; <span class="comment">/* 暂时不用管，自动测试用的 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> extra : <span class="number">10</span>; <span class="comment">/* 扩展字段，目前还没被使用，刚好凑成32bit */</span></span><br><span class="line">&#125; quicklistNode;</span><br></pre></td></tr></table></figure>
+<p>然后quicklist这个结构体将上面节点表示连起来：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">quicklist</span> &#123;</span></span><br><span class="line">    quicklistNode *head; <span class="comment">// 头部节点</span></span><br><span class="line">    quicklistNode *tail; <span class="comment">// 尾部节点</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> count;        <span class="comment">/* ziplist的item个数总和 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> len;          <span class="comment">/* 节点个数 */</span></span><br><span class="line">    <span class="keyword">int</span> fill : <span class="number">16</span>;              <span class="comment">/* 单个ziplist的大小设置 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> compress : <span class="number">16</span>; <span class="comment">/* 节点的压缩设置 */</span></span><br><span class="line">&#125; quicklist;</span><br></pre></td></tr></table></figure>
+<p>fill的设置与单个quicklistNode的大小有关，当该值为正数时，表示节点指向的ziplist的数据项个数，因此16bit可以最多表示32k的个数；当该值为负数时，表示单个节点最多存储大小。（-1:4kb, -2:8kb, -3:16kb, -4:32kb, -5:64kb）。默认是-2，8kb。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FILL_MAX (1 &lt;&lt; 15)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">quicklistSetFill</span><span class="params">(quicklist *quicklist, <span class="keyword">int</span> fill)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (fill &gt; FILL_MAX) &#123;</span><br><span class="line">        fill = FILL_MAX;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fill &lt; <span class="number">-5</span>) &#123;</span><br><span class="line">        fill = <span class="number">-5</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    quicklist-&gt;fill = fill;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">quicklist *<span class="title">quicklistCreate</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">quicklist</span> *<span class="title">quicklist</span>;</span></span><br><span class="line"></span><br><span class="line">    quicklist = zmalloc(<span class="keyword">sizeof</span>(*quicklist));</span><br><span class="line">    quicklist-&gt;head = quicklist-&gt;tail = <span class="literal">NULL</span>; <span class="comment">// 不包含多余的头部节点</span></span><br><span class="line">    quicklist-&gt;len = <span class="number">0</span>;</span><br><span class="line">    quicklist-&gt;count = <span class="number">0</span>;</span><br><span class="line">    quicklist-&gt;compress = <span class="number">0</span>;</span><br><span class="line">    quicklist-&gt;fill = <span class="number">-2</span>; <span class="comment">// 默认的fill是-2，8kb</span></span><br><span class="line">    <span class="keyword">return</span> quicklist;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="插入push"><a href="#插入push" class="headerlink" title="插入push"></a>插入push</h2><p>push操作是通过quicklistpush实现的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">quicklistPush</span><span class="params">(quicklist *quicklist, <span class="keyword">void</span> *value, <span class="keyword">const</span> <span class="keyword">size_t</span> sz,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="keyword">int</span> where)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (where == QUICKLIST_HEAD) &#123;</span><br><span class="line">        quicklistPushHead(quicklist, value, sz); <span class="comment">// push头部</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (where == QUICKLIST_TAIL) &#123;</span><br><span class="line">        quicklistPushTail(quicklist, value, sz); <span class="comment">// push尾部</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>插入头部的函数，返回0表示已经存在头部，返回1表示创建了新的头部。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __GNUC__ &gt;= 3</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> likely(x) __builtin_expect(!!(x), 1)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> unlikely(x) __builtin_expect(!!(x), 0)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> likely(x) (x)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> unlikely(x) (x)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">quicklistPushHead</span><span class="params">(quicklist *quicklist, <span class="keyword">void</span> *value, <span class="keyword">size_t</span> sz)</span> </span>&#123;</span><br><span class="line">    quicklistNode *orig_head = quicklist-&gt;head;</span><br><span class="line">  	<span class="comment">// 判断ziplist大小是否超过限制</span></span><br><span class="line">    <span class="keyword">if</span> (likely(</span><br><span class="line">            _quicklistNodeAllowInsert(quicklist-&gt;head, quicklist-&gt;fill, sz))) &#123;</span><br><span class="line">        quicklist-&gt;head-&gt;zl =</span><br><span class="line">            ziplistPush(quicklist-&gt;head-&gt;zl, value, sz, ZIPLIST_HEAD); <span class="comment">// 插数据到头部节点</span></span><br><span class="line">        quicklistNodeUpdateSz(quicklist-&gt;head);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        quicklistNode *node = quicklistCreateNode();<span class="comment">//新建一个节点</span></span><br><span class="line">        node-&gt;zl = ziplistPush(ziplistNew(), value, sz, ZIPLIST_HEAD);<span class="comment">// 新建一个ziplist并插入一个节点</span></span><br><span class="line"></span><br><span class="line">        quicklistNodeUpdateSz(node); <span class="comment">// 更新节点的sz</span></span><br><span class="line">        _quicklistInsertNodeBefore(quicklist, quicklist-&gt;head, node); <span class="comment">// 将该节点插入到原头部节点之前</span></span><br><span class="line">    &#125;</span><br><span class="line">    quicklist-&gt;count++;</span><br><span class="line">    quicklist-&gt;head-&gt;count++;</span><br><span class="line">    <span class="keyword">return</span> (orig_head != quicklist-&gt;head);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>检查ziplist的大小是否满足要求</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> sizeMeetsSafetyLimit(sz) ((sz) &lt;= SIZE_SAFETY_LIMIT)</span></span><br><span class="line"></span><br><span class="line">REDIS_STATIC <span class="keyword">int</span> _quicklistNodeAllowInsert(<span class="keyword">const</span> quicklistNode *node,</span><br><span class="line">                                           <span class="keyword">const</span> <span class="keyword">int</span> fill, <span class="keyword">const</span> <span class="keyword">size_t</span> sz) &#123;</span><br><span class="line">    <span class="keyword">if</span> (unlikely(!node))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ziplist_overhead;</span><br><span class="line">    <span class="comment">/* size of previous offset */</span></span><br><span class="line">    <span class="keyword">if</span> (sz &lt; <span class="number">254</span>)</span><br><span class="line">        ziplist_overhead = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        ziplist_overhead = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* size of forward offset */</span></span><br><span class="line">    <span class="keyword">if</span> (sz &lt; <span class="number">64</span>)</span><br><span class="line">        ziplist_overhead += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (likely(sz &lt; <span class="number">16384</span>))</span><br><span class="line">        ziplist_overhead += <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        ziplist_overhead += <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 忽略sz被编码成整数的情况*/</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> new_sz = node-&gt;sz + sz + ziplist_overhead;</span><br><span class="line">  	<span class="comment">// 检查fill为负数时，是否超过容量大小</span></span><br><span class="line">  	<span class="comment">// 五种情况：static const size_t optimization_level[] = &#123;4096, 8192, 16384, 32768, 65536&#125;;</span></span><br><span class="line">    <span class="keyword">if</span> (likely(_quicklistNodeSizeMeetsOptimizationRequirement(new_sz, fill)))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (!sizeMeetsSafetyLimit(new_sz)) <span class="comment">// fill为正数时，不能超过#define SIZE_SAFETY_LIMIT 8192，8kb</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ((<span class="keyword">int</span>)node-&gt;count &lt; fill) <span class="comment">// fill为正数时，检查节点的ziplist项数</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="节点压缩"><a href="#节点压缩" class="headerlink" title="节点压缩"></a>节点压缩</h2><p>前面提到过，如果当前的节点需要进行压缩，zl数据指针将指向quicklistLZF结构体。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">quicklistLZF</span> &#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> sz; <span class="comment">/* LZF size in bytes, compressed的长度*/</span></span><br><span class="line">    <span class="keyword">char</span> compressed[]</span><br><span class="line">&#125; quicklistLZF;</span><br></pre></td></tr></table></figure>
+<p>具体的压缩操作函数如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Compress the ziplist in 'node' and update encoding details.</span></span><br><span class="line"><span class="comment"> * Returns 1 if ziplist compressed successfully.</span></span><br><span class="line"><span class="comment"> * Returns 0 if compression failed or if ziplist too small to compress. */</span></span><br><span class="line">REDIS_STATIC <span class="keyword">int</span> __quicklistCompressNode(quicklistNode *node) &#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> REDIS_TEST</span></span><br><span class="line">    node-&gt;attempted_compress = <span class="number">1</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 小于 #define MIN_COMPRESS_BYTES 48 不进行压缩 */</span></span><br><span class="line">    <span class="keyword">if</span> (node-&gt;sz &lt; MIN_COMPRESS_BYTES)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    quicklistLZF *lzf = zmalloc(<span class="keyword">sizeof</span>(*lzf) + node-&gt;sz); <span class="comment">// 分配内存</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 如果压缩失败，或者压缩尺寸不够，节省的空间不足8字节则取消 */</span></span><br><span class="line">  	<span class="comment">// #define MIN_COMPRESS_IMPROVE 8</span></span><br><span class="line">    <span class="keyword">if</span> (((lzf-&gt;sz = lzf_compress(node-&gt;zl, node-&gt;sz, lzf-&gt;compressed,</span><br><span class="line">                                 node-&gt;sz)) == <span class="number">0</span>) ||</span><br><span class="line">        lzf-&gt;sz + MIN_COMPRESS_IMPROVE &gt;= node-&gt;sz) &#123;</span><br><span class="line">        <span class="comment">/* lzf_compress aborts/rejects compression if value not compressable. */</span></span><br><span class="line">        zfree(lzf);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    lzf = zrealloc(lzf, <span class="keyword">sizeof</span>(*lzf) + lzf-&gt;sz); <span class="comment">// 重新分配内存</span></span><br><span class="line">    zfree(node-&gt;zl); <span class="comment">// 释放原来的节点</span></span><br><span class="line">    node-&gt;zl = (<span class="keyword">unsigned</span> <span class="keyword">char</span> *)lzf;</span><br><span class="line">    node-&gt;encoding = QUICKLIST_NODE_ENCODING_LZF;</span><br><span class="line">    node-&gt;recompress = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>具体lzf压缩算法，可以参考<a href="https://github.com/antirez/redis/blob/fc0c9c8097a5b2bc8728bec9cfee26817a702f09/src/lzf_c.c" target="_blank" rel="noopener">lzf_compress函数</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/18/Atomicity-All-or-Nothing-and-Before-or-After——MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1794,155 +1936,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/30/std-array/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/30/std-array/" itemprop="url">std::array</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-30T13:09:44+08:00">
-                2019-05-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h1><p>std::array是在c++11中引入的，对原来C语言的数组的一个包装器，具有额外的优点。这是一种具有恒定大小元素的顺序容器。</p>
-<p>其模版为：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt; <span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">size_t</span> <span class="title">N</span> &gt; </span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">array</span>;</span></span><br></pre></td></tr></table></figure>
-<p>T为元素类型，N为数组元素的个数。</p>
-<p>头文件为：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;array&gt;</span></span></span><br></pre></td></tr></table></figure>
-<h2 id="Defining-and-Initializing-an-std-array-lt-gt-object"><a href="#Defining-and-Initializing-an-std-array-lt-gt-object" class="headerlink" title="Defining and Initializing an std::array&lt;&gt; object"></a>Defining and Initializing an std::array&lt;&gt; object</h2><p>举两个例子：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, 200&gt; arr1;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, 10&gt; arr3 = &#123; <span class="number">34</span>, <span class="number">45</span> &#125;;<span class="comment">//Init: 34 , 45 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,</span></span><br></pre></td></tr></table></figure>
-<p>std::array还提供了一个方法可以一次性对所有的元素设置相同的值。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, 10&gt; arr4;</span><br><span class="line"><span class="comment">// Fill all elements in array with same value</span></span><br><span class="line">arr4.fill(<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="How-to-get-the-size-of-std-array"><a href="#How-to-get-the-size-of-std-array" class="headerlink" title="How to get the size of std::array"></a>How to get the size of std::array</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr.size();</span><br></pre></td></tr></table></figure>
-<h2 id="How-to-access-elements-in-std-array"><a href="#How-to-access-elements-in-std-array" class="headerlink" title="How to access elements in std::array"></a>How to access elements in std::array</h2><ul>
-<li><strong>operator []</strong>：访问超出范围的元素时会引起undefined behaviour；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = arr[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>at()</strong>：访问超出范围的元素时会抛出<strong>out_of_range</strong>异常；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = arr.at(<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>std::tuple’s get&lt;&gt;()</strong>：访问超出范围的元素时会编译错误；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="built_in">std</span>::get&lt;<span class="number">2</span>&gt;(arr);</span><br></pre></td></tr></table></figure>
-<h2 id="How-to-Iterate-over-a-std-array-lt-gt-object"><a href="#How-to-Iterate-over-a-std-array-lt-gt-object" class="headerlink" title="How to Iterate over a std::array&lt;&gt; object"></a>How to Iterate over a std::array&lt;&gt; object</h2><p>对array的遍历，存在四种方法：</p>
-<ul>
-<li>使用基于范围的迭代循环；</li>
-<li>使用循环；</li>
-<li>使用迭代器；</li>
-<li>使用for_each；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1991,7 +1984,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">258</span>
+                <span class="site-state-item-count">259</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
