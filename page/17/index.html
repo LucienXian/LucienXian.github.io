@@ -265,6 +265,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/Introduction-to-parsing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/Introduction-to-parsing/" itemprop="url">Introduction to parsing</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T23:03:30+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Introduction-to-parsing"><a href="#Introduction-to-parsing" class="headerlink" title="Introduction to parsing"></a>Introduction to parsing</h1><p>Input: sequence of tokens from lexer</p>
+<p>Output: parse tree of the program</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap5_1.png" alt="img"></p>
+<h2 id="Context-Free-grammars"><a href="#Context-Free-grammars" class="headerlink" title="Context-Free grammars"></a>Context-Free grammars</h2><ul>
+<li><p>不是所有tokens都是有效的，怕parsers要进行区分</p>
+</li>
+<li><p>程序语言是具有递归结构的</p>
+</li>
+</ul>
+<p>CFG包含了以下内容：</p>
+<ul>
+<li>A set of terminals-&gt;T</li>
+<li>A set of non-terminals-&gt;N</li>
+<li>A start symbols-&gt;S</li>
+<li>A set of productions -&gt; X-&gt;Y1…Y2</li>
+</ul>
+<p>productions可以理解成rules，例如S-&gt;(S)，意味着左边的能被右边的替代</p>
+<p>CFG的处理过程：</p>
+<ol>
+<li>从一个带有start symbol S的字符串开始</li>
+<li>替换所有字符串中所有non-terminal X，根据production X-&gt;Y1..Y2</li>
+<li>重复2，直到没有non-terminals</li>
+</ol>
+<p>假设G是以S为start symbol的CFG，那么语言L(G)就是：</p>
+<ul>
+<li>{a1….an | 对于所有的terminal ai，都有 S-&gt;a1….an}</li>
+</ul>
+<p>terminals是不能被替换，是永恒的，terminals就是语言的tokens；</p>
+<p>因此CFG就是指所有的production的左边只有一个非终结符</p>
+<h2 id="Derivations"><a href="#Derivations" class="headerlink" title="Derivations"></a>Derivations</h2><p>derivations: 一些列的productions，可以表示成一颗树，根就是start symbol，箭头右边的就是子节点，</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap52.png" alt="img"></p>
+<p>叶节点都是terminals，根就是start symbol。这种推导就是left-most derivation，每一步都替代掉最左边的non-terminal。</p>
+<p>同理，也有right-most derivation：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap53.png" alt="img"></p>
+<p>right-most和left-most有着相同的parse tree。</p>
+<h2 id="Ambiguity"><a href="#Ambiguity" class="headerlink" title="Ambiguity"></a>Ambiguity</h2><p>考虑grammar：<strong>E-&gt;E+E|E*E|(E)|id</strong> ， <strong>string为id*id+id</strong></p>
+<p>会解释得到两个parse tree：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap54.png" alt="img"></p>
+<p>如果有两颗以上的parse tree，我们就认为一个grammar是ambiguous。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/深度探索C-对象模型-八/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1820,150 +1978,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/15/Unix网络编程——chap5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/15/Unix网络编程——chap5/" itemprop="url">Unix网络编程——chap5</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T22:09:47+08:00">
-                2018-03-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="TCP客户-服务器程序"><a href="#TCP客户-服务器程序" class="headerlink" title="TCP客户/服务器程序"></a>TCP客户/服务器程序</h1><h2 id="POSIX信号处理"><a href="#POSIX信号处理" class="headerlink" title="POSIX信号处理"></a>POSIX信号处理</h2><p>信号：告知某个进程发生了某个事件的通知。由于信号是异步的，也就是进程无法得知信号发生的准确时间；</p>
-<p>两个传播路径：</p>
-<ul>
-<li>由一个进程发给另外一个进程（或自身）；</li>
-<li>由内核发给某个进程；</li>
-</ul>
-<p>函数声明：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> (*signal(<span class="keyword">int</span> signo, <span class="keyword">void</span> (*func)(<span class="keyword">int</span>)))(<span class="keyword">int</span>);</span><br></pre></td></tr></table></figure>
-<p>POSIX的信号处理：</p>
-<ol>
-<li>一旦安装了信号处理函数，它便一直安装着；</li>
-<li>在一个信号处理函数运行期间，正在被递交的信号是阻塞的；</li>
-<li>如果一个信号在被阻塞期间产生了多次，那么信号不在阻塞之后只会被递交一次，也就是不进行队列排序；</li>
-</ol>
-<h2 id="Zombie进程"><a href="#Zombie进程" class="headerlink" title="Zombie进程"></a>Zombie进程</h2><p>设置僵死(zombie)进程的一个目的就是维护子进程的信息，以便父进程在未来要使用的时候能获取诸如子进程的ID，进程终止状态和资源利用信息。</p>
-<p>由于僵死进程会占用内核空间，因此我们通常利用函数wait或者waitpid来防止其变成僵死进程。</p>
-<h2 id="wait和waitpid函数"><a href="#wait和waitpid函数" class="headerlink" title="wait和waitpid函数"></a>wait和waitpid函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pid_t</span> wait(<span class="keyword">int</span> *staloc);</span><br><span class="line"><span class="keyword">pid_t</span> waitpid(<span class="keyword">pid_t</span> pid, <span class="keyword">int</span> *staloc, <span class="keyword">int</span> options);</span><br></pre></td></tr></table></figure>
-<p>比较：</p>
-<p>进程在调用wait之后，如果没有已终止的子进程，它会一直阻塞，直到现有的子进程第一个终止为止。</p>
-<p>而对于waitpid来说，它在阻塞非阻塞方面有更多的控制权，首先是pid能指定等待的进程pid，options则是附加选项，设置为WNOHANG则可以告诉内核在没有子进程完成时不要阻塞。</p>
-<h2 id="accept返回前连接中止"><a href="#accept返回前连接中止" class="headerlink" title="accept返回前连接中止"></a>accept返回前连接中止</h2><p>在三次握手建立之后，客户端的TCP却发来了一个RST。那么一般来说，服务器端的accept函数将会返回一个错误。</p>
-<h2 id="服务器进程终止"><a href="#服务器进程终止" class="headerlink" title="服务器进程终止"></a>服务器进程终止</h2><p>假设我们在两端建立起连接之后，杀死了服务器端的进程。那么服务器端会向客户端发去一个FIN，而如果此时客户端阻塞于fgets，当我们在客户端输入要发送的内容之后，客户端仍然照常将数据发去服务端。</p>
-<p>由于服务端的进程已经关闭了，所以服务端会响应一个RST。然而此时客户端还看不到RST，而是接受FIN，也就是在read中返回0，由于不像预期那样接收到EOF，所以客户端会因为出错而退出。</p>
-<h2 id="SIGPIPE"><a href="#SIGPIPE" class="headerlink" title="SIGPIPE"></a>SIGPIPE</h2><p>还是上面的那个情况，如果我们不是执行一次写操作，而是在读回数据之前执行两次写操作，那么会引发EPIPE错误。这是因为第一次的写操作会导致RST的接收，而第二次向接收到RST的套接字进行写操作是不允许的，因此返回了错误。</p>
-<h2 id="服务器主机崩溃后重启"><a href="#服务器主机崩溃后重启" class="headerlink" title="服务器主机崩溃后重启"></a>服务器主机崩溃后重启</h2><p>假设客户端发送数据前，重启处于崩溃状态的服务器，那么由于服务器已经丢失了之前的连接信息，所以会响应一个RST。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2012,7 +2026,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">259</span>
+                <span class="site-state-item-count">260</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

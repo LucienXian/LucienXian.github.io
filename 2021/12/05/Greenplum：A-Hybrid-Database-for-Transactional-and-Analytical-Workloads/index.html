@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="数据库,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="Greenplum：A Hybrid Database for Transactional and Analytical WorkloadsIntroductionGreenplum是一个老牌的、基于MPP架构的数据仓库系统，主打的OLAP功能，采用了share nothing和sharding的架构，能够处理PB级别的数据。Greenplum存在一个固定的coordinator节点，负责与cli">
+<meta name="keywords" content="数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Greenplum：A Hybrid Database for Transactional and Analytical Workloads">
+<meta property="og:url" content="http://yoursite.com/2021/12/05/Greenplum：A-Hybrid-Database-for-Transactional-and-Analytical-Workloads/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Greenplum：A Hybrid Database for Transactional and Analytical WorkloadsIntroductionGreenplum是一个老牌的、基于MPP架构的数据仓库系统，主打的OLAP功能，采用了share nothing和sharding的架构，能够处理PB级别的数据。Greenplum存在一个固定的coordinator节点，负责与cli">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73a32ab3f51d91ec3a9e.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3ab9.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3ac2.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3ad4.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3acc.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec643e.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec6443.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec644d.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec6457.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec6460.png">
+<meta property="og:updated_time" content="2021-12-05T08:12:04.307Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Greenplum：A Hybrid Database for Transactional and Analytical Workloads">
+<meta name="twitter:description" content="Greenplum：A Hybrid Database for Transactional and Analytical WorkloadsIntroductionGreenplum是一个老牌的、基于MPP架构的数据仓库系统，主打的OLAP功能，采用了share nothing和sharding的架构，能够处理PB级别的数据。Greenplum存在一个固定的coordinator节点，负责与cli">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/61ac73a32ab3f51d91ec3a9e.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/12/05/Greenplum：A-Hybrid-Database-for-Transactional-and-Analytical-Workloads/">
+
+
+
+
+
+  <title>Greenplum：A Hybrid Database for Transactional and Analytical Workloads | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/12/05/Greenplum：A-Hybrid-Database-for-Transactional-and-Analytical-Workloads/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Greenplum：A Hybrid Database for Transactional and Analytical Workloads</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-05T16:11:28+08:00">
+                2021-12-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Greenplum：A-Hybrid-Database-for-Transactional-and-Analytical-Workloads"><a href="#Greenplum：A-Hybrid-Database-for-Transactional-and-Analytical-Workloads" class="headerlink" title="Greenplum：A Hybrid Database for Transactional and Analytical Workloads"></a>Greenplum：A Hybrid Database for Transactional and Analytical Workloads</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>Greenplum是一个老牌的、基于MPP架构的数据仓库系统，主打的OLAP功能，采用了share nothing和sharding的架构，能够处理PB级别的数据。Greenplum存在一个固定的coordinator节点，负责与client交互，查询计划的生成与分布式执行、事务的管理等，是一个比较重要的节点。其他segment节点（单机Postgres）则存储数据与本地查询和事务。为了增强Greenplum的OLTP能力，往HTAP的方向发展，论文中提到了Greenplum对以下几个方面进行了增强：</p>
+<ul>
+<li>事务能力的增强：加入了全局的死锁检查器，避免了过去由于严格的锁机制导致并发能力不够的问题；对于单个segment server上的事务，由2PC转变为1PC；</li>
+<li>提高点查询的性能；</li>
+<li>引入了资源管理组，避免OLAP与OLTP两种查询负载相互影响；</li>
+</ul>
+<p>从某种角度来说，Greenplum演变成HTAP数据库的路径与大多数数据库不一样，它是在传统的OLAP数据库上加强了OLTP功能的支持。</p>
+<h2 id="GreenPlum’s-MPP-Architecture"><a href="#GreenPlum’s-MPP-Architecture" class="headerlink" title="GreenPlum’s MPP Architecture"></a>GreenPlum’s MPP Architecture</h2><p>GreenPlum是一个典型的MPP架构，集群由多个worker segments组成，每个segment都是一个增强版的PostgreSQL。下图就是GreenPlum的架构。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73a32ab3f51d91ec3a9e.png" alt></p>
+<h3 id="Roles-and-Responsibility-of-Segments"><a href="#Roles-and-Responsibility-of-Segments" class="headerlink" title="Roles and Responsibility of Segments"></a>Roles and Responsibility of Segments</h3><p>一个GreenPlum集群由许多个跨主机的segments组成，其中会有一个segment是coordinator，其他的统称为segment server。coordinator是一个比较重的节点，负责接收client请求，生成分布式查询计划，根据计划生成分布式进程，将计划分配到每个进程，收集结果，返回到client。</p>
+<p>segment server则是存储数据，从coordinator接收查询计划。为了提高可用性，segment也可以配置镜像节点，不参与计算，但会接收WAL并回放日志。</p>
+<p>作为一个share nothing的架构，GreenPlum中每个segment都会有自己的共享内存和数据目录。</p>
+<h3 id="Distributed-Plan-and-Distributed-Executor"><a href="#Distributed-Plan-and-Distributed-Executor" class="headerlink" title="Distributed Plan and Distributed Executor"></a>Distributed Plan and Distributed Executor</h3><p>由于是share nothing的架构，当两个表需要进行join时，通常需要检查不同的segment server的元组是否满足条件，免不了需要在segment server移动数据。GreenPlum引入了一种叫Motion的算子来实现移动。Motion算子会通过网络来接发数据，Motion算子将查询计划切成不同的slice，在slice之间会做数据的分发，每个slice的执行都由一组特定的worker负责，这组进程就是gang。coordinator将查询计划分配个跨集群的进程组，不同的segment server生成不同的进程，都有相关的上下文信息。</p>
+<p>如下图，顶部是一个join的分布式计划，下方则是在两个segment server集群的执行过程。在segment server上有两个slice，一个slice会扫描class表并通过redistributed Motion发送元组，两个slice则是从Motion节点接收元组，并扫描Student表执行hash join，将结果发送至顶部的coordinator。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3ab9.png" alt></p>
+<h3 id="Distributed-Transaction-Management"><a href="#Distributed-Transaction-Management" class="headerlink" title="Distributed Transaction Management"></a>Distributed Transaction Management</h3><p>Greenplum通过分布式快照和2PC来确保ACID属性，在单个segment节点上，则是Postgres原生的事务机制。</p>
+<h3 id="Hybrid-Storage-and-Optimizer"><a href="#Hybrid-Storage-and-Optimizer" class="headerlink" title="Hybrid Storage and Optimizer"></a>Hybrid Storage and Optimizer</h3><p>Greenplum支持三种表类型：PostgreSQL原生的heap表，行存储；还有就是两种新加入的，Append Optimized的行存储和列存储。AO表更有利于批量IO而不是heap表的随机访问模式，因此更适合AP的工作负载。特别是AO column表，可以用不同的压缩算法对不同的列进行压缩。Greenplum的查询引擎不敢直表的存储类型，同一个查询可以join不同的表类型。</p>
+<p>表可以按用户指定的key和分区策略（list、Range）进行分区，其中每个分区可以是heap、AO-row、AO-column、甚至是外部表（比如AWS的S3）。以下图的销售表为例，每个分区由日期范围定义，从老到新分别是外部表、heap表和AO-column表。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3ac2.png" alt></p>
+<p>至于优化器、Greenplum也提供两种选择（不是自适应的），分别是适合执行时间长的Orca和适合短查询Postgres原生的优化器。</p>
+<h2 id="OBJECT-LOCK-OPTIMIZATION"><a href="#OBJECT-LOCK-OPTIMIZATION" class="headerlink" title="OBJECT LOCK OPTIMIZATION"></a>OBJECT LOCK OPTIMIZATION</h2><p>这一节主要讲的是锁优化，这是Greenplum增强OLTP性能的关键，着眼于解决分布式系统的全局死锁。</p>
+<h3 id="Locks-in-Greenplum"><a href="#Locks-in-Greenplum" class="headerlink" title="Locks in Greenplum"></a>Locks in Greenplum</h3><p>Greenplum有三种锁：spin锁、LW锁和对象锁。前两种用于保护读写共享内存的临界区，并遵循某些规则来避免死锁。这里主要关注的是操作表、元组或事务等数据库对象时的对象锁。</p>
+<p>其锁级别如下，level越高，并发控制粒度更严格。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3ad4.png" alt></p>
+<h3 id="Global-Deadlock-Issue"><a href="#Global-Deadlock-Issue" class="headerlink" title="Global Deadlock Issue"></a>Global Deadlock Issue</h3><p>在Greenplum中处理全局死锁时，DML语句的锁定级别非常重要：在分析阶段，事务会对表上锁；在执行阶段，则是用tuplelock。由于Greenplum会夸与多个segment server执行锁，很难避免全局死锁。如下图，在segment server0上，事务B等待事务A，而在segment server1上，事务A等待事务B。但本地的PostgreSQL却没有发现本地死锁。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73a42ab3f51d91ec3acc.png" alt></p>
+<p>更复杂的例子如下，包括协调者在内的所有segment server都导致了全局死锁。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec643e.png" alt></p>
+<p>在旧版本的Greenplum中，会在coordinator分析阶段，用X模式锁定目标表。因此对于执行写操作的事务来说，它们是以串行的方式运行，而且即便是更小不同元组也会串行运行，降低了OLTP的性能。</p>
+<h3 id="Global-Deadlock-Detection-Algorithm"><a href="#Global-Deadlock-Detection-Algorithm" class="headerlink" title="Global Deadlock Detection Algorithm"></a>Global Deadlock Detection Algorithm</h3><p>新版的Greenplum的全局死锁检查方法（GDD）如下：会在coordinator起一个守护进程，然后该进程会定期收集每个segment server上的Wait-for图，并检查是否发送全局死锁，然后用预定的策略终止全局的死锁。（比如终止最新的事务）</p>
+<p>对于全局Wait-for图来说，事务就是顶点，其中输出边是顶点的出度，输入边数量则是入度。顶点的局部度是在某单个segment server的wait-for图中计算的值； 顶点的全局度则是在所有segment server的所有局部度的总和。另外考虑收集Wait-for图的过程是异步的，因此在下检测结论的时候，需要判断下涉及的事务是否还存在。如果有事务结束了，则放弃本轮检测，等待下一个周期。</p>
+<p>对于Wait-for图有两种类型的边，实边是指等待的锁只有在事务结束的时候才能释放，pg中大多数对象都是这个类型。如果等待的锁无需事务结束则可以释放，比如tuple lock，则对应虚边。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec6443.png" alt></p>
+<p>至于具体的检测方法如上图，是一种贪婪的算法，在每一轮的循环中：</p>
+<ul>
+<li>首先会将全局出度为0的顶点对应的输入边删除掉，出度为0的事务没有等待任何锁，本身可以正常结束，对它的等待也不会导致死锁，这一步可以持续直到没有这种顶点；</li>
+<li>接着关注局部graph，接着删除局部出度为0的点所对应的输入虚边删除掉。虚边本身依赖的是tuple lock，但因为没有局部出度，因此该依赖关系可以在事务执行完之前就结束了，可以直接删掉。</li>
+</ul>
+<p>如果仍然存在无法消除的边，则认为死锁存在，此时再确认下之前的事务是否还存在。</p>
+<p>下面就是一个具体的例子，上面一个图是全局和局部的Wait-for图，下图则是GDD算法执行过程。由于事务C没有全局出度，因此删除它和关联的边，变为(b)图。再看局部图，s1中A到B是一个虚边，并且B的局部出度为0，这条边也可以去掉，变成(c)图。再看全局图中B -&gt; A的边，A没有全局出度了，可以继续消除而变为(d)。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec644d.png" alt></p>
+<h2 id="DISTRIBUTED-TRANSACTION-MANAGEMENT"><a href="#DISTRIBUTED-TRANSACTION-MANAGEMENT" class="headerlink" title="DISTRIBUTED TRANSACTION MANAGEMENT"></a>DISTRIBUTED TRANSACTION MANAGEMENT</h2><p>Greenplum的事务是由coordinator创建的，并将其分发到各个segment server中。coordinator为每个事务分配了一个单调递增的整数，作为分布式事务id。在每个局部segment上，根据分布式事务id也会利用原生的PG事务机制来生成本地事务标id。</p>
+<h3 id="Distributed-Transaction-Isolation"><a href="#Distributed-Transaction-Isolation" class="headerlink" title="Distributed Transaction Isolation"></a>Distributed Transaction Isolation</h3><p>Greenplum利用了Postgres原生的snapshot机制来构建全局的分布式snapshot，可以应付分布式环境下的事务隔离。元组的可见性是由本地事务id和分布式事务id共同决定的。对于一个给定的事务，在修改一个元组时会给该元组创建一个新版本并打上局部事务ID，维护局部事务到分布式事务ID的映射。</p>
+<p>考虑到维护本地事务ID映射分布式事务ID的开销较大，因此仅维护一个最大的分布式事务ID，和周期性地截断映射关系的元数据。</p>
+<h3 id="One-Phase-Commit-Protocol"><a href="#One-Phase-Commit-Protocol" class="headerlink" title="One-Phase Commit Protocol"></a>One-Phase Commit Protocol</h3><p>一般来说，coordinator会使用2pc来保证事务在所有segment server上要么abort要么commit。至于这里说的一阶段优化，则是指如果事务只会修改单个segment上的数据，则可以省掉不必要的PREPARE过程。如下图，coordinator将跳过PREPARE阶段，直接把Commit命令分发至参与segment server上，节省掉一个网络来回的PREPARE消息：</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec6457.png" alt></p>
+<p>还有进一步的优化，最后一个Query可以和Prepared/Commit消息合并，多节省一轮roundtrip。</p>
+<p><img src="https://pic.imgdb.cn/item/61ac73e92ab3f51d91ec6460.png" alt></p>
+<h2 id="RESOURCE-ISOLATION"><a href="#RESOURCE-ISOLATION" class="headerlink" title="RESOURCE ISOLATION"></a>RESOURCE ISOLATION</h2><p>Greenplum还引入资源组的概念，考虑到TP和AP同时运行时，AP的工作负载会对TP产生极大的影响，通常前者会消耗大量的CPU、内存和IO带宽，并对后者的查询性能产生影响。目前Greenplum主要是实现了对CPU和memory的限制。</p>
+<p>CPU的使用隔离是利用cgroup实现的，可以通过cpu.shares来控制着CPU的使用百分比或者优先级，也可以通过cpuset.cpus来指定资源组的cpu的核数。</p>
+<p>内存的使用隔离则是基于内存管理模块Vmemtracker实现的，但由于想要显式控制内存的使用不是那么容易，引入了三个层次来管理内存使用情况：</p>
+<ul>
+<li>slot memory：单个查询的内存使用情况，通过资源组的非共享内存除以并发数得出；</li>
+<li>shared memory：在同一资源组中的查询超过slot memory时使用该层；</li>
+<li>global shared memory：最后一层，前面的都限制不了时会使用这个配额；</li>
+</ul>
+<h2 id="CONCLUSION"><a href="#CONCLUSION" class="headerlink" title="CONCLUSION"></a>CONCLUSION</h2><p>论文主要讲了主要面向OLAP的数据库如何转换成一个HTAP系统，考虑到OLAP的工作负载会极大影响OLTP的性能，论文提出的方法如全局死锁检测器和1PC的提交协议会显著提高OLTP性能。另外就是通过资源组的使用，限制CPU和内存，保证了在单个系统中同时运行OLTP和OLAP工作负载不会有太大的影响。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/12/01/F1-Lightning-HTAP-as-a-Service/" rel="next" title="F1 Lightning HTAP as a Service">
+                <i class="fa fa-chevron-left"></i> F1 Lightning HTAP as a Service
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">260</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Greenplum：A-Hybrid-Database-for-Transactional-and-Analytical-Workloads"><span class="nav-number">1.</span> <span class="nav-text">Greenplum：A Hybrid Database for Transactional and Analytical Workloads</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GreenPlum’s-MPP-Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">GreenPlum’s MPP Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Roles-and-Responsibility-of-Segments"><span class="nav-number">1.2.1.</span> <span class="nav-text">Roles and Responsibility of Segments</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Distributed-Plan-and-Distributed-Executor"><span class="nav-number">1.2.2.</span> <span class="nav-text">Distributed Plan and Distributed Executor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Distributed-Transaction-Management"><span class="nav-number">1.2.3.</span> <span class="nav-text">Distributed Transaction Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hybrid-Storage-and-Optimizer"><span class="nav-number">1.2.4.</span> <span class="nav-text">Hybrid Storage and Optimizer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OBJECT-LOCK-OPTIMIZATION"><span class="nav-number">1.3.</span> <span class="nav-text">OBJECT LOCK OPTIMIZATION</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Locks-in-Greenplum"><span class="nav-number">1.3.1.</span> <span class="nav-text">Locks in Greenplum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Global-Deadlock-Issue"><span class="nav-number">1.3.2.</span> <span class="nav-text">Global Deadlock Issue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Global-Deadlock-Detection-Algorithm"><span class="nav-number">1.3.3.</span> <span class="nav-text">Global Deadlock Detection Algorithm</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DISTRIBUTED-TRANSACTION-MANAGEMENT"><span class="nav-number">1.4.</span> <span class="nav-text">DISTRIBUTED TRANSACTION MANAGEMENT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Distributed-Transaction-Isolation"><span class="nav-number">1.4.1.</span> <span class="nav-text">Distributed Transaction Isolation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#One-Phase-Commit-Protocol"><span class="nav-number">1.4.2.</span> <span class="nav-text">One-Phase Commit Protocol</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RESOURCE-ISOLATION"><span class="nav-number">1.5.</span> <span class="nav-text">RESOURCE ISOLATION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONCLUSION"><span class="nav-number">1.6.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

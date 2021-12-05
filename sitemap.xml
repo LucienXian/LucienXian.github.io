@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2021/12/05/Greenplum%EF%BC%9AA-Hybrid-Database-for-Transactional-and-Analytical-Workloads/</loc>
+    
+    <lastmod>2021-12-05T08:12:04.307Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2021/12/01/F1-Lightning-HTAP-as-a-Service/</loc>
     
     <lastmod>2021-11-30T16:57:29.645Z</lastmod>

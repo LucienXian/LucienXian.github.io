@@ -265,6 +265,156 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/02/Variadic-templates-in-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/06/02/Variadic-templates-in-C/" itemprop="url">Variadic templates in C++</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-02T11:51:37+08:00">
+                2019-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Variadic-templates"><a href="#Variadic-templates" class="headerlink" title="Variadic templates"></a>Variadic templates</h1><blockquote>
+<p>Reference from : <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/" target="_blank" rel="noopener">https://eli.thegreenplace.net/2014/variadic-templates-in-c/</a></p>
+</blockquote>
+<p>在C++11之前，编写一个具有任意数量参数的参数的唯一方法就是使用variadic函数，如printf,scanf之流就是这样实现的，使用了省略语法<strong>…</strong>和相关的<strong>va_ 宏定义</strong>。由于所有的类型解析都在运行时，并且必须要在va_arg中显式地使用强制转换，这些低级的内存操作，很容易带来代码的段错误。</p>
+<p>而同样的，在C++11之前，模板的编写必须要声明固定数量的参数，无法表达具有可变数量参数的类或者函数模板。</p>
+<h2 id="Basic-example"><a href="#Basic-example" class="headerlink" title="Basic example"></a>Basic example</h2><p>C++11的一个新特性就是可变参数模板，这个新特性使得我们以类型安全的方式编写接收任意数量参数的函数，并在编译时解析所有参数处理逻辑，而不是运行时。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function">T <span class="title">adder</span><span class="params">(T v)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> v;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... Args&gt;</span><br><span class="line"><span class="function">T <span class="title">adder</span><span class="params">(T first, Args... args)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> first + adder(args...);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Usage: long sum = adder(1, 2, 3, 8, 7);</span></span><br></pre></td></tr></table></figure>
+<p>上面的adder函数可以接受任意数量的参数，并且只要+运算符能够应用于这些参数，就可以正常编译，其中的检查是编译器完成的，遵循的是模板语法和重载规则。</p>
+<p><strong>typename… Args</strong>是模板参数包，而<strong>Args… args</strong>是函数参数包，而该模板的编写方式与编写递归代码一样，需要一个基本的、接受一个参数的adder函数。每次调用函数的时候，都会从模板参数包中剥离一个类型T，缩短一个参数，直到遇到第一个函数模板。调用过程如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">T adder(T, Args...) [T = int, Args = &lt;int, int, int, int&gt;]</span><br><span class="line">T adder(T, Args...) [T = int, Args = &lt;int, int, int&gt;]</span><br><span class="line">T adder(T, Args...) [T = int, Args = &lt;int, int&gt;]</span><br><span class="line">T adder(T, Args...) [T = int, Args = &lt;int&gt;]</span><br><span class="line">T adder(T) [T = int]</span><br></pre></td></tr></table></figure>
+<h2 id="Some-simple-variations"><a href="#Some-simple-variations" class="headerlink" title="Some simple variations"></a>Some simple variations</h2><p>C++模版元编程中有一个模式匹配的概念，以下面的代码为例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">pair_comparer</span><span class="params">(T a, T b)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// In real-world code, we wouldn't compare floating point values like</span></span><br><span class="line">    <span class="comment">// this. It would make sense to specialize this function for floating</span></span><br><span class="line">    <span class="comment">// point types to use approximate comparison.</span></span><br><span class="line">    <span class="keyword">return</span> a == b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... Args&gt;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">pair_comparer</span><span class="params">(T a, T b, Args... args)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> a == b &amp;&amp; pair_comparer(args...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的函数接受任意数量的参数，如果参数成对相等，那么最终返回true，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pair_comparer(<span class="number">1.5</span>, <span class="number">1.5</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">6</span>)</span><br></pre></td></tr></table></figure>
+<p>但如果我们将第一个参数改成<strong>1</strong>，那么将会编译报错。同理，如果参数个数不为偶数，编译也不会通过。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pair_comparer(<span class="number">1.5</span>, <span class="number">1.5</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line">pair_comparer(<span class="number">1</span>, <span class="number">1.5</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">6</span>);</span><br></pre></td></tr></table></figure>
+<p>如果想避免这个问题，我们可以添加一个单参数的模版函数，这样就可以避免奇数参数编译不通过：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">pair_comparer</span><span class="params">(T a)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Performance"><a href="#Performance" class="headerlink" title="Performance"></a>Performance</h2><p>关于性能的考虑，可变参数模版并没有涉及真正的递归，而是在编译时预生成一系列函数调用，而且由于现代编译器会对代码进行内联优化，很可能最后编译的机器代码中并没有函数调用。与C风格的可变参数函数相比，va_宏实际上是在操纵运行时堆栈，在运行时解析C语言的可变参数。</p>
+<h2 id="Varidic-data-structures"><a href="#Varidic-data-structures" class="headerlink" title="Varidic data structures"></a>Varidic data structures</h2><p>这个案例就比较复杂了，在C++11之前要实现具有动态添加新字段的自定义数据结构，是比较困难的。以下面的代码为例，我们进行类型定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span>... <span class="title">Ts</span>&gt; <span class="title">struct</span> <span class="title">tuple</span> &#123;</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">class</span>... <span class="title">Ts</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">struct</span> <span class="title">tuple</span>&lt;T, Ts...&gt; :</span> tuple&lt;Ts...&gt; &#123;</span><br><span class="line">    tuple(T t, Ts... ts) : tuple&lt;Ts...&gt;(ts...), tail(t) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    T tail;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>我们先从基类开始，定义了一个空的tuple类模版，后面的特化则从参数包中剥离出第一个类型，以此定义了一个名为tail的成员。通过递归定义，当没有更多类型可以剥离时就停止。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">tuple&lt;<span class="keyword">double</span>, <span class="keyword">uint64_t</span>, <span class="keyword">const</span> <span class="keyword">char</span>*&gt; t1(<span class="number">12.2</span>, <span class="number">42</span>, <span class="string">"big"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">struct tuple&lt;double, uint64_t, const char*&gt; : tuple&lt;uint64_t, const char*&gt; &#123;</span></span><br><span class="line"><span class="comment">  	double tail;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">struct tuple&lt;uint64_t, const char*&gt; : tuple&lt;const char*&gt; &#123;</span></span><br><span class="line"><span class="comment">  	uint64_t tail;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">struct tuple&lt;const char*&gt; : tuple &#123;</span></span><br><span class="line"><span class="comment">  	const char* tail;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">struct tuple &#123;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>上面对于数据结构的定义使我们创建了tuple，其数据结构的大小和成员的内部布局都是确定的。另外，要想访问元祖，我们应该使用get函数模板来访问，定义一个帮助器类型，它允许我们访问元组中第k个元素的类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">size_t</span>, <span class="class"><span class="keyword">class</span>&gt; <span class="title">struct</span> <span class="title">elem_type_holder</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">class</span>... <span class="title">Ts</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">struct</span> <span class="title">elem_type_holder</span>&lt;0, tuple&lt;T, Ts...&gt;&gt; &#123;</span></span><br><span class="line">  	<span class="keyword">typedef</span> T type;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">size_t</span> k, <span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">class</span>... <span class="title">Ts</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">struct</span> <span class="title">elem_type_holder</span>&lt;k, tuple&lt;T, Ts...&gt;&gt; &#123;</span></span><br><span class="line">  	<span class="keyword">typedef</span> <span class="keyword">typename</span> elem_type_holder&lt;k - <span class="number">1</span>, tuple&lt;Ts...&gt;&gt;::type type;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>elem_type_holder是另一个可变参数类模板。它需要一个数字k和元组类型作为模板参数。这是一个编译时模板元编程，作用于常量和类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">elem_type_holder</span>&lt;2, tuple&lt;T, Ts...&gt;&gt; &#123;</span></span><br><span class="line">  	<span class="keyword">typedef</span> <span class="keyword">typename</span> elem_type_holder&lt;<span class="number">1</span>, tuple&lt;Ts...&gt;&gt;::type type;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">elem_type_holder</span>&lt;1, tuple&lt;T, Ts...&gt;&gt; &#123;</span></span><br><span class="line">  	<span class="keyword">typedef</span> <span class="keyword">typename</span> elem_type_holder&lt;<span class="number">0</span>, tuple&lt;Ts...&gt;&gt;::type type;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">elem_type_holder</span>&lt;0, tuple&lt;T, Ts...&gt;&gt; &#123;</span></span><br><span class="line">  	<span class="keyword">typedef</span> T type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以elem_type_holder &lt;2，some_tuple_type&gt;为例，其从tuple的开头剥离了两种类型，并将其类型设置为第三种类型。接下来再实现get。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">size_t</span> k, <span class="class"><span class="keyword">class</span>... <span class="title">Ts</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">typename</span> <span class="title">std</span>:</span>:enable_if&lt;k == <span class="number">0</span>, <span class="keyword">typename</span> elem_type_holder&lt;<span class="number">0</span>, tuple&lt;Ts...&gt;&gt;::type&amp;&gt;::type</span><br><span class="line">get(tuple&lt;Ts...&gt;&amp; t) &#123;</span><br><span class="line">  <span class="keyword">return</span> t.tail;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">size_t</span> k, <span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">class</span>... <span class="title">Ts</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">typename</span> <span class="title">std</span>:</span>:enable_if&lt;k != <span class="number">0</span>, <span class="keyword">typename</span> elem_type_holder&lt;k, tuple&lt;T, Ts...&gt;&gt;::type&amp;&gt;::type</span><br><span class="line">get(tuple&lt;T, Ts...&gt;&amp; t) &#123;</span><br><span class="line">  tuple&lt;Ts...&gt;&amp; base = t;</span><br><span class="line">  <span class="keyword">return</span> get&lt;k - <span class="number">1</span>&gt;(base);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">tuple&lt;double, uint64_t, const char*&gt; t1(12.2, 42, "big");</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">std::cout &lt;&lt; "0th elem is " &lt;&lt; get&lt;0&gt;(t1) &lt;&lt; "\n";</span></span><br><span class="line"><span class="comment">std::cout &lt;&lt; "1th elem is " &lt;&lt; get&lt;1&gt;(t1) &lt;&lt; "\n";</span></span><br><span class="line"><span class="comment">std::cout &lt;&lt; "2th elem is " &lt;&lt; get&lt;2&gt;(t1) &lt;&lt; "\n";</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="Variadic-templates-for-catch-all-functions"><a href="#Variadic-templates-for-catch-all-functions" class="headerlink" title="Variadic templates for catch-all functions"></a>Variadic templates for catch-all functions</h2><p>假设我们想要实现一个可以打印出标准库容器的函数，并且适用于任何容器。对于vector<code>,</code>list<code>,</code>deque来说，他们的摹本参数只有两个：value type和allocator type。但对于map和set来说，它们的参数个数都不止两个。因此我们可以使用可变模板来实现这个功能：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>, <span class="keyword">typename</span>...&gt; <span class="class"><span class="keyword">class</span> <span class="title">ContainerType</span>,</span></span><br><span class="line"><span class="class">          <span class="title">typename</span> <span class="title">ValueType</span>, <span class="title">typename</span>... <span class="title">Args</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">print_container</span>(<span class="title">const</span> <span class="title">ContainerType</span>&lt;ValueType, Args...&gt;&amp; <span class="title">c</span>) &#123;</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; v : c) &#123;</span><br><span class="line">      <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; v &lt;&lt; <span class="string">' '</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt;</span><br><span class="line"><span class="built_in">std</span>::ostream&amp; <span class="keyword">operator</span>&lt;&lt;(<span class="built_in">std</span>::ostream&amp; out, <span class="keyword">const</span> <span class="built_in">std</span>::pair&lt;T, U&gt;&amp; p) &#123;</span><br><span class="line">    out &lt;&lt; <span class="string">"["</span> &lt;&lt; p.first &lt;&lt; <span class="string">", "</span> &lt;&lt; p.second &lt;&lt; <span class="string">"]"</span>;</span><br><span class="line">    <span class="keyword">return</span> out;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/30/std-array/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1622,142 +1772,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/03/Rvalue-in-C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/03/Rvalue-in-C/" itemprop="url">Rvalue in C++</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-03T11:28:31+08:00">
-                2019-05-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Rvalue-in-C"><a href="#Rvalue-in-C" class="headerlink" title="Rvalue in C++"></a>Rvalue in C++</h1><h2 id="lvalue-vs-rvalue"><a href="#lvalue-vs-rvalue" class="headerlink" title="lvalue vs rvalue"></a>lvalue vs rvalue</h2><p>在C中，判断是左值还是右值比较容易，赋值运算符的左边就是左值，右边就是右值。但在C++中不能这样一概而论。</p>
-<h3 id="What-is-lvalue"><a href="#What-is-lvalue" class="headerlink" title="What is lvalue"></a>What is lvalue</h3><p>左值意味着其地址是可以访问的，即我们可以使用&amp;运算符去访问地址。例如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> *ptr = &amp;x;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> *ptr2 = &amp;(x+<span class="number">1</span>); <span class="comment">//Compiler Error</span></span><br></pre></td></tr></table></figure>
-<p>因为(x+1)在这个表达式之后不能再生效，因此这不是左值而是一个右值。</p>
-<h3 id="What-is-rvalue"><a href="#What-is-rvalue" class="headerlink" title="What is rvalue"></a>What is rvalue</h3><p>非左值即为右值，如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *ptr = &amp;(<span class="number">1</span>); <span class="comment">//Compiler Error, 1 is rvalue</span></span><br><span class="line"><span class="keyword">int</span> *ptr2 = &amp;(x+<span class="number">1</span>); <span class="comment">//Compiler Error, x+1 is rvalue</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getData</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> *ptr = &amp;getData(); <span class="comment">//Compiler Error</span></span><br></pre></td></tr></table></figure>
-<p>getData()是一个右值，在赋值之后这个临时值就失效了，里面的data是拷贝出来的，因此我们不能取其地址。</p>
-<h2 id="Is-rvalue-immutable-in-C"><a href="#Is-rvalue-immutable-in-C" class="headerlink" title="Is rvalue immutable in C++"></a>Is rvalue immutable in C++</h2><p>虽然我们不能获取右值的地址，但我们能根据右值的数据类型去修改其。</p>
-<h3 id="rvalues-of-builtin-data-type-is-Immutable"><a href="#rvalues-of-builtin-data-type-is-Immutable" class="headerlink" title="rvalues of builtin data type is Immutable"></a>rvalues of builtin data type is Immutable</h3><p>我们无法修改内置的数据类型，例如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(x+<span class="number">7</span>) = <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line">getData() = <span class="number">9</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Both Compile Error</span></span><br></pre></td></tr></table></figure>
-<h3 id="rvalue-of-User-Defined-data-type-is-not-Immutable"><a href="#rvalue-of-User-Defined-data-type-is-not-Immutable" class="headerlink" title="rvalue of User Defined data type is not Immutable"></a>rvalue of User Defined data type is not Immutable</h3><p>如果右值是用户定义的数据类型，我们可以在同一个表达式中使用成员函数去修改右值：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line">		<span class="keyword">int</span> mAge;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Person() &#123;</span><br><span class="line">      	mAge = <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">incrementAge</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      	mAge = mAge + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="function">Person <span class="title">getPerson</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Person();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">getPerson().incrementAge(); <span class="comment">// persist in single expression</span></span><br></pre></td></tr></table></figure>
-<h2 id="What-is-rvalue-reference-in-C-11"><a href="#What-is-rvalue-reference-in-C-11" class="headerlink" title="What is rvalue reference in C++11"></a>What is rvalue reference in C++11</h2><h3 id="lvalue-references"><a href="#lvalue-references" class="headerlink" title="lvalue references"></a>lvalue references</h3><p>在C++11以前只有引用，即指向现存变量的别名。</p>
-<p>c++11将原来的引用变成了左值引用，只能引用左值：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp; lvalueRef = x; <span class="comment">// lvalueRef is a lvalue reference</span></span><br><span class="line"><span class="keyword">int</span> &amp; lvalueRef2 = (x+<span class="number">1</span>); <span class="comment">// compile error</span></span><br></pre></td></tr></table></figure>
-<h3 id="rvalue-Reference"><a href="#rvalue-Reference" class="headerlink" title="rvalue Reference"></a>rvalue Reference</h3><p>右值引用是C++11引入的新特性：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> &amp;&amp; rvalueRef = (x+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> &amp; lvalueRef3 = getData(); <span class="comment">// compile error</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp; lvalueRef3 = getData(); <span class="comment">// OK but its const</span></span><br><span class="line"><span class="keyword">int</span> &amp;&amp; rvalueRef2 = getData();</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1806,7 +1820,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">259</span>
+                <span class="site-state-item-count">260</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
