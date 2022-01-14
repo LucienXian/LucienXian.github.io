@@ -265,6 +265,318 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/29/cs231n-lecture10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/29/cs231n-lecture10/" itemprop="url">cs231n@lecture10</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-29T23:27:11+08:00">
+                2018-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Recurrent-Nerual-Networks"><a href="#Recurrent-Nerual-Networks" class="headerlink" title="Recurrent Nerual Networks"></a>Recurrent Nerual Networks</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>相比较于CNN，RNN能够更好地序列的信息。比如理解一句话的意思，根据视频输出行为，判断文本的情感等等。前后的输入是有关联的。</p>
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>RNN的结构中有一个内部状态值$h_t$，这个值取决于输入的x和上一次的内部状态值$h_{t-1}$。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值$Y_t$</p>
+<p>结构图如下：</p>
+<p><img src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg" alt="img"></p>
+<p>RNN的公式如下：<br>$$<br>Y_t = g(V h_t) \<br>h_t = f(UX_t+Wh_{t-1})<br>$$</p>
+<h2 id="truncated-backprop"><a href="#truncated-backprop" class="headerlink" title="truncated backprop"></a>truncated backprop</h2><p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final states作为后一个序列的initial states。</p>
+<p><img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png" alt="img"></p>
+<h2 id="vanilla-RNN"><a href="#vanilla-RNN" class="headerlink" title="vanilla RNN"></a>vanilla RNN</h2><p>只有一层隐藏层的RNN</p>
+<h1 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h1><p>用来缓解梯度消失和梯度爆炸。</p>
+<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell state，即c，让它保存长期的状态。</p>
+<p>LSTM将隐藏状态和输入拼接在一起，然后乘以一个巨大的矩阵，得到四个门向量。</p>
+<ul>
+<li>i：input gate，whether to write to cell；</li>
+</ul>
+<p>$$<br>i_t = \sigma  (W_i [h_{t-1},x_t] + b_i)<br>$$</p>
+<ul>
+<li>f：forget gate，how much do we want to forget；</li>
+</ul>
+<p>$$<br>f_t = \sigma (W_f [h_{t-1},x_t] + b_f)<br>$$</p>
+<ul>
+<li>o：output gate，how much to reveal cell；</li>
+</ul>
+<p>$$<br>o_t = \sigma (W_o [h_{t-1}, x_t] + b_o)<br>$$</p>
+<ul>
+<li>g：gate gate，how much to write to cell；</li>
+</ul>
+<p>$$<br>g_t = tanh(W_g [h_{t-1}, x_t] + b_g)<br>$$</p>
+<p>cell state的计算公式为：(注意是按元素相乘)<br>$$<br>c_t = f_t \circ c_{t-1} + i_t \circ g_t<br>$$<br>至于隐藏状态：<br>$$<br>h_t = o_t \circ tanh(c_t)<br>$$</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/30/redis的字典/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/30/redis的字典/" itemprop="url">redis的字典</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-30T01:14:27+08:00">
+                2018-08-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h1><p>字典在redis中的应用比较广泛，比如redis的数据库，哈希键的底层实现等等</p>
+<h2 id="字典的实现"><a href="#字典的实现" class="headerlink" title="字典的实现"></a>字典的实现</h2><p>redis的字典用哈希表表示，一个哈希表有多个哈希表结点，每个结点保存一个键值对。</p>
+<h3 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">    dictEntry **table;<span class="comment">//哈希表数组，每个元素为指向dictEntry的指针</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> size;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> sizemask;<span class="comment">//等于size-1，与哈希值一起决定key应该放在哪个索引</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> used;</span><br><span class="line">&#125; dictht;</span><br></pre></td></tr></table></figure>
+<h3 id="哈希表结点"><a href="#哈希表结点" class="headerlink" title="哈希表结点"></a>哈希表结点</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> &#123;</span></span><br><span class="line">    <span class="keyword">void</span> *key;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        <span class="keyword">void</span> *val;</span><br><span class="line">        <span class="keyword">uint64_t</span> u64;</span><br><span class="line">        <span class="keyword">int64_t</span> s64;</span><br><span class="line">    &#125; v;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span><span class="comment">//可用于解决哈希冲突</span></span><br><span class="line">&#125;dictEntry;</span><br></pre></td></tr></table></figure>
+<h3 id="字典-1"><a href="#字典-1" class="headerlink" title="字典"></a>字典</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">    dictType *type;</span><br><span class="line">    <span class="keyword">void</span>* privdata;</span><br><span class="line">    dictht ht[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">int</span> trehashidx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>type属性是一个指向dictType的指针，dictType结构保存了一组用于操作特定类型键值对的函数，实现多台。</p>
+<p>pricdata则保存了需要传给那些类型特定参数的可选参数。</p>
+<p>ht保存了两个dictht，一般只是用第一个，第二个会在第一个rehash的时候被使用。</p>
+<p>trehashidx则是记录了目前是否在进行rehash。</p>
+<h2 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h2><p>当添加一个新的键值对到字典的时候，程序依次计算出哈希值和索引值，再根据索引值把包含新键值对的哈希表结点加到哈希数组指定索引上面</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hash = dict-&gt;type-&gt;hashFunction(key);</span><br><span class="line">index = hash &amp; dict-&gt;ht[x].sizemask;</span><br></pre></td></tr></table></figure>
+<p>ht[x]是因为有可能在第一个字典或者第二个。</p>
+<p>另外，redis使用murmurhash2算法来计算哈希值。</p>
+<h2 id="解决键冲突"><a href="#解决键冲突" class="headerlink" title="解决键冲突"></a>解决键冲突</h2><p>redis解决hash冲突的方法是链地址法，则产生冲突时使用next指针将索引值相同的结点连起来。</p>
+<h2 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h2><blockquote>
+<p>哈希表的负载因子=哈希表已保存的结点数量/哈希表大小</p>
+</blockquote>
+<p>为了使得哈希表的负载因子维持在一个合理的范围内，哈希表需要扩展或者缩小。</p>
+<p>步骤为</p>
+<ol>
+<li>为ht[1]分配空间，大小取决于：</li>
+</ol>
+<ul>
+<li>扩展：大小为 大于或等于ht[0].used*2 = 2^n</li>
+<li>收缩：大小为 大于或等于ht[0].used = 2^n</li>
+</ul>
+<ol start="2">
+<li>将保存在ht[0]的所有键值对rehash到ht[1]上，重新计算哈希值和索引值；</li>
+<li>释放ht[0]，将ht[1]设置为ht[0]，并新创建一个空白ht[1]，为下次rehash做准备</li>
+</ol>
+<p>另外，当下列条件满足时，会进行扩展：</p>
+<ul>
+<li>服务器目前没有执行BGSAVE或者BGREWRITEAOF，并且哈希表负载因子大于等于1；</li>
+<li>服务器目前正在执行BGSAVE或者BGREWRITEAOF，并且哈希表负载因子大于等于5；</li>
+</ul>
+<p>这是因为这些命令执行时，子进程会运行中，由于写时复制的操作系统特性，过多或者过快地扩展会带来过多的内存写入操作；</p>
+<p>当哈希表负载因子小于0.1时，执行收缩。</p>
+<h2 id="渐进式rehash"><a href="#渐进式rehash" class="headerlink" title="渐进式rehash"></a>渐进式rehash</h2><p>由于哈希表可能非常大，所以不能一次性rehash成功，而是使用渐进式的方法。</p>
+<p>步骤如下：</p>
+<ol>
+<li>为ht[1]分配号空间后，dict结构体同时持有两个哈希表；</li>
+<li>然后dict结构的rehashidx记为0，开始rehash；</li>
+<li>进行期间，会逐个将ht[0]的结点rehash到ht[1]，每次成功都会使rehashidx递增一；</li>
+<li>直到rehash完全，rehashidx设为-1，表示完成；</li>
+</ol>
+<p>如果此时有新增的键值对，一律保存到ht[1]中。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/21/简单动态字符串/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1545,335 +1857,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/04/go入门学习/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/04/go入门学习/" itemprop="url">go入门学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T21:17:45+08:00">
-                2018-08-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="GO入门学习"><a href="#GO入门学习" class="headerlink" title="GO入门学习"></a>GO入门学习</h1><h2 id="why"><a href="#why" class="headerlink" title="why"></a>why</h2><ul>
-<li>语法简单；</li>
-<li>性能好；</li>
-</ul>
-<h2 id="常用类型"><a href="#常用类型" class="headerlink" title="常用类型"></a>常用类型</h2><p>主要讲三种类型：</p>
-<h3 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h3><p>go里面有数组类型。但开发过程中使用比较少。因为其元素类型确定，长度不可变，并且传递参数时是值拷贝；</p>
-<p>slice是对底层数组的一段内容的引用：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data := [...]<span class="keyword">int</span>&#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>&#125;</span><br><span class="line">slice := data[<span class="number">1</span>:<span class="number">4</span>:<span class="number">5</span>] <span class="comment">//[low:high:max]</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>避免在两个变量中修改同一个底层数组；可以这样修改：</p>
-</blockquote>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">v2 := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">6</span>)</span><br><span class="line"><span class="built_in">copy</span>(v2, v1[<span class="number">0</span>:<span class="number">6</span>])</span><br><span class="line">v3 := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">3</span>)</span><br><span class="line"><span class="built_in">copy</span>(v3, v1[<span class="number">2</span>:<span class="number">5</span>])</span><br></pre></td></tr></table></figure>
-<h3 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
-<p>创造一个长度为10，元素类型为int的管道；</p>
-<ul>
-<li>读 v := &lt;- ch</li>
-<li>写 ch &lt;- v</li>
-<li>关闭 close(ch)</li>
-</ul>
-<p>目的是保证协程之间交换数据时，并发安全；</p>
-<ul>
-<li>长度为0的channel为不带buffer的channel</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br></pre></td></tr></table></figure>
-<p>同时读写的时候，读会在写之前发生。也不会发生额外的数据拷贝。</p>
-<ul>
-<li>长度不为0的</li>
-</ul>
-<p>写会在读之前发生；</p>
-<h3 id="interface"><a href="#interface" class="headerlink" title="interface"></a>interface</h3><p>定义一个抽象的方法：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Gun <span class="keyword">interface</span>&#123;</span><br><span class="line">    Shoot()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>作用：解耦，抽象</li>
-</ul>
-<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><p>通过通信来共享数据，而不是通过共享数据来通信。</p>
-<h3 id="context"><a href="#context" class="headerlink" title="context"></a>context</h3><p>这是一个接口，内部有几个方法。context是在多个协程之间传递，如何保证数据安全。</p>
-<h3 id="web服务端模型"><a href="#web服务端模型" class="headerlink" title="web服务端模型"></a>web服务端模型</h3><p>接受一个请求，创建一个新的协程用于读写该连接上的数据，但这种方式在请求处理阻塞的情况下，容易引发协程爆炸。</p>
-<h2 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h2><p>go提供了一些性能分析的工具</p>
-<h3 id="profile"><a href="#profile" class="headerlink" title="profile"></a>profile</h3><ul>
-<li>cpu分析：每隔一段时间，记录当前正在运行的协程的栈，出现频率比较高的函数就是占用CPU比较多的；</li>
-<li>mem分析：分析堆上申请内存的情况；</li>
-</ul>
-<p>一般都是通过采样实现。</p>
-<h2 id="高效的go代码"><a href="#高效的go代码" class="headerlink" title="高效的go代码"></a>高效的go代码</h2><ul>
-<li>减少对象创建，减少内存分配；</li>
-<li>sync.Pool</li>
-<li>sync/atomic</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/29/Linux内核学习——虚拟文件系统/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/29/Linux内核学习——虚拟文件系统/" itemprop="url">Linux内核学习——虚拟文件系统</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-29T23:04:27+08:00">
-                2018-07-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="虚拟文件系统"><a href="#虚拟文件系统" class="headerlink" title="虚拟文件系统"></a>虚拟文件系统</h1><p>虚拟文件系统为用户空间提供了文件和不同文件系统相关的通用接口。</p>
-<h2 id="通用文件系统接口"><a href="#通用文件系统接口" class="headerlink" title="通用文件系统接口"></a>通用文件系统接口</h2><p>VFS使得用户可以直接使用诸如open()，read()和write()的系统调用接口，而不需要考虑具体的文件系统和物理介质。它把不同的文件系统抽象后采用统一的方式。</p>
-<h2 id="文件系统抽象层"><a href="#文件系统抽象层" class="headerlink" title="文件系统抽象层"></a>文件系统抽象层</h2><p>由于内核在底层的文件系统接口之上建立了一个抽象层，底层文件系统通过实现VFS期望的抽象接口和数据接口，这样用户空间就可以调用统一的系统调用。</p>
-<p>以write()为例，这个系统调用会被一个sys_write()进行处理，sys_write会找到文件描述符fd对应的真实文件系统调用该文件系统的写方法。</p>
-<h2 id="Unix文件系统"><a href="#Unix文件系统" class="headerlink" title="Unix文件系统"></a>Unix文件系统</h2><p>Unix使用了四种和文件系统相关的抽象概念：文件、目录项、索引节点和挂载点。</p>
-<p>这是一种分层存储结构的结构。在unix中，文件系统挂载在一个特定的挂载点，相当于是一个命名空间，所有已安装的文件系统都作为根文件系统树的树叶出现在系统上。</p>
-<p>文件通过目录组织起来，但VFS把目录也看做一种文件。Unix会把文件的相关信息诸如权限，创建时间，创建者这些元数据和文件区分对待，这些元数据存储在inode结点中，这是一个单独的数据结构。</p>
-<p>文件的元数据和文件系统的控制信息息息相关，文件系统的控制信息存储在超级块，这样一个数据结构上。</p>
-<h2 id="VFS对象及其数据结构"><a href="#VFS对象及其数据结构" class="headerlink" title="VFS对象及其数据结构"></a>VFS对象及其数据结构</h2><p>VFS主要有四种对象类型：</p>
-<ul>
-<li>超级块对象，一个具体的已安装文件系统；</li>
-<li>索引节点对象，一个具体的文件；</li>
-<li>目录项对象，代表一个目录项，是路径的一个组成成分；</li>
-<li>文件对象，由进程打开的文件（注意目录也是一种文件）</li>
-</ul>
-<h2 id="超级块对象"><a href="#超级块对象" class="headerlink" title="超级块对象"></a>超级块对象</h2><p>每个文件系统都必须要实现超级块对象，用来存储特定文件系统的信息。超级块对象由<strong>super_block</strong>结构体表示。</p>
-<h2 id="索引结点对象"><a href="#索引结点对象" class="headerlink" title="索引结点对象"></a>索引结点对象</h2><p>索引节点对象包含了内核在操作文件时所需要的全部信息，如果一个文件系统没有索引结点，这些文件系统会将文件描述的信息作为文件的一部分存放。无论如何，索引结点信息必须要创建。</p>
-<p>索引结点对象由结构体<strong>inode</strong>表示</p>
-<h2 id="目录项对象"><a href="#目录项对象" class="headerlink" title="目录项对象"></a>目录项对象</h2><p>考虑这一个路径/bin/vi，那么/，bin和vi都属于目录项对象，前两个是目录，后一个是普通文件。由于路径中每个部分都是目录项对象，为了路径查找方便，就引入了目录项对象。目录项对象由结构体<strong>dentry</strong>表示。目录项对象没有对应的磁盘数据结构，因为目录项对象不是保存在物理硬盘中的。</p>
-<h3 id="目录项状态"><a href="#目录项状态" class="headerlink" title="目录项状态"></a>目录项状态</h3><p>目录项对象有三种状态：被使用、未被使用和负状态。</p>
-<p>一个被使用的目录项对应一个有效的索引结点，并且该对象存在使用者；一个未被使用的目录项对应一个有效的索引结点，但未被使用；而负状态的目录项则没有对应的有效索引点，只是目录项还存在。</p>
-<h3 id="目录项缓存"><a href="#目录项缓存" class="headerlink" title="目录项缓存"></a>目录项缓存</h3><p>由于VFS层遍历路径并解析其成dentry对象非常耗时，因此可以使用目录项缓存：</p>
-<ul>
-<li>被使用的目录项链表</li>
-<li>最近被使用的双向链表；</li>
-<li>散列表用来快速将给定路径解析成目录项对象；</li>
-</ul>
-<p>这样VFS会现在缓存中查找路径，如果找不到了，就必须要自己解析路径，找到dentry对象并将其假如到dcache中。</p>
-<h2 id="文件对象"><a href="#文件对象" class="headerlink" title="文件对象"></a>文件对象</h2><p>文件对象表示的是进程已经打开的文件在内存中的表示，涉及到诸如访问模式，位偏移等信息。一个文件对应的文件对象不是唯一的，但对应的目录项和索引结点是唯一的。</p>
-<p>文件对象由结构体file表示。</p>
-<p>文件操作由结构体file_operations表示，内定义了大量的函数指针。</p>
-<h2 id="和进程相关的数据结构"><a href="#和进程相关的数据结构" class="headerlink" title="和进程相关的数据结构"></a>和进程相关的数据结构</h2><p>有三个结构体将VFS和系统的进程紧密地联系在一起：file_struct, fs_struct和namespace。</p>
-<h3 id="file-struct"><a href="#file-struct" class="headerlink" title="file_struct"></a>file_struct</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">atomic_t</span> count; <span class="comment">/* 共享该表的进程数 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">rwlock_t</span> file_lock; <span class="comment">/* 保护以下的所有域,以免在tsk-&gt;alloc_lock中的嵌套*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> max_fds; <span class="comment">/*当前文件对象的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> max_fdset; <span class="comment">/*当前文件描述符的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> next_fd; ／*已分配的文件描述符加<span class="number">1</span>*/</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> ** <span class="title">fd</span>;</span> <span class="comment">/* 指向文件对象指针数组的指针 */</span></span><br><span class="line"></span><br><span class="line">    fd_set *close_on_exec; <span class="comment">/*指向执行exec( )时需要关闭的文件描述符*/</span></span><br><span class="line"></span><br><span class="line">    fd_set *open_fds; <span class="comment">/*指向打开文件描述符的指针*/</span></span><br><span class="line"></span><br><span class="line">    fd_set close_on_exec_init;<span class="comment">/* 执行exec( )时需要关闭的文件描述符的初 值集合*/</span></span><br><span class="line"></span><br><span class="line">    fd_set open_fds_init; <span class="comment">/*文件描述符的初值集合*/</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> * <span class="title">fd_array</span>[32];</span><span class="comment">/* 文件对象指针的初始化数组*/</span></span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>进程描述符的files域指向该结构体，包含了所有与单个进程相关的文件信息。</p>
-<h3 id="fs-struct"><a href="#fs-struct" class="headerlink" title="fs_struct"></a>fs_struct</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fs_struct</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> users; <span class="comment">//用户数目</span></span><br><span class="line">    <span class="keyword">rwlock_t</span> lock <span class="comment">//锁</span></span><br><span class="line">    <span class="keyword">int</span> umask; <span class="comment">//掩码</span></span><br><span class="line">    <span class="keyword">int</span> in_exec; <span class="comment">//正在执行的文件</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">path</span> <span class="title">root</span>;</span> <span class="comment">//根目录路径</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">path</span> <span class="title">pws</span>;</span> <span class="comment">//当前工作目录的路径</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>该结构体包含了进程与文件系统的相关信息，由fs域指向的；</p>
-<h3 id="namespace结构体"><a href="#namespace结构体" class="headerlink" title="namespace结构体"></a>namespace结构体</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mmt_namespace</span> &#123;</span></span><br><span class="line">  	<span class="keyword">atomic_t</span> count; <span class="comment">//结构体的使用计数</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vfsmount</span> *<span class="title">root</span>;</span> <span class="comment">//根目录的安装点对象</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span> <span class="comment">//安装点链表</span></span><br><span class="line">    <span class="keyword">wait_queue_head_t</span> poll; <span class="comment">//轮询的等待队列</span></span><br><span class="line">    <span class="keyword">int</span> event; <span class="comment">//事件计数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>该结构体使得进程在系统中看到唯一的安装文件系统，由进程描述符的mmt_namespace域指向。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1917,7 +1905,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">260</span>
+                <span class="site-state-item-count">262</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2003,7 +1991,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

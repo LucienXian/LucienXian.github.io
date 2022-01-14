@@ -265,6 +265,370 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/20/Percolator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/06/20/Percolator/" itemprop="url">Percolator</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-06-20T00:14:20+08:00">
+                2021-06-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Percolator"><a href="#Percolator" class="headerlink" title="Percolator"></a>Percolator</h1><blockquote>
+<p>本文是谷歌的经典论文，介绍了一个对大型数据集做增量处理更新的系统Percolator，谷歌用它来构建索引系统，极大地提高了处理速度。Percolator基于BigTable构建的，由于BigTable不支持跨行事务，更像是给BigTable打补丁。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>索引系统是Google Web搜索的核心系统，在应对海量索引数据时，索引创建和索引的实时更新必须要面对的挑战。Google使用Mapreduce解决了高效创建索引的问题，但MR对于实时更新的场景是不合适的，因此他们构建了一个新的增量更新系统Percolator。Percolator主要关注的是跨行事务和Notification，支持在PB级别存储库中进行随机访问，并提供强一致性的保证。</p>
+<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Percolator为了大规模的增量更新提供了两个抽象：</p>
+<ul>
+<li>基于随机访问库的ACID事务；</li>
+<li>observers，一种处理增量计算的方式；</li>
+</ul>
+<p>每个Percolator系统包含三个二进制文件：Percolator的worker、一个BigTable的tablet服务器和一个GFS chunkserver。所有的observer都会连接到Percolator的worker中，该worker会扫描所有在BigTable中发生改变的列，然后调用observer中的回调逻辑。另外Percolator还会依赖两个服务：timestamp oracle和一个轻量级锁服务，前者通过递增的时间戳提供了快照隔离协议，后者则是依赖锁服务来搜索“dirty notification”。</p>
+<h3 id="BigTable"><a href="#BigTable" class="headerlink" title="BigTable"></a>BigTable</h3><p>Percolator是在BigTable基础上构建，数据被组织到BigTable的行列中，元数据则存储在旁边的特殊列中，基于BigTable的接口封装了大量的API，主要目的是提供BigTable缺失的功能：多行事务和observer框架。</p>
+<p>至于BigTable和SSTable所在的GFS的具体实现可以查看对应的论文。</p>
+<h3 id="Transactions"><a href="#Transactions" class="headerlink" title="Transactions"></a>Transactions</h3><p>Percolator使用ACIS快照隔离来基于BigTable的跨行跨表事务。Percolator使用Bigtable中的timestamp，对每个数据项都存储多版本，以实现快照隔离。在一个事务中，按照某个timestamp读出来的版本数据就是一个快照，然后再用一个往后的timestamp写入新数据。快照隔离可以有效解决write- write冲突，如果事务A和B并行运行，同时往某个cell执行写操作，大部分情况下都能正常提交。任意的timestamp都代表了一个一致快照，读取一个cell仅仅需要用给出的timestamp执行BigTable查询即可。</p>
+<p><img src="https://pic.imgdb.cn/item/60ce1787844ef46bb231edf4.png" alt></p>
+<p>考虑到Percolator不能直接控制对存储介质的访问，而是需要修改BigTable的状态，所以Percolator需要明确地维护锁，以实现分布式事务。这个锁服务需要具备几个特点：高可用，能够解决锁在2PC阶段消失的情况；高吞吐，上千台机器同时请求锁；低延时，读请求需要读取锁。BigTable作为存储介质，恰好满足这些需求，所以Percolator将数据和锁存储在同一行，特殊的内存列存取锁。访问某一行数据时，Percolator将在一个BigTable行事务中同时对同行的锁进行Read and Modify。</p>
+<p>下图是Percolator在执行事务期间，数据和元数据的布局情况。以银行转账为例，Bob向Joe转7元，该事务从<code>start_ts=7开始，commit_ts=8</code>结束。</p>
+<p><img src="https://pic.imgdb.cn/item/60ce1787844ef46bb231ee35.png" alt></p>
+<p>下图则展示了Percolator在BigTable中的列所展现的作用，其在BigTable中使用了5个列，其中3个与事务相关：</p>
+<ul>
+<li>c:lock：事务产生的锁，未commit的事务会写该列，映射对是{key,start_ts}=&gt;{primary_key}；</li>
+<li>c:write: 已commit的数据信息，映射对是{key,commit_ts}=&gt;{start_ts}；</li>
+<li>c:data: 具体存储的数据，映射对是{key,start_ts} =&gt; {value}；</li>
+</ul>
+<p><img src="https://pic.imgdb.cn/item/60ce1787844ef46bb231ee6d.png" alt></p>
+<p>事务的处理流程则是经典的两阶段提交，首先是<strong>Prewrite</strong>：</p>
+<ul>
+<li>client首先从Oracle获取全局唯一的时间戳start_ts；</li>
+<li>client然后从所有key中选出一个primary，其余作为secondaries，并将所有数据写入请求并行发往存储节点；<ul>
+<li>存储节点首先会进行write-write冲突检查，从c:write获取当前key的最新数据，如果该列中的commit_ts&gt;=start_ts，则返回写冲突错误；</li>
+<li>然后会检查key是否被锁，如果锁了则返回错误；</li>
+<li>向c:lock写入{key, start_ts} =&gt; {primary_key}；</li>
+<li>向c:data写入{key,start_ts} =&gt; {value}；</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// prewrite tries to lock cell w, returning false in case of conflict.</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Prewrite</span><span class="params">(Write w, Write primary)</span> </span>&#123;</span><br><span class="line">	Column c = w.col;</span><br><span class="line">	bigtable::Txn T = bigtable::StartRowTransaction(w.row);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (T.Read(w.row, c+<span class="string">"write"</span>, [start_ts_, max])) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	<span class="keyword">if</span> (T.Read(w.row, c+<span class="string">"lock"</span>, [<span class="number">0</span>, max])) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">	T.Write(w.row, c+<span class="string">"data"</span>, start_ts_, w.value);</span><br><span class="line">	T.Write(w.row, c+<span class="string">"lock"</span>, start_ts_, &#123;primary.row, primary.col&#125;);</span><br><span class="line">	<span class="keyword">return</span> T.Commit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Prewrite成功后，则进入第二阶段<strong>commit</strong>：</p>
+<ul>
+<li>从Oracle获取全局唯一的时间戳commit_ts；</li>
+<li>向primary key所在节点发起commit请求；</li>
+<li>primary commit成功后则标记为事务成功了，紧接着就是向secondaries发起commit请求（事实上这里primary commit成功后，即可响应client，后续异步往secondaries发起commit即可）；</li>
+<li>存储节点的处理：<ul>
+<li>首先是检查key的lock是否合法；</li>
+<li>往c:write写入{key,commit_ts}=&gt;{start_ts}；</li>
+<li>清除c:lock中内容，释放锁；</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Commit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	Write primary = write_[<span class="number">0</span>];</span><br><span class="line">	<span class="built_in">vector</span>&lt;Write&gt; secondaries(write_.begin() + <span class="number">1</span>, write_.end());</span><br><span class="line">	<span class="keyword">if</span> (!Prewrite(primary, primary)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">		<span class="keyword">for</span> (Write w : secondaries)</span><br><span class="line">			<span class="keyword">if</span> (!Prewrite(w, primary)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> commit_ts = oracle.GetTimestamp();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Commit primary first.</span></span><br><span class="line">	Write p = primary;</span><br><span class="line">	bigtable::Txn T = bigtable::StartRowTransaction(p.row);</span><br><span class="line">	<span class="keyword">if</span> (!T.Read(p.row, p.col+<span class="string">"lock"</span>, [start_ts_, start_ts_]))</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// aborted while working</span></span><br><span class="line">	T.Write(p.row, p.col+<span class="string">"write"</span>, commit_ts, start_ts_); <span class="comment">// Pointer to data written at start_ts_</span></span><br><span class="line">	T.Erase(p.row, p.col+<span class="string">"lock"</span>, commit_ts); <span class="comment">// 应该是start_ts_</span></span><br><span class="line">	<span class="keyword">if</span>(!T.Commit()) <span class="keyword">return</span> <span class="literal">false</span>;  <span class="comment">// commit point</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Second phase: write our write records for secondary cells.</span></span><br><span class="line">	<span class="keyword">for</span> (Write w:secondaries) &#123;</span><br><span class="line">		bigtable::write(w.row, w.col+<span class="string">"write"</span>, commit_ts, start_ts_);</span><br><span class="line">		bigtable::Erase(w.row, w.col+<span class="string">"lock"</span>, commit_ts);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Percolator的读取操作则相对简单，由于c:write记录了key的commit记录，client读取key的时候会先从c:write找到start_ts_，然后到c:data查找相对应的数据，具体流程：</p>
+<ul>
+<li>检查[0, start_ts_]内是否存在锁，若存在，则意味着有未commit的事务，client则必须进行等待和cleanup操作；</li>
+<li>否则，获取最新的commit记录，从c:write中获取start_ts；</li>
+<li>根据{key, start_ts}从c:data中获取数据；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Get</span><span class="params">(Row row, Column c, <span class="built_in">string</span>* value)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">		bigtable::Txn = bigtable::StartRowTransaction(row);</span><br><span class="line">		<span class="comment">// Check for locks that signal concurrent writes.</span></span><br><span class="line">		<span class="keyword">if</span> (T.Read(row, c+<span class="string">"locks"</span>, [<span class="number">0</span>, start_ts_])) &#123;</span><br><span class="line">			<span class="comment">// There is a pending lock; try to clean it and wait</span></span><br><span class="line">			BackoffAndMaybeCleanupLock(row, c);</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Find the latest write below our start_timestamp.</span></span><br><span class="line">	latest_write = T.Read(row, c+<span class="string">"write"</span>, [<span class="number">0</span>, start_ts_]);</span><br><span class="line">	<span class="keyword">if</span>(!latest_write.found()) <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// no data</span></span><br><span class="line">	<span class="keyword">int</span> data_ts = latest_write.start_timestamp();</span><br><span class="line">	*value = T.Read(row, c+<span class="string">"data"</span>, [data_ts, data_ts]);</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至于事务处理过程中如何应对异常：若commit一个事务时出现了异常，导致前面Prepare阶段的锁留下来，为避免阻塞住后来的事务，Percolator采取lazy的方式清理这些锁，即访问到了这个key才会去处理。</p>
+<p>Prewrite阶段遇到锁冲突会直接返回失败，因此锁的清理是在读阶段进行的。当事务执行过程中commit失败时，事务会留下一个commit point（Primary Key写入c:write了），但可能留下一些锁没有清理。另一个事务发现锁冲突时，会去Primary上查找primary lock是否存在。如果存在，说明前面的事务没有提交，进行roll back；如果不存在，则需要检查c:write是否已经被写入，写入了就说明事务已经被成功提交，此时执行Roll Forward（在secondaries上将c:lock替换成c:write）。BigTable的行级事务避免了数据竞争。</p>
+<h3 id="Timestamps"><a href="#Timestamps" class="headerlink" title="Timestamps"></a>Timestamps</h3><p>时间戳oracle是一个分配严格递增时间戳的服务器，考虑到每个事务需要调用oracle两次，因此oracle需要具备很好的可扩展性。oracle会定期分配一定范围的时间戳，并把该范围的最大值持久化存储，这样如果服务器挂了就直接从上次范围的最大值作为开始值进行分配。为了减少RPC消耗，Percolator的worker会维持一个长连接RPC到oracle，低频批量地获取时间戳。</p>
+<p>事务协议使用严格递增的时间戳，保证了Get操作能看到所有在start_ts之前已提交的写操作。</p>
+<h3 id="Notifications"><a href="#Notifications" class="headerlink" title="Notifications"></a>Notifications</h3><p>Percolator提供了一种方法来触发和运行事务，用户编写的代码即observer会表的变化而触发，observer会被放入Percolator worker中，随着每一个tablet服务器运行。每个observer都会向Percolator注册一个function和它感兴趣的列，一旦这些列发生了变化就会调用function。</p>
+<p>与数据库中的触发器不一样，假设写操作触发了observer，但他们会运行在各自的事务中，产生的结果不是原子的。Percolator提供了一种保证：对于一个被观察列的变化，至多一个observer的事务被提交。反之则不然，对于一个被观察列的多次变化，可能只会触发一次observer事务。</p>
+<p>为了实现通知机制，Percolator为每个被监测的列额外提供一个“acknowledgment”列。包含最近一次observer事务的开始时间戳。当被监测的列发生改变时，Percolator启动一个事务来处理通知，该事务读取被监测列和它对应的acknowledgment列，判断acknowledgment列的时间戳是否在被检测列之前，若是则意味着可以开启observer事务，否则意味着已经有observer被运行了。</p>
+<p>为了实现通知机制，Percolator需要高效找到被观察的脏cell，其在BigTable的locality group维护了一个特殊的“notify”列，表示该cell是否为脏，当一个事务对被监测列进行写入时，同时会写对应的notify cell。每个Percolator的worker指定几个线程负责扫描这些脏cell。 </p>
+<p>Percolator的通知机制主要是异步实现的，当改变发生时，并不是立刻以同步方式调用observer，而是写入一个notify列，等worker线程扫描到才会调用observer。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Percolator的一大特点就是构建在仅支持单行事务的BigTable之上，提供了良好的跨行事务，实现了比较简洁的分布式事务。但其性能本身不够高效，每个work都需要发送大量的RPC（比如获取两次事务timestamp，比如可能读取secondary的lock列是指向primary的，还要多读取一次），虽然论文提到了一些合并RPC，延迟发送，提高并行和增大BatchSize等措施来优化RPC的调用，但Percolator对于写协议本身也要需要多次在BigTable做持久化，读的话则可能遇到由于先写primary再同步到其他参与者导致的锁被持有而等待的问题。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/05/15/《UCB-cs294》Required-Reading-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/05/15/《UCB-cs294》Required-Reading-3/" itemprop="url">《UCB cs294》Required Reading 3</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-15T23:41:29+08:00">
+                2021-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="《UCB-cs294》Required-Reading-3"><a href="#《UCB-cs294》Required-Reading-3" class="headerlink" title="《UCB cs294》Required Reading 3"></a>《UCB cs294》Required Reading 3</h1><h2 id="论文一"><a href="#论文一" class="headerlink" title="论文一"></a>论文一</h2><p>《Hidden Technical Debt in Machine Learning Systems》这篇文章是谷歌基于多年的机器学习系统开发和使用经验总结出来的，着重强调了在机器学习系统中出现的technical debt：</p>
+<ul>
+<li>Complex Models Erode Boundaries</li>
+</ul>
+<p>在一般的软件开发中，人们会使用封装、模块化等抽象手段，但机器学习系统由于其依赖大量外部数据，特征的改变会影响全局。论文提到的解决方法是模型隔离和监测模型中的变化。</p>
+<ul>
+<li>Data Dependencies Cost More than Code Dependencies</li>
+</ul>
+<p>这个主要是将对数据依赖关系的分析成本比通常的代码依赖关系分析要高，一是因为数据依赖关系不够稳定，可能存在把一个输出当成另一个地方外部输入的使用；二是存在不必要的数据依赖。对于这两个问题，论文的解决方法是做数据输入的版本控制和定期检查去除不必要的依赖。</p>
+<ul>
+<li>Feedback Loops</li>
+</ul>
+<p>机器学习系统的一大特征就是他们未来的更新很可能会影响到自身，导致analysis debt的出现，在模型部署之前很难预测模型的行为。Direct Feedback Loops是指模型直接影响自身的特征选择，Hidden Feedback Loops是指系统之间间接影响对方，这种Feedback Loops的问题更加严重。</p>
+<ul>
+<li>ML-System Anti-Patterns</li>
+</ul>
+<p>在实际的机器学习系统中，仅仅一小部分代码是用于学习和预测的，慢慢地，系统中会出现各种系统设计的Anti-Patterns。比如出现大量的机器学习库代码，论文的建议是使用胶水语言封装API；数据准备阶段积攒了更多的输入信号，混杂着各种数据操作；机器学习实验过程中，代码出现了一些不必要的条件分支，导致技债出现；还有就是一些代码的code smell比较差。</p>
+<ul>
+<li>Configuration Debt</li>
+</ul>
+<p>由于机器学习系统和算法比较复杂，大型的ML系统往往依赖大量的配置，因此需要关注配置的可维护性、易读性、需要做code review提交到库中。</p>
+<ul>
+<li>Dealing with Changes in the External World</li>
+</ul>
+<p>这个指的是ML系统与外部世界有较多的交互，外部世界的变化会影响系统、影响模型等。因此需要高效的监控预警配套。</p>
+<ul>
+<li>Other Areas of ML-related Debt</li>
+</ul>
+<p>Data Testing Debt，提供基本的、完整的代码测试；Reproducibility Debt，真实的ML系统由于外部世界的变化、并行学习中的随机等等难以保持严格的可重复性；Process Management Debt，模型的管理问题，真实的系统可能存在数以百计的模型，如何分配资源、控制优先级等很重要；Cultural Debt，文化问题，研究员和系统工程师可能存在沟通不当的情况。</p>
+<h2 id="论文二"><a href="#论文二" class="headerlink" title="论文二"></a>论文二</h2><p>《TFX: A TensorFlow-Based Production-Scale Machine Learning Platform》这篇论文主要介绍了Google开发的一个机器学习平台TFX。TFX最大的特点就是将机器学习所需的各个组件部分集成在一起，提供训练模型、分析验证模型和模型部署的完整工作流，避免了机器学习pipeline各个部分的割裂。</p>
+<h3 id="platform-overview"><a href="#platform-overview" class="headerlink" title="platform overview"></a>platform overview</h3><p>作为一个机器学习平台，不单单只关注机器学习算法，还需要考虑到依赖分布式系统架构促使数据和模型的并行，机器学习工作流便于搭建，拥有集中的仓库跟踪保存训练过的多模型等等。</p>
+<p>TFX的设计主要考虑了以下几点：</p>
+<ul>
+<li>平台能应对多种学习任务，除了选用tensorflow作为核心算法库，还支持数据验证分析和可视化工具、模型验证评估和推断工具等；</li>
+<li>持续训练，TFX考虑支持多种持续训练策略；</li>
+<li>易用的配置与工具；</li>
+<li>生产级别的可靠性与可扩展性；</li>
+</ul>
+<p>基于上述的特点，把多种组建模块集成在一起，就形成了下图的平台。</p>
+<p><img src="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce25e3.png" alt></p>
+<h3 id="DATA-ANALYSIS-TRANSFORMATION-AND-VALIDATION"><a href="#DATA-ANALYSIS-TRANSFORMATION-AND-VALIDATION" class="headerlink" title="DATA ANALYSIS, TRANSFORMATION, AND VALIDATION"></a>DATA ANALYSIS, TRANSFORMATION, AND VALIDATION</h3><p>对于机器学习来说，了解数据并及时发现异常数据是至关重要的，有利于避免下游数据出错。这一章主要讲TFX将数据分析、转换和验证作为独立又相互关联的部分。</p>
+<p>数据分析的时候，需要对输入的数据集进行统计，输出一系列统计数据，如连续型数据需要分位数、直方图等等，离散数据需要top-K值和频率等等。</p>
+<p>数据转换则是对数据进行格式转换，如将特征转换为特定的整数。这里的关键是保证在训练和推断期间确保转换逻辑的一致性。TFX会将任何数据转换导出为经过训练的模型的一部分，从而避免了不一致的问题。</p>
+<p>数据验证则是使用schema来描述数据规范，每个算法团队维护自己的schema，数据验证时可以快速确认数据集的异常情况，如何进行修正，反映出数据的变化情况。</p>
+<h3 id="MODEL-TRAINING"><a href="#MODEL-TRAINING" class="headerlink" title="MODEL TRAINING"></a>MODEL TRAINING</h3><p>TFX的设计一大核心是尽可能流水线地、自动化地完成训练生产模型，支持训练使用Tensorflow配置的所有模型。TFX使用了warm starting来在模型质量和模型时效性之间达到一个平衡，这是迁移学习使用的技术，讲一个训练好的基准模型应用另一个场景。</p>
+<p>论文另外一点就是TFX用了定义和描述模型的API——model specification API，通过对Tensorflow的封装减少代码冗余，提高开发速度。</p>
+<h3 id="MODEL-EVALUATION-AND-VALIDATION"><a href="#MODEL-EVALUATION-AND-VALIDATION" class="headerlink" title="MODEL EVALUATION AND VALIDATION"></a>MODEL EVALUATION AND VALIDATION</h3><p>模型的评估是模型上线前验证模型有效性的关键步骤，TFX对于好模型的定义主要是：<strong>safe to serve</strong>和<strong>the desired prediction quality</strong>，前者关心的是模型完整性，不会使得推断服务crash，资源使用少，后者则主要是模型预测准确率。</p>
+<p>TFX一方面也使用了各种准确率标准来做AB Test，根据不同的产品团队要求提供告警配置，另一方面也支持对数据集根据feature做slice切分，帮助更好地评估模型在不同feature伤的表现。</p>
+<h3 id="MODEL-SERVING"><a href="#MODEL-SERVING" class="headerlink" title="MODEL SERVING"></a>MODEL SERVING</h3><p>最后则是模型服务，TFX主要依赖Tensorflow serving去做这个事情，通过多用户隔离和快速的训练数据反序列化来满足系统的低时延和高性能要求，总的来说提供了一套工业级的模型上线推断服务。</p>
+<h2 id="论文三"><a href="#论文三" class="headerlink" title="论文三"></a>论文三</h2><p>《Towards Unified Data and Lifecycle Management for Deep Learning》这篇论文主要关注了深度学习中数据和生命周期管理系统的实现，提出了一个modelHub系统，包括了三个部分，一种DSL来帮助泛化对模型的探索、查询，一种新的模型版本管理系统（Dlv）和一种读参数优化的参数归档存储系统（PAS）。</p>
+<p><img src="https://pic.imgdb.cn/item/609febea6ae4f77d357d697a.png" alt></p>
+<p>ModelHub主要分为local组件和远程组件，local functionality包括了一些DNN系统与本地计算机集群的集成，remote functionality则是不同用户组共享模型与其版本。</p>
+<p>DLV是一种通过命令行工具的版本控制系统，可以用来与其他本地或者远程组件进行交互，替代了传统的git/svn可以方便其更好地描述查询建模过程中生成的artifacts内部结构。另外通过DQL模块可以帮助研究员开发新模型。Model Learning模块本质是特定DNN系统的wrapper。</p>
+<p>至于本地仓库的PAS则是用来存储大量的模型学习参数，PAS的目标是在不影响查询性能的情况下，尽可能维护大量学习的模型信息。其中一大特点是使用了一种新的近似模型评估技术，适用于分段存储PAS。由于浮点算数表示中浮点数具备高熵，难以压缩，PAS提供了按字节分割的浮点矩阵存储方案，通过分割高阶和低阶尾数位，浮点数矩阵按块存储，第一个块由8个高位组成，其余的每个块被分割为一个字节，由于高阶位具有低熵，能更好地做压缩。</p>
+<p>这篇论文描述了如何通过ModelHub去解决一些在管理和调整深度学习模型中的关键数据管理挑战：</p>
+<ul>
+<li>通过调整网络结构和超参数，更容易优化潜在的模型效果；</li>
+<li>减少跟踪模型的负担；</li>
+<li>在不影响查询和检索性能的前提下，尽可能多地存储大量模型和构造快照；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/05/12/C-atomics-from-basic-to-advanced/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1772,370 +2136,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing——MIT6-824-1/" itemprop="url">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6-824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-05T00:02:46+08:00">
-                2021-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing"><a href="#Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing" class="headerlink" title="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing"></a>Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1><blockquote>
-<p>本文提出了一种称之为RDDs的分布式内存抽象，以此解决在大规模集群中以容错的方式提供内存计算的方式。当前的计算框架对于迭代算法和交互式数据挖掘的效率都很低，RDDs通过将数据留在内存来提高性能。本文通过Spark系统来实现RDDs。</p>
-</blockquote>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>诸如MapReduce 和Dryad之类的集群计算框架已被广泛用于大规模数据分析。这些系统使用户可以使用一组高级API来编写并行计算，而不必担心工作分配和容错能力。</p>
-<p>尽管当前的框架为集群的计算资源提供了许多抽象，但它们还是缺乏对利用分布式内存的抽象。这就导致了在多个计算之间复用中间结果时，显得非常低效。数据重用在许多迭代机器学习和图计算中很常见。另外在交互式数据挖掘中，用户会需要对数据的同一子集运行多个临时查询。然而在大多数框架中，在计算之间（例如在两个MapReducce作业之间）重用数据的唯一方法是将其写入外部稳定的存储系统，例如分布式文件系统。由于数据复制，磁盘IO和序列化，这会导致相当大的开销，这可能会影响应用程序的执行时间。</p>
-<p>在这篇论文中提出了一个全新的抽象，叫做RDDs(Resilient Distributed Datasets)，它可以在广泛的应用程序中实现有效的数据重用。RDDs 是一个可以容错且并行的数据结构，它可以让用户显式的将中间结果数据集保存在内中。</p>
-<p>现存的分布式内存抽象系统，都是基于对可变状态的细粒度更新。这种接口保证容错的方式无非是将数据进行多副本备份，需要在机器节点间复制大量的数据，宽带传输数据的速度远远比RAM 内存慢。</p>
-<p>与这些系统相比，RDD提供了基于粗粒度转换的接口（map，reduce，filter）。这些接口可以对多条数据条目应用相同的操作，这样就可以通过记录来生成某个数据集的一系列转换，而不是记录真实的数据。如果RDD丢失，则RDD具有足够的有关如何从其他RDD派生的信息，可以仅重新计算该分区。因此，丢失的数据通常可以很快恢复。</p>
-<h2 id="Resilient-Distributed-Datasets"><a href="#Resilient-Distributed-Datasets" class="headerlink" title="Resilient Distributed Datasets"></a>Resilient Distributed Datasets</h2><p>本章主要介绍RDD和Spark编程接口，并与细粒度共享内存做对比。</p>
-<h3 id="RDD-Abstraction"><a href="#RDD-Abstraction" class="headerlink" title="RDD Abstraction"></a>RDD Abstraction</h3><p>RDD是一个只读的、可分区的数据集，可以通过对稳定的存储系统或者其他的RDD进行操作来创建一个新的RDD，这些操作称之为transformations，比如map，filter 以及join。另外用户可以控制RDD的存储和分区，指定存储策略，也可以根据key做hash来做数据分区。</p>
-<h3 id="Spark-Programming-Interface"><a href="#Spark-Programming-Interface" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h3><p>Spark通过集成编程语言API来表示RDD，每一个数据集就是一个对象，通过对象的方法来操作对象。RDD有两种操作，一种是上面说的transformations，另一种则是action，action操作可以得到应用结果值，比如count可以返回数据集的元素个数、collect返回数据集的所有元素以及save则是将输出结果写入到存储系统中。</p>
-<p>Spark定义RDDs是并不会计算，只是采取lazy特性，可以将transformations组成pipeline，触发了actions操作才会真正计算。用户可以通过RDDs的preset方法来缓存数据，也可以调整缓存策略。</p>
-<h3 id="Advantages-of-the-RDD-Model"><a href="#Advantages-of-the-RDD-Model" class="headerlink" title="Advantages of the RDD Model"></a>Advantages of the RDD Model</h3><p>论文将RDD和分布式共享内存系统DSM做了比较，RDD只能粗粒度的操作转换，而DSM可以在任意内存位置进行写入。这样RDD的容错机制更加高效，不需要发生非常耗时的checkpoint，只需重新计算丢数据的分区。另外一个好处就是任务备份比较简单，因为RDD是不变的。还有就是，RDD可以进行进行任务调度来提高大批量的写入效率，在scan-base的操作中也能根据需要将内存数据写到磁盘中。</p>
-<h3 id="Applications-Not-Suitable-for-RDDs"><a href="#Applications-Not-Suitable-for-RDDs" class="headerlink" title="Applications Not Suitable for RDDs"></a>Applications Not Suitable for RDDs</h3><p>RDD更适合批量的数据处理场景，并不适合于需要异步且细粒度的更新共享状态的应用。</p>
-<h2 id="Spark-Programming-Interface-1"><a href="#Spark-Programming-Interface-1" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h2><p>Spark提供了一个用Scala编写的语言集成API。为了使用Spark，开发者编写了一个driver，该driver会连接workers集群，并定义若干个RDDs，在RDDs上执行action，在driver上的Spark代码会追踪RDDs的lineage。workers是一直运行的进程，能在内存中存储RDD分区。</p>
-<h3 id="RDD-Operations-in-Spark"><a href="#RDD-Operations-in-Spark" class="headerlink" title="RDD Operations in Spark"></a>RDD Operations in Spark</h3><p>下图列出了Spark中RDD的transformations和actions操作。transformations是定义新RDD的lazy操作，而actions才是真正计算结果或者写数据到外部存储；</p>
-<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abc98.png" alt></p>
-<h2 id="Representing-RDDs"><a href="#Representing-RDDs" class="headerlink" title="Representing RDDs"></a>Representing RDDs</h2><p>抽象RDDs会带来一个问题：如何在广泛转换中表示追踪lineage。理想情况下，一个实现RDDs的系统应该能够提供丰富的·转换算子，用户可以以任意方式进行组合。在Spark中则是提出了一个简单的图表示来达到以上目的。</p>
-<p>论文提出了一个通用接口去表示RDD，接口表达了五种信息：</p>
-<ul>
-<li>一组分片（partitions），数据集的原子组成；</li>
-<li>一组父RDDs上的依赖；</li>
-<li>一个基于父数据集计算的函数；</li>
-<li>分片策略元数据，一个分片函数partitioner；</li>
-<li>数据位置策略，存储每个partition的优先位置；</li>
-</ul>
-<p>论文将RDDs之间的依赖分为了两类：</p>
-<ul>
-<li>窄依赖：父RDD的每个分片被子RDD至多一个分片使用；</li>
-<li>宽依赖：多个子分片依赖一个父分片；</li>
-</ul>
-<p>例如，代表HDFS文件的RDD对文件的每个块都有一个分片，并且通过数据位置策略知道每个块在哪台计算机上。</p>
-<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abcd2.png" alt="img"></p>
-<p>窄依赖能在一个节点上流水线执行，节点故障的时候也能高效地通过重新计算父分片来进行恢复；而宽依赖，单一节点故障可能会导致一个RDD的所有祖先分片丢失，需要完全重新执行。</p>
-<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>Spark可以从任何的Hadoop输入源中读取数据，比如HDFS和HBase。本章主要关注下面的几个部分：任务调度、Spark解释器的交互式使用、内存管理和checkpoint。</p>
-<h3 id="Job-Scheduling"><a href="#Job-Scheduling" class="headerlink" title="Job Scheduling"></a>Job Scheduling</h3><p>Spark的调度器与Dryad类似，另外还会考虑持久化了的RDD的哪些分片在内存中可用。任何时候用户在RDD上执行action，调度器就会检查RDD的lineage，建立由stages组成的DAG，然后执行这个图。调度器会使每个stage包含尽可能多的窄依赖，stages的边界是宽依赖shuffle操作，或者任何计算过的分片。</p>
-<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd14.png" alt="img"></p>
-<p>调度器会根据数据存放位置使用延迟调度给机器指派任务。</p>
-<p>若一个任务失败了，只要stage的父分片还在，就可以在另一个节点重新运行。如果一些stages都不可用了，就需要重新提交任务去并行计算丢失分片。</p>
-<h3 id="Interpreter-Integration"><a href="#Interpreter-Integration" class="headerlink" title="Interpreter Integration"></a>Interpreter Integration</h3><p>Scala包含一个类似于Ruby和Python的交互式shell，考虑到内存数据的低延迟，Spark可以让用户在解释器上运行。</p>
-<p>Spark中的编译器相对Scala做了一些改变：</p>
-<ul>
-<li>类传输：通过HTTP传输创建类的字节码；</li>
-<li>代码生成：代码生成的单例对象是通过生成类的静态方法访问的，为了避免序列化一个访问不到前面定义变量的闭包，Spark将代码生成逻辑改成直接引用每行对象的实例；</li>
-</ul>
-<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd29.png" alt="img"></p>
-<h3 id="Memory-Management"><a href="#Memory-Management" class="headerlink" title="Memory Management"></a>Memory Management</h3><p>Spark对RDD的持久化提供了三个选项：</p>
-<ul>
-<li>序列成Java对象，存在内存中；性能最好</li>
-<li>作为序列化数据存在内存中；内存空间有限时使用</li>
-<li>存在硬盘中；RDDs过大无法存入内存</li>
-</ul>
-<p>当计算新的RDD分片后，如果没有足够空间去存储，就会基于LRU的淘汰策略去淘汰一个分片。但如果新旧分片属于同一个RDD，则会将旧的分片写入内存，避免相同RDD的分片循环读写。</p>
-<h3 id="Support-for-Checkpointing"><a href="#Support-for-Checkpointing" class="headerlink" title="Support for Checkpointing"></a>Support for Checkpointing</h3><p>虽然lineage可以帮助恢复RDDs，但如果lineage很长的时候就会变得很耗时，因此RDD可以执行checkpoint存入稳定内存。</p>
-<p>Spark为checkpoint提供了一个API，让用户决定checkpoint哪个数据。同样，Spark的调度器也制定每个数据集大小，了解第一次计算的耗时，因此也会基于一定的策略选择一个优化RDDs集合来执行checkpoint，缩短系统恢复时间。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了一个在集群中共享数据的高效的、具备容错能力的的抽象——RDD。RDD能表达通用的并行应用，提供了一个基于粗粒度转换的API，也能通过lineage来快速恢复数据。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance——MIT6-824-1/" itemprop="url">No compromises distributed transactions with consistency, availability, and performance——MIT6-824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-15T01:43:49+08:00">
-                2020-11-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="No-compromises-distributed-transactions-with-consistency-availability-and-performance"><a href="#No-compromises-distributed-transactions-with-consistency-availability-and-performance" class="headerlink" title="No compromises: distributed transactions with consistency, availability, and performance"></a>No compromises: distributed transactions with consistency, availability, and performance</h1><blockquote>
-<p>强一致性和高可用性的事务简化了分布式系统的构建，但在从前，分布式事务的设计实现不大理想，这就迫使以前构建分布式系统的时候抛弃分布式事务或者使用弱一致性，或者使用单机事务，要求业务方通过数据分区的方式，保证事务数据落在一个机器上。</p>
-<p>本文一个名为FaRM的内存分布式计算平台，具备以下特性：强序列化，高性能，持久性和高可用性。</p>
-</blockquote>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>具有高可用性和强序列化的事务通过简单的抽象来简化了分布式系统的编程和推理：单机永不失败，一次执行一个实时同步的事务。但是，先前在分布式系统中实现此抽象的尝试都导致了较差的性能。因此，诸如Dynamo或Memcached之类的系统通过不支持事务或实施弱一致性保证来提高性能。其他系统仅在所有数据都驻留在一台机器中时才提供事务。</p>
-<p>本文证明了现代数据中心中的新软件可以消除折衷的要求。它在一种称为FaRM的内存分布式计算平台中描述了事务，复制和恢复协议。 FaRM为分布式ACID事务提供严格的可简化性，高可用性，高吞吐量和低延迟。FaRM平台利用了两个趋势：带有RDMA的网络和提供非易失性DRAM，消除了存储和网络瓶颈，并通过减少消息数量，使用单面RDMA读写存储而不是消息以及有效利用并行性，来解决CPU瓶颈。</p>
-<p>FaRM允许数据分布在不同机器，同时允许事务跨越任何数量的机器。FaRM通过使用vertical Paxos，而不是通过Paxos协议进行coordinators和数据的复制，此时副本是主-备，然后协调者是单个，不进行复制。FaRM使用具有四个阶段提交协议（锁定，验证，提交备份和主要提交）。</p>
-<p>在事务执行和验证期间和在事务中修改的对象副本上将记录记录到非易失性预写日志WAL时，都会使用RDMA，避免了本地CPU开销。不再需要CPU参与，意味着传统的故障恢复（failure-recovery）协议不再适合FaRM，因此文章使用了precise membership的解决方案：保证所有机器都在当前membership configuration上达成一致，并且只会发送请求给组员。</p>
-<p>FaRM中的故障恢复速度很快，因为它有效地利用了并行性。它在集群中平均分配恢复的数据，并在每台计算机之间并行进行恢复。</p>
-<h2 id="Hardware-trends"><a href="#Hardware-trends" class="headerlink" title="Hardware trends"></a>Hardware trends</h2><p>FaRM的设计受到数据中心机器中大量廉价DRAM的推动。FaRM利用两种硬件趋势来消除存储和网络瓶颈：非易失性DRAM和具有RDMA的网络。</p>
-<h3 id="Non-volatile-DRAM"><a href="#Non-volatile-DRAM" class="headerlink" title="Non-volatile DRAM"></a>Non-volatile DRAM</h3><p>distributed uninterruptible power supply (UPS)利用锂离子电池的广泛可用性来降低数据中心UPS的成本，与传统的UPS相比，这种方法更加可靠：锂离子电池配备了多个独立的电池单元，并且电池故障仅会影响机架的一部分。</p>
-<p>分布式UPS有效地使DRAM持久耐用。发生电源故障时，分布式UPS使用电池中的能量将内存内容保存到SSD中。这不仅避免了对SSD的同步写入，从而提高了常见情况的性能，而且还通过仅在发生故障时对其进行写入来延长SSD的寿命。另一种方法是使用非易失性DIMM（NVDIMM），它们包含自己的专用闪存，控制器和超级电容器，但这种设备成本更高。</p>
-<p>FaRM将所有数据存储在内存中，并在将其写入多个副本上的NVRAM中时，将其作为持久数据。</p>
-<h3 id="RDMA-networking"><a href="#RDMA-networking" class="headerlink" title="RDMA networking"></a>RDMA networking</h3><p>FaRM尽可能使用单边RDMA操作，因为它们不使用远程CPU。与RPC相比，RDMA的读取性能更高，并且消除了NIC消息速率瓶颈。但RPC和RDMA与CPU有关，减少CPU开销能更好释放新硬件的潜力。</p>
-<h2 id="Programming-model-and-architecture"><a href="#Programming-model-and-architecture" class="headerlink" title="Programming model and architecture"></a>Programming model and architecture</h2><p>FaRM提供了一个全局的抽象地址空间，提供对事务中本地和远程对象的透明访问。应用程序线程可以随时启动事务，而后会成为事务的协调者。在事务执行期间，线程可以执行任何逻辑，包括读取，写入，分配和释放对象。在执行结束时，线程调用FaRM提交事务。</p>
-<p>FaRM事务使用乐观并发控制，更新在执行期间会缓冲在本地，并且仅在成功提交后才对其他事务可见，FaRM对成功提交的事务提供了严格的串行性。至于读，FaRM保证对单个对象操作的原子性，每次读总能返回最新的值。不同对象间的读取不保证原子性，但保证严格串行。</p>
-<p>下图显示了具有四台计算机的FaRM实例和机器A的内部组成。每台机器在用户进程中运行FaRM，且内核线程固定在每个硬件线程上。每个内核线程运行一个事件循环，该循环执行应用程序代码并轮询RDMA完成队列。</p>
-<p><img src="https://pic.downk.cc/item/5fa03c371cd1bbb86b8e1d77.png" alt></p>
-<p>扩缩容的时候，FaRM实例会随着时间推移逐步进行一系列配置，配置是⟨i, S, F , CM⟩，其中i是唯一单调递增的64位配置id，S是配置的机器集合，F是Pair&lt;机器, 独立故障域&gt;，CM是配置管理机器。FaRM使用Zookeeper来确保机器就当前配置达成一致并进行存储，但是它不像通常那样依靠Zookeeper来管理租约，检测故障或协调恢复。 而是使用配置管理器通过RDMA快速恢复来负责。</p>
-<p>FaRM的全局内存以2GB进行划分，每个2GB称为一个region，每个region保存在1个primary和f个backups上，每个region存储在非易失内存中，能够被其他机器通过RMDA直接读取。一般会先读primary，如果在本地有就读本地内存，远程有就读RDMA。region到primary-backups的映射关系信息则是保存在CM上。</p>
-<p>机器可以与CM联系分配新区域。CM从单调递增的计数器分配region id，为该区域选择副本，并尽可能平衡各个机器的region数。与一致性哈希的方法相比，这种集中式方法提供了更大的灵活性来满足故障独立性和局部性约束。它还使平衡机器之间的负载和接近容量运行变得更加容易。</p>
-<p>每台机器还存储基于FIFO队列的环形缓冲区，用于事务日志或消息队列。每个发送方-接收方对都有自己的日志和消息队列，但物理上位于接收方处。发送方通过RDMA直接写到尾部，然后NIC直接回ACK，接收方则周期性的从头部读取数据处理。</p>
-<h2 id="Distributed-transactions-and-replication"><a href="#Distributed-transactions-and-replication" class="headerlink" title="Distributed transactions and replication"></a>Distributed transactions and replication</h2><p>FaRM结合了事务协议和副本协议来提高性能，并利用单端RDMA读写来提高cpu的有效性和低延迟。FaRM在非易失的内存中使用主备副本协议来存储数据和事务日志，协调器没有副本，并且协调器会直接和主备副本进行通信。在执行阶段，事务使用单面RDMA（如果与协调器在同一个机器则使用本地内存）读取对象，并且它们在本地缓冲写操作，下图是FaRM事务的执行时间表：</p>
-<p><img src="https://pic.downk.cc/item/5fa803141cd1bbb86b451dff.png" alt></p>
-<p>执行结束后，通过以下步骤进行提交：</p>
-<ol>
-<li>lock：协调器将LOCK记录（版本、新值和region列表）写入所有被修改对象的primary中。然后primary会使用CAS尝试锁住这些对象的指定版本，返回是否锁成功的消息。如果自从事务读取对象以来发生任何对象版本的更改，或者当前对象已被另一个事务锁定，则锁定可能失败，协调器终止事务；</li>
-<li>Validate：协调器对事务内所有的只读对象进行读校验，从这些只读对象的primary发起RMDA读或RPC读。默认情况下使用单面RDMA读取，只读对象的数量超过4个，则使用RPC。如果版本号变更了，事务就被终止；</li>
-<li>Commit backups：通过RDMA写log到所有backups，等待网卡的确认；</li>
-<li>Commit primaries：在确认所有COMMIT-BACKUP写入之后，协调器将Commit primaries记录写入每个primary的日志中，收到至少一个响应，协调器马上返回给应用成功。primary通过更新对象，增加其版本并对其进行解锁来处理这些记录，从而完成了事务所提交的写入；</li>
-<li>Truncate：协调器在收到来自所有primary的确认后，会延迟地truncate事务内的primary和backup的日志；</li>
-</ol>
-<p>正确性；</p>
-<p>在获取所有写锁时，已提交的读写事务是串行的，这是在串行点上所有读取和写入对象的版本与执行期间看到的版本相同。锁阶段保证了写对象的串行性，而校验阶段保证了只读对象的串行性，在没有失败的情况下，这等效于在串行点原子地执行和提交整个事务。 </p>
-<p>为了确保故障时的串行性，必须在写入COMMIT-PRIMARY之前等待所有backup的确认。否则当某些COMMIT-BACKUP失败，且协调器故障了，就会丢失记录。</p>
-<p>由于读的集合只保存在协调器中，一旦协调器挂了就没有commit记录可以证明验证成功了，这样就会导致事务abort。所以协调器等待一个primary的提交成功才会响应给client成功。这样能避免f个backup和coordinator一起挂了使得锁记录保存但丢失校验没成功的记录。</p>
-<p>传统的二阶段提交协议，可以在准备阶段去检查有没有资源。但FaRM因为只用单边RDMA，无法使用远程CPU，因此必须要保留空间去记录所有的提交协议记录，包括在开始commit之前截断primary和backup的记录。日志保留是协调器上的本地操作，因为协调器会将记录写入其在每个参与者处拥有的日志中，写完相应记录之后会释放保留空间。</p>
-<h3 id="Failure-detection"><a href="#Failure-detection" class="headerlink" title="Failure detection"></a>Failure detection</h3><p>FaRM使用租约机制来检测故障。除CM之外，每台机器都在CM处拥有租约，而CM则对其他所有机器拥有租约，这是一个双向租约的机制。租约使用三次握手的方式授权，每台机器向CM发送一个租约请求，CM返回的响应消息即代表对机器的授权，也是CM对该机器的租约请求，最后该机器授权租约给CM。</p>
-<p>FaRM租期非常短，这是高可用性的关键。在高负载下，FaRM可以为90台计算机群集使用5毫秒的租约，而不会产生误报。</p>
-<p>为了在高负载的情况下获得短期租约，FaRM使用专门的队列来支持租约，这样就能避免租约消息的延迟。另外为了避免性能的影响，FaRM的租约管理器通过无连接的不可靠数据包去发送和接收租约。默认情况下，租约的延续一般是租约超时周期的五分之一。</p>
-<p>续租还必须及时在CPU上定时调度，FaRM使用专用的租约管理器线程，该线程以最高的用户空间优先级运行，并且租约管理器线程没有固定到任何的硬件线程，它使用中断而不是轮询来避免在每个硬件线程上定期运行的关键OS任务饿死，导致误报租约过期。虽然增加了几毫秒的消息延迟，但对于租约来说不是问题。</p>
-<p>最后，在初始化期间预先分配租约管理器使用的所有内存，然后分页并固定其使用的所有代码，以避免由于内存管理而造成的延迟。</p>
-<h3 id="Reconfiguration"><a href="#Reconfiguration" class="headerlink" title="Reconfiguration"></a>Reconfiguration</h3><p>重新配置协议将FaRM实例从一种配置移到另一种，FaRM使用了RDMA操作来保证极高的性能，因为缺少CPU的使用，因此无法利用租约机制来实现一致性。FaRM使用的是精确的成员身份来实现这个问题，发生故障后，采用新配置的所有计算机必须先同意其成员身份，然后才能进行对象更改。这就允许了在客户端做检查而不是服务端。配置中的计算机不会向不在其中的计算机发出RDMA请求，并且也会忽略配置中不再存在的计算机做回应。</p>
-<p><img src="https://pic.downk.cc/item/5fb00c44ef76db7fe8909662.png" alt></p>
-<ol>
-<li>猜测：当CM上的一个机器租约过期时，CM会猜测那个机器挂了，并初始化重新配置，这个时间点开始阻塞所有外部客户端的请求。如果一个非CM机器上的租约过期了，它会推断CM挂了，这个非CM租约上的机器会尝试请求少量的CM备机去初始化配置。如果超时后配置未更改，则它将尝试重新配置自身。这种设计避免了在CM故障时会有大量机器同时尝试重新配置，在所有情况下，启动重新配置的机器都将尝试成为新的CM，作为重新配置的一部分。</li>
-<li>探测：新的CM向配置中的所有机器发出RDMA读取，除了前面猜测故障的机器和读失败的机器，这些读取探测允许通过一次重新配置来处理影响多台机器的相关故障，例如电源和开关故障。新CM仅在获得大多数响应后才继续进行重新配置。这样可以确保如果网络已分区，则CM不会位于较小的分区中。</li>
-<li>更新配置：CM尝试更新zk的配置为 ⟨c + 1, S, F , CM(id)⟩，c是当前的配置版本号id，S是探测有返回的机器列表，F是故障域映射，CM(id)是自己的id。FaRM使用zk的znode序列号去实现原子的CAS，只有当前配置的的版本仍然是c是，CAS才成功。</li>
-<li>重新映射区域：新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f + 1。它尝试平衡负载并满足容量和故障独立性约束的应用程序指定的局部性提示。对于失败的主数据库，它会将尚存的备份升级为新的主数据库，以减少恢复时间。如果它检测到丢失了所有副本的区域，或者没有空间可以重新复制区域，则会发出错误消息。</li>
-<li>发送新配置：重新映射区域后，CM会使用配置标识符，其自身的标识符，配置中其他机器的标识符以及区域到机器的所有新映射，向配置中的所有机器发送NEW-CONFIG消息。并根据需要重置租约或者进行租约交换；</li>
-<li>应用新配置：当机器收到配置标识符大于其自身配置的NEW-CONFIG时，它将更新其当前配置标识符及其区域映射的缓存副本，并分配空间以容纳分配给它的所有新区域副本。同时还会给CM进行租约的授权。</li>
-<li>提交新配置：一旦CM从配置中的所有计算机接收到NEW-CONFIG-ACK消息，它会等待所有不在新配置中的机器的租约过期。然后CM向所有配置成员发送NEW-CONFIG-COMMIT，和第6步租约申请的授权，最后所有成员解锁外部客户端请求；</li>
-</ol>
-<h3 id="Transaction-state-recovery"><a href="#Transaction-state-recovery" class="headerlink" title="Transaction state recovery"></a>Transaction state recovery</h3><p>在配置更改后，FaRM使用事务修改的对象副本之间的日志来恢复事务状态。这涉及到事务修改的对象副本和协调器恢复状态，以决定事务的结果。</p>
-<p><img src="https://pic.downk.cc/item/5fb016c63e3fc2acb7182059.png" alt></p>
-<ol>
-<li>阻塞访问正在恢复的region：当一个primary的region挂了，其中一个备份就会被提升为primary，在所有更新该region的操作都反映到该primary之前都不允许访问该region；</li>
-<li>清除日志：单面RDMA写一般会和故障恢复冲突，FaRM无法通过网卡来拒绝来自旧配置的消息，只能在收到NEW-CONFIG-COMMIT消息时清除所有的日志记录，然后拒绝新来的日志；</li>
-<li>找到正在恢复的日志：</li>
-<li>锁定恢复：region的每个primary会等本地机器日志被排出，并且从所有backup中收到NEED-RECOVERY消息，然后primary并行地从backup中拉取任意的、本地没有存储的事务日志记录，并对任何被恢复事务修改的对象进行锁定。当锁定恢复完成了一个region时，这个region就可以被本地或远程的coordinator获得本地指针和RDMA引用；</li>
-<li>备份日志记录：在primary中的线通过发送REPLICATE-TX-STATE消息给backup来备份日志记录；</li>
-<li>投票：恢复事务的coordinator基于每个被该事务修改的region的投票决定是否提交或abort事务；</li>
-<li>决定：如果从所有region收到了commit-primary，coordinator就会决定提交事务；如果至少有一个region投票了commit-backup并且所有其他的被事务修改的region提交了lock或commit-backup或truncated，则等待所有region去投票和提交；其他情况会abort；</li>
-</ol>
-<h3 id="Recovering-data"><a href="#Recovering-data" class="headerlink" title="Recovering data"></a>Recovering data</h3><p>FaRM一定会将region数据复制数据到新的backup上，以便将来能容忍f个故障。一个region的一个新的backup初始化空间为0。region被划分给worker线程并行地恢复数据。每一个线程发出一个单端RDMA操作去读primary的一个block。每个恢复对象被复制到backup之前都会做版本检查，然后使用CAS更新对象状态。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2179,7 +2184,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">260</span>
+                <span class="site-state-item-count">262</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2265,7 +2270,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

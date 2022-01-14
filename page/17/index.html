@@ -265,6 +265,386 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/predictive-parsing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/predictive-parsing/" itemprop="url">predictive parsing</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T23:04:02+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="predictive-parsing"><a href="#predictive-parsing" class="headerlink" title="predictive parsing"></a>predictive parsing</h1><p>能预测使用哪一个production：</p>
+<ul>
+<li>通过观察接下来的tokens；</li>
+<li>没有回溯；</li>
+</ul>
+<p>predictIve parsers接收LL(k)语法（left to right，leftmost derivation），k代码向前看k个tokens</p>
+<p>LL(1):每一个step，只能选择一个production</p>
+<p>但这里有一个问题就是，对于这样的grammar：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;T+E|T</span><br><span class="line"></span><br><span class="line">T-&gt;<span class="keyword">int</span> | <span class="keyword">int</span> * T | (E)</span><br></pre></td></tr></table></figure>
+<p>很难去根据next token预测T和E；</p>
+<p>解决方法就是：left factoring，即去除公共前缀；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;TX</span><br><span class="line">X-&gt;+E|epsilon</span><br><span class="line"></span><br><span class="line">T-&gt;intX|(E)</span><br><span class="line">X-&gt;*T|epsilon</span><br></pre></td></tr></table></figure>
+<h1 id="First-Sets"><a href="#First-Sets" class="headerlink" title="First Sets"></a>First Sets</h1><p>如果a-&gt;tB，即a能推导出在第一个位置的t,那么t属于First(a)</p>
+<p>定义：</p>
+<p>First(X) = {t|X-&gt;<em>ta}并{ε|X-&gt;</em>ε}</p>
+<p>算法：</p>
+<ol>
+<li>First(t)={t}</li>
+<li>ε属于First(X)</li>
+</ol>
+<ul>
+<li>if X-&gt;ε</li>
+<li>if X-&gt;A1A2…Ana and ε属于First(Aj)for 1&lt;=j&lt;=n</li>
+</ul>
+<ol start="3">
+<li>First(a)属于Frist(X) if X-&gt;A1..An a and ε属于First(Aj) for 1&lt;=j&lt;=n</li>
+</ol>
+<h1 id="Follow-Sets"><a href="#Follow-Sets" class="headerlink" title="Follow Sets"></a>Follow Sets</h1><p>定义：</p>
+<p>Follow(X)={t|S-&gt;*βXtε}</p>
+<p>follow sets没有ε</p>
+<p>Intution:</p>
+<p>if X-&gt;AB, then First(B)属于Follow(A) and Follow(X)属于Follow(B)</p>
+<ul>
+<li>if B-&gt;*ε then Follow(X)属于Follow(B)</li>
+</ul>
+<p>if S 是开始symbol，$属于Follow(S)</p>
+<p>algorithm sketch</p>
+<ol>
+<li>$属于Follow(S)</li>
+<li>First(β)-{ε} 属于 Follow(X), when A-&gt;aXβ</li>
+<li>Follow(A)属于Follow(X)</li>
+</ol>
+<ul>
+<li>对于每一个production， A-&gt;aXB 都有B-&gt;ε</li>
+</ul>
+<h1 id="LL-1-Parsing-tables"><a href="#LL-1-Parsing-tables" class="headerlink" title="LL(1) Parsing tables"></a>LL(1) Parsing tables</h1><p>构建一个parsing tables：</p>
+<p>对于每一个production：A-&gt;a:</p>
+<ul>
+<li>对于每一个终止符t属于First(a): T[A, t] = a</li>
+<li>如果ε属于First(a), 对于每一个终止符t属于Follow(A): T[A, t] = a</li>
+<li>如果ε属于First(a)，并且$属于Follow(A): T[A, $] = a</li>
+</ul>
+<p>如果parsing table中的entry有两项，就会有冲突：</p>
+<p>比如：S-&gt;Sa|b</p>
+<p>First(S) = {b};</p>
+<p>Follow(S) = {$, a};</p>
+<p>这种情况下，就不是LL(1)。</p>
+<h1 id="bottom-up-parsing"><a href="#bottom-up-parsing" class="headerlink" title="bottom up parsing"></a>bottom up parsing</h1><ul>
+<li>bottom up比top down更加常用和有效</li>
+</ul>
+<p>这种方式就是主键的规约，回到start symbol：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * <span class="keyword">int</span> + <span class="keyword">int</span>    T-&gt;<span class="keyword">int</span></span><br><span class="line"><span class="keyword">int</span> * T + <span class="keyword">int</span>      T-&gt;<span class="keyword">int</span> * T</span><br><span class="line">T + <span class="keyword">int</span>            T-&gt;<span class="keyword">int</span></span><br><span class="line">T + T              E-&gt;T</span><br><span class="line">T + E              E-&gt;T+E</span><br><span class="line">E</span><br></pre></td></tr></table></figure>
+<ul>
+<li>trace a rightmost derivation in reverse</li>
+</ul>
+<h1 id="shift-reduce-parsing"><a href="#shift-reduce-parsing" class="headerlink" title="shift-reduce parsing"></a>shift-reduce parsing</h1><p>shift,reduce是bottom-up parsing的两个操作</p>
+<ul>
+<li>Shift a terminal to the left string</li>
+<li>apply an inverse production at the right end of the left string</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/Syntax-Directed-Translation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/Syntax-Directed-Translation/" itemprop="url">Syntax-Directed Translation</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T23:03:45+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Syntax-Directed-Translation"><a href="#Syntax-Directed-Translation" class="headerlink" title="Syntax-Directed Translation"></a>Syntax-Directed Translation</h1><h2 id="error-handling"><a href="#error-handling" class="headerlink" title="error handling"></a>error handling</h2><p>编译器的两个作用：</p>
+<ul>
+<li>检测无效的程序；</li>
+<li>翻译有效的程序；</li>
+</ul>
+<p>error handler的作用：</p>
+<ul>
+<li>准确报告错误；</li>
+<li>迅速从错误回复；</li>
+<li><p>不影响有效部分的编译速度；</p>
+</li>
+<li><p>panic mode：</p>
+</li>
+</ul>
+<p>考虑这样的错误：(1++2)+3</p>
+<p>panic mode的测量是：跳过，到达下一个整数，然后继续；</p>
+<ul>
+<li>error productions</li>
+</ul>
+<p>分辨出已知的语法错误</p>
+<p>error correction：尝试去找出正确的接近的程序，对tokens进行插入和删除；</p>
+<h2 id="Abstract-Syntax-Tree"><a href="#Abstract-Syntax-Tree" class="headerlink" title="Abstract Syntax Tree"></a>Abstract Syntax Tree</h2><p>编译器需要一个数据结构去代表那个程序。</p>
+<p>考虑grammar：E-&gt;int|(E)|E+E，字符串为5+(2+3)，lexical analysis之后变成int’+’(‘int’+’int’)’，然后parse tree为</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap61.png" alt="img"></p>
+<p>然后构造AST：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap62.png" alt="img"></p>
+<p>强调嵌套结构，更加抽象并且没有non-terminals</p>
+<h2 id="Recursive-Descent-Parsing"><a href="#Recursive-Descent-Parsing" class="headerlink" title="Recursive Descent Parsing"></a>Recursive Descent Parsing</h2><p>也叫top-down parsing，则parse tree是从上到下，从左到右去构建。</p>
+<p>考虑grammar：</p>
+<p>E-&gt;T|T+E<br>T-&gt;int | int * T | (E)</p>
+<p>token stream为：(int),匹配5个括号</p>
+<p>在构造过程中，按照从上到下从左到右一个一个比对，找到正确的parse tree</p>
+<h2 id="Recursive-Descent-Algorithm"><a href="#Recursive-Descent-Algorithm" class="headerlink" title="Recursive Descent Algorithm"></a>Recursive Descent Algorithm</h2><p>首先来看一些特别的tokens：INT,OPEN,CLOSE,PLUS,TIMES，全局的next指向下一个的输入token</p>
+<p>定义个函数来检测匹配与否：</p>
+<ul>
+<li><p>对于给定的终止符：<strong>bool term(TOKEN tok){return *next++==tok;}</strong></p>
+</li>
+<li><p>S中的第n个production：<strong>bool Sn(){…}</strong></p>
+</li>
+<li><p>尝试所有的production：<strong>bool S(){…}</strong></p>
+</li>
+<li><p>对于production：E-&gt;T: <strong>bool E1(){return T();}</strong></p>
+</li>
+<li><p>对于production：E-&gt;T+E: <strong>bool E2(){return T()&amp;&amp;term(PLUS)&amp;&amp;E();}</strong></p>
+</li>
+<li><p>对于所有的productions of E(带回溯的情况): </p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">E</span><span class="params">()</span></span>&#123;</span><br><span class="line">    TOKEN* save = next;</span><br><span class="line">    <span class="keyword">return</span> (next=save, E1()) || (next, save, E2()) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>non-terminal T: </li>
+</ul>
+<p><strong>bool T1(){return term(INT);}</strong></p>
+<p><strong>bool T2(){return term(INT)&amp;&amp;term(TIMES)&amp;&amp;T();}</strong></p>
+<p><strong>bool T3(){return term(OPEN)&amp;&amp;E()&amp;&amp;term(CLOSE);}</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">T</span><span class="params">()</span></span>&#123;</span><br><span class="line">    TOKEN* save = next;</span><br><span class="line">    <span class="keyword">return</span> (next=save, T1()) || (next=save, T2()) || (next=save, T3());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如何开始parser:</p>
+<ul>
+<li>初始化next指针</li>
+<li>调用E()</li>
+</ul>
+<p>接下来就可以按照从上到下，从左到右进行parse，如果mismatch就进行回溯。</p>
+<h2 id="Left-Recursion"><a href="#Left-Recursion" class="headerlink" title="Left Recursion"></a>Left Recursion</h2><ul>
+<li>考虑这样的production：S-&gt;Sa</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">S1</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> S()&amp;&amp;term(a);&#125;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">S</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> S1();&#125;</span><br></pre></td></tr></table></figure>
+<p>在这种情况下，S()进入了无限递归；</p>
+<p>对于一个grammar，若存在P经过一次或者多次的递归，即推导出以P开头的式子，则称之为左递归。</p>
+<h3 id="elimination-of-left-recursion"><a href="#elimination-of-left-recursion" class="headerlink" title="elimination of left recursion"></a>elimination of left recursion</h3><p>考虑这样的grammar：<strong>A→Aa1｜Aa2……｜Aan｜b1｜b2……｜bm</strong></p>
+<p>可以改写成：</p>
+<p><strong>A→b1A’｜b2A’……｜bmA’</strong></p>
+<p><strong>A’ →a1A’｜a2A’……｜anA’｜ε</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/Introduction-to-parsing/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1538,451 +1918,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/18/linker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/18/linker/" itemprop="url">linker</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-18T12:35:50+08:00">
-                2018-03-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h1><p>链接可以在编译时，也可以是在加载时，更可以在链接时。由于链接器的出现，使得分离编译成为了可能，也就是每次只要修改某个模块的代码就可以重新链接应用，不用重新编译其它代码。</p>
-<h2 id="编译器驱动程序"><a href="#编译器驱动程序" class="headerlink" title="编译器驱动程序"></a>编译器驱动程序</h2><p>假如有两个源文件：main.c和sum.c</p>
-<p>那么要通过这两个源程序生成可执行文件，要经过这些步骤：预处理——编译——汇编——链接。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-dc69ba053b205af7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/357" alt="img"></p>
-<p>以main.c为例，预处理器会将main.c翻译成一个ascii码的中间文件mian.i。接着运行编译器，生成main.s的汇编语言文件。然后是运行汇编器，将汇编语言翻译成二进制的可重定位目标文件main.o。最后与经过同样步骤生成的sum.o进链接，生成可执行的目标文件。</p>
-<p>当shell要执行文件时，shell会调用一个loader的函数，将代码和数据复制到内存，然后将控制权移动到程序的开头。</p>
-<h2 id="静态链接"><a href="#静态链接" class="headerlink" title="静态链接"></a>静态链接</h2><p>Linux的linker以一组可重定位的目标文件和命令行参数，生成一个可执行文件，这就叫静态链接。</p>
-<p>链接器的两个功能：</p>
-<ul>
-<li>符号解析：每个符号对应于一个函数，一个全局变量或是一个静态变量；</li>
-<li>重定位：由于汇编器和编译器生成的代码都是从0地址开始的，链接器需要将原地址映射到真事的内存位置；</li>
-</ul>
-<h2 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h2><p>三种目标文件：</p>
-<ul>
-<li>可重定位目标文件：可与其它的可重定位目标文件进行链接，生成可执行的目标文件；</li>
-<li>可执行的目标文件：能直接复制进内存并执行；</li>
-<li>共享目标文件：特殊的可重定位目标文件，能够动态地进行链接；</li>
-</ul>
-<h2 id="可重定位目标文件"><a href="#可重定位目标文件" class="headerlink" title="可重定位目标文件"></a>可重定位目标文件</h2><p>首先来看这种类型的文件具体表示</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-f5ea954f51122c88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/276" alt="img"></p>
-<p>我们逐个section来看：</p>
-<ul>
-<li>.text：已经编译程序的机器代码；</li>
-<li>.rodata：只可以读的数据；</li>
-<li>.data：已经初始化的全局和静态变量；</li>
-<li>.bss：未初始化的全局和静态变量；</li>
-<li>.symtab：符号表，存放在程序中函数和全局变量的信息；</li>
-<li>.rel.text：一个.text节中位置的列表，当与其他文件合并时需要修改；</li>
-<li>.rel.data：被模块引用或者定义的所有全局变量的重定位信息；</li>
-<li>.debug：一个调试符号表；</li>
-<li>.line：源文件的行号与.text杰中机器指令之间的映射；</li>
-<li>.strtab：字符串表；</li>
-</ul>
-<h2 id="符号与符号表"><a href="#符号与符号表" class="headerlink" title="符号与符号表"></a>符号与符号表</h2><p>每个可重定位目标文件的模块都会有一个符号表，里面存着本模块定义或者从外部引用的符号，主要分为三类：</p>
-<ul>
-<li>由本模块定义并被其它模块引用的全局符号，对应于非静态的全局变量和C函数；</li>
-<li>由其它模块定义的并被模块引用的全局符号，对应于在其它模块定义的非静态的全局变量和C函数；</li>
-<li>只被本模块定义和引用的符号，对应于带static属性的的全局变量和C函数；</li>
-</ul>
-<p>通常情况，利用static属性可以隐藏变量和函数名字，保证只能被本模块使用；</p>
-<h2 id="符号解析"><a href="#符号解析" class="headerlink" title="符号解析"></a>符号解析</h2><p>链接器符号解析的方法就是将输入的引用与符号表中一个确定的符号定义关联起来。</p>
-<p>对于局部静态变量，会有一个本地链接器，确保它们有唯一的名字。</p>
-<p>至于全局符号会比较麻烦，有可能抛出错误，也可能通过某个规则选择某个定义。</p>
-<p>对于C++和Java的重载而言，编译器会将每个唯一的函数名和参数列表组合编码成对于链接器唯一的符号，这叫mangling。</p>
-<h3 id="如何解析多重定义的全局符号"><a href="#如何解析多重定义的全局符号" class="headerlink" title="如何解析多重定义的全局符号"></a>如何解析多重定义的全局符号</h3><p>我们先来区分两种类型的符号：强类型和弱类型。这是由编译器输出到链接器的，函数和已经初始化的全局变量是强符号，未初始化的全局变量是弱符号。</p>
-<p>如何处理多重定义的符号名：</p>
-<ul>
-<li>规则1：不允许有同名的强符号；</li>
-<li>规则2：如果有1个强符号和多个弱符号同名；</li>
-<li>规则3：如果有多个弱符号同名，那么可以从这些弱符号中任意选择一个；</li>
-</ul>
-<p>来看规则2：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*foo2.c*/</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">int</span> x = <span class="number">15213</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    f();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d\n"</span>, x);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*bar2.c*/</span></span><br><span class="line"><span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    x = <span class="number">15213</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">linux&gt; gcc -o foobar2 foo2.c bar2.c</span><br><span class="line">linux&gt; ./foobar2</span><br><span class="line"><span class="number">15213</span></span><br></pre></td></tr></table></figure>
-<p>再来看规则3</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*foo2.c*/</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    x = <span class="number">15213</span>;</span><br><span class="line">    f();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d\n"</span>, x);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*bar2.c*/</span></span><br><span class="line"><span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    x = <span class="number">15212</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">linux&gt; gcc -o foobar2 foo2.c bar2.c</span><br><span class="line">linux&gt; ./foobar2</span><br><span class="line"><span class="number">15213</span></span><br></pre></td></tr></table></figure>
-<h3 id="与静态库链接"><a href="#与静态库链接" class="headerlink" title="与静态库链接"></a>与静态库链接</h3><p>静态库：将所有相关的目标文件模块打包成一个单独的可执行文件，它可以作为链接器的输入。这种做法的好处就是只复制静态库里被应用程序引用的目标模块。</p>
-<p>例如：libm.a库中定义了一组浮点函数，sin, cos和sqrt；</p>
-<p>在Linux系统中，静态库以一种称为存档（archive）的特殊文件格式存放在磁盘中，是一组连接起来的可重定位目标文件的集合。以后缀.a标识。</p>
-<p>举个与静态库连接的例子：</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-a56677ede8a55219.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/603" alt="img"></p>
-<p>创建一个静态库的方法：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span> gcc -c addvec.c multvec.c</span><br><span class="line"><span class="meta">linux&gt;</span> ar rcs libvector.a addvec.o multvec.o</span><br><span class="line"></span><br><span class="line">创建可执行文件</span><br><span class="line"><span class="meta">linux&gt;</span> gcc -c main2.c</span><br><span class="line"><span class="meta">linux&gt;</span> gcc -static -o prog2c main2.o ./libvector.a</span><br></pre></td></tr></table></figure>
-<h3 id="如何使用静态库来解析引用"><a href="#如何使用静态库来解析引用" class="headerlink" title="如何使用静态库来解析引用"></a>如何使用静态库来解析引用</h3><p>在符号解析阶段，链接器从左到右按照它们在编译器驱动程序命令上的顺序来扫描可重定位目标文件和存档文件。shell会自动将.c文件翻译成.o文件。</p>
-<p>对于每个被存档文件的成员外部引用的符号s，在命令行中至少有一个s的定义是在对s的引用之后的。</p>
-<p>假如依赖关系如下：<strong>p.o-&gt;libx.a-&gt;liby.a且liby.a-&gt;libx.a-&gt;p.o</strong></p>
-<p>那么编译命令应该为：<strong>gcc p.c libx.a liby.a libx.a</strong></p>
-<h2 id="重定位"><a href="#重定位" class="headerlink" title="重定位"></a>重定位</h2><p>链接器进行符号解析之后，就要进行重定位了。重定位操作把输入模块进行合并，并且为每个符号分配运行时的地址。主要分为两步：</p>
-<ul>
-<li>重定位节和符号定义：把相同类型的节合并成一个节；</li>
-<li>重定位节中的符号引用：修改代码节和数据节中对每个符号的引用，使其指向正确的运行时地址；</li>
-</ul>
-<h3 id="重定位条目"><a href="#重定位条目" class="headerlink" title="重定位条目"></a>重定位条目</h3><p>由于汇编器有可能会遇到不知道数据和代码的内存位置的情况，因此会把信息存储在重定位条目，即代码的重定位条目在.rel.text中，数据的重定位条目在.rel.data中。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-7cd5047c4892996b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="img"></p>
-<p>ELF有基本的两种重定位类型：R_X86_64_PC32（相对地址），R_X86_64_32（绝对地址）</p>
-<h3 id="重定位符号引用"><a href="#重定位符号引用" class="headerlink" title="重定位符号引用"></a>重定位符号引用</h3><p>迭代地在每个节和每个节相关联的重定位条目执行重定位：</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-33f22824c94ff95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="img"></p>
-<h2 id="可执行目标文件"><a href="#可执行目标文件" class="headerlink" title="可执行目标文件"></a>可执行目标文件</h2><p>文件格式</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-f3a09952bf9326be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/450" alt="img"></p>
-<p>ELF头会描述文件的总体格式，还会有一个程序的入口点。.init节中有一个_init的函数来初始化代码。</p>
-<p>可执行的目标文件可以轻易加载到内存，并且文件的连续的chunk与内存段有着直接的映射。</p>
-<h2 id="加载可执行目标文件"><a href="#加载可执行目标文件" class="headerlink" title="加载可执行目标文件"></a>加载可执行目标文件</h2><p>运行命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span> ./prog</span><br></pre></td></tr></table></figure>
-<p>因为prog不是一个内置的命令，所以shell会调用loader去加载运行它，loader将可执行文件的代码和数据从磁盘复制到内存，然后跳转到程序的第一条指令或入口点来运行该程序。</p>
-<p>内存映像如下：</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-865dbae0f07c3f10.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/491" alt="img"></p>
-<h2 id="动态链接共享库"><a href="#动态链接共享库" class="headerlink" title="动态链接共享库"></a>动态链接共享库</h2><p>静态链接库的问题是，运行时调用的库函数会被复制到每个运行进程的文本段里面，这里带来的问题就是对内存造成了浪费。</p>
-<p>而共享库可以解决这个问题，共享库是一个目标模块，在运行时会加载到任意的内存地址，并和一个在内存的程序链接起来，这是由动态链接器完成的。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3010486-5b2b951f27e58469.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/442" alt="img"></p>
-<p>一个库只有一个.so文件，所有引用该库的可执行目标文件共享这个.so文件的代码和数据，而不是像静态文件那样复制嵌入到它们的可执行文件里面去。</p>
-<p>执行指令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span> gcc -shared -fpic -o libvector.so addvec.c multvec.c</span><br><span class="line"><span class="meta">linux&gt;</span> gcc -o prog21 main.c ./libvector.so</span><br></pre></td></tr></table></figure>
-<p>这里进行了两次链接，先是静态执行一些链接，复制一些重定位和符号表信息；然后是动态链接，但.so文件的代码和数据是不会被复制到可执行文件里的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/Unix网络编程——chap6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/17/Unix网络编程——chap6/" itemprop="url">Unix网络编程——chap6</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T11:34:46+08:00">
-                2018-03-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="I-O复用：select和poll函数"><a href="#I-O复用：select和poll函数" class="headerlink" title="I/O复用：select和poll函数"></a>I/O复用：select和poll函数</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>IO复用：一旦一个或者多个IO条件就绪了，内核就会通知进程</p>
-<p>应用场景：</p>
-<ul>
-<li>当客户处理多个描述符，例如交互输入和网络套接字</li>
-<li>一个客户处理多个套接字</li>
-<li>服务器既要处理监听套接字，又要处理已连接套接字</li>
-<li>服务器既要处理TCP，又要处理UDP</li>
-<li>服务器处理多个服务或者多个协议</li>
-</ul>
-<h2 id="I-O模型"><a href="#I-O模型" class="headerlink" title="I/O模型"></a>I/O模型</h2><p>阻塞型I/O；非阻塞型I/O；I/O复用；信号驱动式I/O；异步I/O</p>
-<p>套接字上的输入分为两步：首先是等待数据从网络中到达。到达后会先将数据复制到内核缓冲区，接着复制到应用进程缓冲区。</p>
-<h3 id="阻塞式I-O模型"><a href="#阻塞式I-O模型" class="headerlink" title="阻塞式I/O模型"></a>阻塞式I/O模型</h3><p><img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img"></p>
-<p>进程在调用recvfrom()之后，一直阻塞直到数据复制到应用进程缓冲区或者返回错误</p>
-<h3 id="非阻塞式I-O模型"><a href="#非阻塞式I-O模型" class="headerlink" title="非阻塞式I/O模型"></a>非阻塞式I/O模型</h3><p><img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img"></p>
-<p>应用进程持续的轮询，查看操作是否就绪。如果没有就绪就会返回一个错误。这种做法会耗费大量的CPU时间</p>
-<h3 id="I-O复用模型"><a href="#I-O复用模型" class="headerlink" title="I/O复用模型"></a>I/O复用模型</h3><p><img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img"></p>
-<p>对于这种模型，我们可以使用select或者poll来完成我们的需求。通过select这个系统调用（阻塞于此），让内核在IO就绪的情况下通知应用进程，然后应用进程再调用recvfrom。这里使用了两个系统调用，但好处是可以等待多个描述符就绪。</p>
-<h3 id="信号驱动式I-O"><a href="#信号驱动式I-O" class="headerlink" title="信号驱动式I/O"></a>信号驱动式I/O</h3><p><img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img"></p>
-<p>对于这种模型，首先是安装一个信号驱动函数，并马上返回。在内核发现描述符就绪后，通过信号通知应用进程。这样，在等待数据到达的期间进程不会被阻塞。</p>
-<h3 id="异步I-O"><a href="#异步I-O" class="headerlink" title="异步I/O"></a>异步I/O</h3><p><img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img"></p>
-<p>这种模型比之信号驱动式I/O更绝，它是内核完成IO操作之后才会通知应用进程</p>
-<p>前面四种模型都是同步I/O模型，因为进程都会因为IO请求而阻塞，知道IO操作完成</p>
-<h2 id="select函数"><a href="#select函数" class="headerlink" title="select函数"></a>select函数</h2><p>先来看函数原型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">select</span><span class="params">(<span class="keyword">int</span> maxfdpl, fd_set *readset, fd_set *writeset, fd_set *exceptest, <span class="keyword">const</span> struct timeval *timeout)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>对于最后一个函数，这是一个时间参数，控制的是在内核等待操作就绪需要花费多少时间：</p>
-<ul>
-<li>永远等待，直到有一个描述符就绪。设置为NULL</li>
-<li>等待一定的时间，在时间范围内直到有一个描述符就绪</li>
-<li>不等待，轮询，马上返回</li>
-</ul>
-<p>至于中间三个参数：readset，writeset，exceptest。控制的是内核需要测试哪些描述符的读写，异常操作。</p>
-<p>注意的是，fd_set是一个描述符集，通常是一个整数数组。每个元素是32位，每一个位对应的是一个描述符，其中第一个元素对应的是描述符0-31，第二个元素对应的是32-63。例如，3对应的就是描述符123。通过某些宏定义的操作可以设置需要检查的描述符。</p>
-<p>另外就是，由于这里传入的指针会被修改，也就是作为值——结果返回。通过调用select之后检查指针的值就知道哪些bit修改了，也就是描述符的操作就绪了。也因此，每次调用select都要重新设置。</p>
-<p>第一个参数就是待测试的最大描述符+1，也就是测试的描述符个数。</p>
-<h3 id="描述符就绪条件"><a href="#描述符就绪条件" class="headerlink" title="描述符就绪条件"></a>描述符就绪条件</h3><table>
-<thead>
-<tr>
-<th>Condition</th>
-<th style="text-align:center">Readable?</th>
-<th style="text-align:right">Writable?</th>
-<th style="text-align:right">Exception</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Data to read</td>
-<td style="text-align:center">x</td>
-<td style="text-align:right"></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td>Read half of the connection closed</td>
-<td style="text-align:center">x</td>
-<td style="text-align:right"></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td>New connection ready for listening socket</td>
-<td style="text-align:center">x</td>
-<td style="text-align:right"></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td>Space available for writing</td>
-<td style="text-align:center"></td>
-<td style="text-align:right">x</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td>Write half of the connection closed</td>
-<td style="text-align:center"></td>
-<td style="text-align:right">x</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td>Pending error</td>
-<td style="text-align:center">x</td>
-<td style="text-align:right">x</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td>TCP out-of-band data</td>
-<td style="text-align:center"></td>
-<td style="text-align:right"></td>
-<td style="text-align:right">x</td>
-</tr>
-</tbody>
-</table>
-<h2 id="shutdown函数"><a href="#shutdown函数" class="headerlink" title="shutdown函数"></a>shutdown函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">shutdown</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">int</span> howto)</span></span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>与close函数相比，shutdown函数不需理会引用计数是否为0，它可以直接激发TCP的正常连接终止；</li>
-<li>另外，close终止的是读与写两个方向的数据传送，而shutdown函数则是告诉对端我们已经完成了数据传送，即使对端仍有数据发送。</li>
-</ul>
-<p>也就是shutdown函数的调用会关闭一半的TCP连接。</p>
-<h2 id="poll函数"><a href="#poll函数" class="headerlink" title="poll函数"></a>poll函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">poll</span><span class="params">(struct pollfd *fdarray, <span class="keyword">unsigned</span> <span class="keyword">long</span> nfds, <span class="keyword">int</span> timeout)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>poll函数与select类似，但它能提供额外的信息，而且用的不是值——结果参数。</p>
-<p>注意第一个参数，fdarray是这样的一个结果体指针：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">short</span> events;</span><br><span class="line">    <span class="keyword">short</span> revents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>需要测试的条件由events指定，函数会在revents成员中返回描述符的测试结果。具体表现如下图：</p>
-<p><img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img"></p>
-<p>从这个表可以看到，我们可以测试读写和异常三种操作，另外还能识别三类数据：普通数据，优先级带，高优先级带。至于怎么区分这些数据的类型，就有些争议了，这里就不写了。</p>
-<p>timeout参数跟select的类似，也是指定poll函数返回前等待多长时间。</p>
-<ul>
-<li>INFTIM：永远等待</li>
-<li>0：立即返回，不阻塞进程</li>
-<li><blockquote>
-<p>0：等待指定的时间</p>
-</blockquote>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2026,7 +1966,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">260</span>
+                <span class="site-state-item-count">262</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2112,7 +2052,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

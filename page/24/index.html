@@ -265,6 +265,281 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/Effective-cpp-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/24/Effective-cpp-6/" itemprop="url">Effective_cpp-#6</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T23:42:22+08:00">
+                2017-11-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Explicitly-disallow-the-use-of-complier-generated-functions-you-do-not-want"><a href="#Explicitly-disallow-the-use-of-complier-generated-functions-you-do-not-want" class="headerlink" title="Explicitly disallow the use of complier-generated functions you do not want"></a>Explicitly disallow the use of complier-generated functions you do not want</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>在某些时候，我们不希望某个对象能被拷贝或者赋值，因此我们需要某些方法来阻止对象被拷贝或复制。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
+<li>将成员函数定义为private，并且不去具体实现它们；这样可以避免friend函数和member函数取调用它们；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myClass</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	...</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	...</span><br><span class="line">  	myClass(<span class="keyword">const</span> myClass&amp;);</span><br><span class="line">  	myClass&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> myClass&amp;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此时如果client试图拷贝类对象，编译器会报错；而当friend函数和member函数试图去调用，链接器则会报错；</p>
+</blockquote>
+<ul>
+<li>另一种方法则是定义一个uncopyable的基类，让那些不希望被拷贝的类继承该基类</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">unCopyable</span>&#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	unCopyable();</span><br><span class="line">  	~unCopyable();<span class="comment">//允许派生对象去构造和析构</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	...</span><br><span class="line">  	unCopyable(<span class="keyword">const</span> unCopyable&amp;);</span><br><span class="line">  	unCopyable&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> unCopyable&amp;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myClass</span> :</span> <span class="keyword">private</span> unCopyable&#123;</span><br><span class="line">  ... <span class="comment">//不再声明copy构造函数和copy赋值函数</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这种操作可以使得任何调用（包括member函数和friend函数）尝试去拷贝的都会被编译器驳回，因为这种函数的“编译器生成版本”在尝试调用其基类的对应生成时发现基类的拷贝构造和拷贝赋值都是private的</p>
+</blockquote>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>为驳回编译自动生成的函数，可以将相应的成员函数声明为private并且不予实现；或者继承一个如上的unCopyable的基类；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/Builder-DesignPattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/22/Builder-DesignPattern/" itemprop="url">Builder(DesignPattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-22T23:49:26+08:00">
+                2017-11-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Builder"><a href="#Builder" class="headerlink" title="Builder"></a>Builder</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>构造一个复杂的对象，并且构造与表示分开，同一个构建方式能达到不同的表示</p>
+<h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>假设有一个富文本的编辑器，你需要将RTF转换为多种不同的正文格式（比如普通的ASCII文本或者能进行交互的窗口），倘若需要转换很多种文本格式，那么我们就需要快速实现新的转换方式。因此我们可以构建一个文本转换器，在读入不同的标记时进行不同的转换。</p>
+<h2 id="使用范围"><a href="#使用范围" class="headerlink" title="使用范围"></a>使用范围</h2><ul>
+<li>构建对象的算法与对象的组成部分无关；</li>
+<li>构造的对象要有不同表示，即可能由不同的组件组成；</li>
+<li>角色：<ul>
+<li>builder：创建一个product的各个组件时，提供接口；</li>
+<li>concretebuilder：具体实现builder的接口并提供返回产品的接口；</li>
+<li>director：蓝图，指导builder如何构造产品；</li>
+<li>product：被构造的对象；</li>
+</ul>
+</li>
+</ul>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><ul>
+<li>可以根据蓝图（director）随机修改产品的<strong>内部表示</strong>；</li>
+<li>director可以<strong>复用</strong>builder封装的接口去生成product；</li>
+<li>精装控制product的构造，这也是与abstract factor不同的地方，后者着重在生成一系列统一风格的product，前者可以一步一步地控制product的生成；</li>
+</ul>
+<h2 id="代码示范"><a href="#代码示范" class="headerlink" title="代码示范"></a>代码示范</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Builder.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Product() &#123; <span class="built_in">cout</span> &lt;&lt; <span class="string">"A product..."</span> &lt;&lt; <span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Builder</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Builder() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildA</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildB</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildC</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">buildPro</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">GetProduct</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="literal">NULL</span>; &#125;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">concreteBuilder</span> :</span> <span class="keyword">public</span> Builder&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	concreteBuilder() &#123; product = <span class="number">0</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">buildPro</span><span class="params">()</span> </span>&#123; product = <span class="keyword">new</span> Product; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildA</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"build a"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildB</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"build b"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">BuildC</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"build c"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">GetProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> product;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Product* product;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Director</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">create</span><span class="params">(Builder&amp; builder)</span> </span>&#123;</span><br><span class="line">		builder.buildPro();</span><br><span class="line">		builder.BuildA();</span><br><span class="line">		builder.BuildA();</span><br><span class="line">		builder.BuildB();</span><br><span class="line">		builder.BuildC();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> builder.GetProduct();</span><br><span class="line">	&#125;</span><br><span class="line">	Director()&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Director director;</span><br><span class="line">	concreteBuilder concretebuilder;</span><br><span class="line">	director.create(concretebuilder);</span><br><span class="line">	Product* pro = concretebuilder.GetProduct();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">delete</span> pro;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/Effective-cpp-5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1371,292 +1646,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/虚函数的学习-2-——CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/15/虚函数的学习-2-——CPP/" itemprop="url">虚函数的学习(2)——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T13:19:02+08:00">
-                2017-11-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="关于虚函数的学习二"><a href="#关于虚函数的学习二" class="headerlink" title="关于虚函数的学习二"></a>关于虚函数的学习二</h1><h2 id="纯虚函数"><a href="#纯虚函数" class="headerlink" title="纯虚函数"></a>纯虚函数</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>纯虚函数是在基类中声明的基函数，它没有定义，并且要求任何派生类都必须实现自己的定义方法，否则该派生类不能实例化。</p>
-<p>使用方法是在函数原型后面加<strong>“=0”</strong></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func</span><span class="params">()</span></span>=<span class="number">0</span>;</span><br></pre></td></tr></table></figure>
-<h3 id="引入原因"><a href="#引入原因" class="headerlink" title="引入原因"></a>引入原因</h3><ul>
-<li>为了多态性，我们需要在基类中实现虚函数；</li>
-<li>某些情况下，基类不应该生成对象。例如，一个动物的基类可以派生出兔子、老虎等类，但动物基类不应该实例化。</li>
-</ul>
-<h2 id="抽象类"><a href="#抽象类" class="headerlink" title="抽象类"></a>抽象类</h2><ul>
-<li>带有纯虚函数的类为抽象类；</li>
-<li>抽象类的作用是为派生类提供一个公共的根，要求派生类实现抽象类描述的操作操作。</li>
-<li>如果派生类没有自定义抽象类中的虚函数，则该派生类仍然是一个抽象类。</li>
-</ul>
-<h2 id="虚析构函数"><a href="#虚析构函数" class="headerlink" title="虚析构函数"></a>虚析构函数</h2><h3 id="引入原因-1"><a href="#引入原因-1" class="headerlink" title="引入原因"></a>引入原因</h3><p>当我们去delete一个动态分配的对象指针的时候将执行析构函数，该指针有可能指向继承体系中的某一个对象，出现指针的静态类型和所指对象的动态类型不符合的情况。因此，为了让编译器清楚执行哪个版本的析构函数，我们需要在基类中将析构函数定义为虚函数。</p>
-<blockquote>
-<p>如果基类的析构函数不是虚函数，那么delete一个指向派生类对象的基类指针将会产生未定义行为。</p>
-</blockquote>
-<h2 id="构造函数中调用虚函数"><a href="#构造函数中调用虚函数" class="headerlink" title="构造函数中调用虚函数"></a>构造函数中调用虚函数</h2><p><strong>先说结论，尽量不要这样使用</strong></p>
-<p>因为在构造函数中调用虚函数，会使得虚函数的机制失效。在构造函数中调用虚函数，由于构造顺序是先构造父类再构造子类，如果构造父类的时候调用了虚函数，这时查询的将是父类的虚函数表地址。然后再构造子类，此时查询的将是子类的虚函数表地址。</p>
-<p>这是为了避免出现bug。因为如果构造父类时查询的是子类的虚函数表地址，而子类的虚函数又用到了子类自定义的数据成员，此时该数据成员还没完成初始化，这样做就会出现错误。</p>
-<h2 id="析构函数中调用虚函数"><a href="#析构函数中调用虚函数" class="headerlink" title="析构函数中调用虚函数"></a>析构函数中调用虚函数</h2><p>与上原因，同理。但析构函数的析构顺序与构造函数的构造顺序相反。当基类的析构函数执行时，派生类的析构函数已经执行完成，派生类的数据成员已经失效，如果基类还要调用派生类的虚函数，则可能会出错。</p>
-<h2 id="析构函数抛出异常"><a href="#析构函数抛出异常" class="headerlink" title="析构函数抛出异常"></a>析构函数抛出异常</h2><p>总结;</p>
-<ul>
-<li>析构函数尽量不要抛出异常；</li>
-<li>如果真的要抛，则在析构函数里面解决，但这种方法不好，因为不能及时地知道异常出现在什么地方；</li>
-</ul>
-<p>因为类对象分配的资源由对象的析构函数执行，如果在释放资源之前，异常发生，那么分配的资源将无法被释放。所以我们必须要在类中控制资源的释放。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/多态与虚函数——CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/15/多态与虚函数——CPP/" itemprop="url">多态与虚函数——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T00:39:45+08:00">
-                2017-11-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="多态性与虚函数"><a href="#多态性与虚函数" class="headerlink" title="多态性与虚函数"></a>多态性与虚函数</h1><h2 id="多态性"><a href="#多态性" class="headerlink" title="多态性"></a>多态性</h2><blockquote>
-<p>多态意义就是使得接口重用，不管传过来哪一个类的对象，我们都可以通过同一个接口去找到相对应的调用方法；</p>
-</blockquote>
-<p>OOP的核心思想之一。当我们使用基类的引用或者指针去调用基类中定义的一个函数时，我们并不知道该函数真正的作用对象是基类的对象还是子类的对象。引用或指针的静态类型和动态类型不一致正是支持这一特性的根本原因。如果该类是一个虚函数，那么直到运行时才能完全确定执行那个版本，依据则是指针或者引用绑定了哪个版本的对象。</p>
-<h2 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h2><h3 id="通常用法"><a href="#通常用法" class="headerlink" title="通常用法"></a>通常用法</h3><blockquote>
-<p>声明基类的指针，利用该指针去指向任意一个子类对象，调用相应的虚函数，这样可以根据子类的不同而调用不同的方法；</p>
-</blockquote>
-<h3 id="派生类中的虚函数"><a href="#派生类中的虚函数" class="headerlink" title="派生类中的虚函数"></a>派生类中的虚函数</h3><ul>
-<li>如果在派生类中覆盖了某个虚函数，可以再一次用virtual关键字进行声明，也可以不用，因为默认如果基类的某个函数是虚函数，则所有派生类中它都是虚函数。</li>
-<li>派生类覆盖的虚函数的参数列表类型必须与基类中的函数形参类型严格匹配；</li>
-</ul>
-<h3 id="虚函数表"><a href="#虚函数表" class="headerlink" title="虚函数表"></a>虚函数表</h3><p>虚函数本质上是通过一张虚函数表实现的，每当程序声明了一个虚函数时，就会为这个<strong>类</strong>构造一张表。V表是由虚函数的地址组成的。</p>
-<p>每当有虚函数被调用时，V表就会被用来解析函数地址。包含虚函数的类的对象实例都会包含一个虚拟指针，这个指针会在对象地址的最开始处，称为vptr，通过这个vprt就可以找到V表的内存地址。而V表又包含一个或多个虚函数的基地址。</p>
-<p>这就可以完成虚函数调用期间的动态绑定：在运行时，首先是基类的指针被赋予派生类对象的地址，这样就可以找到所属类的虚函数表的地址，通过虚函数的名字在虚函数表中找到对应的虚函数地址，然后进行调用。</p>
-<blockquote>
-<p>注意：虚函数表是针对类的，同一个类的多个对象都指向同一个虚函数表；</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/23/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><span class="page-number current">24</span><a class="page-number" href="/page/25/">25</a><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/25/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/23/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><span class="page-number current">24</span><a class="page-number" href="/page/25/">25</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/25/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1700,7 +1694,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">260</span>
+                <span class="site-state-item-count">262</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1786,7 +1780,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

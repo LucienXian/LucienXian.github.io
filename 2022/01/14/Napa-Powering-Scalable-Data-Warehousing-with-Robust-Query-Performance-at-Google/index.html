@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="数据库,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="Napa: Powering Scalable Data Warehousing with Robust !ery Performance at Google Google产生的大量应用数据，需要有一个可扩展性强、响应时间短、可用性高和强一致性的存储提供服务。Napa就是Google用来满足这些要求的系统，其核心的数据就是使用一致的物化视图。  INTRODUCTIONNapa其实是用来替代Goo">
+<meta name="keywords" content="数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google">
+<meta property="og:url" content="http://yoursite.com/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Napa: Powering Scalable Data Warehousing with Robust !ery Performance at Google Google产生的大量应用数据，需要有一个可扩展性强、响应时间短、可用性高和强一致性的存储提供服务。Napa就是Google用来满足这些要求的系统，其核心的数据就是使用一致的物化视图。  INTRODUCTIONNapa其实是用来替代Goo">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcad.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcb1.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcbb.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcc5.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcd1.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61e199e72ab3f51d91a9e423.png">
+<meta property="og:updated_time" content="2022-01-14T15:46:33.576Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google">
+<meta name="twitter:description" content="Napa: Powering Scalable Data Warehousing with Robust !ery Performance at Google Google产生的大量应用数据，需要有一个可扩展性强、响应时间短、可用性高和强一致性的存储提供服务。Napa就是Google用来满足这些要求的系统，其核心的数据就是使用一致的物化视图。  INTRODUCTIONNapa其实是用来替代Goo">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcad.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/">
+
+
+
+
+
+  <title>Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-14T23:43:55+08:00">
+                2022-01-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Napa-Powering-Scalable-Data-Warehousing-with-Robust-ery-Performance-at-Google"><a href="#Napa-Powering-Scalable-Data-Warehousing-with-Robust-ery-Performance-at-Google" class="headerlink" title="Napa: Powering Scalable Data Warehousing with Robust !ery Performance at Google"></a>Napa: Powering Scalable Data Warehousing with Robust !ery Performance at Google</h1><blockquote>
+<p>Google产生的大量应用数据，需要有一个可扩展性强、响应时间短、可用性高和强一致性的存储提供服务。Napa就是Google用来满足这些要求的系统，其核心的数据就是使用一致的物化视图。</p>
+</blockquote>
+<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>Napa其实是用来替代Google另一款OLAP产品Mesa的，并且从Mesa迁移了PB级的历史数据，与Mesa相比，Napa的设计需求更为广泛：一是更稳定的查询性能，期望毫秒级的低查询延迟和无论集群负载如何延迟相对稳定；二是更灵活，支持用户根据需求在查询性能、数据新鲜度等方面进行取舍；三是数据写入高吞吐，在海量更新负载下，Napa实现了一个LSM范式的分布式表和视图维护框架。</p>
+<h2 id="NAPA’S-DESIGN-CONSTRAINTS"><a href="#NAPA’S-DESIGN-CONSTRAINTS" class="headerlink" title="NAPA’S DESIGN CONSTRAINTS"></a>NAPA’S DESIGN CONSTRAINTS</h2><p>这一章主要是将Napa的设计过程中考虑了哪些关键目标，最理想的情况当然是以尽可能低的成本实现最高的查询性能和最高的数据新鲜度。数据新鲜度是通过将数据添加到表的时间点到可用于查询的时间点之间的维度来衡量的，而成本则主要是数据处理和存储所需要的机器资源成本。</p>
+<h3 id="Clients-Need-Flexibility"><a href="#Clients-Need-Flexibility" class="headerlink" title="Clients Need Flexibility"></a>Clients Need Flexibility</h3><p>这一个前面也说了，Napa需要支持client在下面三个因素（数据新鲜度、资源成本和查询性能）之间进行权衡选择。</p>
+<p><img src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcad.png" alt></p>
+<p>一个重要的考虑点在于数据写入和当前存储是否耦合，如果将新的数据和当前存储结合起来，这意味着数据的写入只有只有在应用到表及其所有视图后才会提交，这是Mesa的设计，但有一个比较大的缺点，即额外添加视图会导致数据写入变慢，这种设计虽然提高了查询速度，但牺牲了一定的数据新鲜度。另一种就是视图的生成可以作为查询的一部分选择性地完成，维护视图的异步模型会在一定程度上影响表及视图之间的一致性。</p>
+<p>因此Napa需要提供一个灵活的client，以便随时调整系统对于这些目标的需求。</p>
+<h2 id="DESIGN-CHOICES-MADE-BY-NAPA"><a href="#DESIGN-CHOICES-MADE-BY-NAPA" class="headerlink" title="DESIGN CHOICES MADE BY NAPA"></a>DESIGN CHOICES MADE BY NAPA</h2><p>Napa中的一个关键设计选择是依靠物化视图来实现更高的查询性能。Napa的主要架构由下图三个组件组成：</p>
+<p><img src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcb1.png" alt></p>
+<ul>
+<li>Ingestion framework：负责将更新数据提交到表中，这些更新在Napa称为deltas。</li>
+<li>Storage framework：将更新应用于表及其视图，Napa以LSM的结构维护deltas，每个表都以一个deltas的集合方式表示。Delta不断合并以形成更大的Delta，即Compaction。视图维护层通过应用相应的SQL转换将表Delta转换为视图Delta，存储层还负责定期压缩表和视图。</li>
+<li>Query serving：负责应对客户端的查询，系统在查询时执行表（或视图）的必要Delta合并。存储子系统处理更新的速度越快，查询时需要合并的增量就越少。</li>
+</ul>
+<p>Napa将数据写入、视图维护与查询处理进行解耦，允许client根据自己的需要在数据新鲜度、性能和成本之间进行权衡。</p>
+<h3 id="Providing-Flexibility-to-Clients"><a href="#Providing-Flexibility-to-Clients" class="headerlink" title="Providing Flexibility to Clients"></a>Providing Flexibility to Clients</h3><p>Napa会将client在数据新鲜度、查询性能和成本方面的要求转换为对应的数据库配置、比如视图数量、写入任务的quota限制、查询期间的最大打开delta数量等等，这是一个动态但易于理解的数据库状态指示器。</p>
+<p>为此Napa引入了称为可查询时间戳 (QT) 的概念。QT是数据新鲜度的直接指标，因为[Now() - QT]表示数据延迟，客户端可以查询到 QT 时间戳之前的所有数据。下文就介绍了三类Napa client以及系统如何使用QT来调整Napa。</p>
+<ul>
+<li>Tradeoff freshness：牺牲数据新鲜度即意味着Napa的QT推进会取决于查询执行时保持适度数量的视图和更少的deltas来合并。同时为了保持低资源成本，Napa的执行框架会使用更少的worker和资源进行视图维护。</li>
+<li>Tradeoff query performance：牺牲查询性能即意味着Napa的QT推进会取决于更少的视图，但在查询执行时需要合并的Deltas可能相对较多。由于每个表和视图的Deltas较多，查询性能较低。简单来说就是将视图维护和压缩的成本转移到查询；</li>
+<li>Tradeoff costs：以更高的成本提供良好的查询性能和数据新鲜度。Napa的QT推进取决于多个视图，并且合并时的Deltas数量非常少，从而确保更短的查询执行时间。并且花费更多的资源来增加worker来满足要求。</li>
+</ul>
+<h3 id="Data-Availability"><a href="#Data-Availability" class="headerlink" title="Data Availability"></a>Data Availability</h3><p>关于数据可用性，Napa的做法是将数据和元数据操作解耦，在数据中心的每个副本上异步执行数据操作，并定期在Spanner使用元数据操作以确保副本彼此保持同步，确保副本之间的一致性，将同步和异步的模式进行组合。</p>
+<h2 id="SYSTEM-ARCHITECTURE"><a href="#SYSTEM-ARCHITECTURE" class="headerlink" title="SYSTEM ARCHITECTURE"></a>SYSTEM ARCHITECTURE</h2><p>如下图，Napa的架构由数据平面和控制平面组成，数据平面则是由上述的数据写入、存储和查询服务组成的。控制平面则负责协调各个子系统之间的工作，多个数据中心同步和元数据事务。</p>
+<p><img src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcbb.png" alt></p>
+<p>Napa大量依赖了Google现有的基础设施，比如Napa的表数据就是存储在Colossus文件系统上、Spanner负责元数据管理和系统状态存储、F1 Query则用来做查询服务和大规模的数据处理。</p>
+<p>Napa客户端使用ETL管道将数据写入表中，数据摄取框架可以承受高达数十GB/s压缩数据的负载。同时，Napa的存储组件通过压缩表和视图的delta，创建更大的delta，从而减少在线查询期间的合并操作。查询服务则在运行时进行必须要缓存、预取和合并Delta的操作，提供低延迟和稳定的查询，前者是通过查询定向到预先计算的物化视图实现的，后者则是通过控制compaction和一些系列IO优化技术来减少长尾。</p>
+<p>Napa依赖视图作为获得良好查询性能的主要机制，包含物化视图的Napa表按其主键进行排序、索引和Range分区。与现有数据库更多倾向于使用Scan的查询处理不同，Napa考虑到负载和查询性能等要求，最终选择了按索引key查找，当然这可能会带来热点和负载均衡等问题，但论文中并没有详细讲述如何应对的。</p>
+<p>Napa的控制平面则调度compaction和视图的更新任务，以控制表的deltas保持在一个配置值。如前所述，QT构成了数据新鲜度的基础，查询系统使用它来提供稳定的查询性能。如果数据相对落后了（写入慢了），Napa会通过牺牲查询性能来将写入速度拉回到一个合理的配置值。</p>
+<h2 id="INGESTING-TRILLIONS-OF-ROWS"><a href="#INGESTING-TRILLIONS-OF-ROWS" class="headerlink" title="INGESTING TRILLIONS OF ROWS"></a>INGESTING TRILLIONS OF ROWS</h2><p>数据写入框架的目标是允许写入管道在没有显着开销的情况下将大量数据写到Napa中。该子系统的目标是接受数据、执行最少的处理并使其持久化，而不考虑后续视图维护的速度。如下图所示，所有写入的行都会被分配一个元数据时间戳用于排序，然后在满足其他持久性条件（例如复制）后标记为已提交。其次，该子系统允许通过配置增加或减少批处理、聚合复制等worker数量的方式来控制机器成本。</p>
+<p><img src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcc5.png" alt></p>
+<p>客户端将要写入的数据发送到所有的Napa副本，该框架会产生写入优化的delta，但不能立即用于查询。这些就是unqueryable delta，需要在可查询前将它们进行压缩。</p>
+<h2 id="QUERYABLE-TIMESTAMP"><a href="#QUERYABLE-TIMESTAMP" class="headerlink" title="QUERYABLE TIMESTAMP"></a>QUERYABLE TIMESTAMP</h2><p>表的可查询时间戳（QT）是一个时间戳，它表示可以查询的数据的新鲜度。假设QT(table) = X，则client可以查询到时间 X之前的所有数据，并且时间X之后摄入的数据属于不可查询数据的一部分，即一个表的新鲜度是[Now() - QT]。一旦在(Y-X)时间范围内写入的数据经过优化后满足了查询性能要求，QT的值将从X变成Y。因此client可以使用Napa的配置选项和这个指标来调整新鲜度、查询性能和成本。如果client想要高查询性能和低成本，但可以牺牲数据新鲜度，则系统优先使用较少的机器资源进行视图维护以降低成本，QT的推进则变得缓慢。</p>
+<p>确保更高查询性能的一个重要方法是优化读取的基础数据并确保视图可用以加快查询速度。Napa中的表是其所有delta files的集合，每个delta对应于在一个时间窗口内为该表接收的更新，如下图所示，不可查询的delta对应于最近写入的数据。每个delta都按key排序、范围分区，并具有类似本地B树的索引，在查询时合并需要读取的delta。</p>
+<p><img src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcd1.png" alt></p>
+<p>一般client查询都会有严格的延迟限制，通常会在查询期间对打开和合并读的最多delta做限制，通常会限制不超过数十个delta，并且会根据对数据的查询性能做自动设置。通过保持给定数据库的增量数量接近恒定，Napa能够提供强大且稳定的查询性能。</p>
+<p>QT本质上会依赖于后台操作如compaction和视图维护的进度。数据库的QT是数据库中所有表的QT的最小值。 另外，QT还用于为client提供跨所有Napa副本的一致数据视图。每个副本都有一个局部QT，它基于本地副本中数据的新鲜程度的得出的。 QT的全局值则是根据查询服务可用性要求从本地QT值计算出来的，实际就是一个基于Quorum机制的选择。</p>
+<h2 id="MAINTAINING-VIEWS-AT-SCALE"><a href="#MAINTAINING-VIEWS-AT-SCALE" class="headerlink" title="MAINTAINING VIEWS AT SCALE"></a>MAINTAINING VIEWS AT SCALE</h2><p>Napa的存储子系统负责维护视图和delta的compaction，其目标是能有效地管理数千个表和视图，并且数据量通常是PB级的。但视图维护遇到的一个困难是，基表的更新转换为视图更新的过程中，由于key空间的映射带来的数据倾斜问题。另外就是由于数据库的QT往往会受到长尾视图的影响，因此Napa利用了下面的技术来解决视图维护的问题：</p>
+<ul>
+<li>Use of F1 Query as a “data pump”：使用Google的F1 Query作为data pump来压缩表和维护视图，视图维护使用查询优化器，它可以在备选计划中做出很好的选择。</li>
+<li>Replanning to avoid data skews：如果检测到数据倾斜，系统可以即时做新的维护计划，提高视图的维护速度。</li>
+<li>Intelligence in the loop：需要具备能力，根据历史负载选择数据中心执行任务，根据进度主动终止任务，并发任务执行以限制长尾。</li>
+</ul>
+<h3 id="Query-optimizations-challenges-in-View-Maintenance"><a href="#Query-optimizations-challenges-in-View-Maintenance" class="headerlink" title="Query optimizations challenges in View Maintenance"></a>Query optimizations challenges in View Maintenance</h3><p>Napa的视图维护过程有效地利用了输入中的数据属性，由于处理的数据量和特定数据属性使大规模查询处理变得更复杂，视图更新必须解决独特的优化挑战。数据属性的一个例子就是要更新的视图相对于基表的排序顺序。如果基于视图排序顺序对视图key重新排序，这可能会是一个非常昂贵的方案，而尽可能维护输入顺序反而是低成本。因此如下图所示，根据维护它们的成本，存在三类视图：</p>
+<p><img src="https://pic.imgdb.cn/item/61e199e72ab3f51d91a9e423.png" alt></p>
+<ul>
+<li>与基表共享前缀的视图：例如基表具有键(A, B, C)，而视图位于(A, B)上，框架只需要对公共key前缀（A、B）对输入进行聚类则可以完全避免重新排序；</li>
+<li>仅有部分公共前缀的视图：例如基表具有key(A, B, C, D)，而视图位于(A, B, D)。即使在这种情况下，我们也可以通过在(A,B)上对输入基表进行聚类，然后在D上对每个唯一的(A,B)组进行排序来部分利用输入顺序；</li>
+<li>不共享任意前缀的视图：这一类的优化机会就很少了；</li>
+</ul>
+<h3 id="Mechanics-of-Compaction"><a href="#Mechanics-of-Compaction" class="headerlink" title="Mechanics of Compaction"></a>Mechanics of Compaction</h3><p>压缩将多个输入delta组合成一个输出delta，异步压缩能有效减少查询时的合并负载，但对于高频写入的表来说，压缩是非常高的代价，会使得数据新鲜度变低。由于delta files是单独排序的，因此压缩本质上是归并排序。合并过程会在各种输入之间分配固定的内存预算，因此输入越多，每个输入流的内存越小，并且当其中一个输入被消耗完时，归并过程将停止。因此大型的归并会使得发送归并终止的可能性越高。</p>
+<h2 id="ROBUST-QUERY-SERVING-PERFORMANCE"><a href="#ROBUST-QUERY-SERVING-PERFORMANCE" class="headerlink" title="ROBUST QUERY SERVING PERFORMANCE"></a>ROBUST QUERY SERVING PERFORMANCE</h2><p>维护较低的查询性能是业务使用的关键，本节主要讲Napa如果使用QT、视图等一系列技术实现强大的查询性能。</p>
+<p>这里主要讲了几点：</p>
+<ol>
+<li>尽量使用视图来响应查询，filter和聚合下推，尽可能减少读取的数据量。并且依赖并发加快查询。</li>
+<li>通过分布式的cache层和数据预取来进一步减少IO。</li>
+<li>并行化的IO调用往往会受到长尾延迟的影响，为了对抗这种延迟，Napa会尽可能合并小IO，并基于下面两种技术去实现：Lazy merging across deltas，当有N个子查询和M个delta时，尽可能避免delta server中的交叉delta合并，每个server只处理一个delta，将NxM的并行IO组合减少到N个冰箱IO；Size-based disk layout，根据delta大小选择不同的磁盘文件布局，PAX适用于小delta，将所有列访问组合到一个IO，大delta则使用按列layout，提高扫描查询的IO效率。</li>
+<li>由于Napa建立在多种Google基础设施上，对于这种复杂且相互依赖的系统所有可变性来源，无法完全消除长尾延迟。Napa的做法是采用对冲机制，则记录延迟的状态，尽可能在状态不稳定时将请求发送到不同的服务器/数据中心，以容忍一定的长尾延迟。</li>
+</ol>
+<h2 id="CONCLUSION"><a href="#CONCLUSION" class="headerlink" title="CONCLUSION"></a>CONCLUSION</h2><p>Napa是Google新一代的OLAP系统，具备高可用性，并且与其他数据库依赖列存储、并行、压缩等方式不同，其强依赖物化视图提供了更好的查询能力，同时允许client自行在数据新鲜度、查询延迟和成本之间进行权衡选择，总体而言是一篇非常具备启发性的OLAP论文。</p>
+<p>### </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/12/05/Greenplum：A-Hybrid-Database-for-Transactional-and-Analytical-Workloads/" rel="next" title="Greenplum：A Hybrid Database for Transactional and Analytical Workloads">
+                <i class="fa fa-chevron-left"></i> Greenplum：A Hybrid Database for Transactional and Analytical Workloads
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/01/14/Mesa-Geo-Replicated-Near-Real-Time-Scalable-Data-Warehousing/" rel="prev" title="Mesa: Geo-Replicated, Near Real-Time, Scalable Data Warehousing">
+                Mesa: Geo-Replicated, Near Real-Time, Scalable Data Warehousing <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">262</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Napa-Powering-Scalable-Data-Warehousing-with-Robust-ery-Performance-at-Google"><span class="nav-number">1.</span> <span class="nav-text">Napa: Powering Scalable Data Warehousing with Robust !ery Performance at Google</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">1.1.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAPA’S-DESIGN-CONSTRAINTS"><span class="nav-number">1.2.</span> <span class="nav-text">NAPA’S DESIGN CONSTRAINTS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Clients-Need-Flexibility"><span class="nav-number">1.2.1.</span> <span class="nav-text">Clients Need Flexibility</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DESIGN-CHOICES-MADE-BY-NAPA"><span class="nav-number">1.3.</span> <span class="nav-text">DESIGN CHOICES MADE BY NAPA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Providing-Flexibility-to-Clients"><span class="nav-number">1.3.1.</span> <span class="nav-text">Providing Flexibility to Clients</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-Availability"><span class="nav-number">1.3.2.</span> <span class="nav-text">Data Availability</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SYSTEM-ARCHITECTURE"><span class="nav-number">1.4.</span> <span class="nav-text">SYSTEM ARCHITECTURE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#INGESTING-TRILLIONS-OF-ROWS"><span class="nav-number">1.5.</span> <span class="nav-text">INGESTING TRILLIONS OF ROWS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QUERYABLE-TIMESTAMP"><span class="nav-number">1.6.</span> <span class="nav-text">QUERYABLE TIMESTAMP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MAINTAINING-VIEWS-AT-SCALE"><span class="nav-number">1.7.</span> <span class="nav-text">MAINTAINING VIEWS AT SCALE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Query-optimizations-challenges-in-View-Maintenance"><span class="nav-number">1.7.1.</span> <span class="nav-text">Query optimizations challenges in View Maintenance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mechanics-of-Compaction"><span class="nav-number">1.7.2.</span> <span class="nav-text">Mechanics of Compaction</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROBUST-QUERY-SERVING-PERFORMANCE"><span class="nav-number">1.8.</span> <span class="nav-text">ROBUST QUERY SERVING PERFORMANCE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONCLUSION"><span class="nav-number">1.9.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

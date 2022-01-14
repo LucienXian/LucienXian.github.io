@@ -265,6 +265,277 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/04/C-内存分配方式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/04/C-内存分配方式/" itemprop="url">C++内存分配方式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-04T19:49:17+08:00">
+                2018-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="内存分配的５个区域"><a href="#内存分配的５个区域" class="headerlink" title="内存分配的５个区域"></a>内存分配的５个区域</h1><ul>
+<li>堆</li>
+</ul>
+<p>由操作符new分配的空间，它们的释放不由编译器管理，需要程序员手动释放，或者在程序结束时由操作系统回收释放。</p>
+<ul>
+<li>栈</li>
+</ul>
+<p>一般存储局部变量和函数参数，由编译器去分配</p>
+<ul>
+<li>自由存储区</li>
+</ul>
+<p>与堆类似，但它是由malloc\free来分配和释放的</p>
+<ul>
+<li>静态存储区</li>
+</ul>
+<p>在C++中，全局变量和静态变量都存储在这</p>
+<ul>
+<li>常量存储区</li>
+</ul>
+<p>比较好理解，就是存储常量的区域</p>
+<h2 id="堆和栈的区别"><a href="#堆和栈的区别" class="headerlink" title="堆和栈的区别"></a>堆和栈的区别</h2><ul>
+<li><p>堆是由程序员控制的，而栈是由编译器控制的</p>
+</li>
+<li><p>堆的空间大小一般为4G，而栈相对较小，比如１M</p>
+</li>
+<li><p>堆有可能产生碎片，而栈是先进后出的模式，不会产生碎片</p>
+</li>
+<li><p>堆是自下往上，往高地址生长的；而栈则相反</p>
+</li>
+<li><p>栈分配效率较高，只需要从寄存器中找到存放栈的地址；而堆比较麻烦，需要通过一定的算法找到内存大小合适的空间（链表），或者因为碎片太多，先进行压缩抖动等</p>
+</li>
+</ul>
+<p>引用自：<br><a href="http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html" target="_blank" rel="noopener">http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/02/OS面试知识点-一/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/02/OS面试知识点-一/" itemprop="url">OS面试知识点<一></一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-02T15:48:27+08:00">
+                2018-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/深度探索C-对象模型-一/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1326,289 +1597,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/Effective-cpp-27/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/09/Effective-cpp-27/" itemprop="url">Effective-cpp-#27</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-09T00:37:40+08:00">
-                2018-02-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Minimize-casting"><a href="#Minimize-casting" class="headerlink" title="Minimize casting"></a>Minimize casting</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>C++的设计目标就是要保证“类型错误”不可能发生，使得程序能够“干净地”通过编译。</p>
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>一般来说，在C++中有两种转型——“old-style casts”和”new-style casts”。</p>
-<ul>
-<li>old：(T)expression或者T(expression)；</li>
-<li>new:<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const_cast</span>&lt;T&gt;(<span class="built_in">exp</span>)</span><br><span class="line"><span class="keyword">dynamic_cast</span>&lt;T&gt;(<span class="built_in">exp</span>)</span><br><span class="line"><span class="keyword">reinterpret_cast</span>&lt;T&gt;(<span class="built_in">exp</span>)</span><br><span class="line"><span class="keyword">static_cast</span>&lt;T&gt;)<span class="built_in">exp</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<ol>
-<li>const_cast：通常用来去除对象的常量性；</li>
-<li>dynamic_cast：主要执行“安全向下转型”，但会耗费大量的运行成本；</li>
-<li>reinterpret_cast：主要是执行低级转型，实际结果取决于编译器，所以其不可移植。例如将一个<strong>pointer to int转为int</strong>；</li>
-<li>static_cast：用来强迫隐式转换，例如将non-const转为const，int转为double，同样也可以是void*转为typed指针，或者pointer to base转为pointer to derived</li>
-</ol>
-<p><br><br>之所以要用新式转换，有两个原因：一是很容易能够在代码中辨认出来，便于debug；二是将转型动作窄化，编译器更可能诊断出错误运用。<br><br><br>至于什么时候用旧式转换——调用一个explicit构造函数讲一个对象传递给一个函数时。例如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">explicit</span> <span class="title">Widget</span><span class="params">(<span class="keyword">int</span> size)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomeWork</span><span class="params">(<span class="keyword">const</span> Widget&amp; w)</span></span>;</span><br><span class="line">doSomeWork(Widget(<span class="number">15</span>));</span><br><span class="line">doSomeWork(Static_cast&lt;Widget&gt;(<span class="number">15</span>));</span><br></pre></td></tr></table></figure>
-<p>往往，转型动作会令到编译器编译出运行期间不同执行的码。例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base&#123;...&#125;;</span><br><span class="line">Derived d;</span><br><span class="line">Base* pd = &amp;d;</span><br></pre></td></tr></table></figure></p>
-<p>我们可以看到，在这种情况下建立一个base class指针指向一个derived class对象，会有一个偏移量在运行期被施行于Derived<em>指针身上，用以取得正确的Base </em>指针值.<br><br><br><br><br>另一个有趣的事情是，如果我们希望在derived classes内的virtual函数代码第一个动作先调用base class的对应函数。使用以下的方式，其实是错误的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Window</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWindow</span>:</span> <span class="keyword">public</span> Windos&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">static_cast</span>&lt;Window&gt;(*<span class="keyword">this</span>).onResize();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>其实这种行为，调用的并不是当前对象上的函数，而是稍早转型动作所建立的一个”*this对象的base class成分”的暂时副本身上的onResize!<br><br><br><br><br><br><br>再来看看dynamic_cast，之所以需要dynamic_cast，通常是因为你只有一个“指向Base”的指针或引用，但希望在一个你认定为derived class对象身上执行derived class操作函数。<br><br>对于这种情况，有两个解决办法：<br><br>使用容器并在其中存储指向derived class对象的指针，并且尽量避免转型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::trl::<span class="built_in">shared_ptr</span>&lt;SpecialWindow&gt; &gt;VPSW;</span><br><span class="line">VPSW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span> (VPSW::iterator iter = winPtrs.begin();</span><br><span class="line">     iter != winPtrs.end();</span><br><span class="line">     ++iter)</span><br><span class="line">    (*iter)-&gt;blink();</span><br></pre></td></tr></table></figure></p>
-<p>但是这种方法，不能在同一个容器中存储指针“指向所有可能的Window派生类”。<br><br><br><br>另外一种做法就可以让你通过base class 接口处理“所有可能的各种Window派生类”，那就是在base class内提供virtual函数做你想对各个Window派生类做的事。当然，在base class只是提供一个“什么都不做”的缺省实现码。</p>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>如果可以，尽量避免转型，尤其是注重效率的代码中避免使用dynamic_cast；</li>
-<li>如果转型是必要的，试着将其隐藏在某个函数背后。客户随后直接调用该函数，而不需要将转型放进自己的代码内；</li>
-<li>宁愿使用新式转型，不要使用旧式转型；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/Effective-cpp-26/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/09/Effective-cpp-26/" itemprop="url">Effective-cpp-#26</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-09T00:14:52+08:00">
-                2018-02-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Postpone-variable-definitions-as-long-as-possible"><a href="#Postpone-variable-definitions-as-long-as-possible" class="headerlink" title="Postpone variable definitions as long as possible"></a>Postpone variable definitions as long as possible</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>这个的条例提出的原因是——当你定义了一个带有构造函数或者析构函数的变量时，那么当程序的control flow到达这个变量的定义表达式时，你就要承受其构造的成本，同样，当离开变量作用域时，还需要承受析构成本。</p>
-<p>关键是，即便你没有使用这个变量，也要耗费这些成本</p>
-<p>考虑一个函数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">encryptPassword</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; password)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line">    <span class="built_in">string</span> encrypted;</span><br><span class="line">    <span class="keyword">if</span> (password.length()&lt;MinimumPasswordLength)</span><br><span class="line">        <span class="keyword">throw</span> logic_error(<span class="string">"Password is too short"</span>);</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> encrypted;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个函数的命题是，如果有异常被抛出，那么对象encrypted就没被使用，但你仍然需要承受其构造和析构的成本；<br><br></p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>解决方法很简单，什么时候使用就什么时候定义。但这个过程需要注意的是通常情况下我们应该尽量避免使用default构造函数，应该在构造时就赋予初值。</p>
-<p>另外有一个需要注意的问题是，循环怎么办？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Method A</span></span><br><span class="line">Widget w;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;n; i++)&#123;</span><br><span class="line">    w = 取决于i的值;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Method B</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;n; i++)&#123;</span><br><span class="line">    Widget w = 取决于i的值;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>需要衡量的是：</p>
-<ul>
-<li>方法A:1个构造函数+1个析构函数+n个赋值操作</li>
-<li>方法B:n个构造函数+n个析构函数</li>
-</ul>
-<p>通常情况下，当n比较大时，方法A比较好；否则应该选B</p>
-<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
-<li>尽量延后变量定义式的出现。这样做可以增加程序的清晰度并改善程序效率；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1652,7 +1645,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">260</span>
+                <span class="site-state-item-count">262</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1738,7 +1731,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
