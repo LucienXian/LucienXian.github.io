@@ -265,6 +265,229 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/18/SuRF-Range-Query-Filter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/07/18/SuRF-Range-Query-Filter/" itemprop="url">SuRF: Range Query Filter</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-18T23:26:19+08:00">
+                2021-07-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="SuRF"><a href="#SuRF" class="headerlink" title="SuRF"></a>SuRF</h1><blockquote>
+<p>本文介绍了一种SuRF的数据结构实现，用以替代传统的布隆过滤器，支持单点查询和范围查询使用。</p>
+</blockquote>
+<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>LSM树是市面上数据库常用的底层存储引擎，能提供快速写和一定速度的读取。但该设计的一个问题是由于SSTable的多层设计导致大量磁盘IO读取，由此引入了布隆过滤器作为内存数据结构来帮助查询。布隆过滤器对于单点查询很有用，但并不能处理范围查找，尽管也有一些类似的设计（如前缀布隆过滤器）做了优化，但总体不够灵活通用。</p>
+<p>因此本文提出了Succinct Range Filter（下文简称SuRF），这是一种快速紧凑的过滤器，提供了精确匹配过滤、范围过滤和近似范围计数等功能。SuRF是建立在Fast Succinct Trie（FST）这一新型空间高效简洁的数据结构上，FST每个trie节点仅需要10bit。文章使用SuRF替代了RocksDB的布隆过滤器，这将范围查询的速度提高了1.5倍到5倍，但极端情况下会导致单点查询变慢40%。</p>
+<h2 id="FAST-SUCCINCT-TRIES"><a href="#FAST-SUCCINCT-TRIES" class="headerlink" title="FAST SUCCINCT TRIES"></a>FAST SUCCINCT TRIES</h2><p>SuRF的核心数据结构是FST，这是一种空间优化的静态tire，可以做单点查询和范围查询，其设计基于以下的思路：一个tire的上层节点较少，但访问量很大；下层节点虽多，但访问不算频繁。因此FST使用了基于位图的快速编码方案（LOUDS-Dense）来对上层节点编码，下层则用LOUDS-Sparse方案来编码，节省空间。</p>
+<h3 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h3><p>如果一颗树所占用的空间接近于信息论的下限，则该树可以认为是succinct。论文使用的是一种叫Level-Ordered Unary Degree Sequence的技术，LOUDS以广度优先的顺序遍历节点，并使用一元编码Unary coding对每个节点的度进行编码，例如下图节点3有三个字节点，因此被编码成”1110”。</p>
+<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826bdba.png" alt></p>
+<p>编码完成后，该树会变成一组bit序列，需要访问节点时，则使用rank＆select两种操作：</p>
+<ul>
+<li>rank1(i): 返回[0, i]位置区间中, 1的个数；</li>
+<li>select1(i): 返回第i个1的位置(整个bit序列)；</li>
+<li>对应的则是rank0(i)和select0(i)操作；</li>
+</ul>
+<p>如今关于rank＆select的实现会使用查找表预算存取计算好的结果，保证查询时可以在常数时间里完成。有了rank＆select的支持，LOUDS就可以在常数时间内实现SuRF需要的点查询和范围查询。假设节点代号和bit位置都是从0开始的：</p>
+<ul>
+<li>在bit序列中第i个节点的位置：<code>select0(i)+1</code>；</li>
+<li>在bit序列中从p开始的节点的第k个子节点：<code>select0 (rank1 (p + k)) + 1</code>；</li>
+<li>始于p的节点的父节点位置：<code>select1 (rank0 (p))</code>；</li>
+</ul>
+<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826bdda.png" alt></p>
+<h3 id="LOUDS-Dense"><a href="#LOUDS-Dense" class="headerlink" title="LOUDS-Dense"></a>LOUDS-Dense</h3><p>LOUDS-Dense使用三个bit map和一个value的字节序列对每个trie节点按层级进行编码：</p>
+<ul>
+<li>D-Labels：记录每个节点的分支标签；上图中根节点具有标记为f，s和t的三个分支。 D-Labels位图设置第102位（f），115位（s）和116位（t）并清除其余位；</li>
+<li>D-HasChild：表示节点是叶子节点还是中间节点，以上图根节点为例，f和t都有子节点，但s没有，所以102和106两个bit会设置为1；</li>
+<li>D-IsPrefixKey：标记当前前缀是否为有效key；以上图根节点为例，f既作为前缀，同时也是trie里的有效key；</li>
+<li>D-Values : 存储的是固定大小的 value，本文中则是三种后缀的指针；</li>
+</ul>
+<p>用rank&amp;select操作trie树，则是：</p>
+<ul>
+<li>第一个孩子节点：<code>D-ChildNodePos(pos)=256 × rank1(D-HasChild, pos)</code>；</li>
+<li>父节点：<code>DParentNodePos(pos)=select1(D-HasChild,[pos / 256])</code>；</li>
+</ul>
+<h3 id="LOUDS-Sparse"><a href="#LOUDS-Sparse" class="headerlink" title="LOUDS-Sparse"></a>LOUDS-Sparse</h3><p>如上图所示，LOUDS-Sparse使用四个字节或者bit序列对trie节点进行编码，然后将编码的节点按层次顺序进行串联。</p>
+<ul>
+<li>S-Labels：记录分支标签，按level order顺序记录所有节点的label，并且使用0xFF($)来标记该key同时也是key节点；</li>
+<li>S-HasChild：使用一个bit记录节点的label是否含有分支子节点；</li>
+<li>S-LOUDS：使用一个bit记录每个label是否为该节点的第一个label；</li>
+<li>S-Values：与上面类似；</li>
+</ul>
+<p>用rank&amp;select操作trie树，则是：</p>
+<ul>
+<li>孩子节点：<code>S-ChildNodePos(pos) = select1(S-LOUDS, rank1(S-HasChild, pos) + 1);</code>；</li>
+<li>父节点：<code>S-ParentNodePos(pos) = select1(S-HasChild, rank1(S-LOUDS, pos) - 1)</code>；</li>
+</ul>
+<h3 id="LOUDS-DS-and-Operations"><a href="#LOUDS-DS-and-Operations" class="headerlink" title="LOUDS-DS and Operations"></a>LOUDS-DS and Operations</h3><p>LOUDS-DS就是一种混合trie，上层用LOUDS-Dense编码，下层使用LOUDS-Sparse编码。其中的分界点则根据性能和空间进行调整，LOUDS-Dense-Size(l)表示从0到l（不包含l）层采用LOUDS-Dense编码，而LOUDS-Sparse-Size(l)则表示从l到H层采用LOUDS-Sparse方式编码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOUDS-Dense-Size(l) × R ≤ LOUDS-Sparse-Size(l) <span class="comment">// 通常使用R = 64作为默认值，R越小，性能越好但空间使用更多</span></span><br></pre></td></tr></table></figure>
+<p>LOUDS-DS支持三个基本操作：</p>
+<ul>
+<li>ExactKeySearch(key)：如果key存在，则返回key的值（否则返回NULL）；</li>
+<li>LowerBound(key)：返回一个迭代器，该迭代器指向的键-值对(k, v)，其中k是按字典顺序的满足k≥key的最小的键；</li>
+<li>MoveToNext(iter)：将迭代器移至下一个键值；</li>
+</ul>
+<p>对于点查询，则是先在LOUDS-Dense上查询，查不到即到LOUDS-Sparse查询。对于范围查询，则是执行LowerBound，找到最小的满足k≥key的键后，则光标将从当前的叶子标签位置开始并向前移动，就是正常的tree搜索方式。</p>
+<h3 id="Space-and-Performance-Analysis"><a href="#Space-and-Performance-Analysis" class="headerlink" title="Space and Performance Analysis"></a>Space and Performance Analysis</h3><p>考虑到在LOUDS-DS中LOUDS-Sparse的节点更多，假设这是一个具备n个节点的trie，其中会有8n位用于S标签，2n位用于S-HasChild和S-LOUDS，总共10n位。</p>
+<p>对于点查询，在每个LOUDS-Dense级别上进行搜索都需要两次数组查找，以及对位向量D-HasChild的rank操作。因此，主要操作是对所有位向量进行rank和 select，并在LOUDS-Sparse层进行标签搜索。</p>
+<h3 id="Optimizations"><a href="#Optimizations" class="headerlink" title="Optimizations"></a>Optimizations</h3><p>论文针对LOUDS-DS中的三个关键操作：rank、select和label search进行了优化。</p>
+<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826be06.png" alt></p>
+<ul>
+<li>Rank</li>
+</ul>
+<p>上图展示了一个简洁的Rank结构，将bit vector分割成B bits大小的块，每个块用32bits的字段预先计算好的到这个block的rank值。对于一个pos来说，就有<code>rank1(pos) = LUT[i / B] + popcount[i / B * B, i]</code>。popcount是内置的CPU指令，可以快速计算出某一段区间1的个数。</p>
+<ul>
+<li>Select</li>
+</ul>
+<p>同样是使用LUT的方法，预先计算好值。假设采样周期是3，上图中第三个LUT保存的就是3x2，也就是第6个1的pos值，即8。那就有<code>select1(i) = LUT[i / S] + (selecting (i - i / S * S)th set bit starting from LUT[i / S] + 1) + 1</code>。</p>
+<ul>
+<li>Label Search</li>
+</ul>
+<p>使用SIMD指令在LOUDS-Sparse中执行标签搜索。</p>
+<ul>
+<li>Prefetching</li>
+</ul>
+<p>在切换到LOUDS-DS中的不同位/字节序列之前进行预取。</p>
+<h2 id="SUCCINCT-RANGE-FILTERS"><a href="#SUCCINCT-RANGE-FILTERS" class="headerlink" title="SUCCINCT RANGE FILTERS"></a>SUCCINCT RANGE FILTERS</h2><p>基于FST构建SuRF，最重要的是在false positive rate和filter所需要的内存使用之间取得平衡。论文的做法是使用裁剪trie，通过截断低层次的trie，并使用从key获得的后缀位（key本身或者key的哈希值）做替代。论文介绍了4种不同的trie树裁剪方式。</p>
+<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826be2f.png" alt></p>
+<ol>
+<li>Basic SuRF</li>
+</ol>
+<p>Basic SuRF的基本思路就是只存储key的共有前缀和一个额外的byte，裁剪掉树的部分叶节点。Basic SuRF的FPR与key的分布有关。</p>
+<ol start="2">
+<li>SuRF with Hashed Key Suffixes</li>
+</ol>
+<p>在Basic SuRF基础上，通过对key进行哈希计算，将hash值的n个bits存储到value中，这种方法可以降低FPR，但对范围查询没有帮助。</p>
+<ol start="3">
+<li>SuRF with Real Key Suffixes</li>
+</ol>
+<p>SuRF-Real存储n个bits的真实key，这样同时增强了Point query和Range query，但其FPR还是要比SuRF-Hash高。</p>
+<ol start="4">
+<li>SuRF with Mixed Key Suffixes</li>
+</ol>
+<p>SuRF-Mixed的做法是混合使用2和3两种方式，一部分是real key，另一部分是hashed key。</p>
+<h3 id="Operations"><a href="#Operations" class="headerlink" title="Operations"></a>Operations</h3><p>论文总结了如何使用FST实现SuRF的基本操作。</p>
+<ul>
+<li>build(keyList)：根据给定的key构建fitter；</li>
+<li>result = lookup(k)：对k执行点查询，返回true意味着k可能存储。以上面SuRF为例，首先搜寻key，直到叶子结点。如果未到叶节点就终止了则返回false；否则计算k的相关bits与叶节点的相关bits做比较；</li>
+<li>iter, fp_flag = moveToNext(k)：这个操作实际上是LowerBound执行，返回满足&gt;=k的最小key的双向迭代器；</li>
+<li>count, low_fp_flag, high_fp_flag = count(lowKey, highKey)：返回在[lowKey, highKey]范围内的key个数；</li>
+</ul>
+<h2 id="EXAMPLE-APPLICATION-ROCKSDB"><a href="#EXAMPLE-APPLICATION-ROCKSDB" class="headerlink" title="EXAMPLE APPLICATION: ROCKSDB"></a>EXAMPLE APPLICATION: ROCKSDB</h2><p>论文将SuRF与RocksDB集成在一起，以替代其Bloom过滤器。下图显示了RocksDB中Get，Seek和Count查询的执行路径。Next的核心算法类似于Seek。过滤器操作在红色框中。如果该框为虚线，则可能由于误报需要检查边界key。</p>
+<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826be57.png" alt></p>
+<p>对于Get(key)，SuRF的用法与Bloom过滤器完全相同。</p>
+<p>对于Seek(lk, hk)，RocksDB首先通过在块索引中搜索lk来决定所有级别的候选SSTable。在没有SuRF的情况下，RocksDB会检查每个候选SSTable并获取满足&gt;=lk的最小的块。 RocksDB然后比较候选key，找到全局最小key。使用SuRF，则无需获取实际的块，RocksDB可以通过在其SuRF上执行moveToNext(lk)查询来避免每个SSTable都进行IO，从而获取每个SSTable的候选key。如果查询成功（例如，是Open Seek或K≤hk），RocksDB将从选定的SSTable中精确地获取一个包含全局最小值K的块。如果查询失败（即，K&gt;hk），则不没有读盘IO。</p>
+<h2 id="CONCLUSION"><a href="#CONCLUSION" class="headerlink" title="CONCLUSION"></a>CONCLUSION</h2><p>本文介绍了SuRF，该filter支持单点查询、范围查询和计数查询，SuRF建立在一个新的succinct数据结构上，即FST。FST的性能极高，并且SuRF本身的内存使用也是较为搞笑的，其空间使用与FPR的权衡可以通过不同数量的后缀位来调整。通过在RocksDB上替换了bloom filter的测试，显著地减少了IO并提高了范围查询的吞吐量。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/20/Percolator/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1961,181 +2184,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/05/Scaling-Memcache-at-Facebook——MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/01/05/Scaling-Memcache-at-Facebook——MIT6-824/" itemprop="url">Scaling Memcache at Facebook——MIT6-824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-05T00:03:08+08:00">
-                2021-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Scaling-Memcache-at-Facebook"><a href="#Scaling-Memcache-at-Facebook" class="headerlink" title="Scaling Memcache at Facebook"></a>Scaling Memcache at Facebook</h1><blockquote>
-<p>Memcache是一个有名的且简单的纯内存缓存方案。论文主要讲了Facebook基于Memcache来构建一个分布式kv存储来为它的社交网站服务，处理几十亿的QPS，存储了上万亿的数据项</p>
-</blockquote>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>本文主要讲述了Facebook如何改进memcached的开源版本，这是一个全内存哈希表的开源实现，能够以较低的开销提供了对存储的访问。Facebook的目标之一是展现部署在不同规模系统的实现，同时需要保持性能、效率、容错能力和一致性。</p>
-<h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>论文提到的设计面临的场景是：读多写少，需要能从多个数据源读取数据。</p>
-<p>MemCached提供了一组简单的操作（set、get和delete），这使它能够成为大规模分布式系统重要的基础组件。开源版本是一个单机内存哈希表，本文基于这个开源版本构建了一个可以处理每秒数十亿请求的分布式的KV储存系统。下文将用“memcached”来指代它的源码或者它运行的二进制实例，用“memcache”来指代由每个实例构成的分布式系统。</p>
-<p><img src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c45c.png" alt></p>
-<p><strong>Query cache</strong>：依赖memcache来减轻读取数据库的负担。如上图所示，读取的时候先读memcache，不命中再读数据库，查询成功后会更新memcache。写请求则是写到数据库，接着发删除请求到memcache。</p>
-<p><strong>Generic cache</strong>：论文还讲了如何使memcache成为一个更加通用的kv系统，如保存机器学习算法的中间结果。</p>
-<p><img src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c464.png" alt></p>
-<p>在系统的迭代中，论文考虑了两个重要的设计：</p>
-<ul>
-<li>只有对用户或者运维产生影响的问题，才值得优化；</li>
-<li>系统可能会暴露轻微陈旧的数据以便后台免受高负载的影响；</li>
-</ul>
-<h2 id="In-a-Cluster-Latency-and-Load"><a href="#In-a-Cluster-Latency-and-Load" class="headerlink" title="In a Cluster : Latency and Load"></a>In a Cluster : Latency and Load</h2><p>这一章主要聚焦于拉取缓存数据时的延迟和缓存不命中时带来的负载</p>
-<h3 id="Reducing-Latency"><a href="#Reducing-Latency" class="headerlink" title="Reducing Latency"></a>Reducing Latency</h3><p>为了减轻数据库的负载，需要准备由数百台memcache机器组成的缓存集群，但多个web服务器对多台memcache服务器的关系，可能会在短时间内导致incast congestion。数据副本可以缓解这种情况，但又会带来内存浪费。</p>
-<p>因此论文中提到的减少延迟的方法主要集中在memcache客户端。</p>
-<p><strong>Parallel requests and batching</strong>：为了尽可能减少网络请求，该系统通过做拓扑图分析来表示数据间的依赖，整合将多个独立请求，并尽可能进行并发操作。</p>
-<p><strong>Client-server communication</strong>：memcached服务器之间并不会直接通信，而是相关控制逻辑集成到client上，memcache的client分为两个部分：sdk和一个叫mcrouter的的proxy，mcrouter在web服务器和memcached服务器之间，提供与memcached相同的接口。</p>
-<p>考虑到对数据错误容忍度高，memcached client的get请求使用UDP与memcached服务器通信，减少了创建和维护连接带来的开销。一旦出现丢包或者乱序包，client会将其作为异常处理，即视作cache miss，get请求会被重传到数据库，论文中提到系统在高峰期也只有0.25%的请求会被丢弃。为了可靠性，对于set和delete，则是通过可靠的TCP通信。</p>
-<p><strong>Incast congestion</strong>：对于Incast congestion问题，memcached的client实现了类似TCP的拥塞控制逻辑，根据网络情况控制滑动窗口。</p>
-<h3 id="Reducing-Load"><a href="#Reducing-Load" class="headerlink" title="Reducing Load"></a>Reducing Load</h3><p>为了减轻负载，论文提到了三种技术；</p>
-<h4 id="Leases"><a href="#Leases" class="headerlink" title="Leases"></a>Leases</h4><p>文中引入了租约机制来解决下面两个问题：stale sets和thundering herds，前者是保证了并发更新下的最终一致性，后者则是缓解惊群效应。</p>
-<p>对于stale sets，是因为发生cache miss的时候，并发读取数据库后需要重新写入到memcache，这样就可能出现过期的数据在数据被删除之后才写入，导致数据库和memcache内的数据不一致。通过引入租约，每次出现cache miss的时候都会返回一个与key绑定的lease id，当数据被删除后，之前发出的lease id会失效，写入数据时，sdk需要带上上次收到的lease id，根据该id是否失效来仲裁写入与否。</p>
-<p>对于惊群效应，当数据出现热点的时候，可能会出现大量的cache miss，导致数据库负载增大。memcache通过控制每个key的lease发送速率，比如每个key在10秒内只发送一个lease id，在这期间有对这个key的请求时，会让客户端等待重试，这时数据可能已经被获得lease的给填上，这时就会重试成功。</p>
-<p><strong>过期值</strong>：对于某些能接受过期数据的应用，memcache会将已经删除的数据短暂地保存到另一个数据结构中，此时web server可以决定是等待新的数据还是读取过期数据，从而减轻负载。</p>
-<h4 id="Memcache-Pools"><a href="#Memcache-Pools" class="headerlink" title="Memcache Pools"></a>Memcache Pools</h4><p>将memcache作为通用缓存意味着所有不同的workloads会共享这一设施，Facebook统计过更新频率高的key很可能会将更新频率低的key给逐出来。</p>
-<p>考虑到这一点，Facebook将集群的memcache服务器分割成独立的池，一个默认pool，一个访问频率高但cache miss成本低的small poll，一个访问频率低但cache miss成本高的large pool。</p>
-<h3 id="Replication-With-in-Pools"><a href="#Replication-With-in-Pools" class="headerlink" title="Replication With in Pools"></a>Replication With in Pools</h3><p>对于某些pool，可以通过数据冗余的方式来提高请求的并发能力。</p>
-<p>###Handling Failures</p>
-<p>论文对于故障处理主要提到了两个维度的故障：网络故障和集群自身服务器宕机。</p>
-<p>对于少数几个server宕机或者网络故障，Facebook主要依赖一个自动恢复机制，如果大规模的停机，Facebook会将用户请求直接转移到另一个数据中心。为了避免在自动恢复的那几分钟里对数据库或者后台服务带来的雪崩，memcached的client会将请求转移到Gutter机器上接管故障服务器的能力。</p>
-<p>一般来说，每次失败的请求都会导致转移到Gutter的存取，从而减轻数据库的负载。</p>
-<h2 id="In-a-Region-Replication"><a href="#In-a-Region-Replication" class="headerlink" title="In a Region: Replication"></a>In a Region: Replication</h2><p>随着流量的增大，需要对Memcached做横向扩展，并且能够解决key的热点问题和网络incast congestion，论文在replication和sharding之间做了取舍，选择了将memcached servers切分成多个集群，这一个memcached集群、前端访问集群还有共享存储集群统称为region。</p>
-<h3 id="Regional-Invalidations"><a href="#Regional-Invalidations" class="headerlink" title="Regional Invalidations"></a>Regional Invalidations</h3><p>考虑到由于存在多个memcached server集群，需要确保数据的一致性，避免同一条数据的不同版本出现在不同集群上。论文的做法是，监控MySQL，一旦出现数据被删除或者更新，且事务提交，那么对应key就会被一个mcsqueal守护进程记录（读取MySQL的commit log），然后批量地将删除明亮发送给对应的Memcached实例。</p>
-<p><img src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c46b.png" alt></p>
-<h3 id="Regional-Pools"><a href="#Regional-Pools" class="headerlink" title="Regional Pools"></a>Regional Pools</h3><p>考虑对部分数据的QPS很低，Facebook的做法是不把所有数据在一个region内存储多份冗余，而是在单个region内划分出一个pool来存储那些访问率低的数据。</p>
-<h3 id="Cold-Cluster-Warmup"><a href="#Cold-Cluster-Warmup" class="headerlink" title="Cold Cluster Warmup"></a>Cold Cluster Warmup</h3><p>由于现有集群需要进行定期维护，在新集群上线时，缓存命中率会很低。Facebook构建了一个Cold Cluster Warmup的系统，在新集群发生cache miss时从热集群中加载数据，而不是去读持久化存储。</p>
-<h2 id="Across-Regions-Consistency"><a href="#Across-Regions-Consistency" class="headerlink" title="Across Regions: Consistency"></a>Across Regions: Consistency</h2><p>Facebook在全球都有数据中心，因此每个数据中心都会有若干个region来服务用户。基于MySQL的复制机制，Facebook将一个region设为master，其他的都是只读region，web servers请求的时候只会访问本地的DB或者memcache。至于写入，所有的请求只是发给master处理，然后mysql再将其同步到从region。这样就可能带来一致性的问题，即从region的memcache一直保留着过期数据。</p>
-<p>对于这种场景，该系统保持一致性的方法是：</p>
-<ul>
-<li><p>如果在master region写，前端集群收到更新，请求转发到数据库，同时删除本集群的memcache记录。数据库的进程同步修改到其他集群，其他region删除过期的记录；</p>
-</li>
-<li><p>在非master region写数据d：</p>
-<ul>
-<li>本地的memcache会设置remote marker，rd；</li>
-<li>将d写到master region的db；</li>
-<li>将d从memcache中删除；</li>
-<li>等待master DB同步带有rd信息的数据到非master DB；</li>
-<li>该非master DB通过解析数据，然后删除掉rd；</li>
-</ul>
-<p>在这个过程中，非master region有对该数据d进行读取，并发生cache miss时，如果发现了数据带有rd，则直接跨region访问master DB，否则直接读取本地DB。</p>
-</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>论文主要是基于memcache技术来满足Facebook的业务需求，有很多取舍在优化线上系统性能时都非常值得参考。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2184,7 +2232,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">262</span>
+                <span class="site-state-item-count">263</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

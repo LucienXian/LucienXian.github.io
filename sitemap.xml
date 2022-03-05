@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2022/03/05/The-Dataflow-Model/</loc>
+    
+    <lastmod>2022-03-05T09:41:59.459Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/</loc>
     
     <lastmod>2022-01-14T15:46:33.576Z</lastmod>
