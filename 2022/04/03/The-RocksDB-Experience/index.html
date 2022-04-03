@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="数据库,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="Evolution of Development Priorities in Key-value Stores Serving Large-scale Applications: The RocksDB Experience RocksDB是一个针对大规模分布式系统的kv存储，并针对SSD的特性进行了优化。本文描述了在过去八年中RocksDB的开发过程。这种演变是硬件趋势的结果，也跟许多组织大规模">
+<meta name="keywords" content="数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The RocksDB Experience">
+<meta property="og:url" content="http://yoursite.com/2022/04/03/The-RocksDB-Experience/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Evolution of Development Priorities in Key-value Stores Serving Large-scale Applications: The RocksDB Experience RocksDB是一个针对大规模分布式系统的kv存储，并针对SSD的特性进行了优化。本文描述了在过去八年中RocksDB的开发过程。这种演变是硬件趋势的结果，也跟许多组织大规模">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://pic.imgdb.cn/item/6249b959239250f7c5aa09a9.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/6249b959239250f7c5aa0997.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/6249b959239250f7c5aa099e.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/6249b959239250f7c5aa09a2.png">
+<meta property="og:updated_time" content="2022-04-03T15:14:16.333Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The RocksDB Experience">
+<meta name="twitter:description" content="Evolution of Development Priorities in Key-value Stores Serving Large-scale Applications: The RocksDB Experience RocksDB是一个针对大规模分布式系统的kv存储，并针对SSD的特性进行了优化。本文描述了在过去八年中RocksDB的开发过程。这种演变是硬件趋势的结果，也跟许多组织大规模">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/6249b959239250f7c5aa09a9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2022/04/03/The-RocksDB-Experience/">
+
+
+
+
+
+  <title>The RocksDB Experience | LucienXian's Blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/04/03/The-RocksDB-Experience/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">The RocksDB Experience</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-04-03T23:13:41+08:00">
+                2022-04-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Evolution-of-Development-Priorities-in-Key-value-Stores-Serving-Large-scale-Applications-The-RocksDB-Experience"><a href="#Evolution-of-Development-Priorities-in-Key-value-Stores-Serving-Large-scale-Applications-The-RocksDB-Experience" class="headerlink" title="Evolution of Development Priorities in Key-value Stores Serving Large-scale Applications: The RocksDB Experience"></a>Evolution of Development Priorities in Key-value Stores Serving Large-scale Applications: The RocksDB Experience</h1><blockquote>
+<p>RocksDB是一个针对大规模分布式系统的kv存储，并针对SSD的特性进行了优化。本文描述了在过去八年中RocksDB的开发过程。这种演变是硬件趋势的结果，也跟许多组织大规模使用RocksDB有关。本文描述了 RocksDB的资源优化目标是如何以及为什么从写放大转变到到空间放大，再到CPU利用率。通过一系列的使用经验总结得知，资源分配需要跨不同的RocksDB实例进行管理，数据格式需要保持向后和向前兼容以允许新软件推出，并且需要对数据库复制和备份的进行支持。故障处理的经验则可以归结为需要在系统的每一层及早发现数据损坏错误。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>RocksDB起源于LevelDB，并针对SSD的一些feature做了定制优化，同时也会被设计成可以嵌入到其他系统的KV库，每个RocksDB节点只管理自己的数据，相互之间没有交互。RocksDB在Database、Stream processing、Logging/queuing services、Index services等领域都有一定的应用。使用RocksDB作为底下的存储引擎也有利有弊，弊端在于每个系统都需要在RocksDB之上处理好一系列复杂的failover recover的操作，优势则是可以复用很多基础功能。下图是针对不同应用特性的总结和负载相关的信息：</p>
+<p><img src="https://pic.imgdb.cn/item/6249b959239250f7c5aa09a9.png" alt></p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>基于flash特性的考虑，RocksDB在设计上采用了flash友好的数据结构，并对当前的硬件进行了优化。</p>
+<h3 id="Embedded-storage-on-flash-based-SSDs"><a href="#Embedded-storage-on-flash-based-SSDs" class="headerlink" title="Embedded storage on flash based SSDs"></a>Embedded storage on flash based SSDs</h3><p>由于flash-based SSD的发展，提供了更高吞吐和更低延迟的设备，使得软件设计需要考虑如何充分使用期全部功能。SSD提供了数十万IOPS和数百MB的带宽，在很多场景下使得性能瓶颈从IO转移到了网络，这就增加了对嵌入式kv存储引擎的需求，RocksDB就是如此应运而生的。</p>
+<h3 id="RocksDB-architecture"><a href="#RocksDB-architecture" class="headerlink" title="RocksDB architecture"></a>RocksDB architecture</h3><p>LSM tree是RocksDB存储数据的主要数据结构。</p>
+<ul>
+<li>Writes：数据的写入首先会写入到一个叫MemTable的内存buffer和磁盘的WAL上，其中MemTable基于跳表实现，WAL则是用于故障恢复；持续的写入会使得MemTable到达设定的大小阈值，这时MemTable和WAL就会变成immutable，并分配一个新的MemTable和WAL接收新的写入；Immutable MemTable则会flush到磁盘的SSTable中，并丢弃旧的MemTable和WAL。每个SSTable按需排列数据，并划分为大小相同的block，每个SSTable也会有一个索引块，其中的索引项则是通过二分查找定位到数据块。</li>
+<li>Read：数据读取则是依次从MemTable开始，逐层查找更高层次的SSTable。其中会使用bloomfilter优化读取；</li>
+<li>Compaction：如下图所示，L0的SSTable是由MemTable flush后创建的，而更高级的SSTable则是通过compaction诞生的。每个层级的sstable大小都会收到配置参数的限制，超过阈值则会与更高一级的重叠SSTable进行合并，合并后deleted和overwritten的数据会被删除，因此能在一定程度上提高读性能和空间效率。这里的compaction可以并行化，提高压缩效率。L0的SSTable会有重叠的key范围，因为其覆盖了完整的sorted run（一个sorted run内部的数据必定有序）。其后的每个层级只包含一个sorted run。其中RocksDB支持不同类型的compacttion：Leveled Compaction如下图所示，每层一个最多一个sorted run；Tiered Compaction与Cassandra、HBase的策略类似，允许一层存在多个sorted run，每次往更高层级压缩时，不会读取高层次的数据；FIFO Compaction：当DB大小达到某个阈值限制时直接丢弃以前的文件并只执行轻量压缩；使用不同的compaction策略，RocksDB能被配置为读友好或者写友好。</li>
+</ul>
+<p><img src="https://pic.imgdb.cn/item/6249b959239250f7c5aa0997.png" alt></p>
+<h2 id="Evolution-of-resource-optimization-targets"><a href="#Evolution-of-resource-optimization-targets" class="headerlink" title="Evolution of resource optimization targets"></a>Evolution of resource optimization targets</h2><p>本章描写了RocksDB的资源优化目标：从写放大到空间放大，再到CPU利用率。</p>
+<h3 id="Write-amplification"><a href="#Write-amplification" class="headerlink" title="Write amplification"></a>Write amplification</h3><p>一开始RocksDB主要关注如何节省flash- based SSD的擦拭次数来减少内部的写放大。这里的写放大主要集中在两个方面，一是SSD本身的写放大（1.1-3），二是软件自身的写放大，有时可能会到100，比如小于100Bytes的修改也需要写入一个4K/16K的页。</p>
+<p>Leveled Compaction在RocksDB中通常会引入10-30的写放大，虽然Tiered Compaction能将写放大降低到4-10，但这也降低了写性能。如下图所示：</p>
+<p><img src="https://pic.imgdb.cn/item/6249b959239250f7c5aa099e.png" alt></p>
+<p>RocksDB通常会选择一种自适应的压缩方法，写频率高时减少写放大，写频率低时更积极地压缩。</p>
+<h3 id="Space-amplification"><a href="#Space-amplification" class="headerlink" title="Space amplification"></a>Space amplification</h3><p>再到后面考虑到flash的写周期和开销都没有做限制，Space amplification的问题会更加明显。RocksDB的策略是Dynamic Leveled Compaction，即LSM中每个Level的大小会根据最后一个Level的实际大小自动调整，而不是更死板的设置每个level的大小。</p>
+<h3 id="CPU-utilization"><a href="#CPU-utilization" class="headerlink" title="CPU utilization"></a>CPU utilization</h3><p>有一些观点会认为性能瓶颈已经从SSD转移到了CPU上，但该论文并不认为这是一个问题，一是因为只有少部分应用会被SSD提供的IOPS所限制，大多数应用还是受限于空间；二是任何具有高端CPU的服务器都有足够的计算能力来饱和一个高端SSD。但同时论文也认为减少CPU开销是一个很重要的优化目标，这是因为减少Space amplification已经做得差不多了，而提高CPU利用率可以尽量优化成本。论文提到的关于CPU优化的努力包括引入prefix bloom filter和其他bf的改进。</p>
+<h3 id="Adapting-to-newer-technologies"><a href="#Adapting-to-newer-technologies" class="headerlink" title="Adapting to newer technologies"></a>Adapting to newer technologies</h3><p>论文提到了RocksDB发展过程中采用或考虑过的一些新技术。</p>
+<ul>
+<li>SSD架构的改进，比如改进查询延迟和节省flash擦拭周期；</li>
+<li>存储内计算，但RocksDB要适应存储内计算会是一个挑战，因为可能需要对整个软件堆栈进行API更改；</li>
+<li>远程存储，这是一个当前比较重要的优化目标。考虑到网络技术的发展能提供更多的远程IO，并且远程存储可以同时充分利用CPU和SSD资源。目前正在通过尝试合并和并行IO来解决长尾延迟，论文提到了已经对RocksDB进行改造，以处理瞬时故障，将QoS要求传递给底层系统，并报告分析信息。然而这一块可以做的还有很多；</li>
+<li>SCM也是一个很有前途的技术，但需要考虑以下几点：将SCM作为DRAM的延伸，需要考虑如何利用好混合的DRAM和SCM，提供更理想的数据结构，并且如果利用了持久性会带来哪些开销；使用SCM作为主要存储部分，但RocksDB往往会受到空间或CPU的瓶颈而不是IO，似乎效果也不会很明显；为WAL使用SCM，然而对于WAL只需要在转移到SSD之前的一小块staging区域，这里的成本是否理想；</li>
+</ul>
+<h3 id="Main-Data-Structure-Revisited"><a href="#Main-Data-Structure-Revisited" class="headerlink" title="Main Data Structure Revisited"></a>Main Data Structure Revisited</h3><p>目前得出的结论是LSM tree仍然是更适合SSD的存储引擎，用CPU或DRAM交换SSD也不是一个普遍的现象。当然RocksDB在发展过程中也不断收到用户关于降低写放大的需求，当对象很大时，可以通过key value分离来减少写放大，RocksDB也添加了BlobDB作为相关的支持。</p>
+<h2 id="Lessons-on-serving-large-scale-systems"><a href="#Lessons-on-serving-large-scale-systems" class="headerlink" title="Lessons on serving large-scale systems"></a>Lessons on serving large-scale systems</h2><p>RocksDB作为需求各异的大型分布式系统的基石，也需要在包括资源管理、WAL处理、文件批量删除、数据格式兼容和配置管理方面进行改进。</p>
+<h3 id="Resource-management"><a href="#Resource-management" class="headerlink" title="Resource management"></a>Resource management</h3><p>大规模的分布式系统通常需要对数据进行分片，每个分片分布在多个存储节点上，并且需要限制大小，因为考虑到需要进行备份和负载均衡，同时也会由于原子性做一些一致性的保证。一个RocksDB通常只会对应一个分片，因此一个节点上可能会运行着多个RocksDB实例，这就对资源管理有一定的影响。共享主机的资源，则需要对资源进行全局的管理，以确保能公平使用，这里的资源管理包括：write buffer和block cache的内存使用、compaction的IO带宽、compaction的线程数、磁盘使用情况、文件的删除比例等。为了确保单个实例不会占用过多资源，RocksDB为每种类型的资源都提供了若干个资源控制器，同时也会支持一些优先级策略。</p>
+<p>另一个运行多实例的教训是，大量的非池化的线程可能会给CPU带来过载，因此论文建议若需要使用一个可能会休眠或等待某个条件的线程来执行一些工作，最好使用一个线程池，便于限制线程的大小和资源使用。</p>
+<p>考虑到每个分片只有局部的信息，当RocksDB运行在单进程里时，全局的资源管理将会变得更加困难。这里可以采用两种策略：为每个实例配置更为谨慎的资源使用；让实例之间共享资源使用信息，并进行相应的调整。</p>
+<h3 id="WAL-treatment"><a href="#WAL-treatment" class="headerlink" title="WAL treatment"></a>WAL treatment</h3><p>传统数据库倾向于在每个写操作都强制执行WAl，而大规模的分布式系统为了可用性和性能，往往会通过各种一致性保证来做到这一点，比如从其他正常副本重建本机的损坏副本，或者通过自己的复制日志（比如分布式系统通常会有的Paxos日志等），这种情况下一般不需要RocksDB的WAL。</p>
+<p>考虑到这点，RocksDB提供了不同的WAL操作模式：同步WAL写，缓冲WAL写，不进行WAL写。</p>
+<h3 id="Rate-limited-file-deletions"><a href="#Rate-limited-file-deletions" class="headerlink" title="Rate-limited file deletions"></a>Rate-limited file deletions</h3><p>RocksDB通过文件系统与底层设备交互，每当删除文件时，可以发送TRIM命令到SSD，这会改善SSD性能和Flash性能，但也会引起性能问题。这是因为TRIM会更新地址映射，并且还需要将修改写入带flash的FTL日志，这会进一步触发SSD内部的GC，并进一步对IO延迟造成负面影响。因此RocksDB引入了文件删除的速度限制，以防止多个文件同时被删除。</p>
+<h3 id="Data-format-compatibility"><a href="#Data-format-compatibility" class="headerlink" title="Data format compatibility"></a>Data format compatibility</h3><p>这一章主要讲RocksDB需要确保数据格式的前后兼容，这样在一个大规模的分布式应用中，可以逐步灰度设计各个实例，也方便在出现问题时进行回退。</p>
+<h3 id="Managing-configurations"><a href="#Managing-configurations" class="headerlink" title="Managing configurations"></a>Managing configurations</h3><p>关于配置管理的方面，RocksDB具备高度的可配置性，但原来继承自leveldb的方法将参数选项嵌入到代码中，也容易造成以下两个问题：参数配置通常与存储在磁盘的文件强绑定，当使用一个选项创建的数据文件可能无法被新配置了另一个选项的RocksDB实例打开，这会带来兼容性的问题；当RocksDB更新时可能会改变默认配置参数。为了解决这些问题，RocksDB引入了对随数据库存储选项文件的可选支持，同时也加入了一些验证和迁移工具来对不同配置进行兼容。</p>
+<p>高度的可配置性带来的另一个问题就是配置参数过多，难以针对不同类型的应用进行选择。因此RocksdDB在改进开箱即用性能和简化配置上花费了大量的功夫，并尽可能提供自适应的配置。</p>
+<h3 id="Replication-and-backup-support"><a href="#Replication-and-backup-support" class="headerlink" title="Replication and backup support"></a>Replication and backup support</h3><p>RocksDB作为一个单节点存储引擎，分布式系统通常会有复制和备份的需求，因此RocksDB也需要对此进行支持，基于已有副本生成新副本的方式有两种：扫源副本的所有数据，然后将其写入目标副本；直接物理复制sstable和其他需要的文件来建立一个新的副本。</p>
+<h2 id="Lessons-on-failure-handling"><a href="#Lessons-on-failure-handling" class="headerlink" title="Lessons on failure handling"></a>Lessons on failure handling</h2><p>基于生产环境的经验，论文提到了三个关于故障处理的教训：尽早检测到数据损坏；数据完整性保护需要覆盖到整个系统；错误需要以不同的方式进行处理。</p>
+<h3 id="Frequency-of-silent-corruptions"><a href="#Frequency-of-silent-corruptions" class="headerlink" title="Frequency of silent corruptions"></a>Frequency of silent corruptions</h3><p>基于性能的考虑，RocksDB不实用SSD的数据保护（如DIF/DIX），而是通过RocksDB的block checksum进行校验和检测。CPU/内存的损坏很少发生，并且也很难量化。使用RocksDB的应用程序经常会进行数据的一致性检查，比较副本间的一致性，捕获的错误可能是由RocksDB或client引入的。另外传输数据时也会发生数据损坏，比如处理网络故障时，底层存储系统的错误会在一段时间后显现出来，每PB级别的物理数据大约会有17个checksum miss。</p>
+<h3 id="Multi-layer-protection"><a href="#Multi-layer-protection" class="headerlink" title="Multi-layer protection"></a>Multi-layer protection</h3><p>越快检查到数据损坏可以尽可能减少停机时间和数据丢失，对于分布式系统而言，当检测到checksum miss的时候可以丢弃损坏的副本，然后用正常的副本做替换。如下所示，RocksDB进行了多层的文件数据校验，并同时使用了块校验和文件校验。</p>
+<p><img src="https://pic.imgdb.cn/item/6249b959239250f7c5aa09a2.png" alt></p>
+<ul>
+<li>Block integrity：每个SSTable块和WAL segment都附加了一个checksum，数据创建时生成，每次读取数据都要验证；</li>
+<li>File integrity：如SSTable等文件内容有可能会在传输操作期间被破坏，为了解决这个问题，SSTable会在元数据的文件条目中记录checksum，在传输时使用SSTable文件进行验证。但WAL文件没有使用这种保护方式；</li>
+<li>Handoff integrity：早期检测写损坏的一种技术时对将要写入底层文件系统的数据生成一个Handoff checksum，并与数据一起传递下去，由底层进行验证，这样就可以很好地保护WAL的写操作，但很少有本地文件系统支持这一点。另一方面使用远程存储的时候，写API可以更改为接收checksum，并hook住存储服务的内部ECC，这样RocksDB就可以基于现有的WAL segment checksum上使用校验和组合技术来高效地计算write handoff checksum，进一步降低在读时检测到损坏的可能性；</li>
+</ul>
+<h3 id="End-to-end-protection"><a href="#End-to-end-protection" class="headerlink" title="End-to-end protection"></a>End-to-end protection</h3><p>到目前为止，文件IO层以上的数据还是缺乏保护的，例如MemTable中的数据和块缓存，此级别的损坏数据无法检测，会进一步暴露给用户，也会因为flush和compaction导致损坏被持久化。为了解决这个问题，RocksDB正在为每个kv对实现checksum。</p>
+<h3 id="Severity-based-error-handling"><a href="#Severity-based-error-handling" class="headerlink" title="Severity-based error handling"></a>Severity-based error handling</h3><p>RocksDB遇到的大多数错误都是底层存储系统返回的错误，比如文件系统只读，访问远程存储的网络问题等。因此RocksDB的目标是在错误不能在本地恢复的情况下中断RocksDB的操作，比如网络错误时进行周期性重试恢复，而不需要用户手动重启。</p>
+<h2 id="Lessons-on-the-key-value-interface"><a href="#Lessons-on-the-key-value-interface" class="headerlink" title="Lessons on the key-value interface"></a>Lessons on the key-value interface</h2><p>KV接口的用途非常广泛，几乎所有的存储系统都可以通过一个KV接口的API来提供存储服务，其是通用的，key和value都是变长的字节数组，由应用程序决定如何打包信息和如何进行编码解码。</p>
+<p>尽管如此，KV接口还是存在一些限制，比如构建并发控制等还是有需要考虑的东西。RocksDB已经意识到了数据版本控制的重要性，也规划支持合适的功能，如MVCC和point in time read等。</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>本文很像是一个综述，主要是把RocksDB相关的一些问题和开发设计思路进行了总结，包括写放大、空间放大，CPU利用率提高、remote storage等，同时也提到了开发过程中的一些反思，包括数据格式的前后兼容，如何支持数据库的备份和复制，简单化配置系统等。总而言之，这是一篇总结类的工业论文，非常适合进一步学习RocksDB。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/03/05/The-Dataflow-Model/" rel="next" title="The Dataflow Model">
+                <i class="fa fa-chevron-left"></i> The Dataflow Model
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="LucienXian">
+          <p class="site-author-name" itemprop="name">LucienXian</p>
+           
+              <p class="site-description motion-element" itemprop="description">LucienXian's Garden</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LucienXian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/feng-shao-37-35/activities" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Evolution-of-Development-Priorities-in-Key-value-Stores-Serving-Large-scale-Applications-The-RocksDB-Experience"><span class="nav-number">1.</span> <span class="nav-text">Evolution of Development Priorities in Key-value Stores Serving Large-scale Applications: The RocksDB Experience</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Background"><span class="nav-number">1.2.</span> <span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Embedded-storage-on-flash-based-SSDs"><span class="nav-number">1.2.1.</span> <span class="nav-text">Embedded storage on flash based SSDs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RocksDB-architecture"><span class="nav-number">1.2.2.</span> <span class="nav-text">RocksDB architecture</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Evolution-of-resource-optimization-targets"><span class="nav-number">1.3.</span> <span class="nav-text">Evolution of resource optimization targets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Write-amplification"><span class="nav-number">1.3.1.</span> <span class="nav-text">Write amplification</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Space-amplification"><span class="nav-number">1.3.2.</span> <span class="nav-text">Space amplification</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU-utilization"><span class="nav-number">1.3.3.</span> <span class="nav-text">CPU utilization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adapting-to-newer-technologies"><span class="nav-number">1.3.4.</span> <span class="nav-text">Adapting to newer technologies</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Main-Data-Structure-Revisited"><span class="nav-number">1.3.5.</span> <span class="nav-text">Main Data Structure Revisited</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lessons-on-serving-large-scale-systems"><span class="nav-number">1.4.</span> <span class="nav-text">Lessons on serving large-scale systems</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Resource-management"><span class="nav-number">1.4.1.</span> <span class="nav-text">Resource management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WAL-treatment"><span class="nav-number">1.4.2.</span> <span class="nav-text">WAL treatment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rate-limited-file-deletions"><span class="nav-number">1.4.3.</span> <span class="nav-text">Rate-limited file deletions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-format-compatibility"><span class="nav-number">1.4.4.</span> <span class="nav-text">Data format compatibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Managing-configurations"><span class="nav-number">1.4.5.</span> <span class="nav-text">Managing configurations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Replication-and-backup-support"><span class="nav-number">1.4.6.</span> <span class="nav-text">Replication and backup support</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lessons-on-failure-handling"><span class="nav-number">1.5.</span> <span class="nav-text">Lessons on failure handling</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Frequency-of-silent-corruptions"><span class="nav-number">1.5.1.</span> <span class="nav-text">Frequency of silent corruptions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Multi-layer-protection"><span class="nav-number">1.5.2.</span> <span class="nav-text">Multi-layer protection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#End-to-end-protection"><span class="nav-number">1.5.3.</span> <span class="nav-text">End-to-end protection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Severity-based-error-handling"><span class="nav-number">1.5.4.</span> <span class="nav-text">Severity-based error handling</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lessons-on-the-key-value-interface"><span class="nav-number">1.6.</span> <span class="nav-text">Lessons on the key-value interface</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-number">1.7.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

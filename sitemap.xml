@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2022/04/03/The-RocksDB-Experience/</loc>
+    
+    <lastmod>2022-04-03T15:14:16.333Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2022/03/05/The-Dataflow-Model/</loc>
     
     <lastmod>2022-03-05T09:41:59.459Z</lastmod>

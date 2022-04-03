@@ -265,6 +265,183 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/22/Two-phase-Commit-protocol/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/22/Two-phase-Commit-protocol/" itemprop="url">Two-phase Commit protocol</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-22T21:05:08+08:00">
+                2018-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="2PC提交协议"><a href="#2PC提交协议" class="headerlink" title="2PC提交协议"></a>2PC提交协议</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><blockquote>
+<p>在分布式系统中，每个节点虽然可以知道自己的操作是否成功，但当一个事物跨越多个节点时，为了保证事务的ACID特性，系统需要引入一个协调者组件来管控所有节点的操作；</p>
+</blockquote>
+<p>2 Phase Commit（简称2PC）协议是在分布式事务中，用于在多个节点达成一致性的协议。</p>
+<h2 id="协议内容"><a href="#协议内容" class="headerlink" title="协议内容"></a>协议内容</h2><ul>
+<li><p>角色</p>
+<ul>
+<li>一个协调者(coordinator，事务管理器)和多个参与者(participant，资源管理器)</li>
+</ul>
+</li>
+<li><p>操作流程</p>
+<ul>
+<li>Prepare阶段：<ul>
+<li>协调者会向所有参与者发送prepare命令，然后开始等待参与者节点的响应；</li>
+<li>参与者会询问发起为止的所有实务操作，并将Undo和Redo信息持久化日志，此时会将事务在本地提交；</li>
+<li>向协调者应答commit同意或abort失败，协调者收到之后会将信息反馈到客户端；</li>
+</ul>
+</li>
+<li>commit阶段：在这个阶段，会根据不同的应答执行操作<ul>
+<li>成功：当所有参与者节点都应答”同意”；<ul>
+<li>协调者向所有参与者节点发出”正式commit”的请求；</li>
+<li>参与者节点本地完成操作，并释放在整个事务期间占用的资源；</li>
+<li>参与者节点向协调者节点应答“完成”；</li>
+<li>协调者收到完成之后，完成事务；</li>
+</ul>
+</li>
+<li>失败：存在参与节点在第一阶段响应“终止”，或者协调者等待超时<ul>
+<li>协调者向所有参与者节点发出“回滚操作”的请求；</li>
+<li>参与者节点本地利用之前写入的Undo日志执行回滚，并释放相关资源；</li>
+<li>参与者向协调者反馈“回滚完成”；</li>
+<li>协调者收到所有信息之后，取消事务；</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>两阶段完成之后，无论结果如何，协调者都必须要在此结束当前事务；</p>
+</li>
+</ul>
+<p><strong>流程如下</strong>：</p>
+<p>Coordinator</p>
+<p><img src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-coord.jpg" alt="img"></p>
+<p>Participant</p>
+<p><img src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-part.jpg" alt="img"></p>
+<h2 id="2PC的缺点"><a href="#2PC的缺点" class="headerlink" title="2PC的缺点"></a>2PC的缺点</h2><p>尽管2PC看起来能提供原子性的事务，但其也有局限：</p>
+<ol>
+<li>同步阻塞：这是2PC最大的缺点，在执行过程中，节点都处于阻塞状态，即节点之间都在等待对方的相应消息。一旦协调者宕机，整个事务进程将会被阻塞；而参与者崩溃，则可能会导致协调者无法收到消息，执行保守的回滚政策；另外就是，一旦协调者发出了commit消息之后宕机，而唯一接收到这消息的参与同时崩溃，即便重新选出了协调者，那么这条事务的状态也是不确定的；</li>
+<li>延迟：在prepare和commit两阶段，至少会产生两次RPC延迟，和三次持久化数据的延迟——prepare写日志+协调者状态持久化+commit写日志</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>相比2PC，3PC能解决一些单点故障和阻塞的问题，但都无法彻底解决分布式的一致性问题，只有Paxos算法才是完整的一致性算法</p>
+<blockquote>
+<p>there is only one consensus protocol, and that’s Paxos” – all other approaches are just broken versions of Paxos.                ——————Mike Burrows</p>
+</blockquote>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
+<li><a href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Two-phase_commit_protocol</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/22594180" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/22594180</a></li>
+<li><a href="https://www.hollischuang.com/archives/681" target="_blank" rel="noopener">https://www.hollischuang.com/archives/681</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/用私有构造器或者枚举类型强化Singleton属性/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1476,141 +1653,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/07/Inner-class-of-Java/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/07/Inner-class-of-Java/" itemprop="url">Inner class of Java</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-07T22:04:57+08:00">
-                2018-11-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h1><p>内部类(Inner Class)是定义在一个类中的类。</p>
-<h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><ul>
-<li>内部类可以访问该类定义的作用域数据，包括私有数据；</li>
-<li>内部类可以对同包内的其它类隐藏；</li>
-<li>用匿名类实现回调函数；</li>
-</ul>
-<blockquote>
-<p>C++有嵌套类，嵌套类是一种类之间的关系，而不是对象之间的关系。另外，Java内部类能够引用实例化该内部对象的外部类对象。</p>
-</blockquote>
-<p>只有内部类可以设为private的。</p>
-<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p>大多数用法与常规类类似，有一些特殊的语法规则：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">outerObject.new InnerClass(para);</span><br></pre></td></tr></table></figure>
-<h2 id="局部内部类"><a href="#局部内部类" class="headerlink" title="局部内部类"></a>局部内部类</h2><p>如果某个内部类只有在某个方法中创建类型时使用一次，那么可以在一个方法中定义局部类：</p>
-<h3 id="外部方法访问final变量"><a href="#外部方法访问final变量" class="headerlink" title="外部方法访问final变量"></a>外部方法访问final变量</h3><p>局部类不但能访问外部类，还可以访问局部变量。但该局部变量必须是final的。</p>
-<h3 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h3><p>如果内部类不需要引用外部类对象，就可以把该内部类声明为静态内部类。</p>
-<p>在静态方法中new对象的时候，对应的类必须为static。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1659,7 +1701,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">263</span>
+                <span class="site-state-item-count">264</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

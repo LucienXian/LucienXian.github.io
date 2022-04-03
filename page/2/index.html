@@ -265,6 +265,218 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/26/TiDB-A-Raft-based-HTAP-Database/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LucienXian">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/07/26/TiDB-A-Raft-based-HTAP-Database/" itemprop="url">TiDB: A Raft-based HTAP Database</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-26T00:03:14+08:00">
+                2021-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="TIDB"><a href="#TIDB" class="headerlink" title="TIDB"></a>TIDB</h1><h2 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h2><p>Hybrid Transactional and Analytical Processing (HTAP，混合事务和分析处理)数据库要求独立地处理事务和分析查询，避免相互干扰。为了实现这一点，需要为两类查询维护不同的数据副本。然而，为存储系统中的分布式副本提供一致性视图并不容易。在该系统中，分析请求可以大规模地、高可靠性地从事务工作负载中读取一致的实时数据。</p>
+<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>关系型数据库（RDBMS）一直因其关系模型、强力的事务保证和SQL接口而广受好评，但它不具备高可扩展性和高可用性。因此NoSQL就应运而生，像Google bigtable和DynamoDB之类的放宽了一致性要求，提供了更高的可扩展性。但由于业务又需要事务处理能力、数据一致性和SQL接口等，就慢慢出现了像CockroachDB和Spanner之类的NewSQL。此外，像许多架构在Hadoop之上的SQL系统一样，在线分析处理系统（OLAP）也在迅速发展。</p>
+<p>以前一般认为针对OLAP和OLTP应该采用的不同的数据模型和技术方案，但维护多个系统的成本很高。业界开始探索OLTP和OLAP的混合系统HTAP。HTAP系统需要满足几个关键点：一是数据新鲜度，即OLAP需要拿到最新的数据；二是隔离，即为单独的OLTP或者OLAP查询提供不同的硬件资源处理，避免性能相互影响。</p>
+<p>本文就是基于上面的考虑，提出了一个以Raft为共识算法的HTAP数据库——TiDB，在Raft中引入了一个专门的节点Learner，Learner会异步地复制Leader节点的事务日志，并为OLAP查询构造新副本，并将日志中的行格式元组转换为列格式，便于查询。</p>
+<h2 id="RAFT-BASED-HTAP"><a href="#RAFT-BASED-HTAP" class="headerlink" title="RAFT-BASED HTAP"></a>RAFT-BASED HTAP</h2><p>使用共识算法如Raft、Paxos等可以基于复制状态机在服务器之间实时可靠地复制数据，通过调整，该论文的做法可以针对不同的 HTAP 工作负载将数据复制到不同的服务器，并且保持资源隔离和数据新鲜度。</p>
+<p><img src="https://pic.imgdb.cn/item/60fd8ba35132923bf82635ad.png" alt></p>
+<p>如上图所示，TiDB将数据按行格式存储在多个Raft Group里，每个Raft Group由一个Leader和多个Follower组成，另外为每个组增加一个Learner角色，可以异步复制Leader的数据，并将行格式转换为列格式。另外，扩展的查询优化器用来构建访问列存和行存的物理计划。</p>
+<p>在该实现中，Leader不参与Leader选举，也不计入日志复制的个数，不参与Quorum。读数据时，需要保证Leader和Learner之间的强一致性和日志复制的低延迟。行列格式的转换也有优点，行格式可以利用索引来高效进行事务查询，列格式可以有效利用数据压缩和矢量化处理。由于Learner部署在单独的物理资源中，OLAP和OLTP可以在独立的资源中得到处理。</p>
+<p>总的来说，这个设计克服了几个困难：一是基于Raft的系统如何应对高并发读写；二是资源独立如何保证数据新鲜度；另外就是如何构建查询计划在行式存储和列式存储中选择最优的。</p>
+<h2 id="ARCHITECTURE"><a href="#ARCHITECTURE" class="headerlink" title="ARCHITECTURE"></a>ARCHITECTURE</h2><p>如下图所示，这是TIDB的架构，兼容MySQL协议，由三个核心组件组成：分布式存储层、Placement Driver布局驱动器和计算引擎层。</p>
+<p><img src="https://pic.imgdb.cn/item/60fd8ba35132923bf82635cf.png" alt></p>
+<ul>
+<li>分布式存储层</li>
+</ul>
+<p>由行式存储（TiKV）和列式存储（TiFlash）组成，存储在TiKV的数据是有序的key-value对，key由两个整数table id和row id组成，其中row id就是主键列，value就是真实的行数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Key: &#123;table&#123;tableID&#125; record&#123;rowID&#125;&#125;</span><br><span class="line">Value: &#123;col0, col1, col2, col3&#125;</span><br></pre></td></tr></table></figure>
+<p>为了保证可扩展性，TiDB采用了range partition的策略，将kv对映射分割成若干个连续的范围，每个范围称为一个region，每个region都有多个副本来保证可用性，Raft就是用于维护每个region中若干个副本的一致性的。</p>
+<p>PD负责管理region，包括提供每个key对应的region和其物理位置，以及自动转移region以平衡负载。同时PD也是时间戳分配器，提供了严格递增全剧唯一的时间戳。PD不具备持久状态。</p>
+<p>计算引擎层是无状态、可扩展的，其SQL引擎由cost-based query optimizer和distributed query executor组成。另外TiDB基于Percolator实现了2PC协议。</p>
+<p>除此之外，TiDB还与Spark集成，方便集成TiDB和HDFS中存储的数据。</p>
+<h2 id="MULTI-RAFT-STORAGE"><a href="#MULTI-RAFT-STORAGE" class="headerlink" title="MULTI-RAFT STORAGE"></a>MULTI-RAFT STORAGE</h2><p>下图展示了分布式存储层的架构，其由TiKV和TiFlash组成。每个Region的副本之间都使用Raft来维护数据一致性。当数据复制到TiFlash的时候，为了方便扫描，多个Regions会被合并成一个Partition。</p>
+<p><img src="https://pic.imgdb.cn/item/60fd8ba35132923bf82635e8.png" alt></p>
+<h3 id="Row-based-Storage"><a href="#Row-based-Storage" class="headerlink" title="Row-based Storage"></a>Row-based Storage</h3><p>TiKV是由多个TiKV服务器组成的，每个TiKV服务器都可以是不同Region的Raft Leader或者Follower，另外在TiKV服务器上，数据和原数据都会保存在RocksDB上。</p>
+<p>基于Raft算法响应读写请求的过程如下：</p>
+<ol>
+<li>Region的Leader从SQL引擎层接受请求；</li>
+<li>Leader将请求Append到日志中；</li>
+<li>Leader向Follower发送新的日志条目，Follower会将接收到的日志Append到自己的日志中；</li>
+<li>Leader等待Follower回应，满足指定数量的节点响应成功后，Leader会在本地commit并Apply；</li>
+<li>Leader将结果发送给客户端；</li>
+</ol>
+<h4 id="Optimization-between-Leaders-and-Followers"><a href="#Optimization-between-Leaders-and-Followers" class="headerlink" title="Optimization between Leaders and Followers"></a>Optimization between Leaders and Followers</h4><p>为了提高吞吐，可以在Leaders和Followers之间的操作做一些优化。首先是，上述过程的第二步和第三步可以并行进行，即便第二步失败了，只要第三步成功了仍然可以提交日志。另外就是，第三步中Leader可以缓冲这些日志条目，并批量发送。并且发送日志后也不需要等待Follower响应，可以假设发送成功，并利用预测的日志索引发送后来的日志。即便出现错误，Leader可以调整日志索引进行重发。还有就是，第四步中，Leader应用日志可以交给其他线程去做。整体流程就变成：</p>
+<ol>
+<li>Region的Leader从SQL引擎层接受请求；</li>
+<li>Leader并行地向Follower发送日志，并同时Append本地日志；</li>
+<li>Leader继续接收请求，重复2；</li>
+<li>Leader commit日志，并将应用逻辑交给另外的线程去做；</li>
+<li>应用日志后，Leader返回结果；</li>
+</ol>
+<h4 id="Accelerating-Read-Requests-from-Clients"><a href="#Accelerating-Read-Requests-from-Clients" class="headerlink" title="Accelerating Read Requests from Clients"></a>Accelerating Read Requests from Clients</h4><p>从Leader读取数据具有线性化的语义，但通过常规的Raft流程来保证会导致很高的网络IO开销。为了提高性能，可以避免日志同步阶段。</p>
+<p>Raft保证：一旦Leader成功写入数据，就可以响应任何读取请求，而无需同步日志。但Leader是可能改变的。为了实现从Leader读取，TiKV做了以下优化：</p>
+<ul>
+<li>read index：Leader响应请求时，会将当前的提交索引记录为本地read index，然后向Follower发送heartbeat确认Leader地位。如果确实是Leader，并且应用的索引大于或等于read index，就可以返回值。</li>
+<li>lease read：为了减少heartbeat开销，Leader和Follower之间维护一个Lease期限，Follower在这期间不发出选举请求，因此Leader在此期间也无需与Follower进行heartbeat交流。</li>
+</ul>
+<p>Follower也可以响应client的读请求，但需要向Leader询问read index，如果本地应用索引等于或大于read index，则Follower可以将值返回给客户端。</p>
+<h4 id="Managing-Massive-Regions"><a href="#Managing-Massive-Regions" class="headerlink" title="Managing Massive Regions"></a>Managing Massive Regions</h4><p>为了实现跨机器平衡Region，Plancement Driver会对Region副本数量和位置施予限制。一个就是必须要在不同的TiKV实例上放置至少三个Region副本。PD通过Heartbeat从服务器收集信息、监控服务器负载，并将热Region进行转移。</p>
+<p>另一方面，维护大量Region涉及Heartbeat信息和元数据管理导致的大量的网络和存储开销，会被PD根据负载情况调整心跳频率。</p>
+<h4 id="Dynamic-Region-Split-and-Merge"><a href="#Dynamic-Region-Split-and-Merge" class="headerlink" title="Dynamic Region Split and Merge"></a>Dynamic Region Split and Merge</h4><p>这里主要设计Region的拆分和合并。热点Region或者大型Region会被拆成小Region，小或者访问少的Region，会被合并成大Region，以减少由于维护小Region心跳和元数据带来的网络和CPU开销。</p>
+<p>PD操作Region，是通过向TiKV发送拆分和合并指令，然后以Raft流程来完成更新请求。Region拆分比较简单，只需要更改元数据。合并的话，PD会移动两个Region的副本，放到单独的服务器上。然后通过两阶段操作，在每台服务器上本地合并两个Region的并置副本：即停止其一Region的服务并将其与另一Region合并。</p>
+<h3 id="Column-based-Storage-TiFlash"><a href="#Column-based-Storage-TiFlash" class="headerlink" title="Column-based Storage (TiFlash)"></a>Column-based Storage (TiFlash)</h3><p>考虑到TiKV中的行存数据并不适合OLAP，因此将列存储TiFlash合并到TiDB中。TiFlash由Learner节点组成，仅从Raft组接收Raft日志，并将行格式的元祖转换为列存数据。</p>
+<p>用户可以通过SQL语句为表设置列格式副本，<code>ALTER TABLE x SET TiFLASH REPLICA n;</code>其中x是表名，n是副本数量。在TiFlash中，每个表会按partitions进行划分，每个partitions包括几个连续Regions，更大的Regions便于范围扫描。</p>
+<p>当初始化一个TiFlash实例时，相关Region的Leader开始讲数据复制到新的Learner。一旦初始化完成后，TiFlash开始监听Raft组的更新。Learner收到日志后，会将日志应用到本子状态机，包括日志重放、转换数据格式和更新本地存储中的引用值。</p>
+<h4 id="Log-Replayer"><a href="#Log-Replayer" class="headerlink" title="Log Replayer"></a>Log Replayer</h4><p>由于在Raft中，Learner接收到的日志时可线性化的，因此重放日志也会按照FIFO的策略重放日志，具体步骤包括：</p>
+<ul>
+<li>压缩日志：事务日志分为三种状态：预写、提交或回滚。回滚的日志不需要写盘；</li>
+<li>解码元组：缓冲区中的日志被解码为行格式的元组，去除关于事务的冗余信息；</li>
+<li>转换数据格式：行元组会被转换为列数据；</li>
+</ul>
+<p><img src="https://pic.imgdb.cn/item/60fd8be25132923bf8275779.png" alt></p>
+<p>更具体的步骤可以参考上图。</p>
+<h4 id="Schema-Synchronization"><a href="#Schema-Synchronization" class="headerlink" title="Schema Synchronization"></a>Schema Synchronization</h4><p>为了实时将元组转换为列格式，Learner需要知道最新的schema，因此TiFlash会通过Schema syncer与TiKV中最新的Schema同步。同时为了减少TiFlash向TiKV的请求次数，每个Learner都会维护一个schema cache。这里采取两阶段策略：</p>
+<ul>
+<li>Regular synchronization：定期同步；</li>
+<li>Compulsive synchronization：synced检测到不匹配的schema，就会主动从TiKV拉去最新的Schema；</li>
+</ul>
+<h4 id="Columnar-Delta-Tree"><a href="#Columnar-Delta-Tree" class="headerlink" title="Columnar Delta Tree"></a>Columnar Delta Tree</h4><p>TiFlash设计了一个新的列存储引擎——Delta Tree，该引擎支持快速追加增量更新，然后将其与每个Partitions的稳定版本合并。如下图所示，在Stable space中，Partitions以chunks的形式存储，每个chunk都覆盖了一个较小的元组范围。TiFlash将元组的列数据及其元数据存储到不同的文件中，以同时更新文件。</p>
+<p><img src="https://pic.imgdb.cn/item/60fd8ba35132923bf82635fd.png" alt></p>
+<p>新进来的增量更新时插入或者删除数据的原子批处理，这些增量会缓存到内存中，并持久化道磁盘。另外TiFlash会定期将小增量压缩成大增量，并持久化。传入增量的内存副本有助于读取最新数据。</p>
+<p>另外，读取的时候由于需要合并增量文件和稳定空间中的数据，而且增量文件本身也可能存在空间放大的问题。TiFlash需要定期将增量合并到稳定空间中，每个增量文件及其相关chunks被读入内存进行合并，合并后的chunks自动替换磁盘中的原始chunks。</p>
+<p>由于相关的键在增量空间中是无序的，合并成本较高，并且也会影响合并读的速度，因此会在增量空间构建B+ Tree索引，每个增量更新项都被插入到 B+ Tree 中，并按其关键字和时间戳进行排序。便于快速响应读请求，和有序数据也更易与稳定块合并。</p>
+<h4 id="Read-Process"><a href="#Read-Process" class="headerlink" title="Read Process"></a>Read Process</h4><p>与Follower read类似，Learner提供snapshot isolation，在接收到读取请求后，Learner向其Leader发送read index请求，以获取涵盖所请求时间戳的最新数据。Learner拿到日志后，回放日志，写入Delta Tree，就可以读到特定数据响应请求了。</p>
+<h2 id="HTAP-ENGINES"><a href="#HTAP-ENGINES" class="headerlink" title="HTAP ENGINES"></a>HTAP ENGINES</h2><p>为了提供OLAP和OLTP查询，TiDB引入了SQL引擎来为了查询计划做决策。SQL引擎使用Percolator模型来实现分布式集群的乐观和悲观锁，并基于优化器、索引和下推算子来支持OLAP查询。</p>
+<h3 id="Transactional-Processing"><a href="#Transactional-Processing" class="headerlink" title="Transactional Processing"></a>Transactional Processing</h3><p>TiDB为ACID事务提供了snapshot isolation语义或者repeatable read语义，前者允许每个请求读取版本一致的数据，后者则是事务中的不同语句可能为同一个key读取不同的值，但重复读取将会读取到相同的值。这是基于MVCC实现。</p>
+<p>如下图，TiDB中的事务由SQL引擎、TiKV和PD三个组件共同完成：</p>
+<p><img src="https://pic.imgdb.cn/item/60fd8ba35132923bf8263619.png" alt></p>
+<p>TiDB对于悲观锁和乐观锁的实现启发自Percolator模型。</p>
+<ol>
+<li>client接收到Begin命令后，SQL引擎向PD请求一个start_ts时间戳；</li>
+<li>SQL引擎从TiKV读取数据并在本地内存中执行SQL DMLs。TiKV提供在start_ts之前最近的commit_ts数据；</li>
+<li>SQL引擎收到client的commit命令后，启动2PC协议。随机选择一个主键，并行锁定所有的key，并将prewrite发送TiKV节点；</li>
+<li>如果所有的prewrite都成功了，SQL引擎会向PD请求一个commit_ts，并向TiKV发送commit命令。TiKV commit主键，并响应成功回到SQL引擎；</li>
+<li>SQL引擎向Client响应成功；</li>
+<li>SQL引擎向TiKV发送commit命令，异步并行地提交从键和清除锁；</li>
+</ol>
+<p>悲观事务和乐观事务的区别在于获取锁的实际，前者是在第二步执行DMLs的时候获取，后者则是第三步prewrite的时候。</p>
+<h3 id="Analytical-Processing"><a href="#Analytical-Processing" class="headerlink" title="Analytical Processing"></a>Analytical Processing</h3><p>TiDB通过两阶段查询优化来实现优化器：rule-based optimization生成逻辑计划， cost-based optimization将逻辑计划转换为物理计划。由于TiDB有两类存储、因此扫描表往往有三种选项：扫描TiKV的行格式表、扫描TiKV中有索引的表和骚婊TiFlash的列。</p>
+<p>索引可以提高点查询和范围查询的性能，TiDB实现了可扩展性的索引，由于维护索引会消耗大量资源，因此会在后台以非同步的形式构建或删除索引。索引是以与数据相同的方式按Regions分割，并作为键值存储在TiKV 中。唯一键索引上的索引项编码为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Key: &#123;table&#123;tableID&#125; index&#123;indexID&#125; indexedColValue&#125;</span><br><span class="line">Value: &#123;rowID&#125;</span><br></pre></td></tr></table></figure>
+<p>非唯一索引上的索引项被解码为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Key: &#123;table&#123;tableID&#125; index&#123;indexID&#125; indexedColValue rowID&#125;</span><br><span class="line">Value: &#123;null&#125;</span><br></pre></td></tr></table></figure>
+<p>物理计划的执行是由SQL引擎层使用pulling iterator model进行的，通过将部分计算下推到存储层，可以进一步优化执行。在存储层，执行计算的组件称为coprocessor，coprocessor在不同的服务器上并行执行substrees of an execution 破烂，这减少了必须从存储层发送到引擎层的元组数量。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要是介绍了一个投入生产环境的HTAP数据库——TiDB。TiDB建立在TiKV上，这是一个基于Raft的分布式行式存储，并引入一个TiFlash组件用于实时分析，作为Raft的learner从TiKV异步复制日志，并将行格式的数据转换为列格式。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/18/SuRF-Range-Query-Filter/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1928,262 +2140,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/18/Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS——MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LucienXian">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/01/18/Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS——MIT6-824/" itemprop="url">Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS——MIT6-824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-18T00:09:57+08:00">
-                2021-01-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS"><a href="#Don’t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS" class="headerlink" title="Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS"></a>Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS</h1><h2 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h2><p> COPS的KV存储系统，并引出了一种新的一致性模型——具有收敛性冲突处理的因果一致性。</p>
-<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>对于分布式存储系统，论文从CAP转移到关注ALPS——即可用性、低延迟、分区容忍性和扩展性。论文介绍了一个叫COPS的KV存储系统，并实现了一种新的一致性模型causal+ consistency，收敛冲突处理的因果一致性。除此之外还有一个扩展版本——COPS-GT，提供了get事务来保证提供对于多个key的一致性视图，并且是无锁和非阻塞的。</p>
-<ul>
-<li>因果一致性：确保数据存储遵循操作之间的因果依赖关系；</li>
-<li>收敛冲突处理：确保副本永远不会发散，并且在所有节点上对相同key的冲突进行相同的处理；</li>
-</ul>
-<p>两者结合，确保客户端看到因果正确，无冲突且始终在发展的数据存储。</p>
-<h2 id="ALPS-SYSTEMS-AND-TRADE-OFFS"><a href="#ALPS-SYSTEMS-AND-TRADE-OFFS" class="headerlink" title="ALPS SYSTEMS AND TRADE-OFFS"></a>ALPS SYSTEMS AND TRADE-OFFS</h2><p>一个分布式系统主要关注以下几个特性：</p>
-<ul>
-<li>Availability：所有操作不会被永久阻塞或者返回不可用的错误；</li>
-<li>Low Latency：client能快速完成操作；</li>
-<li>Partition Tolerance：在网络分区的情况，数据存储能继续提供服务；</li>
-<li>High Scalability：能做到线性扩展；</li>
-<li>Stronger Consistency：理想的数据存储最好能提供线性化；</li>
-</ul>
-<p>由于CAP的缘故，具备可用性和分区容忍性的分布式系统无法实现强一致性。为了在ALPS系统的要求和易编程之间取得平衡，论文定义了一个中间一致性模型。</p>
-<h2 id="CAUSAL-CONSISTENCY"><a href="#CAUSAL-CONSISTENCY" class="headerlink" title="CAUSAL+ CONSISTENCY"></a>CAUSAL+ CONSISTENCY</h2><p>对于具有收敛冲突处理的因果一致性来说，其抽象模型只有两种操作：put(key,val)和 get(key)=val，即读写。在COPS系统里，单个逻辑副本就是完整的本地集群的所有节点。</p>
-<p>该模型定义了三条规则：</p>
-<ul>
-<li>Execution Thread：如果a和b是单线程内的两个操作，a-&gt;b表示a发生在b之前；</li>
-<li>Gets From：如果a是一个put操作，b是一个获取a写入值的get操作，则是a-&gt;b；</li>
-<li>Transitivity：对于操作a、b、c来说，如果存在a-&gt;b和b-&gt;c，则一定有a-&gt;c；</li>
-</ul>
-<p>下图就是这三条规则的一个样例：</p>
-<p><img src="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png" alt></p>
-<h3 id="Definition"><a href="#Definition" class="headerlink" title="Definition"></a>Definition</h3><p>论文将因果一致性定义为两个属性的组合：因果一致性和收敛性冲突处理。</p>
-<p>所谓的因果一致性就是上图提到的一个操作顺序结果，如果client 2读取x的时候，先读取到4，再读取到1就会违反因果一致性。但如果两个操作a和b没有任何顺序关系，那么因果一致性就会认为这是一个并发操作，不会做任何的约束，提高系统性能。如果a和b都在同一个key上做put操作，就意味着发生冲突。冲突会带来两个问题：冲突的值可能不确定，即不同副本的值可能不一致；冲突可能产生需要特殊处理的特殊情况；</p>
-<p>因此就需要收敛的冲突处理，冲突处理函数必须能在所有副本上以相同的方式进行处理，并且满足交换律和结合律的，即$h(a,h(b,c))=h(c,h(b,a))$，不同的副本以接收到顺序处理冲突，收敛处理的结果。</p>
-<p>COPS可以自定义冲突收敛函数，默认使用last writer wins。</p>
-<h3 id="Causal-vs-Other-Consistency-Models"><a href="#Causal-vs-Other-Consistency-Models" class="headerlink" title="Causal+ vs. Other Consistency Models"></a>Causal+ vs. Other Consistency Models</h3><p>这一章主要介绍各种一致性模型的对比，从约束能力来看：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Linearizability &gt; Sequential &gt; Causal+ &gt; Causal &gt; FIFO</span><br><span class="line">																			 &gt; Per-Key Sequential &gt; Eventua</span><br></pre></td></tr></table></figure>
-<p>Causal+提供了比较适中的一致性模型，且能满足ALPS的系统要求。</p>
-<h3 id="Causal-in-COPS"><a href="#Causal-in-COPS" class="headerlink" title="Causal+ in COPS"></a>Causal+ in COPS</h3><p>COPS系统提供了两个抽象：其一是版本号，每个key都有一个版本号；另外就是依赖关系，如果b依赖a，那么在复制的时候，需要先复制a，才能再复制b；</p>
-<h3 id="Scalable-Causality"><a href="#Scalable-Causality" class="headerlink" title="Scalable Causality"></a>Scalable Causality</h3><p>有些类似的因果一致性系统使用的是日志交换的序列化，在扩展性方便表现不好。而COPS则是采用了划分key空间和编码依赖关系到key元数据的方式来提高扩展性。</p>
-<h2 id="SYSTEM-DESIGN-OF-COPS"><a href="#SYSTEM-DESIGN-OF-COPS" class="headerlink" title="SYSTEM DESIGN OF COPS"></a>SYSTEM DESIGN OF COPS</h2><p>COPS是一个实现了causal+一致性的、能满足ALPS的分布式存储系统，论文提及了两个版本：一个是简单版的，支持causal+ 的一致性，另一个则是升级版的，支持get事务，能确保client请求keys的时候，存储系统能提供一个一致的相关values的快照，成为 COPS-GT。</p>
-<h3 id="Overview-of-COPS"><a href="#Overview-of-COPS" class="headerlink" title="Overview of COPS"></a>Overview of COPS</h3><p>如下图，COPS就是一个在若干个数据中心运行着的kv存储系统。每个数据中心都有一个本地的COPS集群，保存着完整的一份数据。Client只与本地的数据中心进行联系，并通过COPS的client库进行调用。</p>
-<p><img src="https://img.imgdb.cn/item/6002872f3ffa7d37b3d238d1.png" alt></p>
-<p>COPS系统主要由两个组件组成的：</p>
-<ul>
-<li>Key-value store：提供了对keys的线性化操作<ul>
-<li>每个key- value对都有对应的元数据。对于COPS，这个元数据是版本号；对于COPS-GT，则是有版本号和一系列的依赖‘</li>
-<li>kv存储提供了三种额外的操作：get by version, put after和dep check这三种操作确保了client库和异步复制进程能够提供Casula+一致性和get事务；</li>
-<li>对于 COPS-GT，系统保存了kv对的一些老版本数据，提供get事务；</li>
-</ul>
-</li>
-<li>client库：主要提供读写操作，COPS的get， COPS-GT的get_trans，还有put。</li>
-</ul>
-<p>另外，COPS为了在确保casual+一致性的时候，能降低资源和性能开销：</p>
-<ul>
-<li>避免检查所有值的依赖关系；</li>
-<li>做垃圾回收，减少存储多版本key和依赖关系元数据的空间开销；</li>
-<li>最多进行两次的get事务，降低延迟；</li>
-</ul>
-<h3 id="The-COPS-Key-Value-Store"><a href="#The-COPS-Key-Value-Store" class="headerlink" title="The COPS Key-Value Store"></a>The COPS Key-Value Store</h3><p>对于COPS，存储元组是&lt;key: {value, version}&gt;，存储的是最新版本的数据；</p>
-<p>对于COPS-GT，存储元组是&lt;key: {value, version, deps}&gt;，deps就是一个链表，链表元素是&lt;key, version&gt;；</p>
-<p>每个COPS集群都持有完整的一份kv存储数据，每个集群节点根据一致性哈希获得一个独立的keys空间。至于容灾，则是通过链式复制来提供的。在每个集群中，每个key都有一个主节点，主节点会复制到集群内的从节点；至于其他集群也有一个对应的主节点；</p>
-<p>集群内的操作是线性化的，本地commit后，跨集群复制时会将数据放到一个队列上异步复制到其他集群的主节点。待其他集群检查完依赖关系后，就会提交该key；</p>
-<h3 id="Client-Library-and-Interface"><a href="#Client-Library-and-Interface" class="headerlink" title="Client Library and Interface"></a>Client Library and Interface</h3><p>COPS的clientAPI主要包含四个步骤：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. ctx id ← createContext()</span><br><span class="line">2. bool ← deleteContext(ctx id)</span><br><span class="line">3. bool ← put (key, value, ctx id)</span><br><span class="line">4. value ← get (key, ctx id) [In COPS]</span><br><span class="line">or</span><br><span class="line">4. hvaluesi ← get trans (hkeysi, ctx id) [In COPS-GT]</span><br></pre></td></tr></table></figure>
-<p>与传统的kv系统API不同，这个client库会有一个针对COPS-GT的get_trans的API，还有就是所有的函数都需要一个context的参数，该参数可以记录每个client操作的因果关系；</p>
-<ul>
-<li>COPS-GT Client Library</li>
-</ul>
-<p>COPS-GT的client库中context存了一组&lt;key, version, deps&gt;，读取时，client会将该key和其依赖关系添加到当前的context里；写入时，client先取出最新版本key的依赖关系，重新计算新依赖D，待写入成功后，则将写入该项&lt;key，返回的version，D&gt;到context；</p>
-<p>下图就是运行过程中的依赖关系变化图：</p>
-<p><img src="https://img.imgdb.cn/item/6002908b3ffa7d37b3d70194.png" alt></p>
-<p>这种依赖关系的设计会嗲来两个问题：空间占用大和检查依赖关系的成本高。</p>
-<p>论文的解决方法是：COPS-GT会在依赖关系被提交后进行垃圾回收，另外就是由于依赖关系具备传递性，一旦依赖项被提交，那么可以确定该依赖项的依赖项也被提交了，所以只需要检查最近依赖；</p>
-<blockquote>
-<p>get_trans需要检查全部的依赖</p>
-</blockquote>
-<ul>
-<li>COPS Client Library</li>
-</ul>
-<p>COPS的client库需要更好的状态，因此读取时只需要将拿到的key和版本号添加到context就好，至于写入，则是先使用context作为最近的依赖项，返回数据后，则用返回的数据去副高context。</p>
-<h3 id="Writing-Values-in-COPS-and-COPS-GT"><a href="#Writing-Values-in-COPS-and-COPS-GT" class="headerlink" title="Writing Values in COPS and COPS-GT"></a>Writing Values in COPS and COPS-GT</h3><p>所有对COPS的写入都分为两步：同步写入本地集群，异步复制到其他集群，并且都通过下面的API去完成：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bool,vers&gt; ← put_after (key, val, [deps], nearest, vers=∅)</span><br></pre></td></tr></table></figure>
-<h4 id="写入本地集群"><a href="#写入本地集群" class="headerlink" title="写入本地集群"></a>写入本地集群</h4><p>当client调用put接口时，首先需要计算最近的依赖关系，然后client库会去调用put_after接口，这里COPS不需要传入deps参数。然后该key对应的本地主节点会赋予该key一个版本号。put_after接口可以确保本地集群的commit是强一致性的，至于其他集群的提交在后面叙述。</p>
-<p>主节点使用Lamport时间戳来为每次更新计算一个版本号，其中高位是版本号，低位是节点号，通过比较Lamport时间戳，并应用 last-writer-wins 来检查和解决冲突。Lamport时间戳提供了所有分布式事件的偏序关系，与COPS的因果一致性兼容。</p>
-<h4 id="复制到其他集群"><a href="#复制到其他集群" class="headerlink" title="复制到其他集群"></a>复制到其他集群</h4><p>本地写入提交后，主节点会调用put_after（此时vers参数需要设置为新得到的值）异步复制到其他集群的主节点，主节点进行依赖检查dep_check，一直阻塞直到依赖中的值都写入提交了，参会写入并提交该key值。依赖检查只需要nearest就好。</p>
-<h3 id="Reading-Values-in-COPS"><a href="#Reading-Values-in-COPS" class="headerlink" title="Reading Values in COPS"></a>Reading Values in COPS</h3><p>COPS的读取会通过下面的API完成，并且version会设置为默认的LATEST，并将得的数据按照前面说的添加到context里。COPS-GT可能需要获取非LATEST版本的值；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;value, version, deps&gt; ← get_by_version (key, version=LATEST)</span><br></pre></td></tr></table></figure>
-<h3 id="Get-Transactions-in-COPS-GT"><a href="#Get-Transactions-in-COPS-GT" class="headerlink" title="Get Transactions in COPS-GT"></a>Get Transactions in COPS-GT</h3><p>COPS-GT提供了get_trans接口，以事务的方式返回一对kv，满足因果一致性。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># @param keys list of keys</span></span><br><span class="line"><span class="comment"># @param ctx_id context id</span></span><br><span class="line"><span class="comment"># @return values list of values</span></span><br><span class="line"></span><br><span class="line">function get_trans(keys, ctx_id):</span><br><span class="line">	<span class="comment"># Get keys in parallel (first round)</span></span><br><span class="line">	<span class="keyword">for</span> k <span class="keyword">in</span> keys</span><br><span class="line">  	results[k] = get_by_version(k, LATEST)</span><br><span class="line">    </span><br><span class="line">  <span class="comment"># Calculate causally correct versions (ccv)</span></span><br><span class="line">  <span class="keyword">for</span> k <span class="keyword">in</span> keys</span><br><span class="line">    ccv[k] = max(ccv[k], results[k].vers)</span><br><span class="line">    <span class="keyword">for</span> dep <span class="keyword">in</span> results[k].deps</span><br><span class="line">    	<span class="keyword">if</span> dep.key <span class="keyword">in</span> keys</span><br><span class="line">    		ccv[dep.key] = max(ccv[dep.key], dep.vers)</span><br><span class="line">          </span><br><span class="line">  <span class="comment"># Get needed ccvs in parallel (second round)</span></span><br><span class="line">  <span class="keyword">for</span> k <span class="keyword">in</span> keys</span><br><span class="line">    <span class="keyword">if</span> ccv[k] &gt; results[k].vers</span><br><span class="line">    	results[k] = get_by_version(k, ccv[k])</span><br><span class="line">      </span><br><span class="line">  <span class="comment"># Update the metadata stored in the context</span></span><br><span class="line">  update_context(results, ctx_id)</span><br><span class="line">      </span><br><span class="line">  <span class="comment"># Return only the values to the client</span></span><br><span class="line">  <span class="keyword">return</span> extract_values(results)</span><br></pre></td></tr></table></figure>
-<p>论文举了一个相册例子：A修改相册权限acl为“仅朋友可见”，然后修改相册说明desc，然后添加照片到相册album。</p>
-<p>现在要读取A的相册，如果出现一个这样的顺序：先读取到旧的acl，检查权限，然后acl被修改，最后越权读到了desc和album。为了避免这种问题，使用get_trans就不会有这个问题：</p>
-<ul>
-<li>首先是第一轮并行调用get_by_version，拿到acl，desc和album的值，并获得相应的依赖；</li>
-<li>此时可能读到旧的acl、新的desc和album，然后计算ccv，根据依赖关系可以得知desc和album依赖的acl比读到的acl要更新；</li>
-<li>然后根据前面的计算，得到需要进行第二轮get_by_version的调用，此时获取指定版本的值；（同样是并行调用）；</li>
-<li>此时拿到的acl值就是最新的了；</li>
-</ul>
-<h2 id="GARBAGE-FAULTS-AND-CONFLICTS"><a href="#GARBAGE-FAULTS-AND-CONFLICTS" class="headerlink" title="GARBAGE, FAULTS, AND CONFLICTS"></a>GARBAGE, FAULTS, AND CONFLICTS</h2><h3 id="Garbage-Collection-Subsystem"><a href="#Garbage-Collection-Subsystem" class="headerlink" title="Garbage Collection Subsystem"></a>Garbage Collection Subsystem</h3><p>随着key的更新和插入，系统的空间占用将会无限制增长。COPS的垃圾回收子系统能够删除无用的状态，将系统的空间维持在一个合适的大小。</p>
-<ul>
-<li>Version Garbage Collection. 仅COPS-GT需要</li>
-</ul>
-<p>存储：COPS-GT存储了每个key的多个版本，以便client调用get_by_version；</p>
-<p>get_trans算法会限制完成一个事务需要的版本数，即在第二轮获取所需的旧版本数据，因此使用默认为5s的trans_time限制执行时间，若超时则进行重试。写入新版本的key后，COPS-GT只需要保留一段时间的旧版本数据，在此之后就不再使用旧版本来请求数据，并且GC可以降低删除。</p>
-<ul>
-<li>Dependency Garbage Collection. 仅COPS-GT需要</li>
-</ul>
-<p>存储：存储get事务需要的依赖</p>
-<p>当COPS-GT的get事务不再需要这个依赖的时候，就可以进行GC回收，至于不需要则是指：kv被写入到所有集群后经过了trans_time。此时的回收主要是清楚value的依赖，并且设置一个never-depend的标志。</p>
-<p>清除依赖需要通知其他集群，在其他集群的写提交后trans_time，就需要通知原集群，原集群删除后再通知其他集群也删除。</p>
-<ul>
-<li>Client Metadata Garbage Collection. COPS和COPS-GT</li>
-</ul>
-<p>存储：client存在context里的元数据，包括依赖关系和其他数据。</p>
-<p>COPS清理的方式有两种：</p>
-<ol>
-<li>put_after作用于所有集群后，会对key标记为never- depend，并返回给client，client就可以在context中进行删除；</li>
-<li>COPS节点会从put_after中移除不需要的依赖，这里使用了一个global checkpoint time的概念，版本号比这个小的都移除；global checkpoint time的计算方式：首先是从pending中的put_after里找到最早的Lamport timestamp；然后联系其他集群的等价节点，一对一交换拿到最早的Lamport timestamp，所有数据中心都能知道key范围内最早的Lamport timestamp是什么了；最后数据中心会gossip自己负责的key range的最小时间戳，以找到任何一个节点观测到的最早Lamport timestamp。论文的实现是，每秒执行10次，并且对性能没有明显影响。</li>
-</ol>
-<h3 id="Fault-Tolerance"><a href="#Fault-Tolerance" class="headerlink" title="Fault Tolerance"></a>Fault Tolerance</h3><h4 id="Client-Failures"><a href="#Client-Failures" class="headerlink" title="Client Failures"></a>Client Failures</h4><p>Client出故障意味着不能发送请求，因此不需要做任何处理</p>
-<h4 id="Key-Value-Node-Failures"><a href="#Key-Value-Node-Failures" class="headerlink" title="Key-Value Node Failures"></a>Key-Value Node Failures</h4><p>COPS使用了类似FAWN-KV的设计来做链式复制，从而实现节点容灾。在本地集群中，put_after则是直接作用于链的头节点，然后向后传导，在尾节点commit。读取时get_by_version则是直接读尾节点。跨集群传播，则是源集群尾节点将其传播到其他集群的头部节点，进行dep_check后同样沿着链条将值传播，尾节点commit。</p>
-<h4 id="Datacenter-Failures"><a href="#Datacenter-Failures" class="headerlink" title="Datacenter Failures"></a>Datacenter Failures</h4><p>应对数据中心出故障，COPS能继续对外工作，但可能会有一些key不一致；</p>
-<p>本地集群写入时出错：</p>
-<ul>
-<li>集群宕掉，若没有拷贝，数据丢失；</li>
-<li>网络分区，数据不会丢失，等分区修复则可；</li>
-</ul>
-<p>其他集群写入出错，需要等待管理员解决：</p>
-<ul>
-<li>允许复制队列增长，直到故障修复；</li>
-<li>重配置，去掉失败数据中心；</li>
-</ul>
-<p>数据中心出故障时，COPS-GT无法进行依赖回收，要等到重新配置去掉有问题的数据中心。</p>
-<h3 id="Conflict-Detection"><a href="#Conflict-Detection" class="headerlink" title="Conflict Detection"></a>Conflict Detection</h3><p>多线程并发写同一个key会导致冲突。</p>
-<p>COPS使用的是前文提到过的last- write-win策略来解决冲突，last则是最新的写入版本号。</p>
-<p>COPS也可以自定义冲突检查和解决策略，但需要考虑三个部分的内容：</p>
-<ul>
-<li>所有的写入都需要带上前面的版本元数据，即本地集群看到的最近版本；</li>
-<li>所有的写入都需要带上隐式依赖数据，在写入前进行依赖检查；</li>
-<li>检查出冲突后需要自定义一个收敛的冲突处理函数；</li>
-</ul>
-<p>冲突检查：如果写入的key——new，带有了一个版本号prev，而此时可见的当前版本是curr，如果prev!=curr，则意味着发生冲突。</p>
-<h2 id="CONCLUSION"><a href="#CONCLUSION" class="headerlink" title="CONCLUSION"></a>CONCLUSION</h2><p>本文介绍了一种可扩展的分布式存储系统COPS，可以在不牺牲ALPS属性的情况下提供因果关系+一致性。COPS通过在每个集群的写入之前跟踪并显式检查是否满足因果关系来实现因果一致性。COPS-GT通过在COPS的基础上引入get事务，使client能够获得多个key的一致性视图； COPS-GT进行了优化，减少状态，最小化多轮协议并减少复制开销。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2232,7 +2188,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">263</span>
+                <span class="site-state-item-count">264</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
