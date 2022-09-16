@@ -1,38 +1,761 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
 
-{% block page_class %}page-post-detail{% endblock %}
+  
 
 
-{% block content %}
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unix," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="通用套接字选项其实应该是通用套接字选项，标题写错了，就不改了，仅仅作为自己学习使用，如有错误，不负责任 因为之前面试有问到，但自己不大熟悉，就学习记录一下，主要参考UNP这本书 SO_DEBUG套接字选项这是一个仅仅由TCP支持的选项，开启该选项之后，内核将为TCP在该套接字上的所有分组保留详细的追踪信息，保存在内核的环形缓冲区。 SO_ERROR套接字选项当一个套接字发送错误时，内核会将套接字的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCP套接字选项介绍">
+<meta property="og:url" content="http://yoursite.com/2018/04/13/TCP%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="通用套接字选项其实应该是通用套接字选项，标题写错了，就不改了，仅仅作为自己学习使用，如有错误，不负责任 因为之前面试有问到，但自己不大熟悉，就学习记录一下，主要参考UNP这本书 SO_DEBUG套接字选项这是一个仅仅由TCP支持的选项，开启该选项之后，内核将为TCP在该套接字上的所有分组保留详细的追踪信息，保存在内核的环形缓冲区。 SO_ERROR套接字选项当一个套接字发送错误时，内核会将套接字的">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-04-13T13:48:04.000Z">
+<meta property="article:modified_time" content="2018-04-14T03:20:05.372Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="Unix">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/13/TCP套接字选项介绍/"/>
+
+
+
+
+
+  <title>TCP套接字选项介绍 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
 
   <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/TCP%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9%E4%BB%8B%E7%BB%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TCP套接字选项介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T21:48:04+08:00">
+                2018-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="通用套接字选项"><a href="#通用套接字选项" class="headerlink" title="通用套接字选项"></a>通用套接字选项</h1><p>其实应该是通用套接字选项，标题写错了，就不改了，仅仅作为自己学习使用，如有错误，不负责任</p>
+<p>因为之前面试有问到，但自己不大熟悉，就学习记录一下，主要参考UNP这本书</p>
+<h2 id="SO-DEBUG套接字选项"><a href="#SO-DEBUG套接字选项" class="headerlink" title="SO_DEBUG套接字选项"></a>SO_DEBUG套接字选项</h2><p>这是一个仅仅由TCP支持的选项，开启该选项之后，内核将为TCP在该套接字上的所有分组保留详细的追踪信息，保存在内核的环形缓冲区。</p>
+<h2 id="SO-ERROR套接字选项"><a href="#SO-ERROR套接字选项" class="headerlink" title="SO_ERROR套接字选项"></a>SO_ERROR套接字选项</h2><p>当一个套接字发送错误时，内核会将套接字的名为so_error的变量设为标准Unix Exxx值的一个，称为待处理的错误。一般会以以下两种方式之一立即通知进程这个错误。</p>
+<ol>
+<li><p>进程阻塞在对该套接字的select调用上，那么无论是检查可读条件还是可写条件，select均返回并设置其中一个或所有两个条件；</p>
+</li>
+<li><p>如果进程使用信号驱动式IO模型，那就给进程产生一个SIGIO信号；</p>
+</li>
+</ol>
+<h2 id="SO-KEEPALIVE套接字选项"><a href="#SO-KEEPALIVE套接字选项" class="headerlink" title="SO_KEEPALIVE套接字选项"></a>SO_KEEPALIVE套接字选项</h2><p>套接字设置该选项后，如果在2小时内在该套接字上都没有数据交换，TCP会自动给对端发送一个保持存活探测分节。这是一个对端必须响应的TCP分节，会导致以下三种情况：</p>
+<ul>
+<li><p>对端以期望的ACK响应；</p>
+</li>
+<li><p>对端以RST响应，告知本端TCP，对端已崩溃且已经重新启动；</p>
+</li>
+<li><p>对端对保持存活探测分节没有任何响应；</p>
+</li>
+</ul>
+<h2 id="SO-LINGER"><a href="#SO-LINGER" class="headerlink" title="SO_LINGER"></a>SO_LINGER</h2><p>本选项指定close函数堆面向连接的协议如何操作。默认操作是close立即返回，但是如果有数据残留在套接字发送缓冲区中，系统会试着将数据发送给对端。</p>
+<p>本选项主要是在内核空间和用户进程之间传递以下的结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">linger</span>&#123;</span></span><br><span class="line">    <span class="type">int</span> l_onoff;</span><br><span class="line">    <span class="type">int</span> l_lingger;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>因此设置该选项时就会出现三种情况：</p>
+<ol>
+<li><p>l_onoff为0，关闭本选项，忽略l_lnlinger。即默认操作，close立即返回；</p>
+</li>
+<li><p>l_onoff 非0，l_linger为0，这时调用close，会丢弃发送缓冲区的数据，并发送一个RST给对端，跳过TIME_WAIT的状态。当然这也会带来一个问题是，创建该连接的另一个化身时，有可能会导致刚刚被终止连接的旧分节被重复传递到新的化身上；</p>
+</li>
+<li><p>两个都为非0时，调用close后，套接字发送缓存区如果还有残留数据，那么进程会进入睡眠，直到所有数据都已经发送完并且被对方确认或延滞时间到（如果是这种情况会返回EWOULDBLOCK错误）；</p>
+</li>
+</ol>
+<h2 id="SO-RECTIMEO和SO-SNDTIMEO套接字选项"><a href="#SO-RECTIMEO和SO-SNDTIMEO套接字选项" class="headerlink" title="SO_RECTIMEO和SO_SNDTIMEO套接字选项"></a>SO_RECTIMEO和SO_SNDTIMEO套接字选项</h2><p>这两个选项允许我们给套接字的接收和发送设置一个超时值。</p>
+<h1 id="TCP套接字选项"><a href="#TCP套接字选项" class="headerlink" title="TCP套接字选项"></a>TCP套接字选项</h1><p>TCP有两个套接字选项：</p>
+<h2 id="TCP-MAXSEG套接字选项"><a href="#TCP-MAXSEG套接字选项" class="headerlink" title="TCP_MAXSEG套接字选项"></a>TCP_MAXSEG套接字选项</h2><p>本选项允许我们获得或者设置TCP连接的最大分节大小。</p>
+<h2 id="TCP-NODELAY套接字选项"><a href="#TCP-NODELAY套接字选项" class="headerlink" title="TCP_NODELAY套接字选项"></a>TCP_NODELAY套接字选项</h2><p>设置了该选项后会禁止TCP的Nagle算法。</p>
+<blockquote>
+<p>Nagle算法：目的是减少广域网上小分组的数目。如果连接上有未被确认的小包（即小于MSS），那么下一个包会被缓存下来，直到上一个包得到确认或者缓存的包的大小达到最大值。</p>
+</blockquote>
+<p>有两种情况不适用Nagle算法，一是其服务器不在相反方向产生数据以便携带ACK；二则是客户端是使用若干个小片数据向服务器发送单个逻辑请求的客户。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unix/" rel="tag"># Unix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/02/Synchronization-mechanism/" rel="next" title="Synchronization mechanism">
+                <i class="fa fa-chevron-left"></i> Synchronization mechanism
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/19/Clustering/" rel="prev" title="Clustering.md">
+                Clustering.md <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
 
     <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+      
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+          </div>
+          
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">1.</span> <span class="nav-text">通用套接字选项</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SO-DEBUG%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">1.1.</span> <span class="nav-text">SO_DEBUG套接字选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SO-ERROR%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">1.2.</span> <span class="nav-text">SO_ERROR套接字选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SO-KEEPALIVE%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">1.3.</span> <span class="nav-text">SO_KEEPALIVE套接字选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SO-LINGER"><span class="nav-number">1.4.</span> <span class="nav-text">SO_LINGER</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SO-RECTIMEO%E5%92%8CSO-SNDTIMEO%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">1.5.</span> <span class="nav-text">SO_RECTIMEO和SO_SNDTIMEO套接字选项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">2.</span> <span class="nav-text">TCP套接字选项</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP-MAXSEG%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">2.1.</span> <span class="nav-text">TCP_MAXSEG套接字选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP-NODELAY%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9"><span class="nav-number">2.2.</span> <span class="nav-text">TCP_NODELAY套接字选项</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

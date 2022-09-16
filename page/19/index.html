@@ -1,23 +1,1971 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
 
-{% block page_class %}
-  {% if is_home() %} page-home {% endif %}
-{% endblock %}
 
-{% block content %}
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LucienXian&#39;s Garden">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LucienXian&#39;s Blog">
+<meta property="og:url" content="http://yoursite.com/page/19/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LucienXian&#39;s Garden">
+<meta property="og:locale">
+<meta property="article:author" content="LucienXian">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/page/19/"/>
+
+
+
+
+
+  <title>LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/12/Compilers-Introduction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/12/Compilers-Introduction/" itemprop="url">Compilers--Introduction</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-12T23:09:28+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>compilers &amp; interpreters</p>
+<ul>
+<li><p>compilers：输入程序，输出执行文件。offline</p>
+</li>
+<li><p>interpreters：输入程序和数据，输出结果。online</p>
+</li>
+</ul>
+<p>five aspects</p>
+<ul>
+<li><p>lexical analysis: divides program text into “words” or “tokens”</p>
+</li>
+<li><p>parsing: understand the program structrue</p>
+</li>
+<li><p>semantic analysis: perform limited semantic analysis to catch inconsistencies; should define strict rules to avoid ambiguties</p>
+</li>
+<li><p>optimization: like editing, to run faster and use less memory; x &#x3D; y*0 &#x3D;&#x3D; x &#x3D; 0(x is int)</p>
+</li>
+<li><p>code generation: produces assembly code(usually)</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/12/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%B8%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/12/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%B8%89/" itemprop="url">深度探索C++对象模型<三></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-12T23:08:10+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="The-Semantics-of-Constructors"><a href="#The-Semantics-of-Constructors" class="headerlink" title="The Semantics of Constructors"></a>The Semantics of Constructors</h1><h2 id="Default-Constructor的建构操作"><a href="#Default-Constructor的建构操作" class="headerlink" title="Default Constructor的建构操作"></a>Default Constructor的建构操作</h2><p><strong>默认构造函数会在需要的时候被编译器产生出来</strong>。这里的关键是：被谁需要，做什么事情。</p>
+<h2 id="被谁需要"><a href="#被谁需要" class="headerlink" title="被谁需要"></a>被谁需要</h2><p>当编译器需要的时候才会合成，但编译器不会为数据成员进行初始化，也就是不会在默认构造函数中进行初始化。考虑下面的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Foo</span> &#123;<span class="keyword">public</span>: <span class="type">int</span> val; Foo *pnext; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo_bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Foo bar;</span><br><span class="line">    <span class="keyword">if</span> (bar.val||bar.pnext)<span class="comment">//...do someting</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意这样的情况下，编译器并没有对var和pnext进行初始化。</p>
+<h2 id="什么时候需要"><a href="#什么时候需要" class="headerlink" title="什么时候需要"></a>什么时候需要</h2><ul>
+<li>“带有默认构造函数的成员类对象”</li>
+</ul>
+<p>如果一个类没有构造函数，但它有一个成员对象，该成员对象拥有默认构造函数。那么编译器会为该类合成默认构造函数，但要到需要使用的时候才会合成。考虑如下的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Foo</span>  </span><br><span class="line">&#123;  </span><br><span class="line">    <span class="keyword">public</span>:  </span><br><span class="line">        <span class="built_in">Foo</span>(); <span class="comment">//构造函数  </span></span><br><span class="line">        ...  </span><br><span class="line">&#125;;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Bar</span>  </span><br><span class="line">&#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">    Foo foo; <span class="comment">//是一个member object, 而其class Foo 拥有default constructor.  </span></span><br><span class="line">    <span class="type">char</span> *str;  </span><br><span class="line">&#125;;  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo_bar</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">    Bar bar <span class="comment">//合成constructor  </span></span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>另外，如果一个类内部含有多个拥有默认构造函数的对象，那么类会按照声明顺序调用对象的默认构造函数。</p>
+<p>如果类内已经有默认构造函数，那么编译器会对默认构造函数进行扩张，初始化类内成员对象。</p>
+<ul>
+<li>带有默认构造函数的基类</li>
+</ul>
+<p>如果一个没有任何构造函数的类派生自一个带有默认构造函数的基类，那么派生类中会合成一个默认构造函数，用来调用基类的构造函数。</p>
+<p>另外如果派生类中有其它构造函数（但没有默认构造函数），那么编译器会扩张所有的构造函数，来调用基类的默认构造函数。</p>
+<ul>
+<li>带有一个virtual function的class</li>
+</ul>
+<p>考虑这两种情况，会合成默认构造函数：</p>
+<ol>
+<li>class声明一个virtual function</li>
+<li>class派生自一个继承链，其中有一个以上的virtual base class</li>
+</ol>
+<p>这种情况是因为编译器需要为类生成virtual table和指向virtual table的指针。因此把这两个操作放在合成的构造函数中进行。</p>
+<ul>
+<li>带有一个virtual base class的class</li>
+</ul>
+<p>因为编译器必须要使得每个派生类的对象都能够拥有虚基类的偏移位置，所以也需要在合成的默认构造函数执行操作。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>常见的两个误解：</p>
+<ol>
+<li>一个类没有定义默认构造函数，就会合成。</li>
+<li>编译器合成的默认构造函数会为每个成员设定初始值。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/10/APUE-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/10/APUE-%E4%B8%80/" itemprop="url">APUE<一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-10T23:44:31+08:00">
+                2018-03-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="unix基础知识"><a href="#unix基础知识" class="headerlink" title="unix基础知识"></a>unix基础知识</h1><h2 id="unix体系结构"><a href="#unix体系结构" class="headerlink" title="unix体系结构"></a>unix体系结构</h2><p>内核的接口称之为系统调用；<br>公用函数库建立在系统调用上，用户既可以调用函数库函数，也可以使用系统调用；<br>shell是特殊的应用程序，为其它应用程序提供接口；</p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>登录项通常在**&#x2F;etc&#x2F;passwd**文件中，但加密口令不在此；</p>
+<h2 id="文件和目录"><a href="#文件和目录" class="headerlink" title="文件和目录"></a>文件和目录</h2><p>目录是一个包含目录项的文件，而目录项包含一个文件名和相关的文件属性；</p>
+<p>工作目录：当前目录</p>
+<p>起始目录：登陆后的当前目录</p>
+<h2 id="输入和输出"><a href="#输入和输出" class="headerlink" title="输入和输出"></a>输入和输出</h2><p>文件描述符：一个非负整数，用来标识一个特定进程正在访问的文件；</p>
+<p>标注输入、输出、错误：0,1,2；</p>
+<p>不带缓冲的IO：open、read、write、lseek、close；</p>
+<p>带缓冲：fgets、fgetc、printf等等；</p>
+<h2 id="程序与进程"><a href="#程序与进程" class="headerlink" title="程序与进程"></a>程序与进程</h2><p>程序：磁盘上的可执行文件，内核通过exec将程序读入内存；</p>
+<p>进程：程序的执行实例；</p>
+<p>线程：线程的ID只在本进程下有效；</p>
+<h2 id="出错处理"><a href="#出错处理" class="headerlink" title="出错处理"></a>出错处理</h2><p>当Unix的系统函数出错时，会返回一个负数，同时errno变量会被设置为一定的相关值。</p>
+<h2 id="用户标识"><a href="#用户标识" class="headerlink" title="用户标识"></a>用户标识</h2><p>用户ID为0的是root；组ID的登录项在**&#x2F;etc&#x2F;group**；</p>
+<h2 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h2><p>处理信号的三种方式：忽略信号，按照系统默认终止进程，提供一个函数去处理信号</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/09/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/09/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap3/" itemprop="url">Unix网络编程——chap3</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-09T11:50:54+08:00">
+                2018-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="套接字编程简介"><a href="#套接字编程简介" class="headerlink" title="套接字编程简介"></a>套接字编程简介</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>socket编程的基础就是socket结构，几乎所有的API都会用到。而socket通常只会在两个方向上传递——进程到内核和内核到进程。</p>
+<h2 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h2><p>先看看IPV4的结构</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> &#123;</span></span><br><span class="line">    <span class="type">in_addr_t</span> s_addr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sin_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sin_family;</span><br><span class="line">    <span class="type">in_port_t</span> sin_port;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span></span><br><span class="line">    <span class="type">char</span> sin_zero[<span class="number">8</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在sockaddr_in这个结构体，通常只需要三个字段: sin_family、sin_addr和sin_port（POSIX标准）。另外sin_zero这个字段一般不会使用，我们直接把其置为０即可</p>
+<p>通常套接字地址结构，由于我们传递给socketAPI的是指针，所以这些API通常要处理各种支持不同协议的套接字地址，又因为套接字函数出来的时候，ANSI C还没有提出，也就无法使用通常指针void *。所以我们每次传入套接字函数，都需要转为以下的结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sa_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sa_family;</span><br><span class="line">    <span class="type">char</span> sa_data[<span class="number">14</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">serv</span>;</span></span><br><span class="line">bind(sockfd, (<span class="keyword">struct</span> sockaddr *) &amp;serv, <span class="keyword">sizeof</span>(serv));</span><br></pre></td></tr></table></figure>
+
+<p>另外在IPv6提出之后，有了新的同样套接字地址结构，并且可以支持任何套接字结构，这里就不表了，可以搜一下：<strong>struct sockaddr_storage</strong></p>
+<h2 id="值——结果参数"><a href="#值——结果参数" class="headerlink" title="值——结果参数"></a>值——结果参数</h2><ul>
+<li><p>从进程到内核传递套接字地址的函数有３个：bind, connect和sendto，参数是指向结构的指针，和结构的大小；</p>
+</li>
+<li><p>从内核到进程传递套接字的函数有４个：accept, recvfrom, getsockname, getpeername，参数是指向结构的指针和直线结构大小变量的指针；</p>
+</li>
+</ul>
+<h2 id="字节排序函数"><a href="#字节排序函数" class="headerlink" title="字节排序函数"></a>字节排序函数</h2><p>这个是因为在不同的主机系统中，采用大小端模式是不同的，比如linux中是小端序，而apple中是大端序。这两种字节序转换用以下４个函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">htons</span><span class="params">(<span class="type">uint16_t</span> host16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">htonl</span><span class="params">(<span class="type">uint32_t</span> host32bitvalue)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">ntohs</span><span class="params">(<span class="type">uint16_t</span> net16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ntohl</span><span class="params">(<span class="type">uint32_t</span> net32bitvalue)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="字节操作函数"><a href="#字节操作函数" class="headerlink" title="字节操作函数"></a>字节操作函数</h2><p>没什么好说的，主要关注bzero，memset，memcpy等几个函数</p>
+<h2 id="inet-aton-inet-addr-inet-ntoa函数和inet-pton，inet-ntop函数"><a href="#inet-aton-inet-addr-inet-ntoa函数和inet-pton，inet-ntop函数" class="headerlink" title="inet_aton, inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数"></a>inet_aton, inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</h2><p>这些函数，是用来在ASCII字符串中和网络字节序的二进制值进行转换的。这两个函数——inet_pton，inet_ntop，针对IPv6和IPv4都是适用的。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/09/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%BA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/09/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%BA%8C/" itemprop="url">深度探索C++对象模型<二></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-09T10:54:05+08:00">
+                2018-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="关键词带来的困扰"><a href="#关键词带来的困扰" class="headerlink" title="关键词带来的困扰"></a>关键词带来的困扰</h1><p>这里需要区分的是struct和class，通常情况下我们认为在C的struct和C++支持的class之间，关键词本身并没有提供了差异。</p>
+<p>另外一个需要的注意的问题是，有一些在C中可用的trick，用在C++里可能出现意想不到的问题。例如我希望一个struct有可变的长度</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mumble</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> pc[<span class="number">1</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mumble</span>* <span class="title">p_mumble</span> =</span> (<span class="keyword">struct</span> mumble* )<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(mumble)+<span class="keyword">sizeof</span>(<span class="built_in">string</span>)+<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>但如果是用class来声明，由于多个区域之间的顺序内存布局是不一定的，也就无法这样精细地控制内存。</p>
+<h2 id="对象的差异"><a href="#对象的差异" class="headerlink" title="对象的差异"></a>对象的差异</h2><p>C++程序设计模型支持三种programming paradigms:</p>
+<ul>
+<li>prodedural model</li>
+<li>ADT</li>
+<li>object-oriented model</li>
+</ul>
+<p>需要多大的内存来保存一个class的大小：</p>
+<ul>
+<li>其所有nonstatic data members的大小；</li>
+<li>由于alignment而需要进行padding的大小，有可能在数据成员上填补，也可能在集合体上进行填补；</li>
+<li>为了支持virtual function而带来的额外负担；</li>
+</ul>
+<p>指针的类型，例如一个指向对象的指针和一个指向整数的指针，一个指向template array的指针有什么区别？关键不在于指针内容的不同，而是通过指针寻址出来的对象不同，也就是指针类型告诉了编译器应该如何解释特定内存地址的内容和大小。</p>
+<p>而一个指针类型为void*的指针，其仅仅代表一个地址，通过转型cast，使得编译器能够解释指出内存的大小和位置。</p>
+<p>考虑这种情况：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Bear b;</span><br><span class="line">ZooAnimal *pz = &amp;b;</span><br><span class="line">Bear *pb = &amp;b;</span><br></pre></td></tr></table></figure>
+
+<p>上面的两个指针都执行了Bear object的第一个字节，但不同的是，pz涵盖的只有Bear object的ZooAnimal部分。而pb则涵盖了整个Bear object;也就是你无法通过pz去使用Bear的任何members。除非使用虚函数机制；</p>
+<p>也就是通过pz所指向的类型去调用某个函数，这里的关键是类型信息并不是存储在pz里，而是存储pz所指向的对象的虚指针和虚指针所指向的虚表里。</p>
+<p>而如果直接把派生类的对象塞进基类的对象里，派生类对象会被切割，也就是失去了多态的功能，</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/08/%E9%9D%A2%E7%BB%8F-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/08/%E9%9D%A2%E7%BB%8F-%E4%B8%80/" itemprop="url">面经<一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-08T22:04:27+08:00">
+                2018-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="阿里、网易游戏面经"><a href="#阿里、网易游戏面经" class="headerlink" title="阿里、网易游戏面经"></a>阿里、网易游戏面经</h1><p>这两个都是现场面的，我投的是网易游戏和蚂蚁金服人工智能部门的实习生，分别在滨江的网易总部和西溪路上Z空间的蚂蚁金服所在地。贼紧张～～。由于我太懒了，没有及时更新，有些已经不多记得了，请见谅～～</p>
+<h2 id="网易游戏"><a href="#网易游戏" class="headerlink" title="网易游戏"></a>网易游戏</h2><p>进去网易之后，等了一会，然后面试官下来带我上二楼找了个地方，就直接开始了</p>
+<p>基本上是按照我的项目问的，可能没有什么值得借鉴的。。</p>
+<ol>
+<li><p>首先当然是自我介绍啦。</p>
+</li>
+<li><p>然后因为我的简历上有一些图形学的项目，所以面试官叫我说一下自己的项目内容，遇到的问题等等。紧接着，就是针对我的项目提出了一些关于游戏优化的问题（不得不说，面试官能在我乱七八糟的语言组织下发现我的问题真是厉害啊），我大概讲了一些（也不知道对不对），面试官就点了点头；还有就是，让我画了一下整个项目架构，我画的很烂。。。另外还有的是，问了一些图形流水线的问题，包括比较了一下老版opengl和新版opengl的区别，各种shader的使用等待</p>
+</li>
+<li><p>然后问了一下另外一个项目，一个解析器，用python写的，所以就提问了一下python的一些magic method，还有就是装饰器的意义作用（这个问题是我引出的，所以回答时注意不要回答到自己不会的东西），当然我都有所准备啦。</p>
+</li>
+<li><p>然后就是各种排序算法的分析，手写了一下快排，解释了一下几种选择pivot的优缺点。</p>
+</li>
+<li><p>紧接着，还是针对我的项目问的，问了一些数据库的问题，然后还问了一下B+树，我就回答了一下B+树定义作用应用，比较了一下B+树和B树，还有红黑树。</p>
+</li>
+<li><p>最后就是问我有时间实习吗，还有问我有什么问题不</p>
+</li>
+</ol>
+<p>总的来说，面试官都很nice，基础很重要，会就是会，不会就说不会。还有一个很重要的是，对于自己的项目要很熟悉，包括问题，解决，整个项目内容，都要很熟悉，起码不能抄袭项目啊</p>
+<h2 id="阿里（蚂蚁金服）"><a href="#阿里（蚂蚁金服）" class="headerlink" title="阿里（蚂蚁金服）"></a>阿里（蚂蚁金服）</h2><p>这个就很累了，别人都是电话面试，我是现场面，幸亏学校离蚂蚁金服也不远，走了半个多小时就到了。等了一下，就跟着面试官上去了，还是单面</p>
+<p>由于我面的这个是蚂蚁金服的人工智能部门，所以一上来就问了一下我会不会机器学习深度学习和分布式之类的，当然，我都不会（刚入门就不用说了，不会就是不会）</p>
+<ol>
+<li><p>首先是自我介绍啦，老套路</p>
+</li>
+<li><p>然后问了一下海量数据的排序问题，比如杭州市人口年龄排序。这种问题网上也有很多，好好看看，理解一下就行</p>
+</li>
+<li><p>还有的是老套路，比较各种排序算法，我还是说了快排，还有归并，这回没有手撕代码。。。</p>
+</li>
+<li><p>后面就很难熬了，各种白板编程，手写代码，首先是出了一道剑指offer上有过的问题，但是改了一下（大致是最大连续子序列和，环路）。没办法，我只会不是环路的情况，就写了一下不是环路怎么做（动态规划），然后面试官各种提示我还是不大会（可能太菜了，也可能比较紧张）。后面面试官就直接说了答案，中途面试官还让我写了一下不是环路下，动态规划的公式。</p>
+</li>
+<li><p>还有，就是面试官让我手写一个单例模式。。妈呀，没想到啊，我看的《设计模式》，刚好还差一章看到单例模式，气死人了。然后就在面试官的提示下，写了一下，我还理解错了一点，不过面试官还是友好地提醒了我，于是改正。。亏大了。。。</p>
+</li>
+<li><p>紧接着，还是一道剑指offer的题，走楼梯，一次可以走一步或者两步，问n级楼梯，有多少种走法（这书要好好看），我刚好会，就写了。然后面试官让我想一下会出现什么问题。我太菜了，还是没想到，后来它说是C++写的话，有可能会溢出。然后我说python就不会（本着和面试官友好交流的想法，没想到。。）。面试官让我写一下大数相加，然后我又手写了大数相加，幸亏没什么bug了。</p>
+</li>
+<li><p>终于可以坐下了，然后就问了一些c++的东西，比如const跟在函数名后面什么意思啊，malloc与new的区别啊之类的，都比较简单啦，好好看网上的面经都有的。</p>
+</li>
+</ol>
+<p>总的来说，蚂蚁金服问的我心力交瘁，不过面试官也比较nice，我在他的引导下也做出了一些解答，不过倒是不怎么问项目了这回，大概是因为项目和他熟悉的领域不相符</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>准备好基础，这样总没错，算法题要刷，面经看一下，项目得熟悉，还必须自信</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/08/%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/08/%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%E9%97%AE%E9%A2%98/" itemprop="url">海量数据问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-08T12:19:20+08:00">
+                2018-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>由于面试中经常遇到海量数据的相关问题，比如排序，比如选出topk，比如找出重复的元素等等</p>
+<ol>
+<li>海量数据排序</li>
+</ol>
+<ul>
+<li>假如有１TB的数据，内存只有32GB</li>
+</ul>
+<p>第一步是将１TB的数据分成40组，每组25GB；<br>然后分别读取40组数据，进行内部排序（可以用快排或者归并），然后写回磁盘；<br>接着从这40组数据中分别读取25GB&#x2F;40&#x3D;0.625GB，放在40个缓冲区里；<br>最后进行多路归并，可以每次将归并结果写满4GB就写回磁盘；并且一旦有缓冲区已经读完了，就从该缓冲区对应的组里读入新的0.625GB；</p>
+<ol start="2">
+<li>海量数据中选出最大的前k个数</li>
+</ol>
+<p>一种方法：通过哈希将海量数据分成n个小文件（如果不够小，继续细分，直到文件大小小于内存）。然后为每个小文件建立一个小顶堆，这样就能选出n个topK，进行归并，选出最后的topK；<br>另外的方法：是直接建立一个k大小的大顶堆，然后依次读入数据，与堆顶元素比较，调整堆。当所有数据读完之后，得到最终的堆就是topK个数；</p>
+<ol start="3">
+<li>海量数据中选出频率最高的几个元素</li>
+</ol>
+<p>与上面相同，先是将数据分成多个小文件，在每个小文件内利用hash_map去统计每个词的频率，选出topK频率的元素。最后再进程归并或者大顶堆统计；</p>
+<ol start="4">
+<li>给定a、b两个文件，各存放50亿个url，每个url各占64字节，内存限制是4G，让你找出a、b文件共同的url？</li>
+</ol>
+<p>首先是分别对这两个大文件进行哈希计算（用同一个哈希函数），得到多个小文件，这样相同的url就会被分到对应的小文件中；然后从a得到的小文件中找出url，存到hash_set中，然后遍历另外的对应小文件url，如果存在则输出到文件中</p>
+<ol start="5">
+<li>在海量数据中找出不重复的数</li>
+</ol>
+<p>采用2bit法，00表示不存在该数字，01表示数字只出现一次，10表示数字重复多次。扫描完之后，输出对应为01的数字即可</p>
+<ol start="6">
+<li>判断一个数是否在海量数据中</li>
+</ol>
+<p>一种方法是采用位图法，1个bit代表一个数，扫描一遍海量数据，得到扫描结果。之后进行判断；<br>另外的方法则是，把海量数据按照每个bit为0或者1分成两类，然后又按照次高位分成2类。。一次下去。这样，每次判断数是否存在于海量数据中花费时间为logN</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="http://blog.csdn.net/FX677588/article/details/72471357">http://blog.csdn.net/FX677588/article/details/72471357</a><br><a target="_blank" rel="noopener" href="https://kb.cnblogs.com/page/95701/">https://kb.cnblogs.com/page/95701/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/07/Singleton-DesignPattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/07/Singleton-DesignPattern/" itemprop="url">Singleton(DesignPattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-07T21:38:59+08:00">
+                2018-03-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Singleton"><a href="#Singleton" class="headerlink" title="Singleton"></a>Singleton</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>在某些应用环境下，我们希望一个类只提供一个实例，用户只能使用一个实例</p>
+<h2 id="做法"><a href="#做法" class="headerlink" title="做法"></a>做法</h2><p>一般来说，我们在类内维持一个静态的成员变量和静态成员函数，在函数内对成员变量进行初始化（准确点说应该是分配对象）</p>
+<h2 id="注意问题"><a href="#注意问题" class="headerlink" title="注意问题"></a>注意问题</h2><ol>
+<li><p>所有函数都定义为static，并不是好的单例模式，一是因为我们无法保证静态变量的初始化顺序，加入是两个单例类互相使用，这样就无法保证互相的一来关系，另外的问题就是可能失去了面向对象的关键特性——多态</p>
+</li>
+<li><p>还有一个是如果我们的静态变量是一个对象，那么程序一开始运行，对象就已经存在了，镇不是我们需要的</p>
+</li>
+<li><p>如果我们希望灵活地使用不同的对象（以后拓展），可以在类内增加一个注册机制，根据环境变量返回不同类型的实例</p>
+</li>
+<li><p>最后返回指针可能会有一个问题就是，程序员可能会自行去销毁指针所指向的对象，这样就无法再次拥有这个实例了</p>
+</li>
+</ol>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton&amp; <span class="title">Instance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> Singleton p_Instance;</span><br><span class="line">        <span class="comment">//if (p_Instance == NULL)</span></span><br><span class="line">        <span class="comment">//    p_Instance = new Singleton();</span></span><br><span class="line">        <span class="keyword">return</span> p_Instance;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">print</span><span class="params">()</span></span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Singleton &quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">//static Singleton *p_Instance;</span></span><br><span class="line">    <span class="built_in">Singleton</span>()&#123;&#125;</span><br><span class="line">    <span class="built_in">Singleton</span>(<span class="type">const</span> Singleton&amp; )&#123;&#125;</span><br><span class="line">    Singleton&amp; <span class="keyword">operator</span>=(Singleton <span class="type">const</span>&amp;)&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Singleton* Singleton::p_Instance = NULL;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Singleton::<span class="built_in">Instance</span>().<span class="built_in">print</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/07/Sort-Algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/07/Sort-Algorithm/" itemprop="url">Sort Algorithm</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-07T10:59:13+08:00">
+                2018-03-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Sort-algorithms"><a href="#Sort-algorithms" class="headerlink" title="Sort algorithms"></a>Sort algorithms</h1><h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><p>每次将最大的放在最后，代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">bubbleSort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; arr.<span class="built_in">size</span>()<span class="number">-1</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; arr.<span class="built_in">size</span>()<span class="number">-1</span>-i; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (arr[j] &gt; arr[j+<span class="number">1</span>])</span><br><span class="line">                <span class="built_in">swap</span>(arr[j], arr[j+<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h2><p>整体比较，相对于冒泡排序，选择排序需要比较选择最小的放在前面，减少了交换次数。代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">selection_sort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; arr.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">        <span class="type">int</span> min_idx = i;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = i+<span class="number">1</span>; j &lt; arr.<span class="built_in">size</span>(); j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (arr[min_idx] &gt; arr[j])</span><br><span class="line">                min_idx = j;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">swap</span>(arr[min_idx], arr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h2><p>插入排序类似于玩扑克牌，拿到一张牌，就把它插入到大小合适的位置，并保证其前面的牌已经按顺序排列好。代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">insertion_sort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> j;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; arr.<span class="built_in">size</span>(); i++)&#123;</span><br><span class="line">        <span class="type">int</span> tmp = arr[i];</span><br><span class="line">        j = i<span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">while</span> (j&gt;=<span class="number">0</span>&amp;&amp;tmp&lt;arr[j]) &#123;</span><br><span class="line">            arr[j+<span class="number">1</span>] = arr[j];</span><br><span class="line">            j--;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[j+<span class="number">1</span>] = tmp; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><p>来自于冒泡排序的思想，通过与基准比较，将小数排到一边，大数排到另外一遍。代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">partion</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr, <span class="type">int</span> low, <span class="type">int</span> high)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> pivot = arr[low];</span><br><span class="line">    <span class="type">int</span> pivotind = low;</span><br><span class="line">    <span class="keyword">while</span> (low &lt; high) &#123;</span><br><span class="line">        <span class="keyword">while</span> (low &lt; high &amp;&amp; arr[high] &gt;= pivot) high--;</span><br><span class="line">        <span class="keyword">while</span> (low &lt; high &amp;&amp; arr[low] &lt;= pivot) low++;</span><br><span class="line">        <span class="built_in">swap</span>(arr[low], arr[high]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">swap</span>(arr[low], arr[pivotind]);</span><br><span class="line">    <span class="keyword">return</span> low;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">quick_sort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr, <span class="type">int</span> low, <span class="type">int</span> high)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (low &gt;= high) <span class="keyword">return</span>;</span><br><span class="line">    <span class="type">int</span> pi = <span class="built_in">partion</span>(arr, low, high);</span><br><span class="line">    <span class="built_in">quick_sort</span>(arr, low, pi<span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">quick_sort</span>(arr, pi+<span class="number">1</span>, high);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><p>基于分而治之的思想，先递归划分成子问题，然后合并结果。简单来说就是先两两合并有序序列，然后再四四合并。。。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">merge</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr, <span class="type">int</span> l, <span class="type">int</span> m, <span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> i, j, k;</span><br><span class="line">    <span class="type">int</span> n1 = m - l + <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> n2 = r - m;</span><br><span class="line">    <span class="type">int</span> lv[n1], rv[n2];</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n1; i++)</span><br><span class="line">        lv[i] = arr[l+i];</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; n2; j++)</span><br><span class="line">        rv[j] = arr[m+<span class="number">1</span>+j];</span><br><span class="line">    </span><br><span class="line">    k = l;</span><br><span class="line">    i = j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt; n1 &amp;&amp; j &lt; n2) &#123;</span><br><span class="line">        <span class="keyword">if</span> (lv[i]&lt;=rv[j])</span><br><span class="line">            arr[k] = lv[i++];</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            arr[k] = rv[j++];</span><br><span class="line">        k++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (i &lt; n1) &#123;</span><br><span class="line">        arr[k] = lv[i++];</span><br><span class="line">        k++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (j &lt; n2) &#123;</span><br><span class="line">        arr[k] = rv[j++];</span><br><span class="line">        k++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">merge_sort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr, <span class="type">int</span> l, <span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> m = l + (r - l) / <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">if</span> (l &lt; r) &#123;</span><br><span class="line">        <span class="built_in">merge_sort</span>(arr, l, m);</span><br><span class="line">        <span class="built_in">merge_sort</span>(arr, m+<span class="number">1</span>, r);</span><br><span class="line">        <span class="built_in">merge</span>(arr, l, m, r);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h2><p>借助堆来实现选择排序，升序就用大顶堆，降序就用小顶堆。将有序数列建成堆，从第一个非叶元素开始依次建堆；调整成堆，每次将堆顶元素和最后一个元素交换，并调整堆。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">heapify</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr, <span class="type">int</span> n, <span class="type">int</span> root)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> largest = root;</span><br><span class="line">    <span class="type">int</span> l = root * <span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> r = root * <span class="number">2</span> + <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">if</span> (l &lt; n &amp;&amp; arr[l]&gt;arr[largest]) largest = l;</span><br><span class="line">    <span class="keyword">if</span> (r &lt; n &amp;&amp; arr[r]&gt;arr[largest]) largest = r;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (largest != root) &#123;</span><br><span class="line">        <span class="built_in">swap</span>(arr[largest], arr[root]);</span><br><span class="line">        <span class="built_in">heapify</span>(arr, n, largest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">heap_sort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; arr, <span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = n / <span class="number">2</span> - <span class="number">1</span>; i &gt;=<span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="built_in">heapify</span>(arr, n, i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = n<span class="number">-1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="built_in">swap</span>(arr[<span class="number">0</span>], arr[i]);</span><br><span class="line">        <span class="built_in">heapify</span>(arr, i, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/06/STL%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/06/STL%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF-%E4%B8%80/" itemprop="url">STL学习之路<一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-06T23:18:18+08:00">
+                2018-03-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="概念理解"><a href="#概念理解" class="headerlink" title="概念理解"></a>概念理解</h1><ul>
+<li>容器算法迭代器的关系</li>
+</ul>
+<p>每个容器都有自己专属的迭代器，而算法则是通过迭代器来操作容器中的元素</p>
+<p>容器通过模板实现，能够装下各种类型的元素</p>
+<p>迭代是一种只能指针，通过*来解引用</p>
+<ul>
+<li>迭代器种类</li>
+</ul>
+<p>5种：输入、输出、前向、双向、随机访问</p>
+<ul>
+<li>适配器种类</li>
+</ul>
+<p>3种：容器适配器（例如stack，queue和priority_queue都是给予其它容器实现的）；迭代器适配器；函数适配器</p>
+<h1 id="sort算法"><a href="#sort算法" class="headerlink" title="sort算法"></a>sort算法</h1><p>数据量大的时候选用快排，分段递归排序，一旦分段小于某个数据量之后采用的是插入排序。如果递归层次过深，又会转而调用堆排序。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/18/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/20/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

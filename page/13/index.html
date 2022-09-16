@@ -1,23 +1,2173 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
 
-{% block page_class %}
-  {% if is_home() %} page-home {% endif %}
-{% endblock %}
 
-{% block content %}
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LucienXian&#39;s Garden">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LucienXian&#39;s Blog">
+<meta property="og:url" content="http://yoursite.com/page/13/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LucienXian&#39;s Garden">
+<meta property="og:locale">
+<meta property="article:author" content="LucienXian">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/page/13/"/>
+
+
+
+
+
+  <title>LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/07/Inner-class-of-Java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/07/Inner-class-of-Java/" itemprop="url">Inner class of Java</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-07T22:04:57+08:00">
+                2018-11-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h1><p>内部类(Inner Class)是定义在一个类中的类。</p>
+<h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><ul>
+<li>内部类可以访问该类定义的作用域数据，包括私有数据；</li>
+<li>内部类可以对同包内的其它类隐藏；</li>
+<li>用匿名类实现回调函数；</li>
+</ul>
+<blockquote>
+<p>C++有嵌套类，嵌套类是一种类之间的关系，而不是对象之间的关系。另外，Java内部类能够引用实例化该内部对象的外部类对象。</p>
+</blockquote>
+<p>只有内部类可以设为private的。</p>
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p>大多数用法与常规类类似，有一些特殊的语法规则：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">outerObject.<span class="keyword">new</span> <span class="title class_">InnerClass</span>(para);</span><br></pre></td></tr></table></figure>
+
+<h2 id="局部内部类"><a href="#局部内部类" class="headerlink" title="局部内部类"></a>局部内部类</h2><p>如果某个内部类只有在某个方法中创建类型时使用一次，那么可以在一个方法中定义局部类：</p>
+<h3 id="外部方法访问final变量"><a href="#外部方法访问final变量" class="headerlink" title="外部方法访问final变量"></a>外部方法访问final变量</h3><p>局部类不但能访问外部类，还可以访问局部变量。但该局部变量必须是final的。</p>
+<h3 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h3><p>如果内部类不需要引用外部类对象，就可以把该内部类声明为静态内部类。</p>
+<p>在静态方法中new对象的时候，对应的类必须为static。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/06/Proxy-of-Java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/06/Proxy-of-Java/" itemprop="url">Proxy of Java</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-06T00:28:29+08:00">
+                2018-11-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>最近在学习Java，学习到了一个新的Java特性——代理(Proxy)。代理可以为其它对象实现一种新的控制访问方式，这是Java SE1.3新加的特性。</p>
+<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>假如我们希望在运行时创建一个实现了一组给定接口的新类，我们就可以使用代理实现。</p>
+<h2 id="模式"><a href="#模式" class="headerlink" title="模式"></a>模式</h2><p>代理类可以运行时创建全新的类，这个代理类能够实现指定的接口：</p>
+<ul>
+<li>指定接口所需要的全部方法</li>
+<li>Object类中的全部方法</li>
+</ul>
+<p>这个模式首先要让代理类和目标类实现相同的接口，然后客户端在通过代理类调用目标类的时候，代理类会将所有方法调用分派到目标对象上反射执行。分派过程中则可以在前后增加一些想要的功能。</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>通过实现InvocationHandler接口来自定义自己的handler，该接口有一个invoke的方法；</li>
+<li>使用Proxy类的newProxyInstance创建一个代理对象，并将handler传入该对象；</li>
+<li>通过代理对象调用目标方法；</li>
+</ol>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>首先来看一个实现例子，这个程序会打印出被调用的参数和名字：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.*;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ProxyTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span>&#123;</span><br><span class="line">        Object[] elements = <span class="keyword">new</span> <span class="title class_">Object</span>[<span class="number">1000</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; elements.length; i++) &#123;</span><br><span class="line">            <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> i + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">            <span class="type">InvocationHandler</span> <span class="variable">handler</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TraceHandler</span>(value);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">proxy</span> <span class="operator">=</span> Proxy.newProxyInstance(<span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Comparable.class&#125;, handler);</span><br><span class="line">            elements[i] = proxy;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">Integer</span> <span class="variable">rand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>().nextInt(elements.length) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> Arrays.binarySearch(elements, rand);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (res &gt; <span class="number">0</span>)</span><br><span class="line">            System.out.println(elements[res]);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TraceHandler</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Object target;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TraceHandler</span><span class="params">(Object t)</span></span><br><span class="line">    &#123;</span><br><span class="line">        target = t;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(Object proxy, Method m, Object[] args)</span> <span class="keyword">throws</span> Throwable</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.print(target);</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">&quot;.&quot;</span> + m.getName()+<span class="string">&quot;(&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (args != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; args.length; i++)</span><br><span class="line">            &#123;</span><br><span class="line">                System.out.print(args[i]);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (i &lt; args.length - <span class="number">1</span>)</span><br><span class="line">                    System.out.print(<span class="string">&quot;, &quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;)&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> m.invoke(target, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Ouput:</span></span><br><span class="line"><span class="comment">500.compareTo(155)</span></span><br><span class="line"><span class="comment">250.compareTo(155)</span></span><br><span class="line"><span class="comment">125.compareTo(155)</span></span><br><span class="line"><span class="comment">187.compareTo(155)</span></span><br><span class="line"><span class="comment">156.compareTo(155)</span></span><br><span class="line"><span class="comment">140.compareTo(155)</span></span><br><span class="line"><span class="comment">148.compareTo(155)</span></span><br><span class="line"><span class="comment">152.compareTo(155)</span></span><br><span class="line"><span class="comment">154.compareTo(155)</span></span><br><span class="line"><span class="comment">155.compareTo(155)</span></span><br><span class="line"><span class="comment">155.toString()</span></span><br><span class="line"><span class="comment">155</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>通过打印结果可以得知，每次调用代理对象的compareTo方法，都会调用InvocationHandler的invoke方法。这是因为JVM动态生成的代理类生成代理对象时，会传入InvocationHandler实例对象。</p>
+<p>然后我们在invoke方法内部通过Method.invoke()方法打印方法名称和参数来进行调用。</p>
+<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p>代理类只有一个实例域，那就是InvocationHandler。另外，所有的代理类都覆盖了Object类中的方法toString，equals和hashCode。</p>
+<p>对于特定的类加载器和预设的一组接口，只能有一个代理类。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/29/cs231n-lecture10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/29/cs231n-lecture10/" itemprop="url">cs231n@lecture10</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-29T23:27:11+08:00">
+                2018-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Recurrent-Nerual-Networks"><a href="#Recurrent-Nerual-Networks" class="headerlink" title="Recurrent Nerual Networks"></a>Recurrent Nerual Networks</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>相比较于CNN，RNN能够更好地序列的信息。比如理解一句话的意思，根据视频输出行为，判断文本的情感等等。前后的输入是有关联的。</p>
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>RNN的结构中有一个内部状态值$h_t$，这个值取决于输入的x和上一次的内部状态值$h_{t-1}$。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值$Y_t$</p>
+<p>结构图如下：</p>
+<p><img src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg" alt="img"></p>
+<p>RNN的公式如下：<br>$$<br>Y_t &#x3D; g(V h_t) \<br>h_t &#x3D; f(UX_t+Wh_{t-1})<br>$$</p>
+<h2 id="truncated-backprop"><a href="#truncated-backprop" class="headerlink" title="truncated backprop"></a>truncated backprop</h2><p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final states作为后一个序列的initial states。</p>
+<p><img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png" alt="img"></p>
+<h2 id="vanilla-RNN"><a href="#vanilla-RNN" class="headerlink" title="vanilla RNN"></a>vanilla RNN</h2><p>只有一层隐藏层的RNN</p>
+<h1 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h1><p>用来缓解梯度消失和梯度爆炸。</p>
+<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell state，即c，让它保存长期的状态。</p>
+<p>LSTM将隐藏状态和输入拼接在一起，然后乘以一个巨大的矩阵，得到四个门向量。</p>
+<ul>
+<li>i：input gate，whether to write to cell；</li>
+</ul>
+<p>$$<br>i_t &#x3D; \sigma  (W_i [h_{t-1},x_t] + b_i)<br>$$</p>
+<ul>
+<li>f：forget gate，how much do we want to forget；</li>
+</ul>
+<p>$$<br>f_t &#x3D; \sigma (W_f [h_{t-1},x_t] + b_f)<br>$$</p>
+<ul>
+<li>o：output gate，how much to reveal cell；</li>
+</ul>
+<p>$$<br>o_t &#x3D; \sigma (W_o [h_{t-1}, x_t] + b_o)<br>$$</p>
+<ul>
+<li>g：gate gate，how much to write to cell；</li>
+</ul>
+<p>$$<br>g_t &#x3D; tanh(W_g [h_{t-1}, x_t] + b_g)<br>$$</p>
+<p>cell state的计算公式为：(注意是按元素相乘)<br>$$<br>c_t &#x3D; f_t \circ c_{t-1} + i_t \circ g_t<br>$$<br>至于隐藏状态：<br>$$<br>h_t &#x3D; o_t \circ tanh(c_t)<br>$$</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/30/redis%E7%9A%84%E5%AD%97%E5%85%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/30/redis%E7%9A%84%E5%AD%97%E5%85%B8/" itemprop="url">redis的字典</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-30T01:14:27+08:00">
+                2018-08-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h1><p>字典在redis中的应用比较广泛，比如redis的数据库，哈希键的底层实现等等</p>
+<h2 id="字典的实现"><a href="#字典的实现" class="headerlink" title="字典的实现"></a>字典的实现</h2><p>redis的字典用哈希表表示，一个哈希表有多个哈希表结点，每个结点保存一个键值对。</p>
+<h3 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">    dictEntry **table;<span class="comment">//哈希表数组，每个元素为指向dictEntry的指针</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> size;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> sizemask;<span class="comment">//等于size-1，与哈希值一起决定key应该放在哪个索引</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> used;</span><br><span class="line">&#125; dictht;</span><br></pre></td></tr></table></figure>
+
+<h3 id="哈希表结点"><a href="#哈希表结点" class="headerlink" title="哈希表结点"></a>哈希表结点</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> &#123;</span></span><br><span class="line">    <span class="type">void</span> *key;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">void</span> *val;</span><br><span class="line">        <span class="type">uint64_t</span> u64;</span><br><span class="line">        <span class="type">int64_t</span> s64;</span><br><span class="line">    &#125; v;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span><span class="comment">//可用于解决哈希冲突</span></span><br><span class="line">&#125;dictEntry;</span><br></pre></td></tr></table></figure>
+
+<h3 id="字典-1"><a href="#字典-1" class="headerlink" title="字典"></a>字典</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">    dictType *type;</span><br><span class="line">    <span class="type">void</span>* privdata;</span><br><span class="line">    dictht ht[<span class="number">2</span>];</span><br><span class="line">    <span class="type">int</span> trehashidx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>type属性是一个指向dictType的指针，dictType结构保存了一组用于操作特定类型键值对的函数，实现多台。</p>
+<p>pricdata则保存了需要传给那些类型特定参数的可选参数。</p>
+<p>ht保存了两个dictht，一般只是用第一个，第二个会在第一个rehash的时候被使用。</p>
+<p>trehashidx则是记录了目前是否在进行rehash。</p>
+<h2 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h2><p>当添加一个新的键值对到字典的时候，程序依次计算出哈希值和索引值，再根据索引值把包含新键值对的哈希表结点加到哈希数组指定索引上面</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hash = dict-&gt;type-&gt;hashFunction(key);</span><br><span class="line">index = hash &amp; dict-&gt;ht[x].sizemask;</span><br></pre></td></tr></table></figure>
+
+<p>ht[x]是因为有可能在第一个字典或者第二个。</p>
+<p>另外，redis使用murmurhash2算法来计算哈希值。</p>
+<h2 id="解决键冲突"><a href="#解决键冲突" class="headerlink" title="解决键冲突"></a>解决键冲突</h2><p>redis解决hash冲突的方法是链地址法，则产生冲突时使用next指针将索引值相同的结点连起来。</p>
+<h2 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h2><blockquote>
+<p>哈希表的负载因子&#x3D;哈希表已保存的结点数量&#x2F;哈希表大小</p>
+</blockquote>
+<p>为了使得哈希表的负载因子维持在一个合理的范围内，哈希表需要扩展或者缩小。</p>
+<p>步骤为</p>
+<ol>
+<li>为ht[1]分配空间，大小取决于：</li>
+</ol>
+<ul>
+<li>扩展：大小为 大于或等于ht[0].used*2 &#x3D; 2^n</li>
+<li>收缩：大小为 大于或等于ht[0].used &#x3D; 2^n</li>
+</ul>
+<ol start="2">
+<li>将保存在ht[0]的所有键值对rehash到ht[1]上，重新计算哈希值和索引值；</li>
+<li>释放ht[0]，将ht[1]设置为ht[0]，并新创建一个空白ht[1]，为下次rehash做准备</li>
+</ol>
+<p>另外，当下列条件满足时，会进行扩展：</p>
+<ul>
+<li>服务器目前没有执行BGSAVE或者BGREWRITEAOF，并且哈希表负载因子大于等于1；</li>
+<li>服务器目前正在执行BGSAVE或者BGREWRITEAOF，并且哈希表负载因子大于等于5；</li>
+</ul>
+<p>这是因为这些命令执行时，子进程会运行中，由于写时复制的操作系统特性，过多或者过快地扩展会带来过多的内存写入操作；</p>
+<p>当哈希表负载因子小于0.1时，执行收缩。</p>
+<h2 id="渐进式rehash"><a href="#渐进式rehash" class="headerlink" title="渐进式rehash"></a>渐进式rehash</h2><p>由于哈希表可能非常大，所以不能一次性rehash成功，而是使用渐进式的方法。</p>
+<p>步骤如下：</p>
+<ol>
+<li>为ht[1]分配号空间后，dict结构体同时持有两个哈希表；</li>
+<li>然后dict结构的rehashidx记为0，开始rehash；</li>
+<li>进行期间，会逐个将ht[0]的结点rehash到ht[1]，每次成功都会使rehashidx递增一；</li>
+<li>直到rehash完全，rehashidx设为-1，表示完成；</li>
+</ol>
+<p>如果此时有新增的键值对，一律保存到ht[1]中。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/21/%E7%AE%80%E5%8D%95%E5%8A%A8%E6%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/21/%E7%AE%80%E5%8D%95%E5%8A%A8%E6%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2/" itemprop="url">简单动态字符串</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-21T01:12:56+08:00">
+                2018-08-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h1><p>redis的字符串表示不是使用的像C语言那种以空字符结尾的字符数组，而是自己构建了一种简单动态字符串（simple dynamic string）——<strong>SDS</strong>。</p>
+<p>而一般来说，redis只会在字符串字面量被用在一些无需对字符串进行更改的地方使用C风格的字符串，比如打印日志。</p>
+<h2 id="SDS的定义"><a href="#SDS的定义" class="headerlink" title="SDS的定义"></a>SDS的定义</h2><p>sds定义在sds.h的sdshdr的结构体中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshds</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> len; <span class="comment">//记录buf数组中已经使用的字节数</span></span><br><span class="line">    <span class="type">int</span> <span class="built_in">free</span>; <span class="comment">//buf数组中未使用的字节数</span></span><br><span class="line">    <span class="type">char</span> buf[];<span class="comment">//与C字符串一样以空字符结尾的字符数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之所以在SDS中，使用了与C字符串类似的风格，是因为这样可以直接使用C字符串函数库里面的函数，比如要打印字符串，直接使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>, s-&gt;buf);</span><br></pre></td></tr></table></figure>
+
+<h2 id="SDS与C字符串的区别"><a href="#SDS与C字符串的区别" class="headerlink" title="SDS与C字符串的区别"></a>SDS与C字符串的区别</h2><p>要了解两者之间的区别，首先要从结构体入手。</p>
+<h3 id="常数复杂度获取字符串的长度"><a href="#常数复杂度获取字符串的长度" class="headerlink" title="常数复杂度获取字符串的长度"></a>常数复杂度获取字符串的长度</h3><p>这个比较好理解，因为结构体本身带有长度域，而设置和更新SDS长度的工作又是由SDS的API执行时自动完成的，所以避免了影响redis的性能。</p>
+<p>对于C字符串来说，要获取字符串长度，只能逐个遍历，直到遇到了空字符。</p>
+<h3 id="杜绝缓冲区溢出"><a href="#杜绝缓冲区溢出" class="headerlink" title="杜绝缓冲区溢出"></a>杜绝缓冲区溢出</h3><p>这个也比较好理解。对于一些字符串拼接的操作，如果没有记录字符串长度，无法得知字符串剩余的内存，这样在拼接的时候就可能发生缓冲区溢出。</p>
+<p>而SDS的API在使用sdscat函数进行字符串拼接的时候，会先检查SDS的空间是否足够，不足的话，会使用某种分配策略扩展空间。</p>
+<h3 id="减少修改字符串带来内存重分配次数"><a href="#减少修改字符串带来内存重分配次数" class="headerlink" title="减少修改字符串带来内存重分配次数"></a>减少修改字符串带来内存重分配次数</h3><p>对于C字符串来说，每次增长或者缩短一个字符串，程序都需要对保存该字符串的数组进行一次重新分配内存的工作，一旦没有重新分配，就可能造成内存泄露或者产生缓冲区溢出。而且因为内存重分配涉及到了复杂的算法，并且有可能会执行系统调用，所以通常是比较耗时的操作。</p>
+<p>为了避免C字符串的这种缺陷，redis的SDS实现了空间预分配和惰性空间释放两种优化策略。</p>
+<ol>
+<li>空间预分配</li>
+</ol>
+<p>这个策略主要用于优化SDS的字符串增长操作，在进行空间扩展时，不仅仅会分配所需空间，还会为SDS分配额外的未使用空间；</p>
+<ul>
+<li>如果对SDS修改后，长度小于1MB，那么程序将分配和len属性同样大小的未使用空间。即如果SDS的len变成了13字节，那么整个buf的数组长度将会变成13+13+1&#x3D;27个字节；</li>
+<li>如果对SDS修改后，长度大于1MB，那么程序将会分配1MB的未使用空间；</li>
+</ul>
+<ol start="2">
+<li>惰性空间释放</li>
+</ol>
+<p>该策略会使得SDS在缩短长度时，不会马上使用内存重分配来回收缩短后多出来的字节，而是使用free属性将这些字节数记录下来，并等待将来使用</p>
+<h3 id="二进制安全"><a href="#二进制安全" class="headerlink" title="二进制安全"></a>二进制安全</h3><p>相比C字符串在读到空字符，则认为是字符串结尾，redis的SDS则是用len属性来检验字符串是否结束。这种二进制安全的做法使得redis不仅可以保存文本格式，还可以保存任意格式的二进制数据</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Effective-Go%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/Effective-Go%E5%AD%A6%E4%B9%A0/" itemprop="url">Effective Go学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:18:41+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="EffectiveGo学习笔记"><a href="#EffectiveGo学习笔记" class="headerlink" title="EffectiveGo学习笔记"></a>EffectiveGo学习笔记</h1><h2 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a>格式化</h2><p>在go中，为了避免各种格式化问题的争论而浪费时间，我可以用gofmt将go程序进行统一的格式化，使得所有人遵循标准风格。</p>
+<p>使用命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gofmt -w program.go</span><br></pre></td></tr></table></figure>
+
+<p>该命令会将源代码格式化后再去覆盖原来的内容。</p>
+<blockquote>
+<p>All GO code in the standard packages has been formatted with gofmt</p>
+</blockquote>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>Go语言支持块注释**&#x2F;* *&#x2F;<strong>和行注释</strong>&#x2F; &#x2F;**。在golang中，因为godoc的提供，我们可以通过两种方式来查看文档。godoc既是一个程序，也是一个web服务器。</p>
+<p>考虑这样一段代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">提供常用库，输出一个vim-go</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//只是一个main函数</span></span><br><span class="line"><span class="comment">//不知道说什么了</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;vim-go&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>go doc的使用可以接收包名作为参数，也可以不输入任何参数，那么显示觉得就是当前目录下的文档。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">&gt; </span><span class="language-bash">go doc</span></span><br><span class="line"><span class="meta prompt_">&gt; </span><span class="language-bash">提供常用库，输出一个vim-go</span></span><br></pre></td></tr></table></figure>
+
+<p>当然也可以打开web服务器去访问：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">godoc -http=:6060</span><br></pre></td></tr></table></figure>
+
+<p>打开之后是官网的一个拷贝，但包的文档**<a target="_blank" rel="noopener" href="http://127.0.0.1:6060/pkg/**%E4%BC%9A%E6%9B%B4%E4%B8%B0%E5%AF%8C%EF%BC%8C%E5%9B%A0%E4%B8%BA%E5%AE%83%E6%98%AF%E5%9F%BA%E4%BA%8E%E7%94%B5%E8%84%91%E4%B8%8AGOROOT%E5%92%8CGOPATH%E8%B7%AF%E5%BE%84%E4%B8%8B%E7%9A%84%E6%89%80%E6%9C%89%E5%8C%85%E7%94%9F%E6%88%90%E7%9A%84%E6%96%87%E6%A1%A3%E3%80%82">http://127.0.0.1:6060/pkg/**会更丰富，因为它是基于电脑上GOROOT和GOPATH路径下的所有包生成的文档。</a></p>
+<h2 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h2><p>命名在任何语言中都是非常重要的</p>
+<h3 id="包名"><a href="#包名" class="headerlink" title="包名"></a>包名</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&quot;bytes&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>一般来说，包名应该以小写的单个单词为命名；另一个约定俗成的是包名应为其源码目录的基本名称。</p>
+<p>由于包名作为一个访问器，使得导出名称可以避免冲突。比如bufio.Reader和io.Reader就不会发生冲突。</p>
+<h3 id="接口名"><a href="#接口名" class="headerlink" title="接口名"></a>接口名</h3><p>按照约定，只包含一个方法的接口应该以该方法的名称加上-er后缀来命名，如Reader、Writer。</p>
+<h2 id="分号"><a href="#分号" class="headerlink" title="分号"></a>分号</h2><p>和C一天，go的正式语法使用分号来结束语句，但这些分号不在源码中出现，而是此法解析器会在每行最后一个标记为标识符时，在后面加上分号。</p>
+<p>另外，分号在闭合的大括号之前可以直接省略，所以尽量不要将大括号换行，以下是错误做法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> i &lt; f()</span><br><span class="line">&#123;</span><br><span class="line">    g()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果一行内写多个语句，也应该用分号隔开。</p>
+<h2 id="控制结构"><a href="#控制结构" class="headerlink" title="控制结构"></a>控制结构</h2><p>Golang有几种控制结构，for，if，switch和select，没有圆括号，而且主体必须使用大括号。</p>
+<h3 id="if"><a href="#if" class="headerlink" title="if"></a>if</h3><p>一个简单的if语句：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> x &gt; <span class="number">0</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，if可以接收初始化语句，设置局部变量：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := file.Chmod(<span class="number">0664</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Print(err)</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重新声明与再次赋值"><a href="#重新声明与再次赋值" class="headerlink" title="重新声明与再次赋值"></a>重新声明与再次赋值</h3><p>比如这样的例程：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f, err := os.Open(name)</span><br><span class="line"><span class="comment">//xxxxxx</span></span><br><span class="line">d, err := f.Stat()</span><br></pre></td></tr></table></figure>
+
+<p>在满足下列条件时，已被声明的变量可以出现**:&#x3D;**声明中：</p>
+<ul>
+<li>本次声明与已声明的v处于同一作用域；（若v在外层作用域已经声明过，则此次声明会创建新的变量）</li>
+<li>在初始化中与其类型相应的值才能赋予v，并且此次声明中至少另有一个变量是新声明的</li>
+</ul>
+<h3 id="for"><a href="#for" class="headerlink" title="for"></a>for</h3><p>golang的for循环有三种：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> init; condition; post &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> condition &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> &#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果要遍历数组、切片、字符串或者映射，抑或是从channel中读取信息，可以使用range子句：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> key, value := <span class="keyword">range</span> oldMap &#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="switch"><a href="#switch" class="headerlink" title="switch"></a>switch</h3><p>golang的switch语句，其表达式无需为常量或整数。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">unhex</span><span class="params">(c <span class="type">byte</span>)</span></span> <span class="type">byte</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;0&#x27;</span> &lt;= c &amp;&amp; c &lt;= <span class="string">&#x27;9&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> c - <span class="string">&#x27;0&#x27;</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;a&#x27;</span> &lt;= c &amp;&amp; c &lt;= <span class="string">&#x27;f&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> c - <span class="string">&#x27;a&#x27;</span> + <span class="number">10</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;A&#x27;</span> &lt;= c &amp;&amp; c &lt;= <span class="string">&#x27;F&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> c - <span class="string">&#x27;A&#x27;</span> + <span class="number">10</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就可以将一系列的if-else转为switch-case。</p>
+<p>另外，switch的case可以使用逗号分隔来列举相同的处理条件：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">shouldEscape</span><span class="params">(c <span class="type">byte</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> c &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27; &#x27;</span>, <span class="string">&#x27;?&#x27;</span>, <span class="string">&#x27;&amp;&#x27;</span>, <span class="string">&#x27;=&#x27;</span>, <span class="string">&#x27;#&#x27;</span>, <span class="string">&#x27;+&#x27;</span>, <span class="string">&#x27;%&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟C一样，我们往往会希望用break打破循环，在golang中，如果我们希望打破外层的循环，可以给break增加一个标签：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Loop:</span><br><span class="line">	<span class="keyword">for</span> n := <span class="number">0</span>; n &lt; <span class="built_in">len</span>(src); n += size &#123;</span><br><span class="line">		<span class="keyword">switch</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> src[n] &lt; sizeOne:</span><br><span class="line">			<span class="keyword">if</span> validateOnly &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			size = <span class="number">1</span></span><br><span class="line">			update(src[n])</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> src[n] &lt; sizeTwo:</span><br><span class="line">			<span class="keyword">if</span> n+<span class="number">1</span> &gt;= <span class="built_in">len</span>(src) &#123;</span><br><span class="line">				err = errShortInput</span><br><span class="line">				<span class="keyword">break</span> Loop</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> validateOnly &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			size = <span class="number">2</span></span><br><span class="line">			update(src[n] + src[n+<span class="number">1</span>]&lt;&lt;shift)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="命名的结果参数"><a href="#命名的结果参数" class="headerlink" title="命名的结果参数"></a>命名的结果参数</h3><p>Go函数的返回可以给定一个名字，在命名后，一旦函数开始执行，它们就会被初始化为与其类型响应的零值；若该函数执行了一条不带参数的return语句，该结果形参的当前值就会被返回。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadFull</span><span class="params">(r Reader, buf []<span class="type">byte</span>)</span></span> (n <span class="type">int</span>, err <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">len</span>(buf) &gt; <span class="number">0</span> &amp;&amp; err == <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> nr <span class="type">int</span></span><br><span class="line">        nr, err = r.Read(buf)</span><br><span class="line">        n += nr</span><br><span class="line">        buf = buf[nr:]</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h3><p>Go的defer语句可以预设一个函数调用，让它在执行defer的函数返回之前立即执行，这可以用来执行一些释放资源的函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Contents returns the file&#x27;s contents as a string.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Contents</span><span class="params">(filename <span class="type">string</span>)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    f, err := os.Open(filename)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> f.Close()  <span class="comment">// f.Close will run when we&#x27;re finished.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> result []<span class="type">byte</span></span><br><span class="line">    buf := <span class="built_in">make</span>([]<span class="type">byte</span>, <span class="number">100</span>)</span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">        n, err := f.Read(buf[<span class="number">0</span>:])</span><br><span class="line">        result = <span class="built_in">append</span>(result, buf[<span class="number">0</span>:n]...) <span class="comment">// append is discussed later.</span></span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;&quot;</span>, err  <span class="comment">// f will be closed if we return here.</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="type">string</span>(result), <span class="literal">nil</span> <span class="comment">// f will be closed if we return here.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>被defer的函数调用按照LIFO的顺序执行，比如这样的代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5</span>; i++ &#123;</span><br><span class="line">    <span class="keyword">defer</span> fmt.Printf(<span class="string">&quot;%d &quot;</span>, i)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//4 3 2 1 0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="data"><a href="#data" class="headerlink" title="data"></a>data</h2><p>golang提供了两种分配方法，即内建函数make和new，它们做的事情不同，但可能引起混淆。</p>
+<h3 id="new分配"><a href="#new分配" class="headerlink" title="new分配"></a>new分配</h3><p>这个内建函数会分配内存，并且将内存置为0，但不会初始化内存。在分配完已置为0的内存之后，会返回它的地址，比如**new(T)*<em>会返回</em>T，即一个指向新分配的，类型为T的零值。</p>
+<p>因此使用者只需要用new就可以创建一个新的对象，例如：零值bytes.Buffer就是已准备就绪的缓冲区，而零值的sync.Mutex就是已解锁的互斥锁。</p>
+<p>另外这种零值属性是具有传递性的，考虑这样的structure：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SyncedBuffer <span class="keyword">struct</span> &#123;</span><br><span class="line">    lock    sync.Mutex</span><br><span class="line">    buffer  bytes.Buffer</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么在后续的声明时，对于SyncedBuffer类型，只要声明分配好内存就可以直接使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p := <span class="built_in">new</span>(SyncedBuffer)  <span class="comment">// type *SyncedBuffer</span></span><br><span class="line"><span class="keyword">var</span> v SyncedBuffer      <span class="comment">// type  SyncedBuffer</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="构造函数与复合字面量"><a href="#构造函数与复合字面量" class="headerlink" title="构造函数与复合字面量"></a>构造函数与复合字面量</h3><p>在很多情况下，我们声明一个对象不单单是要零值，还希望初始化成员，但总不能逐个赋值这么丑陋的做法嘛：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewFile</span><span class="params">(fd <span class="type">int</span>, name <span class="type">string</span>)</span></span> *File &#123;</span><br><span class="line">    <span class="keyword">if</span> fd &lt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    &#125;</span><br><span class="line">    f := <span class="built_in">new</span>(File)</span><br><span class="line">    f.fd = fd</span><br><span class="line">    f.name = name</span><br><span class="line">    f.dirinfo = <span class="literal">nil</span></span><br><span class="line">    f.nepipe = <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span> f</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而golang的做法是这样的：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewFile</span><span class="params">(fd <span class="type">int</span>, name <span class="type">string</span>)</span></span> *File &#123;</span><br><span class="line">    <span class="keyword">if</span> fd &lt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//return &amp;File&#123;fd, name, nil, 0&#125;</span></span><br><span class="line">    <span class="keyword">return</span> &amp;File&#123;fd: fd, name: name&#125; <span class="comment">//此时其它字段默认为零值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>与C不同的是，golang返回一个局部变量地址是有效的，因此可以直接合并上面的语句。当然也可以以key：value的方式标出长远，如上。</p>
+<h3 id="make分配"><a href="#make分配" class="headerlink" title="make分配"></a>make分配</h3><p>内建函数make(T, args) 的目的不同于 new(T)。它只用于创建切片、映射和信道，并返回类型为 T（而非 <code>*T</code>）的一个已初始化 （而非置零）的值。例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">make</span>([]<span class="type">int</span>, <span class="number">10</span>, <span class="number">100</span>) <span class="comment">//分配一个100个int的数组空间，接着创建一个长度为10，容量为100并且指向该数组前10个元素的切片结构</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>若要返回指针，请用new分配内存</p>
+</blockquote>
+<h3 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h3><p>切片是对数组的封装，保存了对底层数组的引用。若某个函数将一个切片作为参数传入时，函数对切片的修改对调用者而言是可见的。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(file *File)</span></span> Read(buf []<span class="type">byte</span>) (n <span class="type">int</span>, err <span class="type">error</span>)</span><br></pre></td></tr></table></figure>
+
+<p>若要从更大的缓冲区 b 中读取前 32 个字节，只需对其进行切片即可。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">n, err := f.Read(buf[<span class="number">0</span>:<span class="number">32</span>])</span><br></pre></td></tr></table></figure>
+
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map的key可以是任何相等性操作符支持的类型， 如整数、浮点数、复数、字符串、指针、接口，结构以及数组，但不能是切片。</p>
+<p>若试图通过map中不存在的键来取值，就会返回与该映射中项的类型对应的零值。</p>
+<p>但这种设计我们不知道到底是不是因为不存在该项而得到零值，因此可以使用这种做法来检查：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> seconds <span class="type">int</span></span><br><span class="line"><span class="keyword">var</span> ok <span class="type">bool</span></span><br><span class="line">seconds, ok = timeZone[tz]</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><h3 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h3><p>Golang中的常量在编译时创建，而且只能是数字，字符，字符串或者布尔量。</p>
+<h3 id="init函数"><a href="#init函数" class="headerlink" title="init函数"></a>init函数</h3><p>init函数会在每个包完成初始化后自动执行，并且执行优先级会比main函数高，一般用来：</p>
+<ul>
+<li>对变量进行初始化；</li>
+<li>检查或者修复程序的状态；</li>
+<li>注册；</li>
+<li>进行一次计算；</li>
+</ul>
+<h2 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h2><p>golang的接口为指定对象的行为提供了一种途径，如果某个类型可以完成这个，那么它就可以被用在这里。通过实现 String 方法，我们可以自定义打印函数，而通过 Write 方法，Fprintf 则能对任何对象产生输出。</p>
+<p>例如一个实现了 sort.Interface 接口的集合就可通过 sort 包中的例程进行排序。该接口包括 Len()、Less(i, j int) bool 以及 Swap(i, j int)。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Sequence []<span class="type">int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Methods required by sort.Interface.</span></span><br><span class="line"><span class="comment">// sort.Interface 所需的方法。</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span></span> Len() <span class="type">int</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(s)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span></span> Less(i, j <span class="type">int</span>) <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> s[i] &lt; s[j]</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span></span> Swap(i, j <span class="type">int</span>) &#123;</span><br><span class="line">    s[i], s[j] = s[j], s[i]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="接口转换和类型断言"><a href="#接口转换和类型断言" class="headerlink" title="接口转换和类型断言"></a>接口转换和类型断言</h3><p>类型选择是类型转换的一种形式：它接受一个接口，通过switch判断选择读经的case，并在某种意义上将其转换为该种类型。以下代码为 fmt.Printf 通过类型选择将值转换为字符串的简化版。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Stringer <span class="keyword">interface</span> &#123;</span><br><span class="line">    String() <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> value <span class="keyword">interface</span>&#123;&#125; <span class="comment">// Value provided by caller.</span></span><br><span class="line"><span class="keyword">switch</span> str := value.(<span class="keyword">type</span>) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="type">string</span>:</span><br><span class="line">    <span class="keyword">return</span> str</span><br><span class="line"><span class="keyword">case</span> Stringer:</span><br><span class="line">    <span class="keyword">return</span> str.String()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一个接口类型的变量可能包含任何类型的值，因此我们需要用类型断言来检查其动态类型，即运行时在变量中存储的值的实际类型。例如我们可以测试某个时刻接口varI是否包含类型T的值：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> v, ok := varI.(T); ok &#123;  <span class="comment">// checked type assertion</span></span><br><span class="line">    Process(v)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// varI is not of type T</span></span><br></pre></td></tr></table></figure>
+
+<p>如果转换合法，那么v就是varI转换到类型T的值。</p>
+<h2 id="空白标识符"><a href="#空白标识符" class="headerlink" title="空白标识符"></a>空白标识符</h2><p>空白标识符可被赋予为任何类型的任何值，它表示只写的值，作为占位符。</p>
+<p>另外，空白标识符能使得那些未使用的导入和变量不受影响，能顺利通过编译，比如这样的程序，由于有两个未使用的导入和一个未使用的变量fd，因此不能编译。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;io&quot;</span></span><br><span class="line">    <span class="string">&quot;log&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fd, err := os.Open(<span class="string">&quot;test.go&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> use fd.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过引入空白标识符，则可以顺利通过编译：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;io&quot;</span></span><br><span class="line">    <span class="string">&quot;log&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _ = fmt.Printf <span class="comment">// For debugging; delete when done. // 用于调试，结束时删除。</span></span><br><span class="line"><span class="keyword">var</span> _ io.Reader    <span class="comment">// For debugging; delete when done. // 用于调试，结束时删除。</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fd, err := os.Open(<span class="string">&quot;test.go&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> use fd.</span></span><br><span class="line">    _ = fd</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还有一种用法，是为了使用其副作用而引入包，比如在 net&#x2F;http&#x2F;pprof 包的 init 函数中记录了 HTTP 处理程序的调试信息。它有个可导出的 API， 但大部分客户端只需要该处理程序的记录和通过 Web 页面访问数据。那么可以这样使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="string">&quot;net/http/pprof&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h2><p>由于golang的多值返回，我们可以很轻易地返回各种类型的错误提示，按照约定，错误的类型通常为 error，这是一个内建的简单接口。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="type">error</span> <span class="keyword">interface</span> &#123;</span><br><span class="line">    Error() <span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Panic"><a href="#Panic" class="headerlink" title="Panic"></a>Panic</h3><p>内建的panic函数，会产生一个运行时错误并终止程序，还会在程序终止时打印。比如这样：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CubeRoot</span><span class="params">(x <span class="type">float64</span>)</span></span> <span class="type">float64</span> &#123;</span><br><span class="line">    z := x/<span class="number">3</span>   <span class="comment">// Arbitrary initial value</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">1e6</span>; i++ &#123;</span><br><span class="line">        prevz := z</span><br><span class="line">        z -= (z*z*z-x) / (<span class="number">3</span>*z*z)</span><br><span class="line">        <span class="keyword">if</span> veryClose(z, prevz) &#123;</span><br><span class="line">            <span class="keyword">return</span> z</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// A million iterations has not converged; something is wrong.</span></span><br><span class="line">    <span class="built_in">panic</span>(fmt.Sprintf(<span class="string">&quot;CubeRoot(%g) did not converge&quot;</span>, x))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于panic被调用后，程序会终止当前函数的执行，并开始回溯goroutine的栈，当到达栈顶时，程序就会终止。不过我们可以用内建的 recover 函数来重新取回 goroutine 的控制权限并使其恢复正常执行。</p>
+<p> 由于在回溯时只有被推迟函数中的代码在运行，因此 recover 只能在被推迟的函数中才有效。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">server</span><span class="params">(workChan &lt;-<span class="keyword">chan</span> *Work)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> work := <span class="keyword">range</span> workChan &#123;</span><br><span class="line">        <span class="keyword">go</span> safelyDo(work)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">safelyDo</span><span class="params">(work *Work)</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> err := <span class="built_in">recover</span>(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            log.Println(<span class="string">&quot;work failed:&quot;</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">    do(work)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Golang%E5%AE%9E%E7%8E%B0Json%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/Golang%E5%AE%9E%E7%8E%B0Json%E5%BA%8F%E5%88%97%E5%8C%96/" itemprop="url">Golang实现Json序列化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:14:28+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Golang实现Json序列化"><a href="#Golang实现Json序列化" class="headerlink" title="Golang实现Json序列化"></a>Golang实现Json序列化</h1><p>学习自：<a target="_blank" rel="noopener" href="https://golang.org/pkg/encoding/json/#Marshal">https://golang.org/pkg/encoding/json/#Marshal</a></p>
+<p>先来看看api的使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Marshal</span><span class="params">(v <span class="keyword">interface</span>&#123;&#125;)</span></span> ([]<span class="type">byte</span>, <span class="type">error</span>)</span><br></pre></td></tr></table></figure>
+
+<p>基本作用就是返回v的json编码</p>
+<h2 id="作用过程"><a href="#作用过程" class="headerlink" title="作用过程"></a>作用过程</h2><p>Marshal递归地遍历v，如果遇到实现了Marshaler接口的值并且不是nil指针，Marshal会调用MarshalJSON方法来生成JSON。如果不存在MarshalJSON方法，但该值实现了encoding.TextMarshaler，则Marshal会调用MarshalText方法将结果编码为JSON字符。</p>
+<h2 id="编码结果"><a href="#编码结果" class="headerlink" title="编码结果"></a>编码结果</h2><p>Marshal使用以下类型相关的默认编码：</p>
+<ul>
+<li>bool值编码为JSON的布尔值；</li>
+<li>浮点数、整数和number值编码为JSON数字</li>
+<li>字符串值编码为有效的UTF-8的JSON字符串，并且会用Unicode替换无效字节</li>
+</ul>
+<blockquote>
+<p>为了防止某些浏览器会将JSON输出解析为HTML，尖括号&lt;和&gt;被转义为<strong>\u003c</strong>和<strong>\u003e</strong>。基于相同的原因，符号**&amp;<strong>会被转义为</strong>\u0026**</p>
+<p>可以使用调用了SetEscapeHTML(false)的编码器禁止此转义</p>
+</blockquote>
+<ul>
+<li>数组和切片值编码为JSON数组，但了[]字节会被编码为base64编码的字符串，而nil切片编码为空JSON值</li>
+<li>结构体则是编码为JSON对象，每个structure字段都会成为JSON对象的成员，并且会使用该字段名称作为对象值</li>
+</ul>
+<h3 id="关于structure编码为JSON"><a href="#关于structure编码为JSON" class="headerlink" title="关于structure编码为JSON"></a>关于structure编码为JSON</h3><p>在golang的结构体中，每个成员变量都可以附带一个Tag说明，因此每个struct字段的编码可以通过存储在以Json为key的tag进行定制化。比如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    UserId   <span class="type">int</span>    <span class="string">`json:&quot;user_id,omitempty&quot; bson:&quot;user_id&quot;`</span></span><br><span class="line">    UserName <span class="type">string</span> <span class="string">`json:&quot;user_name&quot; bson:&quot;user_name&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这些格式化字符串给出了字符的名称，还可以通过逗号在后面加上一系列的选项。tag中如果带有”omitempty”选项，那么如果该字段值为空，就不会输出到JSON串中。</p>
+<p>还有一种特别的情况，如果字段标记为“ - ”，则始终省略该字段。请注意，比较特别的是仍然可以使用标记“ - ，”生成名称为“ - ”的字段。比如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Field is ignored by this package.</span></span><br><span class="line">Field <span class="type">int</span> <span class="string">`json:&quot;-&quot;`</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Field appears in JSON as key &quot;-&quot;.</span></span><br><span class="line">Field <span class="type">int</span> <span class="string">`json:&quot;-,&quot;`</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>“string”选项表示字段在JSON编码的字符串中存储为JSON。它仅适用于字符串，浮点，整数或布尔类型的字段。在与JavaScript程序通信时，有时会使用这种额外的编码级别。</p>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map被编码为JSON对象，而且map的key类型必须是字符串、整数或者实现了encoding.TextMarshaler。其中：</p>
+<ul>
+<li>字符串类型会被直接实现</li>
+<li>encoding.TextMarshaler的会被marshaled</li>
+<li>整数则会转为字符串</li>
+</ul>
+<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><p>接口会被编码为接口中包含的值，nil接口值则被编码为null JSON值</p>
+<p>另外：</p>
+<blockquote>
+<p>Channel, complex, and function values cannot be encoded in JSON. Attempting to encode such a value causes Marshal to return an UnsupportedTypeError.</p>
+</blockquote>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">type</span> ColorGroup <span class="keyword">struct</span> &#123;</span><br><span class="line">		ID     <span class="type">int</span></span><br><span class="line">		Name   <span class="type">string</span></span><br><span class="line">		Colors []<span class="type">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	group := ColorGroup&#123;</span><br><span class="line">		ID:     <span class="number">1</span>,</span><br><span class="line">		Name:   <span class="string">&quot;Reds&quot;</span>,</span><br><span class="line">		Colors: []<span class="type">string</span>&#123;<span class="string">&quot;Crimson&quot;</span>, <span class="string">&quot;Red&quot;</span>, <span class="string">&quot;Ruby&quot;</span>, <span class="string">&quot;Maroon&quot;</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	b, err := json.Marshal(group)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">&quot;error:&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	os.Stdout.Write(b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Pylint%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/Pylint%E5%AD%A6%E4%B9%A0/" itemprop="url">Pylint学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:13:23+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Pylint学习"><a href="#Pylint学习" class="headerlink" title="Pylint学习"></a>Pylint学习</h1><h2 id="Install-Pylint"><a href="#Install-Pylint" class="headerlink" title="Install Pylint"></a>Install Pylint</h2><p>用virtualenv安装pylint：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install virtualenv</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">超时的话可以这样试一下</span></span><br><span class="line">pip --default-timeout=100 install virtualenv</span><br></pre></td></tr></table></figure>
+
+<p>创建一个虚拟环境：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">virtualenv --no-site-packages venv</span><br><span class="line">source venv/bin/activate</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Invoking-pylint"><a href="#Invoking-pylint" class="headerlink" title="Invoking pylint"></a>Invoking pylint</h2><p>pylint可以在命令行使用，具体用法为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint [options] modules_or_packages</span><br></pre></td></tr></table></figure>
+
+<p>从上面的用法可以得知，我们应该提供pylint要检查的python包或者模块的名称。而Pylint不会导入这些包，而是利用Python internals去进行定位。因此我们需要关注<a target="_blank" rel="noopener" href="https://docs.python.org/2/using/cmdline.html#envvar-PYTHONPATH">PYTHONPATH</a>，防止它去检查已安装的模块版本，而不是开发版本。</p>
+<p>如果传给pylint一个单文件，例如这样：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint mymodules.py</span><br></pre></td></tr></table></figure>
+
+<p>就要保证当前的工作目录为一个package（即目录下有_<em>init</em>_.py）。</p>
+<p>另外，也可以在其它的python程序中调用pylint，比如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pylint <span class="keyword">import</span> epylint <span class="keyword">as</span> lint</span><br><span class="line">(pylint_stdout, pylint_stderr) = lint.py_run(<span class="string">&#x27;hello.py&#x27;</span>, return_std=<span class="literal">True</span>)</span><br><span class="line"><span class="built_in">print</span> pylint_stdout.getvalue()</span><br><span class="line"><span class="built_in">print</span> pylint_stderr.getvalue()</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="command-line-options"><a href="#command-line-options" class="headerlink" title="command line options"></a>command line options</h2><p>先来看两个基本的选项：</p>
+<table>
+<thead>
+<tr>
+<th>–version</th>
+<th>show program’s version number and exit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-h, –help</td>
+<td>show help about the command line options</td>
+</tr>
+</tbody></table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(venv) ➜  py pylint --version</span><br><span class="line">No config file found, using default configuration</span><br><span class="line">pylint 1.9.3,</span><br><span class="line">astroid 1.6.5</span><br><span class="line">Python 2.7.10 (default, Jul 15 2017, 17:16:57)</span><br><span class="line">[GCC 4.2.1 Compatible Apple LLVM 9.0.0 (clang-900.0.31)]</span><br></pre></td></tr></table></figure>
+
+<p>接下来介绍一个message control的命令后选项：**–disable<strong>和</strong>–enable**，如果我们只是希望启动某些checker，可以先用–disable &#x3D; all然后使用–enable &#x3D; &lt;symbol&gt;，其中&lt;symbol&gt;是逗号分隔的检查器名称和消息符号列表。这样的使用方式对于仅仅希望启动少数的checkers非常有用。</p>
+<p>举个例子，假如你只想启动相似性检查，可以增加选项：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">–-disable=all –-enable=similarities</span><br></pre></td></tr></table></figure>
+
+<p>pylint提供的symbol，可以参考：<a target="_blank" rel="noopener" href="https://docs.pylint.org/en/1.6.0/features.html#messages-control-options">https://docs.pylint.org/en/1.6.0/features.html#messages-control-options</a></p>
+<h2 id="Parallel-execution"><a href="#Parallel-execution" class="headerlink" title="Parallel execution"></a>Parallel execution</h2><p>如果主机的CPU数量超过1个，可以使用**-j**选项加速pylint的运行，比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint -j 4 mymodule1.py mymodule2.py mymodule3.py mymodule4.py</span><br></pre></td></tr></table></figure>
+
+<p>这样就会产生4个子进程，其中每个提供的模块将被并行检查。checkers发现的问题不会立即显示。 完成检查模块后才会立即显示它们。当提供的参数为0时，将会使用主机上所有CPU的数量。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/" itemprop="url">支持向量机</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:09:13+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="支持向量机"><a href="#支持向量机" class="headerlink" title="支持向量机"></a>支持向量机</h1><h2 id="间隔与支持向量"><a href="#间隔与支持向量" class="headerlink" title="间隔与支持向量"></a>间隔与支持向量</h2><p>考虑这样的训练样本$D &#x3D; {(x_1, y_1), (x_2, y_2), … , (x_m, y_m)}, y_i \in {-1, +1}$。分类学习最重要的基于训练集D找到一个划分超平面，使得不同类别的样本能够分考。虽然划分平面可能很多，但我们应该尽量找到**”位于正中间”**的平面，使得robust最好。</p>
+<p>在样本空间中，划分超平面可以这样描述：<br>$$<br>w^Tx + b &#x3D; 0<br>$$<br>其中$w&#x3D;(w_1;w_2;…;w_d)$为法向量，决定平面的方向，而b则是位移，决定的事平面与原点的距离。</p>
+<p>样本空间中任意点x到平面的距离记为：<br>$$<br>r &#x3D; \frac {|w^Tx+b|} {||w||}<br>$$<br>假设平面能够正确分类，那么对于<br>$$<br>w^T x_i + b \geq +1, y_i +1 \<br>w^T x_i + b \leq -1, y_i -1<br>$$<br>根据这个公式可以得知，距离平面最近的点使得上式成立，那么这几个样本就成为支持向量，两个异类支持向量到平面的距离之和为：<br>$$<br>\gamma &#x3D; \frac {2} {||w||}<br>$$<br>这就是间隔(margin)。</p>
+<p>但如果我们希望找到具有最大间隔的平面，应该要最大化$\gamma$，则使得$\frac{1}{2}{||w||}^2$最大化。</p>
+<p>这就是**support vector machine(SVM)**的基本模型。</p>
+<h2 id="对偶问题"><a href="#对偶问题" class="headerlink" title="对偶问题"></a>对偶问题</h2><p>TODO</p>
+<h2 id="核函数"><a href="#核函数" class="headerlink" title="核函数"></a>核函数</h2><p>在现实生活中，很可能无法找到使得原始样本空间可分的超平面，比如抑或问题就是这样。但我们可以将样本从原始空间映射到一个更高维空间，使得样本在这个特征空间内是线性可分。</p>
+<p>经过映射后，假设超平面模型为：<br>$$<br>f(x) &#x3D; w^T \Phi(x) + b<br>$$<br>在利用对偶问题求解时会涉及得到计算内积——$\Phi(x)^T\Phi(x)$，由于映射后的特征空间可能维度很高，甚至是无穷维，要想直接计算通常是困难的。因此可以设计这样一个函数，即$x_i$与$x_j$在特征空间的内积等于它们在原始空间中通过函数k计算的结果。重写解为：<br>$$<br>f(x) &#x3D; w^T\Phi(x) + b \<br>&#x3D;\sum_{i&#x3D;1}^{m}\alpha_iy_i\Phi(x_i)^T\Phi(x) + b \<br>&#x3D;\sum_{i&#x3D;1}^{m}\alpha_iy_ik(x, x_i) + b<br>$$<br>但这样还存在一个问题，在不知道$ \Phi(x) $形式时该怎么得到核函数呢？</p>
+<blockquote>
+<p>有这么一个定理，如果有这么一个对称函数，它在输入空间中对应的核矩阵是半正定的，那么它就能作为核函数使用。（不懂？？）</p>
+</blockquote>
+<p>以下为一些常见和核函数：</p>
+<ul>
+<li>线性核：$k(x_i, x_j) &#x3D; x_i^Tx_i$</li>
+<li>多项式核：$k(x_i, x_j) &#x3D; (x_i^Tx_j)^d$</li>
+<li>高斯核：$k(x_i, x_j) &#x3D; exp(- \frac{ || x_i - x_j ||^2 }{2\sigma^2})$</li>
+<li>拉普拉斯核：$k(x_i, x_j) &#x3D; exp(- \frac{ || x_i - x_j ||^2 }{\sigma})$</li>
+<li>sigmoid核：$k(x_i, x_j) &#x3D; tanh(\beta x_i^T x_j + \theta)$</li>
+</ul>
+<h2 id="软间隔与正则化"><a href="#软间隔与正则化" class="headerlink" title="软间隔与正则化"></a>软间隔与正则化</h2><p>todo</p>
+<h2 id="支持向量回归"><a href="#支持向量回归" class="headerlink" title="支持向量回归"></a>支持向量回归</h2><p>这样的训练样本$D &#x3D; {(x_1, y_1), (x_2, y_2), … , (x_m, y_m)}$，希望学得一个回归模型，使得f(x)与y尽可能接近，在传统的回归模型中，我们是基于模型输出f(x)与真实输出y之间的差别来计算损失，在这种情况中当且仅当f(x)与y完全相同时，损失才为零。</p>
+<p>但是对于SVR，假设我们能容忍f(x)与y之间最多有$\epsilon$的偏差，这相当于以f(x)为中心，构建了一个宽度为$2\epsilon$的间隔带，若训练样本落入间隔带，则认为是被预测正确的。</p>
+<p>于是，SVR问题可以转化为：</p>
+<p>$$<br>min_{w, b} \frac{1}{2}||w||^2+C\sum_{i&#x3D;1}^{m}\ell_{\epsilon}(f(x_i)-y_i) \<br>$$</p>
+<p>$$<br>f(x)&#x3D;\left{<br>\begin{aligned}<br>0, if |z| \le \epsilon \<br>|z| - \epsilon,otherwise \<br>\end{aligned}<br>\right.<br>$$</p>
+<p>引入松弛变量：<br>$$<br>min_{w, b, \xi_{i2}, \xi_{i1}} \frac{1}{2}||w||^2+C\sum_{i&#x3D;1}^{m}(\xi_{i2}+\xi_{i1})<br>$$</p>
+<p>通过引入拉格朗日乘子，并对目标参数求偏导，最后得到SVR表示为：<br>$$<br>f(x) &#x3D; \sum_{i&#x3D;1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b<br>$$</p>
+<h2 id="核方法"><a href="#核方法" class="headerlink" title="核方法"></a>核方法</h2><p>todo</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/11/linux%E5%86%85%E6%A0%B8%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%92%8C%E9%A1%B5%E5%9B%9E%E5%86%99/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/11/linux%E5%86%85%E6%A0%B8%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%92%8C%E9%A1%B5%E5%9B%9E%E5%86%99/" itemprop="url">linux内核分析——页高速缓存和页回写</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T16:47:22+08:00">
+                2018-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="页高速缓存和页回写"><a href="#页高速缓存和页回写" class="headerlink" title="页高速缓存和页回写"></a>页高速缓存和页回写</h1><p>从访问速度来看，内存访问速度高于磁盘访问，而缓存访问速度又高于内存。</p>
+<h2 id="缓存手段"><a href="#缓存手段" class="headerlink" title="缓存手段"></a>缓存手段</h2><p>页高速缓存是由内存中的物理页面组成，对应的是磁盘上的物理块，可以动态扩大缩小。当内核开始读操作时，会先检查数据是否子啊缓存中，不命中采取磁盘找。</p>
+<blockquote>
+<p>现在的缓存一般焊接在CPU上</p>
+</blockquote>
+<h3 id="写缓存"><a href="#写缓存" class="headerlink" title="写缓存"></a>写缓存</h3><p>Linux在调用写操作时，使用的策略是——<strong>回写</strong>。这种策略是直接写到缓存中，而存储不是立刻更新，而是将页高速缓存中被写入的页面标记成<strong>脏页</strong>，表示缓存与磁盘不同步。延迟写磁盘，能方便后续对该页面的操作。</p>
+<h3 id="缓存回收"><a href="#缓存回收" class="headerlink" title="缓存回收"></a>缓存回收</h3><p>Linux实现的是一种改良LRU算法，则使用双链。Linux维护的是两个链表——活跃链表和非活跃链表，非活跃链表的页面是可以被换出的，而两个链表要保持数量平衡。</p>
+<h2 id="Linux页高速缓存"><a href="#Linux页高速缓存" class="headerlink" title="Linux页高速缓存"></a>Linux页高速缓存</h2><p>由于页高速缓存中的页可能包含多个不连续的物理磁盘块。Linux页高速缓存使用一个新的结构来管理缓存项和页面io操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">inode</span>            *<span class="title">host</span>;</span>              <span class="comment">/* owning inode */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">radix_tree_root</span>  <span class="title">page_tree</span>;</span>          <span class="comment">/* radix tree of all pages */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              tree_lock;          <span class="comment">/* page_tree lock */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">int</span>            i_mmap_writable;    <span class="comment">/* VM_SHARED ma count */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">prio_tree_root</span>   <span class="title">i_mmap</span>;</span>             <span class="comment">/* list of all mappings */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">i_mmap_nonlinear</span>;</span>   <span class="comment">/* VM_NONLINEAR ma list */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              i_mmap_lock;        <span class="comment">/* i_mmap lock */</span></span><br><span class="line">        <span class="type">atomic_t</span>                truncate_count;     <span class="comment">/* truncate re count */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span>           nrpages;            <span class="comment">/* total number of pages */</span></span><br><span class="line">        <span class="type">pgoff_t</span>                 writeback_index;    <span class="comment">/* writeback start offset */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span>   *<span class="title">a_ops</span>;</span>   <span class="comment">/* operations table */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span>           flags;              <span class="comment">/* gfp_mask and error flags */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">backing_dev_info</span> *<span class="title">backing_dev_info</span>;</span>  <span class="comment">/* read-ahead information */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              private_lock;       <span class="comment">/* private lock */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">private_list</span>;</span>       <span class="comment">/* private list */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span>    *<span class="title">assoc_mapping</span>;</span>     <span class="comment">/* associated buffers */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中i_mmap字段是一个优先搜索树，它包含了在该结构体中所有共享的与私有的映射页面。</p>
+<h3 id="address-space-操作"><a href="#address-space-操作" class="headerlink" title="address_space 操作"></a>address_space 操作</h3><p>a_ops域指向地址空间对象中的操作函数表，由adress_space_operations结构体表示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span> &#123;</span></span><br><span class="line">        <span class="type">int</span> (*writepage)(<span class="keyword">struct</span> page *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*readpage) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*sync_page) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*writepages) (<span class="keyword">struct</span> address_space *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*set_page_dirty) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*readpages) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> address_space *,<span class="keyword">struct</span> list_head *, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*prepare_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*commit_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">sector_t</span> (*bmap)(<span class="keyword">struct</span> address_space *, <span class="type">sector_t</span>);</span><br><span class="line">        <span class="type">int</span> (*invalidatepage) (<span class="keyword">struct</span> page *, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">        <span class="type">int</span> (*releasepage) (<span class="keyword">struct</span> page *, <span class="type">int</span>);</span><br><span class="line">        <span class="type">int</span> (*direct_IO) (<span class="type">int</span>, <span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *,<span class="type">loff_t</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这里面最重要的是读写——readpage()和writepage()。</p>
+<p>对于readpage，Linux内核试图在页高速缓存中使用**find_get_page(mapping, index)**找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
+<p>对于writepage，首先在cache中搜索需要的页，如果需要的页不在，则新分配一个空闲项；下一步，内核会创建一个写请求，接着数据被从用户空间拷贝到内核缓冲，最后写入磁盘。</p>
+<h3 id="基树"><a href="#基树" class="headerlink" title="基树"></a>基树</h3><p>每个address_page对象都有唯一的基树，保存在page_tree结构体中。只要指定了文件偏移量，就可以在基树中迅速检索到希望的页面。</p>
+<h2 id="flusher线程"><a href="#flusher线程" class="headerlink" title="flusher线程"></a>flusher线程</h2><p>在内存中累积起来的脏页最终会被写回磁盘，当下列3种情况发生时，脏页被写回磁盘：</p>
+<ul>
+<li>当空闲内存低于阈值时；</li>
+<li>当脏页在内存中驻留时间过长；</li>
+<li>当用户进程调用sync()和fsync()时；</li>
+</ul>
+<p>在Linux内核中由一群flusher线程执行这三种工作，flusher线程会被周期性唤醒，或者因为空闲内存过低被唤醒。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/12/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/14/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

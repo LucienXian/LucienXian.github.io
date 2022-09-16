@@ -1,23 +1,1922 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
 
-{% block page_class %}
-  {% if is_home() %} page-home {% endif %}
-{% endblock %}
 
-{% block content %}
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LucienXian&#39;s Garden">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LucienXian&#39;s Blog">
+<meta property="og:url" content="http://yoursite.com/page/20/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LucienXian&#39;s Garden">
+<meta property="og:locale">
+<meta property="article:author" content="LucienXian">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/page/20/"/>
+
+
+
+
+
+  <title>LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/05/C-11-%E6%A8%A1%E6%9D%BF%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/05/C-11-%E6%A8%A1%E6%9D%BF%E5%AD%A6%E4%B9%A0/" itemprop="url">C++11 模板学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T18:43:31+08:00">
+                2018-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>模板是一种支持参数化多态的工具，使得程序员能够编写与类型无关的代码</p>
+<p>模板又分为两种：函数模板和类模板</p>
+<h2 id="模板特化"><a href="#模板特化" class="headerlink" title="模板特化"></a>模板特化</h2><p>模板特化的提出是根据C++的设计，对于特定的类型，如果你能对某个功能有更好的实现，那么应该听你的。特化必须要在同一个命名空间下进行，函数模板只可以全特化（因为偏特化可以通过函数重载实现），而类模板则可以偏特化或者是全特化。</p>
+<p>因此在模板实例化时，会优先匹配参数类型最匹配的那个特化版本。</p>
+<ul>
+<li>全特化</li>
+</ul>
+<p>通过全特化模板，可以对某些特定参数集合自定义功能。此时模板参数为空。如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//类模板</span></span><br><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span>&lt;<span class="type">int</span>, <span class="type">double</span>&gt;&#123;</span><br><span class="line">    <span class="type">int</span> data1;</span><br><span class="line">    <span class="type">double</span> data2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//函数模板</span></span><br><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">max</span><span class="params">(<span class="type">const</span> <span class="type">int</span> lhs, <span class="type">const</span> <span class="type">int</span> rhs)</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> lhs &gt; rhs ? lhs : rhs;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：类模板需要在类名后面给出模板参数，而函数则不需要，它可以自动推导。</p>
+<ul>
+<li>偏特化</li>
+</ul>
+<p>例如，针对vector进行偏特化</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">vector</span> &#123; <span class="comment">// … // &#125;;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Allocator</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">vector</span>&lt;<span class="type">bool</span>, Allocator&gt; &#123; <span class="comment">//…//&#125;;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="可变模板参数"><a href="#可变模板参数" class="headerlink" title="可变模板参数"></a>可变模板参数</h2><p>这是C++11的新特性，支持模板的可变参数。可变模板参数的写法与原来有一点不同：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... T&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(T... args)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>它需要在typename或者class后面加上省略号，带省略号的参数就是一个参数包，里面包含了０~N个参数。那么如何展开参数包呢？</p>
+<p>两种方法</p>
+<h3 id="递归函数展开参数包"><a href="#递归函数展开参数包" class="headerlink" title="递归函数展开参数包"></a>递归函数展开参数包</h3><p>由于是递归调用，因此我们必须自定义递归的终止函数，保证其在参数为０时，停止递归。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//递归终止函数</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;empty&quot;</span> &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//展开函数</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> ...Args&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print</span><span class="params">(T head, Args... rest)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;parameter &quot;</span> &lt;&lt; head &lt;&lt; endl;</span><br><span class="line">   <span class="built_in">print</span>(rest...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="逗号表达式展开参数包"><a href="#逗号表达式展开参数包" class="headerlink" title="逗号表达式展开参数包"></a>逗号表达式展开参数包</h3><p>不表</p>
+<p>C++11中的std::tuple就是一个可变参数模板类</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="http://harttle.land/2015/10/03/cpp-template.html">http://harttle.land/2015/10/03/cpp-template.html</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.cnblogs.com/qicosmos/p/4325949.html">http://www.cnblogs.com/qicosmos/p/4325949.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/05/B-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/05/B-tree/" itemprop="url">B+ tree</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T16:26:30+08:00">
+                2018-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="B-树"><a href="#B-树" class="headerlink" title="B+ 树"></a>B+ 树</h1><h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>在实际的数据库产品中，为了满足高效率的查找操作，我们需要实现某种索引来进行查找，索引又通常通过B+树或者B树去实现（一般不用红黑树）</p>
+<h2 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h2><p>考虑到索引文件一般也很大，不可能将它们全部存储在内存中，而是存储在磁盘上。又由于介质等原因的不同，磁盘的IO比主存的IO要慢很多。因此要想提高效率，必须要减少磁盘IO的次数。</p>
+<p>为了达到这个目的，系统在发生缺页中断时都会直接读入一个block（page的整数倍）。假设B+树的高度为h，又因为通常设计成一个节点的大小对应于一个block，所以要查找特定的记录，最多只需要h次IO即可。</p>
+<p>而红黑树的深度是远比B+树要高的，所以一般情况下都只会使用B+树</p>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>一颗M阶B+树的定义</p>
+<ul>
+<li><p>根节点只有一个，子树有[2, m]</p>
+</li>
+<li><p>除了根节点之外的非叶子节点，包含的子树为[[m&#x2F;2],m]</p>
+</li>
+<li><p>所有非根节点的key数目为[[m&#x2F;2], m]</p>
+</li>
+<li><p>叶子节点都在同一层，叶子节点才含有key的信息，其它只是索引</p>
+</li>
+<li><p>所有非叶子节点的key等于其子数中最大或者最小的key</p>
+</li>
+</ul>
+<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>插入时判断其是否不满足定义，按需进行分解操作</p>
+<p>删除时判断其是否不满足定义，按需进行合并操作v</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/04/C-%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%96%B9%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/04/C-%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%96%B9%E5%BC%8F/" itemprop="url">C++内存分配方式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-04T19:49:17+08:00">
+                2018-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="内存分配的５个区域"><a href="#内存分配的５个区域" class="headerlink" title="内存分配的５个区域"></a>内存分配的５个区域</h1><ul>
+<li>堆</li>
+</ul>
+<p>由操作符new分配的空间，它们的释放不由编译器管理，需要程序员手动释放，或者在程序结束时由操作系统回收释放。</p>
+<ul>
+<li>栈</li>
+</ul>
+<p>一般存储局部变量和函数参数，由编译器去分配</p>
+<ul>
+<li>自由存储区</li>
+</ul>
+<p>与堆类似，但它是由malloc\free来分配和释放的</p>
+<ul>
+<li>静态存储区</li>
+</ul>
+<p>在C++中，全局变量和静态变量都存储在这</p>
+<ul>
+<li>常量存储区</li>
+</ul>
+<p>比较好理解，就是存储常量的区域</p>
+<h2 id="堆和栈的区别"><a href="#堆和栈的区别" class="headerlink" title="堆和栈的区别"></a>堆和栈的区别</h2><ul>
+<li><p>堆是由程序员控制的，而栈是由编译器控制的</p>
+</li>
+<li><p>堆的空间大小一般为4G，而栈相对较小，比如１M</p>
+</li>
+<li><p>堆有可能产生碎片，而栈是先进后出的模式，不会产生碎片</p>
+</li>
+<li><p>堆是自下往上，往高地址生长的；而栈则相反</p>
+</li>
+<li><p>栈分配效率较高，只需要从寄存器中找到存放栈的地址；而堆比较麻烦，需要通过一定的算法找到内存大小合适的空间（链表），或者因为碎片太多，先进行压缩抖动等</p>
+</li>
+</ul>
+<p>引用自：<br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html">http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/02/OS%E9%9D%A2%E8%AF%95%E7%9F%A5%E8%AF%86%E7%82%B9-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/02/OS%E9%9D%A2%E8%AF%95%E7%9F%A5%E8%AF%86%E7%82%B9-%E4%B8%80/" itemprop="url">OS面试知识点<一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-02T15:48:27+08:00">
+                2018-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/01/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%B8%80/" itemprop="url">深度探索C++对象模型<一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T23:16:17+08:00">
+                2018-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>开始看这本神书，做一些笔记：</p>
+<h1 id="简单对象模型"><a href="#简单对象模型" class="headerlink" title="简单对象模型"></a>简单对象模型</h1><p>第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img"></p>
+<h1 id="表格驱动对象模型"><a href="#表格驱动对象模型" class="headerlink" title="表格驱动对象模型"></a>表格驱动对象模型</h1><p>存储两个指针，分别指向data member table和function member table</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png" alt="img"></p>
+<h1 id="C-对象模型"><a href="#C-对象模型" class="headerlink" title="C++对象模型"></a>C++对象模型</h1><p>来看看重头戏——C++对象模型。有几个需要注意的：</p>
+<ul>
+<li><p>非静态数据成员放在类的对象中；</p>
+</li>
+<li><p>静态数据成员和成员函数放在类对象之外；</p>
+</li>
+<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info object；</p>
+</li>
+</ul>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png" alt="img"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/C-class-size/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/01/C-class-size/" itemprop="url">C++ class size</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T15:11:22+08:00">
+                2018-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="C-class-size"><a href="#C-class-size" class="headerlink" title="C++ class size"></a>C++ class size</h1><p>首先来看这个：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">EmptyClass</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">intClass</span> &#123;</span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="type">int</span> i;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">deriveClass</span> : <span class="keyword">public</span> intClass &#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NotAbstractClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WithStaticClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="type">static</span> <span class="type">int</span> i;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CharClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="type">char</span> c[<span class="number">7</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;EmptyClass size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(EmptyClass) &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;intClass size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(intClass) &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;deriveClass size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(deriveClass) &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;AbstactClass size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(AbstractClass) &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;NotAbtractClass size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(NotAbstractClass) &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;WithStatic size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(WithStaticClass) &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;CharClass size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(CharClass) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//结果：</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">EmptyClass size: 1</span></span><br><span class="line"><span class="comment">intClass size: 4</span></span><br><span class="line"><span class="comment">deriveClass size: 4</span></span><br><span class="line"><span class="comment">AbstactClass size: 8</span></span><br><span class="line"><span class="comment">NotAbtractClass size: 1</span></span><br><span class="line"><span class="comment">WithStatic size: 1</span></span><br><span class="line"><span class="comment">CharClass size: 7</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>类的大小有几点规则：</p>
+<ul>
+<li><p>为类的成员变量大小之和，同时需要满足一些对齐要求（例如上面的例子中对齐为１个字节）</p>
+</li>
+<li><p>编译器额外加入的大小，例如虚函数的指针，虚继承，多重继承</p>
+</li>
+<li><p>与类的构造析构和成员函数无关</p>
+</li>
+<li><p>继承计算大小时会把私有变量计算在内</p>
+</li>
+</ul>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><ul>
+<li><p>空类的大小为１：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/621616/c-what-is-the-size-of-an-object-of-an-empty-class">To ensure that the addresses of two different objects will be different.</a></p>
+</li>
+<li><p>虚函数：由于类中有一个virtual table，所以需要一个指针指向该表，在上例中指针是８个字节。另外，还可能遇到向上对齐的情况，例如：</p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">        <span class="type">char</span> c[<span class="number">3</span>];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//结果为１６</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>虚继承：虚继承除了加上父类的大小之外，还需要一个指针指向虚基类，同时考虑对齐，例如：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">intClass</span> &#123;</span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="type">int</span> i;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">deriveClass</span> : <span class="keyword">virtual</span> intClass &#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//结果是16</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/13/Effective-cpp-33/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/13/Effective-cpp-33/" itemprop="url">Effective-cpp-#33</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-13T01:16:29+08:00">
+                2018-02-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Avoiding-hiding-iherited-names"><a href="#Avoiding-hiding-iherited-names" class="headerlink" title="Avoiding hiding iherited names"></a>Avoiding hiding iherited names</h1><p>这里的关键是区分清楚重载与重写</p>
+<p>继承一个基类时，如果其下的public函数不带virtual，而派生类又重写了一个同名的函数，那么派生类就会把基类版本的该函数给掩盖住了，也就是无法再通过派生类去调用基类版本的函数了</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>有两种解决方法：</p>
+<p>第一种是使用using声明式：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//保证Base class内名为mf1和mf3的所有东西在Derived域内可见</span></span><br><span class="line">    <span class="keyword">using</span> Base::mf1;</span><br><span class="line">    <span class="keyword">using</span> Base::mf3;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mf3</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mf4</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>通过这种手段，继承机制没有问题，在派生类找不到的函数（版本），会继续到基类作用域内寻找。</p>
+<p>第二个方法就是使用<strong>forwarding function</strong>，特别是你如果想要隐藏到基类不同参数的函数中某一个，用例子说话：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">(<span class="type">int</span>)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">private</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Base::<span class="built_in">mf1</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这样就隐藏掉带参数的mf1()了</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>Derived class内的名称会隐藏掉base class内的函数。在public继承体系下，我们不希望发生这样的事情；</li>
+<li>为了重新获取被掩盖的基类函数，可以使用using声明式或者forwarding functions</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/12/Effective-cpp-32/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/12/Effective-cpp-32/" itemprop="url">Effective-cpp-#32</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-12T23:55:09+08:00">
+                2018-02-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Make-sure-public-inheritance-models-“is-a”"><a href="#Make-sure-public-inheritance-models-“is-a”" class="headerlink" title="Make sure public inheritance models “is-a”"></a>Make sure public inheritance models “is-a”</h1><p>通常来说，基类是比派生类更加一般化的概念，所以任何希望获得一个基类的函数，都可以接受一个派生类对象作为参数。</p>
+<p>通常来说，继承体系都有一个比较明显模型：<strong>is-a</strong>。但这里经常遇到的问题是，举个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bird</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">fly</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Penguin</span>: <span class="keyword">public</span> Bird&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，问题出现在——企鹅是鸟，但企鹅不可以飞。也就是构造了一个不严谨的继承体系。当然，这跟你程序设计有关，有可能你设计时不希望有一个Bird::fly()的函数，那样就不会出现问题。</p>
+<p>通常来说，我们希望的是：“public继承”则意味着is-a，也就是说，适用于base class的每一个行为也应该适用于derived class。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-31/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-31/" itemprop="url">Effective-cpp-#31</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T22:32:21+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Minimize-compilation-dependencies-between-files"><a href="#Minimize-compilation-dependencies-between-files" class="headerlink" title="Minimize compilation dependencies between files"></a>Minimize compilation dependencies between files</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>这个问题主要是在多文件的程序中，如果某个class实现文件做了些许的修改，当你重新build&#x2F;make这个项目时，可能所有相关依赖的文件都重新编译和链接了。这个就是“接口和实现没有很好分离的一大弊端”。</p>
+<p>考虑这样一个程序：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//可能包含的头文件</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;date.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;address.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string theName;</span><br><span class="line">    Date theBirthDate;</span><br><span class="line">    Address theAddress;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的问题是：在private中的那几个变量定义，我们需要找到Date和Address的具体定义，也就是说一旦这个文件依赖的头文件发生了变化，那么Person class也要重新编译。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>当然，我们可以分离声明和定义，比如在刚刚那个文件中声明:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Date</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Address</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string theName;</span><br><span class="line">    Date theBirthDate;</span><br><span class="line">    Address theAddress;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//另外的文件</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">    <span class="function">Person <span class="title">p</span><span class="params">(params)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但这里的问题是，对于前置声明，编译器必须提前知道对象的大小，这样才能在stack中分配足够大的空间。</p>
+<p>借鉴Java的经验，我们用一个指针去指向需要的对象。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span><span class="comment">//一般来说，标准库组件不用前置声明</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PersonImpl</span>; <span class="comment">//Person实现类的前置声明</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Date</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Address</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::trl::shared_ptr&lt;PersonImpl&gt; pImpl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种设计就叫做——<strong>pointer to implementation</strong>。至此，Person的客户端就与其他class包括Person的实现细节分离了，也就是其他类的修改不会影响到Person客户端重新编译。</p>
+<h3 id="制作一个handle-class"><a href="#制作一个handle-class" class="headerlink" title="制作一个handle class"></a>制作一个handle class</h3><p>通常来说，我们应该为声明式和定义式提供不同的头文件，这样就不用每次都前置声明其他的class。</p>
+<p>制作一个handle class的方法有两种，第一种已经在前面提及过了，至于第二种就是构造一个抽象类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Person</span>();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::string <span class="title">name</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::string <span class="title">birthDate</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::string <span class="title">address</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="type">static</span> std::<span class="function">trl::shared_ptr&lt;Person&gt; </span></span><br><span class="line"><span class="function">        <span class="title">create</span><span class="params">(<span class="type">const</span> std::string&amp; name,</span></span></span><br><span class="line"><span class="params"><span class="function">               <span class="type">const</span> Date&amp; birthday,</span></span></span><br><span class="line"><span class="params"><span class="function">               <span class="type">const</span> Address&amp; addr)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然，由于这是abstract class，我们需要一个concrete class来定义所有的函数。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>为了保证编译依赖最小化，我们应该依赖于声明而不是定义。这里有两个实现手段——handle class和interface class；</li>
+<li>程序库头文件应该以“完整的并且是仅有声明”的形式存在；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-30/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-30/" itemprop="url">Effective-cpp-#30</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T20:14:37+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Understand-the-ins-and-outs-of-inlining"><a href="#Understand-the-ins-and-outs-of-inlining" class="headerlink" title="Understand the ins and outs of inlining"></a>Understand the ins and outs of inlining</h1><p>inline函数，不是第一次接触这个概念了。编译器的最优化机制会被设计用来执行语境相关的最优化。但有利有弊，由于inline函数的主体会被插到调用处。这样一来，你的目标码会变得越来越大，有可能导致额外的paging行为。</p>
+<br>
+
+<p>通常来说，inline函数有两种定义方法——一是在类内定义函数，这是一种隐喻的方式；二是在定义式前加inline关键字。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>inline函数尽量置于头文件内，因为大多数build environment通常会在编译时进行inlining，这是因为为了将一个“函数调用”替换为“被调用函数的本体”，编译器必须知道那个函数长什么样子。</p>
+<p>template的具体化与inline无关，我们需要的考虑的是——是否希望每一个具体实现的函数都是inline的，毕竟这有可能会引发代码膨胀。</p>
+<p>关于编译器的问题，编译器不一定就真的会对inline函数进行inline行为，例如编译器通常不会对“通过函数指针而进行的函数调用”进行inline行为。另外，如果程序要调用某个inline函数，往往，编译器会生成一个outlined函数本体</p>
+<p>最后一个需要注意的问题是，<strong>inline函数无法随着程序库的升级而升级</strong>。假设f是一个inline函数，而设计者修改了这个函数f，那么所有用到f的客户端程序都必须重新编译，而对于non-inline函数，客户端只需要重新链接即可，这比重新变异的负担少。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>将大多数inline限制在小型的、被频繁调用的函数身上。这可以使得日后的调试和二进制升级更加容易，也可以使得潜在的代码膨胀问题最小化；</li>
+<li>不要只因为function template出现在头文件，就将它们声明为inline；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/19/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/21/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

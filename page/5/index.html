@@ -1,23 +1,2266 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
 
-{% block page_class %}
-  {% if is_home() %} page-home {% endif %}
-{% endblock %}
 
-{% block content %}
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LucienXian&#39;s Garden">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LucienXian&#39;s Blog">
+<meta property="og:url" content="http://yoursite.com/page/5/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LucienXian&#39;s Garden">
+<meta property="og:locale">
+<meta property="article:author" content="LucienXian">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/page/5/"/>
+
+
+
+
+
+  <title>LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/01/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E5%AD%97%E5%85%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/08/01/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E5%AD%97%E5%85%B8/" itemprop="url">redis设计与实现——字典</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-01T00:33:46+08:00">
+                2019-08-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="redis设计与实现——字典"><a href="#redis设计与实现——字典" class="headerlink" title="redis设计与实现——字典"></a>redis设计与实现——字典</h1><p>在字典中，一个key和一个value进行关联，从而组成键值对，但C语言并没有内置了这种数据结构，因为redis自行构建了。字典是哈希键的底层实现之一。</p>
+<h2 id="字典的实现"><a href="#字典的实现" class="headerlink" title="字典的实现"></a>字典的实现</h2><p>Redis的字典使用了哈希表作为底层实现，每个表内部含有多个哈希表节点。</p>
+<h3 id="哈希表节点"><a href="#哈希表节点" class="headerlink" title="哈希表节点"></a>哈希表节点</h3><p>首先是键值对的定义，即每个dictEntry结构保存着一个键值对。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> &#123;</span></span><br><span class="line">    <span class="type">void</span> *key; <span class="comment">// 键</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">void</span> *val;</span><br><span class="line">        <span class="type">uint64_t</span> u64;</span><br><span class="line">        <span class="type">int64_t</span> s64;</span><br><span class="line">        <span class="type">double</span> d;</span><br><span class="line">    &#125; v; <span class="comment">// 值</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span> <span class="comment">// 指向下一个哈希表节点，形成链表</span></span><br><span class="line">&#125; dictEntry;</span><br></pre></td></tr></table></figure>
+
+<p>key-value中的值可以是一个指针，也可能是一个整数或者double。next则是用来以链表的形式解决哈希冲突的问题。</p>
+<h3 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* This is our hash table structure. Every dictionary has two of this as we</span></span><br><span class="line"><span class="comment"> * implement incremental rehashing, for the old to the new table. */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">    dictEntry **table; <span class="comment">// 哈希表数组</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> size; <span class="comment">// 哈希表大小</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> sizemask; <span class="comment">// 哈希表掩码，用来计算索引值，等于size-1</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> used; <span class="comment">// 已有节点的个数</span></span><br><span class="line">&#125; dictht;</span><br></pre></td></tr></table></figure>
+
+<h3 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h3><p>为了使用方便，redis的字典在上面哈希表再多封装一层。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">  	<span class="comment">// 类型特定的函数</span></span><br><span class="line">    dictType *type;</span><br><span class="line">  	<span class="comment">// 私有数据</span></span><br><span class="line">    <span class="type">void</span> *privdata;</span><br><span class="line">  	<span class="comment">// 两个哈希表，其中一个用来存储当前使用的，另一个则是用来做rehash</span></span><br><span class="line">    dictht ht[<span class="number">2</span>];</span><br><span class="line">    <span class="type">long</span> rehashidx; <span class="comment">/* rehashing not in progress if rehashidx == -1 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> iterators; <span class="comment">/* number of iterators currently running */</span></span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure>
+
+<p>这里的type属性保存了一个指向dictType结构的指针，而每个dictType结构都包含了一组用于操作特定类型键值对的函数。而private属性则保存了需要传递给那些类型特定函数的可选参数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictType</span> &#123;</span></span><br><span class="line">  	<span class="comment">// 计算哈希值的函数</span></span><br><span class="line">    <span class="type">uint64_t</span> (*hashFunction)(<span class="type">const</span> <span class="type">void</span> *key); </span><br><span class="line">  	<span class="comment">// 复制key的函数</span></span><br><span class="line">    <span class="type">void</span> *(*keyDup)(<span class="type">void</span> *privdata, <span class="type">const</span> <span class="type">void</span> *key);</span><br><span class="line">  	<span class="comment">// 复制value的函数</span></span><br><span class="line">    <span class="type">void</span> *(*valDup)(<span class="type">void</span> *privdata, <span class="type">const</span> <span class="type">void</span> *obj);</span><br><span class="line"> 		<span class="comment">// 对比key的函数</span></span><br><span class="line">    <span class="type">int</span> (*keyCompare)(<span class="type">void</span> *privdata, <span class="type">const</span> <span class="type">void</span> *key1, <span class="type">const</span> <span class="type">void</span> *key2);</span><br><span class="line">  	<span class="comment">// 销毁key的函数</span></span><br><span class="line">    <span class="type">void</span> (*keyDestructor)(<span class="type">void</span> *privdata, <span class="type">void</span> *key);</span><br><span class="line">  	<span class="comment">// 销毁value的函数</span></span><br><span class="line">    <span class="type">void</span> (*valDestructor)(<span class="type">void</span> *privdata, <span class="type">void</span> *obj);</span><br><span class="line">&#125; dictType;</span><br></pre></td></tr></table></figure>
+
+<p>至此，Redis的封装层级就是dict-&gt;dictht-&gt;dictEntry</p>
+<h2 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h2><p>当需要添加一个新的键值对到dict里面，Redis会根据key计算出哈希值和索引值，再把包含键值对的哈希节点放到哈希表数组的指定索引上。</p>
+<p>先是调用dictAdd</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">dictAdd</span><span class="params">(dict *d, <span class="type">void</span> *key, <span class="type">void</span> *val)</span></span><br><span class="line">&#123;</span><br><span class="line">    dictEntry *entry = dictAddRaw(d,key,<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!entry) <span class="keyword">return</span> DICT_ERR;</span><br><span class="line">    dictSetVal(d, entry, val);</span><br><span class="line">    <span class="keyword">return</span> DICT_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中dictAddRaw会增加一个dictEntry，但不会设置value值，而是由用户自行决定如何设置。同时这个API也直接暴露给用户，用户可以自行调用，比如设置非指针值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entry = dictAddRaw(dict,mykey,<span class="literal">NULL</span>);</span><br><span class="line"><span class="keyword">if</span> (entry != <span class="literal">NULL</span>) dictSetSignedIntegerVal(entry,<span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">dictEntry *<span class="title function_">dictAddRaw</span><span class="params">(dict *d, <span class="type">void</span> *key, dictEntry **existing)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">long</span> index;</span><br><span class="line">    dictEntry *entry;</span><br><span class="line">    dictht *ht;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 判断是否需要rehashing</span></span><br><span class="line">    <span class="keyword">if</span> (dictIsRehashing(d)) _dictRehashStep(d);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取新元素index，如果已存在则返回NULL</span></span><br><span class="line">    <span class="keyword">if</span> ((index = _dictKeyIndex(d, key, dictHashKey(d,key), existing)) == <span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 如果需要rehasing，则插入到ht[1]中</span></span><br><span class="line">    ht = dictIsRehashing(d) ? &amp;d-&gt;ht[<span class="number">1</span>] : &amp;d-&gt;ht[<span class="number">0</span>];</span><br><span class="line">  	<span class="comment">// 分配内存</span></span><br><span class="line">    entry = zmalloc(<span class="keyword">sizeof</span>(*entry));</span><br><span class="line">  	<span class="comment">// 插入到table的头部，这样就可以以O(1)的时间解决哈希冲突</span></span><br><span class="line">    entry-&gt;next = ht-&gt;table[index];</span><br><span class="line">    ht-&gt;table[index] = entry;</span><br><span class="line">    ht-&gt;used++;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Set the hash entry fields. */</span></span><br><span class="line">    dictSetKey(d, entry, key); <span class="comment">// 设置key</span></span><br><span class="line">    <span class="keyword">return</span> entry;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的关键是获取index，这样才能新增一个entry，并设置对应的key。准确来说，是先获取对应的hash值，再利用该hash值计算索引index。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用dict设置的哈希函数，计算key的哈希值</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果key已经存在，则返回-1</span></span><br><span class="line"><span class="type">static</span> <span class="type">long</span> _dictKeyIndex(dict *d, <span class="type">const</span> <span class="type">void</span> *key, <span class="type">uint64_t</span> hash, dictEntry **existing)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> idx, table;</span><br><span class="line">    dictEntry *he;</span><br><span class="line">    <span class="keyword">if</span> (existing) *existing = <span class="literal">NULL</span>; <span class="comment">// existing用来获取当前的entry</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在需要时扩展整个dict</span></span><br><span class="line">    <span class="keyword">if</span> (_dictExpandIfNeeded(d) == DICT_ERR)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  	<span class="comment">// 在两个hash表中查找是否存在相同key</span></span><br><span class="line">    <span class="keyword">for</span> (table = <span class="number">0</span>; table &lt;= <span class="number">1</span>; table++) &#123; </span><br><span class="line">      	<span class="comment">// 使用哈希和sizemark掩码计算index</span></span><br><span class="line">        idx = hash &amp; d-&gt;ht[table].sizemask;</span><br><span class="line">        <span class="comment">// 遍历idx对应的table slot，判断该table不含有相同的key</span></span><br><span class="line">        he = d-&gt;ht[table].table[idx];</span><br><span class="line">        <span class="keyword">while</span>(he) &#123;</span><br><span class="line">            <span class="keyword">if</span> (key==he-&gt;key || dictCompareKeys(d, key, he-&gt;key)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (existing) *existing = he;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            he = he-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!dictIsRehashing(d)) <span class="keyword">break</span>; <span class="comment">// 如果不是正在rehash，则直接break，不去ht[1]中寻找</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> idx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>计算index的过程，首先是判断是否需要扩展dict，然后遍历两个哈希表，在dictEnrty数组中遍历，确保不含有相同的key。</p>
+<h2 id="解决键冲突"><a href="#解决键冲突" class="headerlink" title="解决键冲突"></a>解决键冲突</h2><p>假设Redis计算得出k1和k2的索引值相同，则这就是发生了冲突。Redis使用链地址法解决冲突。每个哈希表节点都有一个next指针，在发生冲突时就使用next指针将k1和k2所在节点连接起来。同时，由于dictEntry节点组成链表没有指向尾部的指针，为了速度考虑，直接将新节点插入到头部。如上代码所示。</p>
+<h2 id="Rehash"><a href="#Rehash" class="headerlink" title="Rehash"></a>Rehash</h2><p>首先来看扩展：正在rehashing的直接返回；第一次增加键值对的，直接扩展哈希表的大小到4；接下来是判断在什么情况下，redis会对哈希表进行扩展：</p>
+<ul>
+<li>服务器没有执行<strong>BGSAVE</strong>或者<strong>BGREWRITEAOF</strong>命令时，哈希表的负载因子大于或等于1；</li>
+<li>服务器正在执行<strong>BGSAVE</strong>或者<strong>BGREWRITEAOF</strong>命令时，哈希表的负载因子大于5；</li>
+</ul>
+<p>之所以这样设计，是因为在子进程存在期间，操作系统是采用写时复制的技术，此时如果进行哈希扩展，就可能产生大量内存写入操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 至于扩展dict也比较直接</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> _dictExpandIfNeeded(dict *d)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 正在rehashing的，直接返回</span></span><br><span class="line">    <span class="keyword">if</span> (dictIsRehashing(d)) <span class="keyword">return</span> DICT_OK;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 第一次新增，则扩展到4；#define DICT_HT_INITIAL_SIZE     4</span></span><br><span class="line">    <span class="keyword">if</span> (d-&gt;ht[<span class="number">0</span>].size == <span class="number">0</span>) <span class="keyword">return</span> dictExpand(d, DICT_HT_INITIAL_SIZE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// static int dict_can_resize = 1;</span></span><br><span class="line">		<span class="comment">// static unsigned int dict_force_resize_ratio = 5;</span></span><br><span class="line">  </span><br><span class="line">  	<span class="comment">/*</span></span><br><span class="line"><span class="comment">  	在server.c里，会根据服务器是否存在有aof或者rdb的子进程，即是否在执行BGSAVE或者BGREWRITEAOF命令</span></span><br><span class="line"><span class="comment">  	void updateDictResizePolicy(void) &#123;</span></span><br><span class="line"><span class="comment">        if (server.rdb_child_pid == -1 &amp;&amp; server.aof_child_pid == -1)</span></span><br><span class="line"><span class="comment">            dictEnableResize();</span></span><br><span class="line"><span class="comment">        else</span></span><br><span class="line"><span class="comment">            dictDisableResize();</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">  	*/</span></span><br><span class="line">    <span class="keyword">if</span> (d-&gt;ht[<span class="number">0</span>].used &gt;= d-&gt;ht[<span class="number">0</span>].size &amp;&amp;</span><br><span class="line">        (dict_can_resize ||</span><br><span class="line">         d-&gt;ht[<span class="number">0</span>].used/d-&gt;ht[<span class="number">0</span>].size &gt; dict_force_resize_ratio))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> dictExpand(d, d-&gt;ht[<span class="number">0</span>].used*<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> DICT_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至于收缩，当哈希表的负载因子小于0.1时，Redis会进行收缩操作。这一个操作是在server.c里进行的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> HASHTABLE_MIN_FILL 10    <span class="comment">/* Minimal hash table fill 10% */</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">htNeedsResize</span><span class="params">(dict *dict)</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> size, used;</span><br><span class="line"></span><br><span class="line">    size = dictSlots(dict);</span><br><span class="line">    used = dictSize(dict);</span><br><span class="line">    <span class="keyword">return</span> (size &gt; DICT_HT_INITIAL_SIZE &amp;&amp;</span><br><span class="line">            (used*<span class="number">100</span>/size &lt; HASHTABLE_MIN_FILL));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="渐进式rehash"><a href="#渐进式rehash" class="headerlink" title="渐进式rehash"></a>渐进式rehash</h2><p>由前面的结构体可以看到dict中有ht[0]和ht[1]，这样的设计可以保证在扩展或者收缩哈希表的时候可以将ht[0]里面的所有键值对rehash到ht[1]。而这一个步骤是分多次、渐进式地完成的，避免过大的计算量导致服务器在一段时间内停止服务。</p>
+<p>在_dictExpandIfNeeded中，当满足扩展条件时会调用dictExpand。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">dictExpand</span><span class="params">(dict *d, <span class="type">unsigned</span> <span class="type">long</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* the size is invalid if it is smaller than the number of</span></span><br><span class="line"><span class="comment">     * elements already inside the hash table */</span></span><br><span class="line">    <span class="keyword">if</span> (dictIsRehashing(d) || d-&gt;ht[<span class="number">0</span>].used &gt; size)</span><br><span class="line">        <span class="keyword">return</span> DICT_ERR;</span><br><span class="line"></span><br><span class="line">    dictht n; <span class="comment">/* the new hash table */</span></span><br><span class="line">  	</span><br><span class="line">  	<span class="comment">/*</span></span><br><span class="line"><span class="comment">  	static unsigned long _dictNextPower(unsigned long size)</span></span><br><span class="line"><span class="comment">    &#123;</span></span><br><span class="line"><span class="comment">        unsigned long i = DICT_HT_INITIAL_SIZE; // 4</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        if (size &gt;= LONG_MAX) return LONG_MAX + 1LU;</span></span><br><span class="line"><span class="comment">        while(1) &#123;</span></span><br><span class="line"><span class="comment">            if (i &gt;= size)</span></span><br><span class="line"><span class="comment">                return i;</span></span><br><span class="line"><span class="comment">            i *= 2;</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">  	*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> realsize = _dictNextPower(size); <span class="comment">// 获取哈希表容量，4，8，16，32，直到比size大</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Rehashing to the same table size is not useful. */</span></span><br><span class="line">    <span class="keyword">if</span> (realsize == d-&gt;ht[<span class="number">0</span>].size) <span class="keyword">return</span> DICT_ERR;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Allocate the new hash table and initialize all pointers to NULL */</span></span><br><span class="line">    n.size = realsize;</span><br><span class="line">    n.sizemask = realsize<span class="number">-1</span>;</span><br><span class="line">    n.table = zcalloc(realsize*<span class="keyword">sizeof</span>(dictEntry*)); <span class="comment">// 分配新的表</span></span><br><span class="line">    n.used = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Is this the first initialization? If so it&#x27;s not really a rehashing</span></span><br><span class="line"><span class="comment">     * we just set the first hash table so that it can accept keys. */</span></span><br><span class="line">    <span class="keyword">if</span> (d-&gt;ht[<span class="number">0</span>].table == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        d-&gt;ht[<span class="number">0</span>] = n;</span><br><span class="line">        <span class="keyword">return</span> DICT_OK;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Prepare a second hash table for incremental rehashing */</span></span><br><span class="line">    d-&gt;ht[<span class="number">1</span>] = n;</span><br><span class="line">    d-&gt;rehashidx = <span class="number">0</span>; <span class="comment">// 更新rehashidx变量，后续有用</span></span><br><span class="line">    <span class="keyword">return</span> DICT_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在分配完dict之后，就可以进行rehash的操作了。在redis中，有两种rehash方式。</p>
+<ul>
+<li>dictRehashMilliseconds：按照ms计时的rehash操作，是databasesCron中针对redis的DB进行rehash。serverCron后台定时任务会每次调用databasesCron()进而调用incrementallyRehash，每隔一段时间就会执行。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Rehash for an amount of time between ms milliseconds and ms+1 milliseconds */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dictRehashMilliseconds</span><span class="params">(dict *d, <span class="type">int</span> ms)</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> start = timeInMilliseconds();</span><br><span class="line">    <span class="type">int</span> rehashes = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(dictRehash(d,<span class="number">100</span>)) &#123;</span><br><span class="line">        rehashes += <span class="number">100</span>;</span><br><span class="line">        <span class="keyword">if</span> (timeInMilliseconds()-start &gt; ms) <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> rehashes;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在server.c里会调用这个函数，使用了CPU时间的1ms。该函数的作用，是对正在rehash的字典，每次执行1毫秒，每次循环100次的哈希表数据迁移。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">incrementallyRehash</span><span class="params">(<span class="type">int</span> dbid)</span> &#123;</span><br><span class="line">    <span class="comment">/* Keys dictionary */</span></span><br><span class="line">    <span class="keyword">if</span> (dictIsRehashing(server.db[dbid].dict)) &#123;</span><br><span class="line">        dictRehashMilliseconds(server.db[dbid].dict,<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>; <span class="comment">/* already used our millisecond for this loop... */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* Expires */</span></span><br><span class="line">    <span class="keyword">if</span> (dictIsRehashing(server.db[dbid].expires)) &#123;</span><br><span class="line">        dictRehashMilliseconds(server.db[dbid].expires,<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>; <span class="comment">/* already used our millisecond for this loop... */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>_dictRehashStep：这是一个单步的rehasing，在执行对dict的增删改查中都会被调用</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> _dictRehashStep(dict *d) &#123;</span><br><span class="line">    <span class="keyword">if</span> (d-&gt;iterators == <span class="number">0</span>) dictRehash(d,<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>比如前面的添加键值对，或者查找操作。但相对其它的操作会在两个哈希表中进行，字典的添加只会在ht[1]中直接新增</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> dictEntry *<span class="title function_">dictAddRaw</span><span class="params">(dict *d, <span class="type">void</span> *key)</span>   <span class="comment">// 新增一个entry</span></span><br><span class="line"> &#123;</span><br><span class="line">     <span class="keyword">if</span> (dictIsRehashing(d)) _dictRehashStep(d); <span class="comment">// 如果在rehash执行一步rehash</span></span><br><span class="line">     <span class="comment">// 正在rehashing的话，直接在ht[1]中添加</span></span><br><span class="line">   	 ht = dictIsRehashing(d) ? &amp;d-&gt;ht[<span class="number">1</span>] : &amp;d-&gt;ht[<span class="number">0</span>];</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">dictEntry *<span class="title function_">dictFind</span><span class="params">(dict *d, <span class="type">const</span> <span class="type">void</span> *key)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">if</span> (dictIsRehashing(d)) _dictRehashStep(d);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面两个函数都调用了通用的rehash函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">dictRehash</span><span class="params">(dict *d, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> empty_visits = n*<span class="number">10</span>; <span class="comment">/* 最多读取n*10个空节点，避免rehash阻塞太久*/</span></span><br><span class="line">    <span class="keyword">if</span> (!dictIsRehashing(d)) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(n-- &amp;&amp; d-&gt;ht[<span class="number">0</span>].used != <span class="number">0</span>) &#123;</span><br><span class="line">        dictEntry *de, *nextde;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 确保rehashidx不会溢出 */</span></span><br><span class="line">        assert(d-&gt;ht[<span class="number">0</span>].size &gt; (<span class="type">unsigned</span> <span class="type">long</span>)d-&gt;rehashidx);</span><br><span class="line">      	<span class="comment">/* 遍历找到非空节点 */</span></span><br><span class="line">        <span class="keyword">while</span>(d-&gt;ht[<span class="number">0</span>].table[d-&gt;rehashidx] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            d-&gt;rehashidx++;</span><br><span class="line">            <span class="keyword">if</span> (--empty_visits == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        de = d-&gt;ht[<span class="number">0</span>].table[d-&gt;rehashidx];</span><br><span class="line">        <span class="comment">/* 将当前节点的所有key-value对转存到ht[1]中 */</span></span><br><span class="line">        <span class="keyword">while</span>(de) &#123;</span><br><span class="line">            <span class="type">uint64_t</span> h;</span><br><span class="line"></span><br><span class="line">            nextde = de-&gt;next;</span><br><span class="line">            <span class="comment">/* Get the index in the new hash table */</span></span><br><span class="line">            h = dictHashKey(d, de-&gt;key) &amp; d-&gt;ht[<span class="number">1</span>].sizemask;</span><br><span class="line">            de-&gt;next = d-&gt;ht[<span class="number">1</span>].table[h];</span><br><span class="line">            d-&gt;ht[<span class="number">1</span>].table[h] = de;</span><br><span class="line">            d-&gt;ht[<span class="number">0</span>].used--;</span><br><span class="line">            d-&gt;ht[<span class="number">1</span>].used++;</span><br><span class="line">            de = nextde;</span><br><span class="line">        &#125;</span><br><span class="line">        d-&gt;ht[<span class="number">0</span>].table[d-&gt;rehashidx] = <span class="literal">NULL</span>; <span class="comment">// 释放该节点</span></span><br><span class="line">        d-&gt;rehashidx++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 检查是否已经完全rehash */</span></span><br><span class="line">    <span class="keyword">if</span> (d-&gt;ht[<span class="number">0</span>].used == <span class="number">0</span>) &#123;</span><br><span class="line">        zfree(d-&gt;ht[<span class="number">0</span>].table);</span><br><span class="line">        d-&gt;ht[<span class="number">0</span>] = d-&gt;ht[<span class="number">1</span>];</span><br><span class="line">        _dictReset(&amp;d-&gt;ht[<span class="number">1</span>]);</span><br><span class="line">        d-&gt;rehashidx = <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* More to rehash... */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为哈希表可能存在大量的空节点，redis的做法是每次遍历10n个节点，如果还没找到非空节点即返回，这里的n是step数。这样就可以避免rehash的时候，阻塞太久。</p>
+<p>另外，结合incrementallyRehash该函数来看，考虑到渐进式rehash在服务器比较空闲的时候将会长时间存在使用两个哈希表的时候。因此在redis的周期函数中，会花费1ms来辅助rehash。具体可以参考server.c&#x2F;databasesCron()：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">databasesCron</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (server.rdb_child_pid == <span class="number">-1</span> &amp;&amp; server.aof_child_pid == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="comment">// ....</span></span><br><span class="line">				</span><br><span class="line">      	<span class="comment">// 这一步有可能产生缩容</span></span><br><span class="line">      	<span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; dbs_per_call; j++) &#123;</span><br><span class="line">            tryResizeHashTables(resize_db % server.dbnum);</span><br><span class="line">            resize_db++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/* Rehash */</span></span><br><span class="line">      	<span class="comment">/* 前提是配置了activerehashing，允许服务器在周期函数中辅助进行渐进式rehash，默认值是1，server.activerehashing = CONFIG_DEFAULT_ACTIVE_REHASHING; */</span></span><br><span class="line">        <span class="keyword">if</span> (server.activerehashing) &#123;</span><br><span class="line">            <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; dbs_per_call; j++) &#123;</span><br><span class="line">                <span class="type">int</span> work_done = incrementallyRehash(rehash_db);</span><br><span class="line">                <span class="keyword">if</span> (work_done) &#123;</span><br><span class="line">                    <span class="comment">/* 如果已经进行了定时rehash，则停止循环，等待下一轮cron */</span></span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">/* 否则，会移动到下一个redis db进行 */</span></span><br><span class="line">                    rehash_db++;</span><br><span class="line">                    rehash_db %= server.dbnum;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结rehash的详细步骤：</p>
+<ol>
+<li>为 ht[1] 分配空间， 让字典同时持有 ht[0] 和 ht[1] 两个哈希表；</li>
+<li>在字典中维持一个索引计数器变量 rehashidx ， 并将它的值设置为 0 ， 表示 rehash 工作正式开始；</li>
+<li>在 rehash 进行期间，每次对字典执行添加、删除、查找或者更新操作时，程序除了执行指定的操作以外，还会顺带将 ht[0] 哈希表在 rehashidx 索引上的所有键值对 rehash 到 ht[1] ，当 rehash 工作完成之后，程序将 rehashidx 属性的值增一。另外，每一步都会遍历至多十个节点，以找到非空节点；</li>
+<li>随着字典操作的不断执行，最终在某个时间点上，ht[0] 的所有键值对都会被 rehash 至 ht[1]，这时程序将 rehashidx 属性的值设为 -1 ，表示 rehash 操作已完成。</li>
+</ol>
+<p>通过将rehash键值对的计算工作分摊到增删改查的操作中，避免了对服务器性能造成影响。</p>
+<p>关于rehash，推荐一篇文章，主要讲的是线上遇到的在rehash期间，同时有两个hash表在使用，会使得redis内存使用量瞬间突增的问题：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2018/07/27/redis-rehash-practice-optimization.html">美团针对Redis Rehash机制的探索和实践</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/26/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E9%93%BE%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/07/26/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E9%93%BE%E8%A1%A8/" itemprop="url">redis设计与实现——链表</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-26T01:28:53+08:00">
+                2019-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="redis设计与实现——链表"><a href="#redis设计与实现——链表" class="headerlink" title="redis设计与实现——链表"></a>redis设计与实现——链表</h1><p>链表是数据结构中一种很常见的实现类型，redis也不例外，其主要实现在<a target="_blank" rel="noopener" href="https://github.com/antirez/redis/blob/unstable/src/adlist.h">adlist.h</a>和<a target="_blank" rel="noopener" href="https://github.com/antirez/redis/blob/unstable/src/adlist.c">adlist.c</a>里。</p>
+<h2 id="链表与链表节点的实现"><a href="#链表与链表节点的实现" class="headerlink" title="链表与链表节点的实现"></a>链表与链表节点的实现</h2><p>如下所示，每个链表节点都用listNode结构来表示，并且用list来持有整个链表：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span> <span class="comment">// 前置节点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span> <span class="comment">// 后置节点</span></span><br><span class="line">    <span class="type">void</span> *value; /节点值</span><br><span class="line">&#125; listNode;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">list</span> &#123;</span></span><br><span class="line">    listNode *head; <span class="comment">// 表头节点</span></span><br><span class="line">    listNode *tail; <span class="comment">// 表尾节点</span></span><br><span class="line">    <span class="type">void</span> *(*dup)(<span class="type">void</span> *ptr); <span class="comment">// 复制链表节点所包含的值</span></span><br><span class="line">    <span class="type">void</span> (*<span class="built_in">free</span>)(<span class="type">void</span> *ptr); <span class="comment">// 释放链表节点所包含的值</span></span><br><span class="line">    <span class="type">int</span> (*match)(<span class="type">void</span> *ptr, <span class="type">void</span> *key); <span class="comment">// 对比链表节点所保存的值与另一个输入是否相等</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> len; <span class="comment">// 链表长度</span></span><br><span class="line">&#125; <span class="built_in">list</span>;</span><br></pre></td></tr></table></figure>
+
+<p>由此可见，redis的链表是一个双端的(具备prev和next指针)、无环的(表头节点的prev和表尾节点的next都指向NULL)、带链表长度计数器(len属性)、多态(使用void*指针来保存节点值)。</p>
+<h2 id="链表和链表节点的API"><a href="#链表和链表节点的API" class="headerlink" title="链表和链表节点的API"></a>链表和链表节点的API</h2><table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">listEmpty</td>
+<td align="center">移除链表所有元素，但不销毁list本身</td>
+</tr>
+<tr>
+<td align="center">listRelease</td>
+<td align="center">销毁整个链表</td>
+</tr>
+<tr>
+<td align="center">listAddNodeHead</td>
+<td align="center">添加一个节点到链表头</td>
+</tr>
+<tr>
+<td align="center">listAddNodeTail</td>
+<td align="center">添加一个节点到链表尾</td>
+</tr>
+<tr>
+<td align="center">listInsertNode</td>
+<td align="center">可选地将新节点插入到指定节点的前面或者后面</td>
+</tr>
+<tr>
+<td align="center">listDelNode</td>
+<td align="center">删除一个节点</td>
+</tr>
+<tr>
+<td align="center">listGetIterator</td>
+<td align="center">返回链表头部或者尾部的迭代器</td>
+</tr>
+<tr>
+<td align="center">listReleaseIterator</td>
+<td align="center">销毁迭代器</td>
+</tr>
+<tr>
+<td align="center">listNext</td>
+<td align="center">返回迭代器的下一个链表节点</td>
+</tr>
+<tr>
+<td align="center">listDup</td>
+<td align="center">拷贝整个链表</td>
+</tr>
+<tr>
+<td align="center">listSearchKey</td>
+<td align="center">在列表中搜索与给定键匹配的节点。（需要实现定义match函数）</td>
+</tr>
+<tr>
+<td align="center">listIndex</td>
+<td align="center">返回链表中特定索引的节点，可以使用负数</td>
+</tr>
+<tr>
+<td align="center">listRotate</td>
+<td align="center">反转链表——将尾部节点插入到头部</td>
+</tr>
+<tr>
+<td align="center">listJoin</td>
+<td align="center">合并两个链表，并把其中一个置空</td>
+</tr>
+</tbody></table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/21/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/07/21/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E5%AD%97%E7%AC%A6%E4%B8%B2/" itemprop="url">redis设计与实现——字符串</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-21T23:24:02+08:00">
+                2019-07-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h1><p>Redis没有使用C语言传统的以空字符结尾的字符串表示，而是自己构造了一种名为简单动态字符串(simple dynamic string，SDS)的抽象类型。</p>
+<p>除了在诸如打印日志等无需对字符串进行修改的地方使用C字符串之外，其它场合一般使用SDS。其优点：</p>
+<ul>
+<li>使用起来更加简单；</li>
+<li>二进制安全；</li>
+<li>计算效率高；</li>
+<li>兼容普通的C字符串函数；</li>
+</ul>
+<h2 id="SDS的定义"><a href="#SDS的定义" class="headerlink" title="SDS的定义"></a>SDS的定义</h2><p>在sds.h&#x2F;sdshdr的结构中有这么一个值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span> *sds;</span><br><span class="line"><span class="comment">/* Note: sdshdr5 is never used, we just access the flags byte directly.</span></span><br><span class="line"><span class="comment"> * However is here to document the layout of type 5 SDS strings. */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr5</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> flags; <span class="comment">/* 3 lsb of type, and 5 msb of string length */</span></span><br><span class="line">    <span class="type">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr8</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="type">uint8_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="type">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr16</span> &#123;</span></span><br><span class="line">    <span class="type">uint16_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="type">uint16_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="type">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr32</span> &#123;</span></span><br><span class="line">    <span class="type">uint32_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="type">uint32_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="type">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">attribute__</span> ((__<span class="title">packed__</span>)) <span class="title">sdshdr64</span> &#123;</span></span><br><span class="line">    <span class="type">uint64_t</span> len; <span class="comment">/* used */</span></span><br><span class="line">    <span class="type">uint64_t</span> alloc; <span class="comment">/* excluding the header and null terminator */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span></span><br><span class="line">    <span class="type">char</span> buf[];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这里flags的低三位表示类型(是sdshdr8还是16)，高五位没被使用；len记录当前字节数组长度，alloc记录当前字节数组分配的内存大小，都不包含’\0’；buf保存真实字符串的值，以及结尾的’\0’。</p>
+<p>这里使用了**<strong>attribute</strong> ((<strong>packed</strong>))**，它的作用是编译器取消结构在编译过程中的优化对齐，按照实际占用字节数进行对齐。我们可以打印出字节长度分别为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sizeof</span>(<span class="keyword">struct</span> sdshdr8)  <span class="comment">// 3-&gt;3, result of llvm</span></span><br><span class="line"><span class="keyword">sizeof</span>(<span class="keyword">struct</span> sdshdr16) <span class="comment">// 6-&gt;5</span></span><br><span class="line"><span class="keyword">sizeof</span>(<span class="keyword">struct</span> sdshdr32) <span class="comment">// 12-&gt;9</span></span><br><span class="line"><span class="keyword">sizeof</span>(<span class="keyword">struct</span> sdshdr64) <span class="comment">// 24-&gt;17</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="SDS与C字符串的区别"><a href="#SDS与C字符串的区别" class="headerlink" title="SDS与C字符串的区别"></a>SDS与C字符串的区别</h2><h3 id="常数复杂度获取字符串长度"><a href="#常数复杂度获取字符串长度" class="headerlink" title="常数复杂度获取字符串长度"></a>常数复杂度获取字符串长度</h3><p>这一点得益于结构体重的len字段，与C字符串不同，redis获取字符串长度的复杂度从O(N)降到O(1)。</p>
+<h3 id="杜绝缓冲区的溢出"><a href="#杜绝缓冲区的溢出" class="headerlink" title="杜绝缓冲区的溢出"></a>杜绝缓冲区的溢出</h3><p>C库中有一个&lt;string.h&gt;&#x2F;strcat函数可以将两个字符串进行拼接，但C库中这个函数是假设使用者为目的字符串分配了足够多的内存，否则会产生缓冲区溢出。</p>
+<p>与C字符串不同，SDS使用了另外的拼接函数：<strong>sdscatlen</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Append the specified binary-safe string pointed by &#x27;t&#x27; of &#x27;len&#x27; bytes to the</span></span><br><span class="line"><span class="comment"> * end of the specified sds string &#x27;s&#x27;.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * After the call, the passed sds string is no longer valid and all the</span></span><br><span class="line"><span class="comment"> * references must be substituted with the new pointer returned by the call. */</span></span><br><span class="line">sds <span class="title function_">sdscatlen</span><span class="params">(sds s, <span class="type">const</span> <span class="type">void</span> *t, <span class="type">size_t</span> len)</span> &#123;</span><br><span class="line">    <span class="type">size_t</span> curlen = sdslen(s);</span><br><span class="line"></span><br><span class="line">    s = sdsMakeRoomFor(s,len);</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">memcpy</span>(s+curlen, t, len);</span><br><span class="line">    sdssetlen(s, curlen+len);</span><br><span class="line">    s[curlen+len] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的关键是sdsMakeRoomFor函数，其它部分只是做一些内存拷贝和长度的重新设置。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">sds <span class="title function_">sdsMakeRoomFor</span><span class="params">(sds s, <span class="type">size_t</span> addlen)</span> &#123;</span><br><span class="line">    <span class="type">void</span> *sh, *newsh;</span><br><span class="line">  	<span class="comment">// sdsavail: 获取可用长度，这里的s是指向buf的，通过buf进行寻址</span></span><br><span class="line">  	<span class="comment">// 获取头部(结构体)指针：#define SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));</span></span><br><span class="line">  	<span class="comment">// sdsavail的计算方式：sh-&gt;alloc - sh-&gt;len;</span></span><br><span class="line">    <span class="type">size_t</span> avail = sdsavail(s);</span><br><span class="line">    <span class="type">size_t</span> len, newlen;</span><br><span class="line">    <span class="type">char</span> type, oldtype = s[<span class="number">-1</span>] &amp; SDS_TYPE_MASK; <span class="comment">// s-1就是flags</span></span><br><span class="line">    <span class="type">int</span> hdrlen;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 有足够的空间就可以直接返回 */</span></span><br><span class="line">    <span class="keyword">if</span> (avail &gt;= addlen) <span class="keyword">return</span> s;</span><br><span class="line"></span><br><span class="line">    len = sdslen(s); <span class="comment">// O(1)获取字符串长度</span></span><br><span class="line">    sh = (<span class="type">char</span>*)s-sdsHdrSize(oldtype);<span class="comment">// 获取头部(结构体)指针</span></span><br><span class="line">    newlen = (len+addlen);<span class="comment">// 新的字符串使用长度</span></span><br><span class="line">  	<span class="comment">// 新字符串小于1M时，预分配两倍空间</span></span><br><span class="line">  	<span class="comment">// 新字符串大于1M时，预分配多1M的空间</span></span><br><span class="line">    <span class="keyword">if</span> (newlen &lt; SDS_MAX_PREALLOC) <span class="comment">// SDS_MAX_PREALLOC (1024*1024)</span></span><br><span class="line">        newlen *= <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        newlen += SDS_MAX_PREALLOC;</span><br><span class="line"></span><br><span class="line">    type = sdsReqType(newlen); <span class="comment">// 重新计算字符串类型</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Don&#x27;t use type 5: the user is appending to the string and type 5 is</span></span><br><span class="line"><span class="comment">     * not able to remember empty space, so sdsMakeRoomFor() must be called</span></span><br><span class="line"><span class="comment">     * at every appending operation. */</span></span><br><span class="line">  	<span class="comment">// SDS_TYPE_5直接按SDS_TYPE_8来计算</span></span><br><span class="line">    <span class="keyword">if</span> (type == SDS_TYPE_5) type = SDS_TYPE_8;</span><br><span class="line"></span><br><span class="line">    hdrlen = sdsHdrSize(type);<span class="comment">// 新类型的长度</span></span><br><span class="line">  	</span><br><span class="line">    <span class="keyword">if</span> (oldtype==type) &#123; </span><br><span class="line">      	<span class="comment">// #define s_realloc realloc</span></span><br><span class="line">      	<span class="comment">// 如果类型没变化，直接在原sds上重新分配内存</span></span><br><span class="line">        newsh = s_realloc(sh, hdrlen+newlen+<span class="number">1</span>); </span><br><span class="line">        <span class="keyword">if</span> (newsh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        s = (<span class="type">char</span>*)newsh+hdrlen;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Since the header size changes, need to move the string forward,</span></span><br><span class="line"><span class="comment">         * and can&#x27;t use realloc */</span></span><br><span class="line">      	<span class="comment">// 如果类型发生了变化，则重新malloc分配空间</span></span><br><span class="line">        newsh = s_malloc(hdrlen+newlen+<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (newsh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        <span class="built_in">memcpy</span>((<span class="type">char</span>*)newsh+hdrlen, s, len+<span class="number">1</span>);<span class="comment">// 将原字符串内容拷贝到新开辟的内存中</span></span><br><span class="line">        s_free(sh); <span class="comment">// 释放原sds内存</span></span><br><span class="line">      	<span class="comment">// 设置flag，len和alloc等字段</span></span><br><span class="line">        s = (<span class="type">char</span>*)newsh+hdrlen;</span><br><span class="line">        s[<span class="number">-1</span>] = type;</span><br><span class="line">        sdssetlen(s, len);</span><br><span class="line">    &#125;</span><br><span class="line">    sdssetalloc(s, newlen);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的关键策略是针对不同长度的字符串做不同的分配策略：</p>
+<ul>
+<li>新字符串小于1M时，预分配两倍空间</li>
+<li>新字符串大于1M时，预分配多1M的空间</li>
+</ul>
+<p>另外就是不使用SDS5，将其当作SDS8来使用。</p>
+<p>由于redis可能出现频繁修改字符串的场景，这种预分配的策略可以使得SDS将连续增长N次字符串所需要的内存重分配次数从必定N次降低为最多N次。</p>
+<h3 id="减少修改字符串时带来的内存重分配次数"><a href="#减少修改字符串时带来的内存重分配次数" class="headerlink" title="减少修改字符串时带来的内存重分配次数"></a>减少修改字符串时带来的内存重分配次数</h3><h4 id="字符串的创建"><a href="#字符串的创建" class="headerlink" title="字符串的创建"></a>字符串的创建</h4><p>直接看源码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">sds <span class="title function_">sdsnewlen</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *init, <span class="type">size_t</span> initlen)</span> &#123;</span><br><span class="line">    <span class="type">void</span> *sh;</span><br><span class="line">    sds s;</span><br><span class="line">    <span class="type">char</span> type = sdsReqType(initlen);</span><br><span class="line">    <span class="comment">/* Empty strings are usually created in order to append. Use type 8</span></span><br><span class="line"><span class="comment">     * since type 5 is not good at this. */</span></span><br><span class="line">    <span class="keyword">if</span> (type == SDS_TYPE_5 &amp;&amp; initlen == <span class="number">0</span>) type = SDS_TYPE_8;</span><br><span class="line">    <span class="type">int</span> hdrlen = sdsHdrSize(type);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> *fp; <span class="comment">/* flags pointer. */</span></span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// +1是因为字符串都以&#x27;\0&#x27;结尾，但其又是二进制安全的，即字符串中间可以出现字符&#x27;\0&#x27;，因为sds有长度属性</span></span><br><span class="line">    sh = s_malloc(hdrlen+initlen+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (init==SDS_NOINIT) <span class="comment">// const char *SDS_NOINIT = &quot;SDS_NOINIT&quot;;</span></span><br><span class="line">        init = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (!init)</span><br><span class="line">        <span class="built_in">memset</span>(sh, <span class="number">0</span>, hdrlen+initlen+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (sh == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">NULL</span>; <span class="comment">// 如果sh是NULL，直接返回NULL</span></span><br><span class="line">    s = (<span class="type">char</span>*)sh+hdrlen;</span><br><span class="line">    fp = ((<span class="type">unsigned</span> <span class="type">char</span>*)s)<span class="number">-1</span>; <span class="comment">// fp就是flag指针</span></span><br><span class="line">    <span class="keyword">switch</span>(type) &#123;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_5: &#123;</span><br><span class="line">          	<span class="comment">// #define SDS_TYPE_BITS 3</span></span><br><span class="line">          	<span class="comment">// flag的前五位保存长度，后三位是类型type，因此结构体中sdshdr5不含有len</span></span><br><span class="line">            *fp = type | (initlen &lt;&lt; SDS_TYPE_BITS);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_8: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">8</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_16: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">16</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_32: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">32</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> SDS_TYPE_64: &#123;</span><br><span class="line">            SDS_HDR_VAR(<span class="number">64</span>,s);</span><br><span class="line">            sh-&gt;len = initlen;</span><br><span class="line">            sh-&gt;alloc = initlen;</span><br><span class="line">            *fp = type;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (initlen &amp;&amp; init)</span><br><span class="line">        <span class="built_in">memcpy</span>(s, init, initlen);</span><br><span class="line">    s[initlen] = <span class="string">&#x27;\0&#x27;</span>; <span class="comment">// 以&#x27;\0&#x27;结尾</span></span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里有两个特殊的地方：一是sds都以’\0’结尾；二是sdshdr5用flag这个字段可以同时保存type和len。</p>
+<h4 id="惰性空间的释放"><a href="#惰性空间的释放" class="headerlink" title="惰性空间的释放"></a>惰性空间的释放</h4><p>惰性空间的释放主要体现在SDS字符串的缩短操作，redis中的sdstrim提供了这样的一个操作：<code>sdstrim</code> 函数接受一个 SDS 和一个 C 字符串作为参数，<strong>从 SDS 左右两端分别移除所有在 C 字符串中出现过的字符</strong>（《redis设计与实现》一书有误）。源码如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sds <span class="title function_">sdstrim</span><span class="params">(sds s, <span class="type">const</span> <span class="type">char</span> *cset)</span> &#123;</span><br><span class="line">    <span class="type">char</span> *start, *end, *sp, *ep;</span><br><span class="line">    <span class="type">size_t</span> len;</span><br><span class="line"></span><br><span class="line">    sp = start = s;</span><br><span class="line">    ep = end = s+sdslen(s)<span class="number">-1</span>;</span><br><span class="line">  	<span class="comment">// 分别从头尾开始便利，即移除掉cset中的字符</span></span><br><span class="line">    <span class="keyword">while</span>(sp &lt;= end &amp;&amp; <span class="built_in">strchr</span>(cset, *sp)) sp++; </span><br><span class="line">    <span class="keyword">while</span>(ep &gt; sp &amp;&amp; <span class="built_in">strchr</span>(cset, *ep)) ep--;</span><br><span class="line">    len = (sp &gt; ep) ? <span class="number">0</span> : ((ep-sp)+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (s != sp) memmove(s, sp, len); <span class="comment">//内存拷贝，即将中间段的字符串拷贝到头部指针</span></span><br><span class="line">    s[len] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    sdssetlen(s,len);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// s=&quot;AA...AA.a.aa.aHelloAWorld     :::&quot; -&gt;sdstrim(s,&quot;Aa. :&quot;)-&gt; &quot;HelloAWorld&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>由此，可以看到sdstrim并没有释放原空间，即alloc不变，变的是len。这样后续再需要扩展的时候，len后的空间能够再被利用。</p>
+<p>事实上，redis的确提供了释放空间的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Free an sds string. No operation is performed if &#x27;s&#x27; is NULL. */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">sdsfree</span><span class="params">(sds s)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="literal">NULL</span>) <span class="keyword">return</span>;</span><br><span class="line">    s_free((<span class="type">char</span>*)s-sdsHdrSize(s[<span class="number">-1</span>])); <span class="comment">// #define s_free free</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二进制的安全"><a href="#二进制的安全" class="headerlink" title="二进制的安全"></a>二进制的安全</h3><p>这里的关键是SDS是使用len属性的值而不是空字符来判断字符串是否结束，这种二进制安全的做法使得redis不仅可以保存文本数据，还可以保存任意格式的二进制数据。</p>
+<h3 id="兼容部分C字符串的函数"><a href="#兼容部分C字符串的函数" class="headerlink" title="兼容部分C字符串的函数"></a>兼容部分C字符串的函数</h3><p>这是基于SDS遵循了C字符串以空字符串结尾的惯例，这些API都会将SDS保存的又用数据的末尾保存位空字符。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/22/ZooKeeper-Wait-free-coordination-for-Internet-scale-systems%E2%80%94%E2%80%94MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/06/22/ZooKeeper-Wait-free-coordination-for-Internet-scale-systems%E2%80%94%E2%80%94MIT6-824/" itemprop="url">ZooKeeper: Wait-free coordination for Internet-scale systems——MIT6.824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-22T13:03:50+08:00">
+                2019-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h1><blockquote>
+<p>《ZooKeeper: Wait-free coordination for Internet-scale systems》</p>
+</blockquote>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>ZooKeeper是一种用于协调分布式应用程序进程的服务，旨在提供一个简单而高性能的内核，用于在客户端中构建更复杂的进程协调原语。</p>
+<p>ZooKeeper接口支持高性能服务实现。除了属性wait-free之外，ZooKeeper还为每个客户端提供FIFO请求执行保证，并为所有更改ZooKeeper状态的请求提供线性化。</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>大规模的分布式应用需要多种不同形式的协调，配置就是其中最基本的配置形式之一。配置只是系统过程的操作参数列表，而更复杂的系统具有动态配置参数。</p>
+<p>在设计ZooKeeper的API时，我们并不会使用阻塞原语。如果处理请求取决于响应和其他客户端的故障检测，则服务本身的实现变得更加复杂。因此，Zookeeper实现了一个API，它可以处理像文件系统一样分层组织的简单无等待数据对象。</p>
+<p>ZooKeeper服务包含一组服务器，这些服务器使用复制来实现高可用和高性能。其高性能使包含大量进程的应用程序能够使用此类协调内核来管理协调的所有方面。我们能够使用简单的流水线架构来实现ZooKeeper，这使我们可以获得数千个未完成的请求，同时仍然保持低延迟。</p>
+<p>为了保证更新操作满足线性化，系统实现了一种基于领导的原子广播协议，称为Zab。在客户端缓存数据是提高读取性能的重要技术，ZooKeeper使用监视机制使客户端能够缓存数据，而无需直接管理客户端缓存。</p>
+<p>本文的主要贡献是：协调内核。其提出了一种无等待协调服务，具有普通的的一致性保证，可用于分布式系统。</p>
+<h2 id="The-ZooKeeper-service"><a href="#The-ZooKeeper-service" class="headerlink" title="The ZooKeeper service"></a>The ZooKeeper service</h2><p>ZooKeeper客户端库通过客户端API向ZooKeeper提交请求，在本节中，我们首先提供ZooKeeper服务的高级视图。 然后讨论客户端用于与ZooKeeper交互的API。</p>
+<h3 id="Service-overview"><a href="#Service-overview" class="headerlink" title="Service overview"></a>Service overview</h3><p>ZooKeeper为其客户端提供了一组数据节点（znode）的抽象，这些节点根据分层名称空间进行组织，而这些层次中的znode是客户端通过ZooKeeper API操作的数据对象。分层名称空间通常用于文件系统。 它是组织数据对象的理想方式。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/zookeeper_fig1.png" alt="img"></p>
+<p>客户端能创建两种ZooKeeper节点：持久节点和临时节点。</p>
+<p>在创建新的znode时，客户端可以设置顺序标志。使用顺序标志设置所创建的节点具有一个单调递增计数器值。如果n是新的znode而p是父znode，则n的序列值永远不会小于在p下创建的任何其他顺序znode的名称中的值。</p>
+<p>ZooKeeper实现了watches，允许客户在不需要轮询的情况下及时收到变更通知。当客户端发出设置了监视标志的读取操作时，操作将正常完成，除非在返回的信息发生更改时服务器通知了客户端。watches是与会话相关的一次性触发器：一旦触发或会话结束，它们就会被注销。</p>
+<p>例如，如果客户端在”&#x2F;foo”更改两次之前发出getData(“&#x2F;foo”，true)，则客户端将获得一个监视事件，告知客户端”&#x2F;foo”的数据已更改。</p>
+<h4 id="Data-model"><a href="#Data-model" class="headerlink" title="Data model"></a>Data model</h4><p>ZooKeeper的数据模型本质上是一个文件系统，它具有简单的API，完整的数据读写和带有分层key的键值表。与文件系统中的文件不同，znode不是为通用数据存储而设计的。相反，znodes是映射到客户端应用程序的抽象，通常对应于用于协调目的的元数据。以上图为例，我们有两个子树，一个用于应用程序1(&#x2F;app1)，另一个用于应用程序2(&#x2F;app2)。应用程序1的子树实现了一个简单的组成员协议：每个客户端进程$p_i$在&#x2F;app1下创建一个znode $p_i$，只要进程正在运行，它就会持续存在。</p>
+<p>尽管znode尚未设计用于通用数据存储，但ZooKeeper确实允许客户端存储一些可用于元数据或分布式计算中所配置的信息。</p>
+<h4 id="Sessions"><a href="#Sessions" class="headerlink" title="Sessions"></a>Sessions</h4><p>客户端连接到ZooKeeper之后会启动一个session，session具有一个超时机制，如果客户端在其session中没有收到该超时机制的相关内容，ZooKeeper会认为客户端有故障。当客户端显式关闭session handler或ZooKeeper检测到客户端出现故障时，session结束。</p>
+<h3 id="Client-API"><a href="#Client-API" class="headerlink" title="Client API"></a>Client API</h3><p>**create(path, data, flags)**：创建一个相关路径的znode；</p>
+<p>**delete(path, version)**：删除一个相关版本的节点；</p>
+<p>**exists(path, watch)**：判断相关路径的znode是否存在，watch标记强制客户端设置监视；</p>
+<p>**getData(path, watch)**：返回数据和元数据（例如版本信息）；</p>
+<p>**setData(path, data, version)**：写入数据data[]；</p>
+<p>**getChildren(path, watch)**：返回一系列子节点；</p>
+<p>**sync(path)**：使得client当前连接着的ZooKeeper服务器，和ZooKeeper的Leader节点同步（sync）一下数据。</p>
+<p>所有方法都具有同步和异步版本。每种更新方法都采用预期的版本号，这样可以实现条件更新。如果znode的实际版本号与预期版本号不匹配，则更新将失败并显示版本错误。如果版本号为-1，则不执行版本检查。</p>
+<h3 id="ZooKeeper-guarantees"><a href="#ZooKeeper-guarantees" class="headerlink" title="ZooKeeper guarantees"></a>ZooKeeper guarantees</h3><p>ZooKeeper有两个基本的顺序保证：</p>
+<ul>
+<li>Linearizable writes：更新ZooKeeper状态的所有请求都是可序列化的，并且与优先级有关；</li>
+<li>FIFO client order：来自给定客户端的所有请求都按客户端发送的顺序执行。</li>
+</ul>
+<p>我们这里所说的线性化是异步线性化，允许客户端有多个未完成的操作，因此我们可以确保同一个客户端的未完成操作的特定顺序或者确保其FIFO的顺序。</p>
+<p>要知道这两个顺序保证如何相互影响，我们考虑以下的方案：多个进程的系统选择leader来命令工作进程的过程，此时新的leader修改更改大量的配置参数，并在完成后通知其它进程。这种场景有两个要求：</p>
+<ul>
+<li>当新leader开始进行更改时，我们不希望其他进程开始使用正在更改的配置；</li>
+<li>如果新配置文件在配置完全更新之前消失，我们不希望进程使用此部分配置；</li>
+</ul>
+<p>分布式锁对于第一个要求有帮助，但无法解决第二个要求的问题。对于第二个要求，在使用ZooKeeper时，新leader可以讲路径指定为reader znode，其它进程仅在该znode存在时才可以使用该配置。新的leader通过删除ready，更改各种配置znode并创建ready来进行配置更改。所有的更改都以pipelined的方式异步发出。由于顺序保证，如果进程看到就绪的znode，它还必须看到新leader的所有配置更改。如果新的leader在创建就绪znode之前死亡，则其他进程知道配置尚未最终确定会不去使用它。</p>
+<p>上述方案仍然存在一个问题：如果进程在新leader开始进行update之前看到ready，然后在update正在进行时开始读取配置，会发生什么。此问题通过通知的排序保证得以解决，如果读取ready znode的进程请求通知该znode的更改，它将在它可以读取任何新配置之前看到通知客户端更改的notifications。</p>
+<p>ZooKeeper还提供了类似flush原语属性， sync使服务器在处理读取之前应用所有挂起的写入请求，而不会产生完全写入的开销，保证客户端在在重新读取配置之前发出写入来看到最新的信息。</p>
+<p>ZooKeeper还具有以下两种活动性和持久性保证：如果大多数ZooKeeper服务器处于活动状态并且可以进行通信，则可以使用该服务；如果ZooKeeper服务成功响应变更请求，只要规定数量的服务器最终能够恢复，该变更就会在任何数量的故障中持续存在。</p>
+<h3 id="Examples-of-primitives"><a href="#Examples-of-primitives" class="headerlink" title="Examples of primitives"></a>Examples of primitives</h3><p>本章主要讲述了如何使用ZooKeeper API实现更加强大的原语。</p>
+<h4 id="Configuration-Management"><a href="#Configuration-Management" class="headerlink" title="Configuration Management"></a>Configuration Management</h4><p>ZooKeeper可用于在分布式应用程序中实现动态配置。一般，配置存储在znode $z_c$中，进程以$z_c$的完整路径名启动。启动的进程通过读取$z_c$来获取其配置，并设置watch标记为true。如果配置更新了，则会通知进程去读取新配置，并再次设置watch标记为true。</p>
+<h4 id="Rendezvous"><a href="#Rendezvous" class="headerlink" title="Rendezvous"></a>Rendezvous</h4><p>在分布式系统中，最终的系统配置并不总是有足够清晰的先验情景。例如，客户端可能希望启动主进程和多个工作进程，但启动进程由调度器完成，因此客户端不会提前知道提供给worker的地址和端口等可以连接到主服务器的进程信息。我们可以使用endezvous znode $z_r$处理这种情况。它是客户端创建的节点，客户端传递该节点的完整路径名作为主进程和工作进程的启动参数。这样，master启动时，就会在$z_r$中填充信息，而worker则可以读取其中的信息。</p>
+<h4 id="Group-Membership"><a href="#Group-Membership" class="headerlink" title="Group Membership"></a>Group Membership</h4><p>我们可以使用临时节点来实现组成员资格，具体来说，就是使用临时节点能够查看创建节点的会话状态。首先指定一个znode $z_g$来表示该组，当该组的成员启动时，会在$z_g$下创建一个临时的子znode。因此只需要通过列举$z_g$的后代，进程就可以获取改组信息。如果进程想要监视组成员身份的更改，则进程可以将监视标志设置为true，并在收到更改通知时刷新组信息 </p>
+<h4 id="Simple-Locks"><a href="#Simple-Locks" class="headerlink" title="Simple Locks"></a>Simple Locks</h4><p>ZooKeeper不是一个带锁的服务，使用ZooKeeper的应用通常使用同步原语来满足其需求。这里我们展示如何使用ZooKeeper实现锁，这样可以实现各种同步原语。</p>
+<p>最简单的锁使用<strong>lock files</strong>，锁由znode表示，为了获取锁，客户端尝试着使用EPHEMERAL标记去创建指定的znode。如果创建成功，客户端则拥有锁。否则，客户端可以读取znode，并设置监视标志，以便在当前leader挂掉时收到通知。客户端在死亡或显式删除znode时释放锁，等待锁定的其他客户端在观察到被删除的znode后再次尝试获取锁定。</p>
+<p>这种锁定协议存在两个问题：一是受到羊群效应(Herd Effect)的影响；二则是只实现了独占锁定。</p>
+<p><strong>Simple Locks without Herd Effect</strong>：我们定义了znode $z_l$来实现这样的锁，我们对所有请求锁的客户端进行排序，并且每个客户端按请求到达的顺序获得锁定。因此，希望获得锁定的客户执行以下操作：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Lock</span><br><span class="line"><span class="number">1</span> n = <span class="built_in">create</span>(l + “/lock-”, EPHEMERAL|SEQUENTIAL) </span><br><span class="line"><span class="number">2</span> C = <span class="built_in">getChildren</span>(l, <span class="literal">false</span>)</span><br><span class="line"><span class="number">3</span> <span class="keyword">if</span> n is lowest znode in C, exit</span><br><span class="line"><span class="number">4</span> p = znode in C ordered just before n</span><br><span class="line"><span class="number">5</span> <span class="keyword">if</span> <span class="built_in">exists</span>(p, <span class="literal">true</span>) wait <span class="keyword">for</span> watch event </span><br><span class="line"><span class="number">6</span> <span class="keyword">goto</span> <span class="number">2</span></span><br><span class="line">Unlock</span><br><span class="line"><span class="number">1</span> <span class="built_in">delete</span>(n)</span><br></pre></td></tr></table></figure>
+
+<p>客户端创建节点，序号最小的获取锁。客户端只监控比自己小的那个节点。最小节点完成任务，发出通知，并释放。客户端获取通知后，获取所有节点，如果自己的序号最小，则获取锁，如果不是，监控比自己小的那个节点，依此类推。其它进程都只watch比它顺序小的进程对应的结点。</p>
+<p>释放锁就像删除表示锁请求的znode n一样简单。通过在创建时使用EPHEMERAL标志，崩溃的进程将自动清除任何锁请求或释放它们可能具有的任何锁。</p>
+<p><strong>Read&#x2F;Write Locks</strong>：为了实现读&#x2F;写锁，我们稍微更改了锁过程，并具有单独的读锁定和写锁定过程。 解锁程序与全局锁情况相同。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Write Lock</span><br><span class="line"><span class="number">1</span> n = <span class="built_in">create</span>(l + “/write-”, EPHEMERAL|SEQUENTIAL) </span><br><span class="line"><span class="number">2</span> C = <span class="built_in">getChildren</span>(l, <span class="literal">false</span>)</span><br><span class="line"><span class="number">3</span> <span class="keyword">if</span> n is lowest znode in C, exit</span><br><span class="line"><span class="number">4</span> p = znode in C ordered just before n</span><br><span class="line"><span class="number">5</span> <span class="keyword">if</span> <span class="built_in">exists</span>(p, <span class="literal">true</span>) wait <span class="keyword">for</span> event </span><br><span class="line"><span class="number">6</span> <span class="keyword">goto</span> <span class="number">2</span></span><br><span class="line">Read Lock</span><br><span class="line"><span class="number">1</span> n = <span class="built_in">create</span>(l + “/read-”, EPHEMERAL|SEQUENTIAL)</span><br><span class="line"><span class="number">2</span> C = <span class="built_in">getChildren</span>(l, <span class="literal">false</span>)</span><br><span class="line"><span class="number">3</span> <span class="keyword">if</span> no write znodes lower than n in C, exit</span><br><span class="line"><span class="number">4</span> p = write znode in C ordered just before n</span><br><span class="line"><span class="number">5</span> <span class="keyword">if</span> <span class="built_in">exists</span>(p, <span class="literal">true</span>) wait <span class="keyword">for</span> event</span><br><span class="line"><span class="number">6</span> <span class="keyword">goto</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>每个进程都在ZooKeeper上创建一个临时的顺序结点，最小的一个或多个结点为当前的持锁者，多个是因为多个读操作可以并发。需要写锁的进程，监视比它顺序小的进程；对于需要读锁的进程，监视比它小的最后一个写进程对应的结点。当前结点释放锁后，所有Watch该结点的进程都会被通知到，他们成为新的持锁者。</p>
+<p><strong>Double Barrier</strong>：Double Barrier可以用来同步一个任务的开始和结束，当有足够多的进程进入barrier之后，才开始执行任务。当所有的进程都执行完各自的任务后，屏障才撤销。而ZooKeeper的实现过程：</p>
+<p>我们用一个znode b代表barrier。进入barrier，客户端监视ready节点，通过判断该结点是否存在来决定是否启动任务。每个进程在进入时会创建一个znode作为b的子节点，并在它准备离开时取消该节点。当b的子znode的数量超过barrier阈值时，进程可以进入屏障，客户端收到ready节点创建的通知。当所有进程都移除了其子节点时，就可以认为任务结束，离开barrier。</p>
+<h2 id="ZooKeeper-Implementation"><a href="#ZooKeeper-Implementation" class="headerlink" title="ZooKeeper Implementation"></a>ZooKeeper Implementation</h2><p>ZooKeeper通过在组成服务的每个服务器备份ZooKeeper数据来提供高可用性。下图展示了其高级组建，收到写请求，服务器会通过请求处理器做执行准备，然后使用相关原子广播的实现协议，最后再提交对ZooKeeper数据库的修改，完全复制到整体的所有服务器。在读请求的情况下，服务器只读取本地数据库的状态并生成对请求的响应。每个ZooKeeper服务器都为客户端服务。客户端只连接一台服务器来提交请求。</p>
+<p><img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/ZooKeeper_fig4.png" alt="img"></p>
+<p>备份数据库是包含了整个数据树的内存数据库，默认情况下，树中的每个znode最多存储1MB的数据。对于可恢复性，我们有效地将更新日志记录到磁盘，并且在将应用程序应用于内存数据库之前强制写入磁盘介质。</p>
+<h3 id="Request-Processor"><a href="#Request-Processor" class="headerlink" title="Request Processor"></a>Request Processor</h3><p>与客户端发送的请求不同，transactions是幂等的。 当leader收到写入请求时，它会计算应用写入时系统的状态，并将其转换为捕获新状态的事务。因为可能存在尚未应用于数据库的事务，所以对于未来的状态，我们必须对其进行计算。例如，客户端执行setData()，如果该请求中的版本号与正在更新的znode的未来版本号相匹配，那么该服务生成一个setDataTXN，包含新数据，新版本号和更新时间戳。如果发生错误，例如版本号不匹配或要更新的znode不存在，则生成errorTXN。</p>
+<h3 id="Atomic-Broadcast"><a href="#Atomic-Broadcast" class="headerlink" title="Atomic Broadcast"></a>Atomic Broadcast</h3><p>更新ZooKeeper状态的所有请求都会被转发到leader，再由leader执行请求并通过原子广播协议Zab广播到各个服务器。接收客户端请求的服务器会在转发相应的状态改变时响应客户端。而Zab则是使用默认的多数仲裁来commit，使用2f+1服务器时，我们可以容忍f故障。</p>
+<p>另外，Zab提供了比常规原子广播更强的顺序保证，Zab保证leader的广播变更按照发送的顺序进行，并且前leader的所有变更都会在广播自己的变更之前传递给已建立的领导者。</p>
+<p>我们使用TCP进行传输，因此网络可以保留消息顺序，这样我们就可以简化实现。</p>
+<p>在正常操作期间，Zab按顺序提供所有消息，但是由于Zab不会持续记录每条消息的ID，因此Zab可能会在恢复期间重新发送消息。但因为ZooKeeper是幂等交易，所以只要按顺序交付，就可以接受多次交易。实际上，ZooKeeper要求Zab至少重新传递在上一个快照开始后传递的所有消息。</p>
+<h3 id="Replicated-Database"><a href="#Replicated-Database" class="headerlink" title="Replicated Database"></a>Replicated Database</h3><p>每个副本都有一个ZooKeeper状态的内存副本，当ZooKeeper服务器从崩溃中恢复时，其需要恢复到此状态。因此ZooKeeper会使用定期快照，仅需要从快照开始后重新传递消息即可恢复。ZooKeeper快照为模糊快照，因为没有锁定ZooKeeper状态来拍摄快照；而是对树进行深度优先扫描，原子地读取每个znode的数据和元数据并将它们写入磁盘。由于生成模糊快照的过程中可能存在额外的状态更改，但因为状态更改是幂等的，只要我们按顺序应用状态更改，就不会影响最终的结果。</p>
+<h3 id="Client-Server-Interactions"><a href="#Client-Server-Interactions" class="headerlink" title="Client-Server Interactions"></a>Client-Server Interactions</h3><p>当服务器处理写入请求时，它还会发送并清除与该更新相关的任何监视通知。</p>
+<p>读请求在每个服务器本地处理。每个读请求都使用zxid进行处理和标记，该zxid与服务器看到的最后一个事务相对应，并定义了与写请求相关的部分读请求顺序。通过在本地处理读取，我们获得了出色的读取性能。但其也存在缺点——不保证读取操作的优先顺序，即可能返回过时值。关于这个，ZooKeeper提供了Sync原语，确保follower和leader是同步的。在读取操作后，客户端调用Sync，使得同步请求添加到一个leader与该服务之间队列末尾，待leader提交了所有决议，再返回响应。</p>
+<p>ZooKeeper服务器按FIFO顺序处理来自客户端的请求。响应包括zxid。如果客户端连接到新服务器，则该新服务器通过检查客户端的最后一个zxid与其最后一个zxid，如果客户端具有比服务器更新的视图，则服务器不会重新建立与客户端的会话，直到服务器已经赶上了其zxid。</p>
+<p>为了检测客户端会话失败，ZooKeeper使用超时机制。如果没有其他服务器在会话超时内从客户端会话中收到任何内容，则leader确定其中存在故障。如果客户端无法对服务器发送请求或者心跳信息（低活动期）则它将连接到其他ZooKeeper服务器以重新建立其会话。为了防止session超时，ZooKeeper客户端在session空闲了s&#x2F;3 ms后发送心跳，如果没有再2s &#x2F;3 ms从服务器收到响应，则切换到新服务器。其中s是会话超时时间。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/02/Variadic-templates-in-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/06/02/Variadic-templates-in-C/" itemprop="url">Variadic templates in C++</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-02T11:51:37+08:00">
+                2019-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Variadic-templates"><a href="#Variadic-templates" class="headerlink" title="Variadic templates"></a>Variadic templates</h1><blockquote>
+<p>Reference from : <a target="_blank" rel="noopener" href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">https://eli.thegreenplace.net/2014/variadic-templates-in-c/</a></p>
+</blockquote>
+<p>在C++11之前，编写一个具有任意数量参数的参数的唯一方法就是使用variadic函数，如printf,scanf之流就是这样实现的，使用了省略语法<strong>…</strong>和相关的<strong>va_ 宏定义</strong>。由于所有的类型解析都在运行时，并且必须要在va_arg中显式地使用强制转换，这些低级的内存操作，很容易带来代码的段错误。</p>
+<p>而同样的，在C++11之前，模板的编写必须要声明固定数量的参数，无法表达具有可变数量参数的类或者函数模板。</p>
+<h2 id="Basic-example"><a href="#Basic-example" class="headerlink" title="Basic example"></a>Basic example</h2><p>C++11的一个新特性就是可变参数模板，这个新特性使得我们以类型安全的方式编写接收任意数量参数的函数，并在编译时解析所有参数处理逻辑，而不是运行时。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function">T <span class="title">adder</span><span class="params">(T v)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> v;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... Args&gt;</span></span><br><span class="line"><span class="function">T <span class="title">adder</span><span class="params">(T first, Args... args)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> first + <span class="built_in">adder</span>(args...);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Usage: long sum = adder(1, 2, 3, 8, 7);</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的adder函数可以接受任意数量的参数，并且只要+运算符能够应用于这些参数，就可以正常编译，其中的检查是编译器完成的，遵循的是模板语法和重载规则。</p>
+<p><strong>typename… Args</strong>是模板参数包，而<strong>Args… args</strong>是函数参数包，而该模板的编写方式与编写递归代码一样，需要一个基本的、接受一个参数的adder函数。每次调用函数的时候，都会从模板参数包中剥离一个类型T，缩短一个参数，直到遇到第一个函数模板。调用过程如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">T <span class="title">adder</span><span class="params">(T, Args...)</span> [T </span>= <span class="type">int</span>, Args = &lt;<span class="type">int</span>, <span class="type">int</span>, <span class="type">int</span>, <span class="type">int</span>&gt;]</span><br><span class="line">T <span class="built_in">adder</span>(T, Args...) [T = <span class="type">int</span>, Args = &lt;<span class="type">int</span>, <span class="type">int</span>, <span class="type">int</span>&gt;]</span><br><span class="line">T <span class="built_in">adder</span>(T, Args...) [T = <span class="type">int</span>, Args = &lt;<span class="type">int</span>, <span class="type">int</span>&gt;]</span><br><span class="line">T <span class="built_in">adder</span>(T, Args...) [T = <span class="type">int</span>, Args = &lt;<span class="type">int</span>&gt;]</span><br><span class="line">T <span class="built_in">adder</span>(T) [T = <span class="type">int</span>]</span><br></pre></td></tr></table></figure>
+
+<h2 id="Some-simple-variations"><a href="#Some-simple-variations" class="headerlink" title="Some simple variations"></a>Some simple variations</h2><p>C++模版元编程中有一个模式匹配的概念，以下面的代码为例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">pair_comparer</span><span class="params">(T a, T b)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// In real-world code, we wouldn&#x27;t compare floating point values like</span></span><br><span class="line">    <span class="comment">// this. It would make sense to specialize this function for floating</span></span><br><span class="line">    <span class="comment">// point types to use approximate comparison.</span></span><br><span class="line">    <span class="keyword">return</span> a == b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">pair_comparer</span><span class="params">(T a, T b, Args... args)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> a == b &amp;&amp; <span class="built_in">pair_comparer</span>(args...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的函数接受任意数量的参数，如果参数成对相等，那么最终返回true，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">pair_comparer</span>(<span class="number">1.5</span>, <span class="number">1.5</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">6</span>)</span><br></pre></td></tr></table></figure>
+
+<p>但如果我们将第一个参数改成<strong>1</strong>，那么将会编译报错。同理，如果参数个数不为偶数，编译也不会通过。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">pair_comparer</span>(<span class="number">1.5</span>, <span class="number">1.5</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line"><span class="built_in">pair_comparer</span>(<span class="number">1</span>, <span class="number">1.5</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">6</span>);</span><br></pre></td></tr></table></figure>
+
+<p>如果想避免这个问题，我们可以添加一个单参数的模版函数，这样就可以避免奇数参数编译不通过：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">pair_comparer</span><span class="params">(T a)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Performance"><a href="#Performance" class="headerlink" title="Performance"></a>Performance</h2><p>关于性能的考虑，可变参数模版并没有涉及真正的递归，而是在编译时预生成一系列函数调用，而且由于现代编译器会对代码进行内联优化，很可能最后编译的机器代码中并没有函数调用。与C风格的可变参数函数相比，va_宏实际上是在操纵运行时堆栈，在运行时解析C语言的可变参数。</p>
+<h2 id="Varidic-data-structures"><a href="#Varidic-data-structures" class="headerlink" title="Varidic data structures"></a>Varidic data structures</h2><p>这个案例就比较复杂了，在C++11之前要实现具有动态添加新字段的自定义数据结构，是比较困难的。以下面的代码为例，我们进行类型定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span>... Ts&gt; <span class="keyword">struct</span> <span class="title class_">tuple</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span>... Ts&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">tuple</span>&lt;T, Ts...&gt; : tuple&lt;Ts...&gt; &#123;</span><br><span class="line">    <span class="built_in">tuple</span>(T t, Ts... ts) : <span class="built_in">tuple</span>&lt;Ts...&gt;(ts...), <span class="built_in">tail</span>(t) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    T tail;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>我们先从基类开始，定义了一个空的tuple类模版，后面的特化则从参数包中剥离出第一个类型，以此定义了一个名为tail的成员。通过递归定义，当没有更多类型可以剥离时就停止。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">tuple&lt;<span class="type">double</span>, <span class="type">uint64_t</span>, <span class="type">const</span> <span class="type">char</span>*&gt; <span class="title">t1</span><span class="params">(<span class="number">12.2</span>, <span class="number">42</span>, <span class="string">&quot;big&quot;</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">struct tuple&lt;double, uint64_t, const char*&gt; : tuple&lt;uint64_t, const char*&gt; &#123;</span></span><br><span class="line"><span class="comment">  	double tail;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">struct tuple&lt;uint64_t, const char*&gt; : tuple&lt;const char*&gt; &#123;</span></span><br><span class="line"><span class="comment">  	uint64_t tail;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">struct tuple&lt;const char*&gt; : tuple &#123;</span></span><br><span class="line"><span class="comment">  	const char* tail;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">struct tuple &#123;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>上面对于数据结构的定义使我们创建了tuple，其数据结构的大小和成员的内部布局都是确定的。另外，要想访问元祖，我们应该使用get函数模板来访问，定义一个帮助器类型，它允许我们访问元组中第k个元素的类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="type">size_t</span>, <span class="keyword">class</span>&gt; <span class="keyword">struct</span> <span class="title class_">elem_type_holder</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span>... Ts&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">elem_type_holder</span>&lt;<span class="number">0</span>, tuple&lt;T, Ts...&gt;&gt; &#123;</span><br><span class="line">  	<span class="keyword">typedef</span> T type;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="type">size_t</span> k, <span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span>... Ts&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">elem_type_holder</span>&lt;k, tuple&lt;T, Ts...&gt;&gt; &#123;</span><br><span class="line">  	<span class="keyword">typedef</span> <span class="keyword">typename</span> elem_type_holder&lt;k - <span class="number">1</span>, tuple&lt;Ts...&gt;&gt;::type type;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>elem_type_holder是另一个可变参数类模板。它需要一个数字k和元组类型作为模板参数。这是一个编译时模板元编程，作用于常量和类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">elem_type_holder</span>&lt;<span class="number">2</span>, tuple&lt;T, Ts...&gt;&gt; &#123;</span><br><span class="line">  	<span class="keyword">typedef</span> <span class="keyword">typename</span> elem_type_holder&lt;<span class="number">1</span>, tuple&lt;Ts...&gt;&gt;::type type;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">elem_type_holder</span>&lt;<span class="number">1</span>, tuple&lt;T, Ts...&gt;&gt; &#123;</span><br><span class="line">  	<span class="keyword">typedef</span> <span class="keyword">typename</span> elem_type_holder&lt;<span class="number">0</span>, tuple&lt;Ts...&gt;&gt;::type type;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">elem_type_holder</span>&lt;<span class="number">0</span>, tuple&lt;T, Ts...&gt;&gt; &#123;</span><br><span class="line">  	<span class="keyword">typedef</span> T type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以elem_type_holder &lt;2，some_tuple_type&gt;为例，其从tuple的开头剥离了两种类型，并将其类型设置为第三种类型。接下来再实现get。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="type">size_t</span> k, <span class="keyword">class</span>... Ts&gt;</span><br><span class="line"><span class="keyword">typename</span> std::enable_if&lt;k == <span class="number">0</span>, <span class="keyword">typename</span> elem_type_holder&lt;<span class="number">0</span>, tuple&lt;Ts...&gt;&gt;::type&amp;&gt;::type</span><br><span class="line"><span class="built_in">get</span>(tuple&lt;Ts...&gt;&amp; t) &#123;</span><br><span class="line">  <span class="keyword">return</span> t.tail;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="type">size_t</span> k, <span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span>... Ts&gt;</span><br><span class="line"><span class="keyword">typename</span> std::enable_if&lt;k != <span class="number">0</span>, <span class="keyword">typename</span> elem_type_holder&lt;k, tuple&lt;T, Ts...&gt;&gt;::type&amp;&gt;::type</span><br><span class="line"><span class="built_in">get</span>(tuple&lt;T, Ts...&gt;&amp; t) &#123;</span><br><span class="line">  tuple&lt;Ts...&gt;&amp; base = t;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">get</span>&lt;k - <span class="number">1</span>&gt;(base);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">tuple&lt;double, uint64_t, const char*&gt; t1(12.2, 42, &quot;big&quot;);</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">std::cout &lt;&lt; &quot;0th elem is &quot; &lt;&lt; get&lt;0&gt;(t1) &lt;&lt; &quot;\n&quot;;</span></span><br><span class="line"><span class="comment">std::cout &lt;&lt; &quot;1th elem is &quot; &lt;&lt; get&lt;1&gt;(t1) &lt;&lt; &quot;\n&quot;;</span></span><br><span class="line"><span class="comment">std::cout &lt;&lt; &quot;2th elem is &quot; &lt;&lt; get&lt;2&gt;(t1) &lt;&lt; &quot;\n&quot;;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Variadic-templates-for-catch-all-functions"><a href="#Variadic-templates-for-catch-all-functions" class="headerlink" title="Variadic templates for catch-all functions"></a>Variadic templates for catch-all functions</h2><p>假设我们想要实现一个可以打印出标准库容器的函数，并且适用于任何容器。对于vector<code>, </code>list<code>, </code>deque来说，他们的摹本参数只有两个：value type和allocator type。但对于map和set来说，它们的参数个数都不止两个。因此我们可以使用可变模板来实现这个功能：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>, <span class="keyword">typename</span>...&gt; <span class="keyword">class</span> <span class="title class_">ContainerType</span>,</span><br><span class="line">          <span class="keyword">typename</span> ValueType, <span class="keyword">typename</span>... Args&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_container</span><span class="params">(<span class="type">const</span> ContainerType&lt;ValueType, Args...&gt;&amp; c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; v : c) &#123;</span><br><span class="line">      std::cout &lt;&lt; v &lt;&lt; <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt;</span><br><span class="line">std::ostream&amp; <span class="keyword">operator</span>&lt;&lt;(std::ostream&amp; out, <span class="type">const</span> std::pair&lt;T, U&gt;&amp; p) &#123;</span><br><span class="line">    out &lt;&lt; <span class="string">&quot;[&quot;</span> &lt;&lt; p.first &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; p.second &lt;&lt; <span class="string">&quot;]&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> out;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/30/std-array/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/30/std-array/" itemprop="url">std::array</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-30T13:09:44+08:00">
+                2019-05-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h1><p>std::array是在c++11中引入的，对原来C语言的数组的一个包装器，具有额外的优点。这是一种具有恒定大小元素的顺序容器。</p>
+<p>其模版为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt; <span class="keyword">class</span> <span class="title class_">T</span>, <span class="type">size_t</span> N &gt; </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">array</span>;</span><br></pre></td></tr></table></figure>
+
+<p>T为元素类型，N为数组元素的个数。</p>
+<p>头文件为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;array&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Defining-and-Initializing-an-std-array-lt-gt-object"><a href="#Defining-and-Initializing-an-std-array-lt-gt-object" class="headerlink" title="Defining and Initializing an std::array&lt;&gt; object"></a>Defining and Initializing an std::array&lt;&gt; object</h2><p>举两个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::array&lt;std::string, 200&gt; arr1;</span><br><span class="line">std::array&lt;<span class="type">int</span>, 10&gt; arr3 = &#123; <span class="number">34</span>, <span class="number">45</span> &#125;;<span class="comment">//Init: 34 , 45 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,</span></span><br></pre></td></tr></table></figure>
+
+<p>std::array还提供了一个方法可以一次性对所有的元素设置相同的值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::array&lt;<span class="type">int</span>, 10&gt; arr4;</span><br><span class="line"><span class="comment">// Fill all elements in array with same value</span></span><br><span class="line">arr4.<span class="built_in">fill</span>(<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="How-to-get-the-size-of-std-array"><a href="#How-to-get-the-size-of-std-array" class="headerlink" title="How to get the size of std::array"></a>How to get the size of std::array</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr.<span class="built_in">size</span>();</span><br></pre></td></tr></table></figure>
+
+<h2 id="How-to-access-elements-in-std-array"><a href="#How-to-access-elements-in-std-array" class="headerlink" title="How to access elements in std::array"></a>How to access elements in std::array</h2><ul>
+<li>**operator []**：访问超出范围的元素时会引起undefined behaviour；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = arr[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>at()<strong>：访问超出范围的元素时会抛出</strong>out_of_range</strong>异常；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = arr.<span class="built_in">at</span>(<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>**std::tuple’s get&lt;&gt;()**：访问超出范围的元素时会编译错误；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = std::<span class="built_in">get</span>&lt;<span class="number">2</span>&gt;(arr);</span><br></pre></td></tr></table></figure>
+
+<h2 id="How-to-Iterate-over-a-std-array-lt-gt-object"><a href="#How-to-Iterate-over-a-std-array-lt-gt-object" class="headerlink" title="How to Iterate over a std::array&lt;&gt; object"></a>How to Iterate over a std::array&lt;&gt; object</h2><p>对array的遍历，存在四种方法：</p>
+<ul>
+<li>使用基于范围的迭代循环；</li>
+<li>使用循环；</li>
+<li>使用迭代器；</li>
+<li>使用for_each；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/28/weak-ptr-unique-ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/28/weak-ptr-unique-ptr/" itemprop="url">weak_ptr&unique_ptr</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-28T11:07:57+08:00">
+                2019-05-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="weak-ptr-amp-unique-ptr"><a href="#weak-ptr-amp-unique-ptr" class="headerlink" title="weak_ptr&amp;unique_ptr"></a>weak_ptr&amp;unique_ptr</h1><h2 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h2><blockquote>
+<p>shared_ptr, Binary trees and the problem of Cyclic References</p>
+</blockquote>
+<p>shared_ptr最大的优点是在不再使用的时候，能够自动释放相关的内存，但也存在缺点，就是循环引用——如果两个对象使用shared_ptr相互引用，在对象超出作用域时，就没办法删除内存。</p>
+<p>这是因为由于相互引用，引用计数永远不会为0。</p>
+<h3 id="Now-How-to-fix-this-problem"><a href="#Now-How-to-fix-this-problem" class="headerlink" title="Now How to fix this problem?"></a>Now How to fix this problem?</h3><p>答案就是使用weak_ptr，weak_ptr能够分享对象，但不会拥有这个对象，它是通过shared_ptr进行创建：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; ptr = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">4</span>);</span><br><span class="line"><span class="function">std::weak_ptr&lt;<span class="type">int</span>&gt; <span class="title">weakPtr</span><span class="params">(ptr)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>对于weak_ptr对象，我们无法直接使用操作符*和-&gt;去访问相关的内存，因此我们只能通过weak_ptr对像去创建shared_ptr，方法是调用lock函数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; ptr = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">4</span>);</span><br><span class="line">    <span class="function">std::weak_ptr&lt;<span class="type">int</span>&gt; <span class="title">weakPtr</span><span class="params">(ptr)</span></span>;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; ptr_2 =  weakPtr.<span class="built_in">lock</span>();</span><br><span class="line">    <span class="keyword">if</span>(ptr_2)</span><br><span class="line">        std::cout&lt;&lt;(*ptr_2)&lt;&lt;std::endl;</span><br><span class="line">    std::cout&lt;&lt;<span class="string">&quot;Reference Count :: &quot;</span>&lt;&lt;ptr_2.<span class="built_in">use_count</span>()&lt;&lt;std::endl;   </span><br><span class="line">    <span class="keyword">if</span>(weakPtr.<span class="built_in">expired</span>() == <span class="literal">false</span>)</span><br><span class="line">        std::cout&lt;&lt;<span class="string">&quot;Not expired yet&quot;</span>&lt;&lt;std::endl;   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果shared_ptr已经被删除，lock()函数返回空的shared_ptr。</p>
+<h2 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h2><p>unique_ptr是c++11提供的智能指针实现之一，用于防止内存泄漏。unique_ptr对象包装了一个原始指针，并负责其生命周期。当该对象被破坏时，然后在其析构函数中删除关联的原始指针。</p>
+<p>它跟shared_ptr的用法类似，也能使用原生指针的一些操作符。但不同的是归属权，unique_ptr对象始终是关联的原始指针的唯一所有者。 我们无法复制unique_ptr对象，它只能移动。也因为如吃，其析构函数中不需要任何引用计数，可以直接删除相关的指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create a unique_ptr object through raw pointer</span></span><br><span class="line"><span class="function">std::unique_ptr&lt;Task&gt; <span class="title">taskPtr2</span><span class="params">(<span class="keyword">new</span> Task(<span class="number">55</span>))</span></span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line">std::unique_ptr&lt;Task&gt; taskPtr3 = taskPtr2; <span class="comment">// Compile error</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line">taskPtr = taskPtr2; <span class="comment">//compile error</span></span><br></pre></td></tr></table></figure>
+
+<p>在unique_ptr类中，拷贝构造函数和赋值构造函数都已经被删除了。</p>
+<h3 id="Transfering-the-ownership-of-unique-ptr-object"><a href="#Transfering-the-ownership-of-unique-ptr-object" class="headerlink" title="Transfering the ownership of unique_ptr object"></a>Transfering the ownership of unique_ptr object</h3><p>虽然不能拷贝一个unique_ptr对象，但我们可以move它们，即传递拥有权。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unique_ptr&lt;Task&gt; <span class="title">taskPtr2</span><span class="params">(<span class="keyword">new</span> Task(<span class="number">55</span>))</span></span>;</span><br><span class="line">std::unique_ptr&lt;Task&gt; taskPtr4 = std::<span class="built_in">move</span>(taskPtr2);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Releasing-the-associated-raw-pointer"><a href="#Releasing-the-associated-raw-pointer" class="headerlink" title="Releasing the associated raw pointer"></a>Releasing the associated raw pointer</h3><p>对unique_ptr对象调用release()函数可以释放相关原始指针的拥有权，即返还一个原始指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unique_ptr&lt;Task&gt; <span class="title">taskPtr5</span><span class="params">(<span class="keyword">new</span> Task(<span class="number">55</span>))</span></span>;</span><br><span class="line">Task * ptr = taskPtr5.<span class="built_in">release</span>();</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/27/shared-ptr-in-C-11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/27/shared-ptr-in-C-11/" itemprop="url">shared_ptr in C++11</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-27T20:12:52+08:00">
+                2019-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h1><h2 id="What-is-std-shared-ptr-lt-gt"><a href="#What-is-std-shared-ptr-lt-gt" class="headerlink" title="What is std::shared_ptr&lt;&gt;"></a>What is std::shared_ptr&lt;&gt;</h2><p>shared_ptr是c++11提出的一种智能指针类，能够自动地删除掉相关的不再被使用的指针，它能够帮助解决内存泄漏和悬空指针的问题。</p>
+<p>shared_ptr有一个共享对象的概念，不同的shared_ptr可以共享相同的指针，并且通过内部的引用计数机制来实现这一功能。每个shared_ptr内部都指向两个内存区域，一个是指向对象的指针，另一个就是用来做引用计数的数据。</p>
+<p>引用计数的使用方式：</p>
+<ul>
+<li>当有一个新的shared_ptr与指针相关联后，其引用计数递增1；</li>
+<li>当一个shared_ptr对象离开作用域时，其引用计数递减1。并且在引用计数变为0的时候，它会delete那部分内存；</li>
+</ul>
+<h3 id="Creating-a-shared-ptr-Object"><a href="#Creating-a-shared-ptr-Object" class="headerlink" title="Creating a shared_ptr Object"></a>Creating a shared_ptr Object</h3><p>创建shared_ptr对象时需要绑定一个原生指针，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>())</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这样，就在堆上创建了两块内存：一个是int，一个是引用计数的数据区域。</p>
+<p>至于，要查看目前的引用计数是多少：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1.<span class="built_in">use_count</span>();</span><br></pre></td></tr></table></figure>
+
+<p>另外，要将一个指针赋值给shared_ptr，我们不能采用隐式的方式，因为其构造器是采用explicit的方式，所以隐式赋值会报错，但我们可以使用<strong>std::make_shared</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = <span class="keyword">new</span> <span class="built_in">int</span>(); <span class="comment">// Compile error</span></span><br><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;();</span><br></pre></td></tr></table></figure>
+
+<h3 id="Detaching-the-associated-Raw-Pointer"><a href="#Detaching-the-associated-Raw-Pointer" class="headerlink" title="Detaching the associated Raw Pointer"></a>Detaching the associated Raw Pointer</h3><p>要使shared_ptr对象取消附加其附加指针，可以调用reset()方法。</p>
+<ul>
+<li>无参调用reset：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1.<span class="built_in">reset</span>(); <span class="comment">// 递减引用计数</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>有参调用：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">int</span>(<span class="number">34</span>)); <span class="comment">//指向新的指针，引用计数变为1</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用nullptr reset</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1 = <span class="literal">nullptr</span>;</span><br></pre></td></tr></table></figure>
+
+<p>shared_ptr可以看作是普通指针，即我们可以对shared_ptr对象使用*和-&gt;与，也可以像其他shared_ptr对象一样进行比较。</p>
+<h2 id="shared-ptr-and-Custom-Deletor"><a href="#shared-ptr-and-Custom-Deletor" class="headerlink" title="shared_ptr and Custom Deletor"></a>shared_ptr and Custom Deletor</h2><p>在上文说过，shared_ptr对象超出作用域的时候，会递减引用计数，当计数为0时，默认情况下会调用<strong>delete</strong>函数删除指针。但如果我们的shared_ptr指向的是一个数组，就应该使用delete[]了。</p>
+<p>因此，为了避免默认调用的错误，我们可以自定义删除器。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">deleter</span><span class="params">(Sample * x)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	std::cout &lt;&lt; <span class="string">&quot;DELETER FUNCTION CALLED\n&quot;</span>;</span><br><span class="line">	<span class="keyword">delete</span>[] x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">std::shared_ptr&lt;Sample&gt; <span class="title">p3</span><span class="params">(<span class="keyword">new</span> Sample[<span class="number">12</span>], deleter)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>当然也可以利用lambda函数或者函数对象来自定义删除器。</p>
+<h2 id="shared-ptr-vs-Pointer"><a href="#shared-ptr-vs-Pointer" class="headerlink" title="shared_ptr vs Pointer"></a>shared_ptr vs Pointer</h2><p>与原生指针不同，shared_ptr只有以下的的操作符：</p>
+<ul>
+<li>-&gt;, *, 比较符号；</li>
+</ul>
+<p>不提供原生指针的这些操作：</p>
+<ul>
+<li>+, -, ++, —和[]；</li>
+</ul>
+<p>当我们创建shared_ptr对象而不分配任何值时，它就是空的。而对于原生的指针来说，它会包含一个垃圾值。因此对于shared_ptr对象，我们可以这样检查：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;Sample&gt; ptr3;</span><br><span class="line"><span class="keyword">if</span>(!ptr3)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;Yes, ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">if</span>(ptr3 == <span class="literal">NULL</span>)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">if</span>(ptr3 == <span class="literal">nullptr</span>)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Create-shared-ptr-objects-carefully"><a href="#Create-shared-ptr-objects-carefully" class="headerlink" title="Create shared_ptr objects carefully"></a>Create shared_ptr objects carefully</h2><p>在创建shared_ptr对象时，有些情况需要注意的：</p>
+<ol>
+<li>不要使用相同的原始指针来创建多个shared_ptr对象，因为不同的shared_ptr对象并不知道它们正在与其它shared_ptr对象共享指针；</li>
+<li>不要从stack中创建shared_ptr对象，因为在stack内存上调用删除操作，程序会崩溃。因此我们应该使用make_shared&lt;&gt;之类的；</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; ptr_1 = <span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;();</span><br><span class="line"> </span><br><span class="line"><span class="function">std::shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr_2</span> <span class="params">(ptr_1)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/21/Designing-Callbacks-in-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/21/Designing-Callbacks-in-C/" itemprop="url">Designing Callbacks in C++</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-21T17:55:36+08:00">
+                2019-05-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Designing-Callbacks-in-C"><a href="#Designing-Callbacks-in-C" class="headerlink" title="Designing Callbacks in C++"></a>Designing Callbacks in C++</h1><h2 id="Function-Pointers"><a href="#Function-Pointers" class="headerlink" title="Function Pointers"></a>Function Pointers</h2><p>首先来看一下什么是callback，callback实际上是一个函数，以参数的形式传递进另一个API中，在往后的某个时间点里面调用我们提供的callback。</p>
+<p>callback的三种类型：</p>
+<ul>
+<li>Function Pointer</li>
+<li>Function Objects&#x2F;Functors</li>
+<li>Lambda functions</li>
+</ul>
+<p>假设我们的框架中存在一个API可以从提供的原生数据构建一个API，API执行以下的步骤：</p>
+<ol>
+<li>对原生数据添加头部和尾部；</li>
+<li>加密；</li>
+<li>返回信息；</li>
+</ol>
+<p>现在这个API知道头部和尾部如何添加，但不了解如何进行加密，这个API可以接受一个函数指针回调如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">buildCompleteMessage</span><span class="params">(std::string rawData, std::string (* encrypterFunPtr)(std::string) )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Add some header and footer to data to make it complete message</span></span><br><span class="line">    rawData = <span class="string">&quot;[HEADER]&quot;</span> + rawData + <span class="string">&quot;[FooTER]&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Call the callBack provided i.e. function pointer to encrypt the</span></span><br><span class="line">    rawData = <span class="built_in">encrypterFunPtr</span>(rawData);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> rawData;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们提供的加密方式如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">encryptDataByLetterInc</span><span class="params">(std::string data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; data.<span class="built_in">size</span>(); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>( (data[i] &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;z&#x27;</span> ) || (data[i] &gt;= <span class="string">&#x27;A&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;Z&#x27;</span> ) )</span><br><span class="line">            data[i]++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么我们的API就可以这样调用了：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::string msg = <span class="built_in">buildCompleteMessage</span>(<span class="string">&quot;SampleString&quot;</span>, &amp;encryptDataByLetterInc);</span><br><span class="line">    std::cout&lt;&lt;msg&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Function-Objects-amp-Functors"><a href="#Function-Objects-amp-Functors" class="headerlink" title="Function Objects &amp; Functors"></a>Function Objects &amp; Functors</h2><p>首先来看看什么是函数对象，实际上就是一个带状态的回调。一个重载了operator()的类对应的对象就是 Function Object or Functor，比如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyFunctor</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">int</span> a , <span class="type">int</span> b)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a+b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//调用时</span></span><br><span class="line">MyFunctor funObj;</span><br><span class="line">std::cout&lt;&lt;<span class="built_in">funObj</span>(<span class="number">2</span>,<span class="number">3</span>)&lt;&lt;std::endl;</span><br><span class="line">funObj.<span class="built_in">operator</span>()(<span class="number">2</span>,<span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+<p>还是以上面的API为例子，假设我们系统API以三种不同的加密方式调用，加密方式分别是对每个字母加一、加二或者减一。如果是用函数指针的方式，我们需要定义三个不同函数，但实际上函数体是类似的。</p>
+<p>但如果使用函数对象，那就可以在类里面绑定状态变量。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Encryptor</span> &#123;</span><br><span class="line">    <span class="type">bool</span> m_isIncremental;</span><br><span class="line">    <span class="type">int</span> m_count;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Encryptor</span>() &#123;</span><br><span class="line">        m_isIncremental = <span class="number">0</span>;</span><br><span class="line">        m_count = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Encryptor</span>(<span class="type">bool</span> isInc, <span class="type">int</span> count) &#123;</span><br><span class="line">        m_isIncremental = isInc;</span><br><span class="line">        m_count = count;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">operator</span><span class="params">()</span><span class="params">(std::string data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; data.<span class="built_in">size</span>(); i++)</span><br><span class="line">            <span class="keyword">if</span> ((data[i] &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;z&#x27;</span>)</span><br><span class="line">                    || (data[i] &gt;= <span class="string">&#x27;A&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;Z&#x27;</span>))</span><br><span class="line">                <span class="keyword">if</span> (m_isIncremental)</span><br><span class="line">                    data[i] = data[i] + m_count;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    data[i] = data[i] - m_count;</span><br><span class="line">        <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>修改一下API的参数类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">buildCompleteMessage</span><span class="params">(std::string rawData,</span></span></span><br><span class="line"><span class="params"><span class="function">        Encryptor encyptorFuncObj)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Add some header and footer to data to make it complete message</span></span><br><span class="line">    rawData = <span class="string">&quot;[HEADER]&quot;</span> + rawData + <span class="string">&quot;[FooTER]&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Call the callBack provided i.e. function pointer to encrypt the</span></span><br><span class="line">    rawData = <span class="built_in">encyptorFuncObj</span>(rawData);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> rawData;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用的时候只需要传递不同的参数到函数对象的构造器即可：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">buildCompleteMessage</span>(<span class="string">&quot;SampleString&quot;</span>, <span class="built_in">Encryptor</span>(<span class="literal">true</span>, <span class="number">1</span>));</span><br><span class="line"><span class="comment">// buildCompleteMessage(&quot;SampleString&quot;, Encryptor(true, 2));</span></span><br><span class="line"><span class="comment">// buildCompleteMessage(&quot;SampleString&quot;, Encryptor(false, 1));</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/19/C-11-unordered-map/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/19/C-11-unordered-map/" itemprop="url">C++11:unordered_map</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-19T16:52:22+08:00">
+                2019-05-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Unordered-Map"><a href="#Unordered-Map" class="headerlink" title="Unordered Map"></a>Unordered Map</h1><h2 id="Basic-Usage-Detail-and-Example"><a href="#Basic-Usage-Detail-and-Example" class="headerlink" title="Basic Usage Detail and Example"></a>Basic Usage Detail and Example</h2><p>Unordered map是C++11新出的特性，它提供了一种map的实现机制，可以存储键值对。Unordered map内部实现了哈希函数，当我们插入一个新的元素时：</p>
+<ul>
+<li>首先对key做哈希函数处理，然后选择一个合适的bucket；</li>
+<li>比较该bucket下的key是否重复；</li>
+<li>在不重复的情况下，添加该元素到bucket中；</li>
+</ul>
+<p>因此Unordered map时无序的，并且其搜索元素的时间复杂度为O(1)。</p>
+<h2 id="Different-Ways-to-initialize-an-unordered-map"><a href="#Different-Ways-to-initialize-an-unordered-map" class="headerlink" title="Different Ways to initialize an unordered_map"></a>Different Ways to initialize an unordered_map</h2><p>unordered map提供了三种不同的重载构造器：</p>
+<ul>
+<li>通过initializer_list初始化</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; <span class="title">wordMap</span><span class="params">(&#123;</span></span></span><br><span class="line"><span class="params"><span class="function">												  &#123; <span class="string">&quot;First&quot;</span>, <span class="number">1</span> &#125;,</span></span></span><br><span class="line"><span class="params"><span class="function">												  &#123; <span class="string">&quot;Second&quot;</span>, <span class="number">2</span> &#125;,</span></span></span><br><span class="line"><span class="params"><span class="function">												  &#123; <span class="string">&quot;Third&quot;</span>, <span class="number">3</span> &#125; &#125;)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用iterable range初始化</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; <span class="title">wordMap_2</span><span class="params">(wordMap.begin(), wordMap.end())</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用另一个unordered_map初始化</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; <span class="title">wordMap_3</span><span class="params">(wordMap)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Searching-in-unordered-map"><a href="#Searching-in-unordered-map" class="headerlink" title="Searching in unordered_map"></a>Searching in unordered_map</h2><p>unordered_map提供了一个成员函数find()，改函数接受一个key作为参数，在找到元素的时候就会返回一个相对应的迭代器，否则会返回map的尾部迭代器。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">find</span> <span class="params">( <span class="type">const</span> key_type&amp; k )</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Different-ways-to-insert-elements-in-an-unordered-map"><a href="#Different-ways-to-insert-elements-in-an-unordered-map" class="headerlink" title="Different ways to insert elements in an unordered_map"></a>Different ways to insert elements in an unordered_map</h2><p>unordered_map提供了多种insert()成员函数的重载版本，我们来一一讨论：</p>
+<ul>
+<li>通过initializer_list插入多个元素；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">insert</span> <span class="params">( initializer_list&lt;value_type&gt; il )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Example</span></span><br><span class="line">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; wordMap;</span><br><span class="line"><span class="comment">// Inserting elements through an initializer_list</span></span><br><span class="line">wordMap.<span class="built_in">insert</span>(&#123; &#123;<span class="string">&quot;First&quot;</span>, <span class="number">1</span>&#125;, &#123;<span class="string">&quot;Second&quot;</span>, <span class="number">2</span>&#125;, &#123;<span class="string">&quot;Third&quot;</span>, <span class="number">3</span>&#125; &#125; );</span><br></pre></td></tr></table></figure>
+
+<p>这种插入方式有一个缺点，因为insert()返回的是void类型，因此在添加重复key的元素时，用户无法确定插入是否成功。</p>
+<ul>
+<li>unordered_map提供了一个重载版本，它接受std::pair of key – value 作为参数，并返回一对迭代器和bool变量，通过该bool变量我们就可以判断插入是否成功；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">pair&lt;iterator,<span class="type">bool</span>&gt; <span class="title">insert</span> <span class="params">( <span class="type">const</span> value_type&amp; val )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> std::unordered_map&lt;std::string, <span class="type">int</span>&gt;::iterator UOMIterator;</span><br><span class="line"><span class="comment">// Pair of Map Iterator and bool value</span></span><br><span class="line">std::pair&lt; UOMIterator , <span class="type">bool</span>&gt; result;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Inserting an element through pair</span></span><br><span class="line">result = wordMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>&lt;std::string, <span class="type">int</span>&gt;(<span class="string">&quot;Second&quot;</span>, <span class="number">6</span>));</span><br><span class="line"><span class="keyword">if</span>(result.second == <span class="literal">false</span>)</span><br><span class="line">      std::cout&lt;&lt;<span class="string">&quot;Element &#x27;Second&#x27; not inserted again&quot;</span>&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Erasing-an-element"><a href="#Erasing-an-element" class="headerlink" title="Erasing an element"></a>Erasing an element</h2><p>要想从unordered_map中删除元素，其提供了两种方式，如下：</p>
+<ul>
+<li>通过提供key类型，即可删除该元素；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">size_type <span class="title">erase</span> <span class="params">( <span class="type">const</span> key_type&amp; k )</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>它的返回值为0或1，对应的是被删除的元素数量</p>
+<ul>
+<li>通过迭代器删除元素；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">erase</span> <span class="params">( const_iterator pos )</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>改函数接收一个迭代器对象，并删除其对应的元素。在删除1，返回指向被删除元素对应的下一个元素的迭代器。因此需要注意的是，在遍历迭代器的过程中删除元素，其返回值是一个有效的迭代器，为被删除元素的下一个。</p>
+<h2 id="std-map-vs-std-unordered-map"><a href="#std-map-vs-std-unordered-map" class="headerlink" title="std::map vs std::unordered_map"></a>std::map vs std::unordered_map</h2><p>本节主要讨论std::map与std::unordered_map的区别，它们虽然都是存储键值对与实现了有效插入、搜索和删除操作，但有着以下的不同：</p>
+<ul>
+<li>内部实现：与std::unordered_map不同，std::map是通过二叉搜索树存储元素的，因此它能通过key进行排序；</li>
+<li>内存使用：std::unordered_map需要更多的内存来存储哈希表；</li>
+<li>搜索的时间复杂度：由于std::map是树的结构，因此其时间复杂度为O(log n)，而std::unordered_map最好的时间复杂度是O(1)，最坏的情况是O(n)，即所有元素在同一个bucket；</li>
+<li>自定义key的使用方法：使用自定义key时，对于std::map来说，需要重载&lt;操作符或者传入外部的comparator比较器，对于std::unordered_map则需要提供std::hash&lt;K&gt;，同时我们还需要重载&#x3D;&#x3D;操作符；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/4/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/6/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

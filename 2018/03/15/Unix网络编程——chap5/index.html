@@ -1,38 +1,748 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
 
-{% block page_class %}page-post-detail{% endblock %}
+  
 
 
-{% block content %}
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unix," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="TCP客户&#x2F;服务器程序POSIX信号处理信号：告知某个进程发生了某个事件的通知。由于信号是异步的，也就是进程无法得知信号发生的准确时间； 两个传播路径：  由一个进程发给另外一个进程（或自身）； 由内核发给某个进程；  函数声明： 123#include &lt;signal.h&gt;void (*signal(int signo, void (*func)(int)))(int);">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unix网络编程——chap5">
+<meta property="og:url" content="http://yoursite.com/2018/03/15/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap5/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="TCP客户&#x2F;服务器程序POSIX信号处理信号：告知某个进程发生了某个事件的通知。由于信号是异步的，也就是进程无法得知信号发生的准确时间； 两个传播路径：  由一个进程发给另外一个进程（或自身）； 由内核发给某个进程；  函数声明： 123#include &lt;signal.h&gt;void (*signal(int signo, void (*func)(int)))(int);">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-03-15T14:09:47.000Z">
+<meta property="article:modified_time" content="2018-03-15T14:50:38.096Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="Unix">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/15/Unix网络编程——chap5/"/>
+
+
+
+
+
+  <title>Unix网络编程——chap5 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
 
   <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/15/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Unix网络编程——chap5</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T22:09:47+08:00">
+                2018-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="TCP客户-x2F-服务器程序"><a href="#TCP客户-x2F-服务器程序" class="headerlink" title="TCP客户&#x2F;服务器程序"></a>TCP客户&#x2F;服务器程序</h1><h2 id="POSIX信号处理"><a href="#POSIX信号处理" class="headerlink" title="POSIX信号处理"></a>POSIX信号处理</h2><p>信号：告知某个进程发生了某个事件的通知。由于信号是异步的，也就是进程无法得知信号发生的准确时间；</p>
+<p>两个传播路径：</p>
+<ul>
+<li>由一个进程发给另外一个进程（或自身）；</li>
+<li>由内核发给某个进程；</li>
+</ul>
+<p>函数声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> (*signal(<span class="type">int</span> signo, <span class="type">void</span> (*func)(<span class="type">int</span>)))(<span class="type">int</span>);</span><br></pre></td></tr></table></figure>
+
+<p>POSIX的信号处理：</p>
+<ol>
+<li>一旦安装了信号处理函数，它便一直安装着；</li>
+<li>在一个信号处理函数运行期间，正在被递交的信号是阻塞的；</li>
+<li>如果一个信号在被阻塞期间产生了多次，那么信号不在阻塞之后只会被递交一次，也就是不进行队列排序；</li>
+</ol>
+<h2 id="Zombie进程"><a href="#Zombie进程" class="headerlink" title="Zombie进程"></a>Zombie进程</h2><p>设置僵死(zombie)进程的一个目的就是维护子进程的信息，以便父进程在未来要使用的时候能获取诸如子进程的ID，进程终止状态和资源利用信息。</p>
+<p>由于僵死进程会占用内核空间，因此我们通常利用函数wait或者waitpid来防止其变成僵死进程。</p>
+<h2 id="wait和waitpid函数"><a href="#wait和waitpid函数" class="headerlink" title="wait和waitpid函数"></a>wait和waitpid函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *staloc)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *staloc, <span class="type">int</span> options)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>比较：</p>
+<p>进程在调用wait之后，如果没有已终止的子进程，它会一直阻塞，直到现有的子进程第一个终止为止。</p>
+<p>而对于waitpid来说，它在阻塞非阻塞方面有更多的控制权，首先是pid能指定等待的进程pid，options则是附加选项，设置为WNOHANG则可以告诉内核在没有子进程完成时不要阻塞。</p>
+<h2 id="accept返回前连接中止"><a href="#accept返回前连接中止" class="headerlink" title="accept返回前连接中止"></a>accept返回前连接中止</h2><p>在三次握手建立之后，客户端的TCP却发来了一个RST。那么一般来说，服务器端的accept函数将会返回一个错误。</p>
+<h2 id="服务器进程终止"><a href="#服务器进程终止" class="headerlink" title="服务器进程终止"></a>服务器进程终止</h2><p>假设我们在两端建立起连接之后，杀死了服务器端的进程。那么服务器端会向客户端发去一个FIN，而如果此时客户端阻塞于fgets，当我们在客户端输入要发送的内容之后，客户端仍然照常将数据发去服务端。</p>
+<p>由于服务端的进程已经关闭了，所以服务端会响应一个RST。然而此时客户端还看不到RST，而是接受FIN，也就是在read中返回0，由于不像预期那样接收到EOF，所以客户端会因为出错而退出。</p>
+<h2 id="SIGPIPE"><a href="#SIGPIPE" class="headerlink" title="SIGPIPE"></a>SIGPIPE</h2><p>还是上面的那个情况，如果我们不是执行一次写操作，而是在读回数据之前执行两次写操作，那么会引发EPIPE错误。这是因为第一次的写操作会导致RST的接收，而第二次向接收到RST的套接字进行写操作是不允许的，因此返回了错误。</p>
+<h2 id="服务器主机崩溃后重启"><a href="#服务器主机崩溃后重启" class="headerlink" title="服务器主机崩溃后重启"></a>服务器主机崩溃后重启</h2><p>假设客户端发送数据前，重启处于崩溃状态的服务器，那么由于服务器已经丢失了之前的连接信息，所以会响应一个RST。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unix/" rel="tag"># Unix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/15/stl-hashtable/" rel="next" title="stl--hashtable">
+                <i class="fa fa-chevron-left"></i> stl--hashtable
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/17/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap6/" rel="prev" title="Unix网络编程——chap6">
+                Unix网络编程——chap6 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
 
     <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+      
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+          </div>
+          
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP%E5%AE%A2%E6%88%B7-x2F-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">TCP客户&#x2F;服务器程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#POSIX%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">POSIX信号处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zombie%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">Zombie进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wait%E5%92%8Cwaitpid%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">wait和waitpid函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#accept%E8%BF%94%E5%9B%9E%E5%89%8D%E8%BF%9E%E6%8E%A5%E4%B8%AD%E6%AD%A2"><span class="nav-number">1.4.</span> <span class="nav-text">accept返回前连接中止</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%BF%9B%E7%A8%8B%E7%BB%88%E6%AD%A2"><span class="nav-number">1.5.</span> <span class="nav-text">服务器进程终止</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SIGPIPE"><span class="nav-number">1.6.</span> <span class="nav-text">SIGPIPE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%BB%E6%9C%BA%E5%B4%A9%E6%BA%83%E5%90%8E%E9%87%8D%E5%90%AF"><span class="nav-number">1.7.</span> <span class="nav-text">服务器主机崩溃后重启</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

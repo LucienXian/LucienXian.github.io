@@ -1,23 +1,2267 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
 
-{% block page_class %}
-  {% if is_home() %} page-home {% endif %}
-{% endblock %}
 
-{% block content %}
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LucienXian&#39;s Garden">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LucienXian&#39;s Blog">
+<meta property="og:url" content="http://yoursite.com/page/16/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LucienXian&#39;s Garden">
+<meta property="og:locale">
+<meta property="article:author" content="LucienXian">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/page/16/"/>
+
+
+
+
+
+  <title>LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/29/cs231n-lecture2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/29/cs231n-lecture2/" itemprop="url">cs231n@lecture2</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-29T23:13:33+08:00">
+                2018-05-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="图像分类"><a href="#图像分类" class="headerlink" title="图像分类"></a>图像分类</h1><h2 id="数据驱动方法"><a href="#数据驱动方法" class="headerlink" title="数据驱动方法"></a>数据驱动方法</h2><p>图像识别时，计算机接收图像，并从固定的标签从选择一个标签，计算机看到的图像其实是一个多维数组。</p>
+<p>但改变相机角度，环境光度，图像变形，遮挡，与背景重叠，类内差异等情况，计算机的识别算法应该是robust的。</p>
+<p>实际上，我们不会考虑为某个是别的物体硬编码某个规则，而是收集图像数据和标签，然后用机器学习去训练分类器，再利用分类器去预测标签。这就是一种数据驱动的算法。</p>
+<p>在比较图像时，我们可以使用L1 distance: $d_1(I_1, I_2)&#x3D;\sum_{p}|I_1^2-I_2^2|$</p>
+<p>对于NNC，最近邻分类器，它的train是O(1)，而predict是O(N)，而我们希望的是训练可以慢一点，而测试要快一点。另外就是，最近邻可能会使得分类不够泛化，因此我们使用knn来解决这个问题。</p>
+<p>下面这张图很好地表示了knn带来的效果，使得分类更加平滑：</p>
+<p><img src="https://pic2.zhimg.com/80/51aef845faa10195e33bdd4657592f86_hd.jpg" alt="img"></p>
+<h2 id="k最近邻算法"><a href="#k最近邻算法" class="headerlink" title="k最近邻算法"></a>k最近邻算法</h2><p>L1距离有坐标依赖，如果特征有特别的意义，一般选择L1距离。但最好都尝试一下。</p>
+<p>L2距离</p>
+<p>k和distance：hyperrparameters</p>
+<p>超参数的设置：</p>
+<ul>
+<li>将参数分为三组：train、validation、test，validation选择参数。</li>
+<li>cross-validation：将数据分成多组，轮流将每组选做validation，然后平均其结果。</li>
+</ul>
+<p>knn很少在图像上使用，一方面是太慢了，另一方面则是距离向量的计算不适合图像像素</p>
+<h2 id="线性分类I"><a href="#线性分类I" class="headerlink" title="线性分类I"></a>线性分类I</h2><p>相对于knn，线性分类需要参数。</p>
+<p>image-&gt;f(x, W)&#x3D;Wx+b-&gt;10 number giving class scores</p>
+<p>打个比方，以下的图可以看作</p>
+<p><img src="https://pic4.zhimg.com/80/7c204cd1010c0af1e7b50000bfff1d8e_hd.jpg" alt="img"></p>
+<p>对于图像来说，我们可以将图像想象成高维空间的一个点，线性分类器就是一条分割线。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><ol>
+<li><p>搭建环境时遇到了这个问题</p>
+<blockquote>
+<p>Unable to compile python Pillow</p>
+</blockquote>
+</li>
+</ol>
+<p>也就是无法编译pillow，导致在virtualenv中无法pip要求的库。从这里找到了答案：<a target="_blank" rel="noopener" href="https://github.com/Microsoft/WSL/issues/256%EF%BC%8C%E6%8A%8A%E4%BE%9D%E8%B5%96%E8%A3%85%E4%B8%8A">https://github.com/Microsoft/WSL/issues/256，把依赖装上</a></p>
+<p><strong>sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk</strong></p>
+<ol start="2">
+<li>用脚本，下载数据集太慢了，还不如手动下载</li>
+<li>pip install -r requirements.txt 时遇到了site无法安装，按照<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/48696858/unable-to-install-distribution-site">这里</a>的说法，site是内置的。</li>
+</ol>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/site.html"><code>site</code></a> is internal to the Python interpreter, and is used to initialize machine-specific details of your Python installation.</p>
+<p>What’s telling you that you need to install this module? Ignore it. It’s wrong.</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/27/%E6%B4%BB%E8%B7%83%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/27/%E6%B4%BB%E8%B7%83%E5%88%86%E6%9E%90/" itemprop="url">活跃分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-27T14:20:42+08:00">
+                2018-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="活跃分析"><a href="#活跃分析" class="headerlink" title="活跃分析"></a>活跃分析</h1><p>liveness analysis：编译器在分析程序的中间表示时，需要确定哪些临时变量同时被使用。如果一个变量的值将来还需要使用，那么这变量就是live的。</p>
+<p>为了对程序进行分析，我们可以看这样的控制流图：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compiler10_1.png" alt="img"></p>
+<p>因此可以得出：a的活跃范围是[1-&gt;2, 4-&gt;5-&gt;2]，b的活跃范围是[2-&gt;3,3-&gt;4]，至于变量c，在进入这段程序时就是活跃的，它有可能是一个形参。如果c是局部变量，活跃分析就可以发现它未初始化，从而给出warning。</p>
+<h2 id="数据流方程的解"><a href="#数据流方程的解" class="headerlink" title="数据流方程的解"></a>数据流方程的解</h2><p>活跃性：一个变量在一条边上的活跃是指，如果存在一条从这条边指向该变量的一个use的有向路径，并且路径不经过该变量的任何def。</p>
+<h3 id="活跃性计算"><a href="#活跃性计算" class="headerlink" title="活跃性计算"></a>活跃性计算</h3><p>入口和出口活跃信息：</p>
+<ul>
+<li>如果一个变量属于use[n]，那么它在结点n是入口活跃的；</li>
+<li>如果一个变量在结点n是入口活跃，那么它在所有属于pred[n]的结点m中都是出口活跃的；</li>
+<li>如果一个变量在结点n是出口活跃的，而且不属于def[n]，那么该变量在结点n是入口活跃的；</li>
+</ul>
+<p>为了加快迭代速度，我们可以沿着箭头的反方向追踪</p>
+<h3 id="集合的表现"><a href="#集合的表现" class="headerlink" title="集合的表现"></a>集合的表现</h3><p>表示数据流方程的集合至少有两种较好的方法：位数组或有序变量表。</p>
+<p>集合稀疏的可以用有序表；集合密集的话，应该用位数组。</p>
+<h3 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h3><p>实际的算法运行时间在$O(N)-O(N^2)$之间</p>
+<h3 id="最小不动点"><a href="#最小不动点" class="headerlink" title="最小不动点"></a>最小不动点</h3><p>数据流方程的任何一个解都只是保守的近似解，它提供的是报收信息，虽然不够准确可以得到非最优的方程，但绝不会是错误的程序。</p>
+<h3 id="静态活跃性与动态活跃性"><a href="#静态活跃性与动态活跃性" class="headerlink" title="静态活跃性与动态活跃性"></a>静态活跃性与动态活跃性</h3><p>动态活跃：如果程序的某个执行从结点n到a的一个使用之间没有经过a的任何定义，那么变量a在结点n是动态活跃；</p>
+<p>静态活跃：如果存在一条从n到a的某个使用的控制流路径，且此路径上没有a的任何定义，则是静态活跃的；</p>
+<h3 id="冲突图"><a href="#冲突图" class="headerlink" title="冲突图"></a>冲突图</h3><p>阻止将变量a和b分配到同一个寄存器的条件就叫冲突（interference）。冲突可以用无向图表示，图中的结点表示变量，每条边连接相冲突的两个变量。</p>
+<p>添加冲突边的方法：</p>
+<ul>
+<li>对于任何对变量a定义的非传送指令，以及在该指令处是出口活跃的变量$b_1,…,b_j$，添加冲突边$(a, b_1),…,(a, b_n)$；</li>
+<li>对于传送指令a&lt;-c，如果变量$b_1,…,b_j$在该指令处是出口活跃的，为每一个不同于c的$b_i$添加冲突边$(a, b_1),…,(a, b_j)$</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/15/Bayesian/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/15/Bayesian/" itemprop="url">Bayesian</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-15T22:41:15+08:00">
+                2018-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="贝叶斯分类器"><a href="#贝叶斯分类器" class="headerlink" title="贝叶斯分类器"></a>贝叶斯分类器</h1><h2 id="贝叶斯决策论"><a href="#贝叶斯决策论" class="headerlink" title="贝叶斯决策论"></a>贝叶斯决策论</h2><p>先来看几个公式：</p>
+<ul>
+<li>条件风险：</li>
+</ul>
+<p>$$<br>R(c_j|x)&#x3D;\sum_{j&#x3D;1}^{N}{\lambda}_{ij}P(c_i|x)<br>$$</p>
+<p>其中λij是将一个真实标记为cj的样本错分类为ci所产生的损失，这里的条件风险也叫作expected loss</p>
+<ul>
+<li>总体风险</li>
+</ul>
+<p>R(h) &#x3D; Ex[R(h(x)|x)]</p>
+<p>其中，h就是我们希望找到的准则，使得R(h)最小化，显然只需要在每个样本上选择那个能使得条件风险R(c|x)最低的类别标记，即<em><em>h</em>(x) &#x3D; arg min R(c|x)</em>*</p>
+<p>因此R(h*)就是贝叶斯风险，而1-R(h*)则反映了分类器能到达的最好性能。</p>
+<p>若将误判损失λij表示为：λij &#x3D; 1，if i &#x3D; j; λij &#x3D; 0, otherwise</p>
+<p>那么条件风险将变成：<br>$$<br>R(c_j|x)&#x3D;\sum_{i&#x3D;1}^{N}P(c_i|x) - P(c_j|x) &#x3D; 1-P(c_j|x)<br>$$</p>
+<p>因此贝叶斯最小分类器就变成了：h*(x) &#x3D; arg max P(c|x),然后根据贝叶斯定理有：<br>$$<br>P(c|x) &#x3D; P(c)P(x|c) &#x2F; P(x)<br>$$<br>如果要根据贝叶斯判断准则来最小化决策风险，那么就要获得后验概率<strong>P(c|x)<strong>，总体有两种策略：给定x，通过直接建模P(c|x)来预测c，这叫</strong>discriminative models</strong>；也可以先对联合概率分布P(x, c)建模，由此得到P(c|x)，这是<strong>generative models</strong>。一般来说，决策树，BP神经网络，支持向量机，都是前者。</p>
+<h2 id="极大似然估计"><a href="#极大似然估计" class="headerlink" title="极大似然估计"></a>极大似然估计</h2><p>这里的介绍说的很好，结合一下：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/20447622">https://www.zhihu.com/question/20447622</a></p>
+<p>最好的理解就是：<strong>利用已知的样本结果，反推最有可能（最大概率）导致这样结果的参数值。</strong></p>
+<p>举个例子，麻袋里有白球和黑球，抽取十个球，有放回地抽到了七个黑球和三个白球，那么如果我们需要估计黑白球的比例时就可以用极大似然估计。假设抽到黑球的概率为p，也就是求解导致这个结果的参数值的最大可能性：P(七个黑球)&#x3D;p*7 * (1-p)*3。要使得概率最大，那就需要求导。</p>
+<p>往往求导之前，我们需要取对数，这样就变成了线性相加，避免下溢。</p>
+<p>需要注意的是，这种方法需要预先假设概率分数，因此这十分依赖假设的概率分布是否符合真实数据分布。</p>
+<h2 id="朴素贝叶斯分类器"><a href="#朴素贝叶斯分类器" class="headerlink" title="朴素贝叶斯分类器"></a>朴素贝叶斯分类器</h2><p>基于上面的贝叶斯公式可以看到，计算后验概率的主要困难是条件概率P(x|c)为所有属性上的联合计算，很难直接估计而得。为了避开这个问题，朴素贝叶斯分类器(naive Bayes classifier)采用了属性条件独立性假设。则将贝叶斯公式写成<br>$$<br>P(c|x) &#x3D; \frac{P(c)P(x|c)}{P(x)}&#x3D; \frac{P(c)}{P(x)}* \prod_{i&#x3D;1}^{d}P(x_i|c)<br>$$</p>
+<p>由于对所有的类别P(x)都是一样的，因此贝叶斯的判断准则就变成了这样的分类器<br>$$<br>h_{nb}(x) &#x3D; \underset{c\in\gamma}{\arg\max}<br>               P(c)\prod_{i&#x3D;1}^{d}P(x_i|c)<br>                \underset{}{}<br>$$</p>
+<p>假设Dc表示训练集D中第c类样本组成的集合，那么<br>$$<br>P(c) &#x3D; \frac{|Dc|} {|D|}<br>$$</p>
+<p>对于离散属性则有<br>$$<br>P(x_i|c) &#x3D; \frac{|D_{c,i}|}{|D_c|}<br>$$</p>
+<p>至于连续属性，则可考虑使用概率密度函数，假定</p>
+<p>$$<br>P(x_i|c) \sim N(\mu_{c,i}, \sigma_{c,i}^2)<br>$$</p>
+<p><strong>需要注意的是</strong>，若某个属性值在训练集中没有与某个类同时出现过，如果直接进行概率估计，那么概率就为0，在分类器的公式计算结果最后也为0。为了便民其它属性携带的信息被该属性值抹去，我们需要在估计概率值时进行<strong>拉普拉斯修正</strong>。则上面的式子会被修正为（其中N为类别数）：</p>
+<p>$$<br>P(c) &#x3D; \frac{|Dc|+1} {|D|+N}<br>$$</p>
+<p>$$<br>P(x_i|c) &#x3D; \frac{|D_{c,i}|+1}{|D_c|+N}<br>$$</p>
+<h2 id="半朴素贝叶斯分类器"><a href="#半朴素贝叶斯分类器" class="headerlink" title="半朴素贝叶斯分类器"></a>半朴素贝叶斯分类器</h2><p>在上面一节中，我们提到了用属性条件独立性假设来降低计算后验概率P(c|x)的困难，但独立性在现实中很难成立。因此人们便提出了半朴素贝叶斯分类器。</p>
+<blockquote>
+<p>半朴素贝叶斯分类器的基本想法是适当考虑一部分属性间的相互依赖信息，从而既不需要进行完全联合概率计算，也不至于彻底忽略了比较强的属性依赖关系</p>
+</blockquote>
+<p>因此，公式改写成：<br>$$<br>P(c|x)  \propto P(c) \prod_{i&#x3D;1}^{d}P(x_i|c, pa_i)<br>$$<br>其中，$pa_i$为属性$x_i$的父属性，即$x_i$所依赖的属性。</p>
+<p>那么现在的问题就是如何确定每个属性的父属性，有以下两种方法：</p>
+<ul>
+<li>一种是假设所有属性都依赖于同一个属性，称为”超父”，即SPODE方法：</li>
+<li>另一种则是TAN，在最大带权生成树的基础上，将依赖关系简约为树形结构；</li>
+</ul>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/ml_xigua_7_1.png" alt="img"></p>
+<p>AODE**(Averaged One-Dependent Estimator)**是一种基于集成学习机制，更加强大的独依赖分类器。它会将每个维度的特征属性作为超父来构建SPODE，然后线性组合出最终的模型。</p>
+<h2 id="贝叶斯网"><a href="#贝叶斯网" class="headerlink" title="贝叶斯网"></a>贝叶斯网</h2><p>贝叶斯网（Bayesian network）借助有向无环图来刻画属性之间的依赖关系，另外还利用了条件概率表来描述属性的联合概率。所以贝叶斯网是由结构G和参数$\theta$组成的。</p>
+<h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p>贝叶斯网的结构表示了属性间的条件独立性，因此所有属性的联合概率定义为：<br>$$<br>P_B(x_1,x_2,…,x_d) &#x3D; \prod_{i&#x3D;1}^{d}P_B(x_i|\pi_i) &#x3D;  \prod_{i&#x3D;1}^{d}\theta_&amp;#123;&amp;#123;x_i}|{\pi_i&amp;#125;&amp;#125;<br>$$<br>下图展示贝叶斯网中三个变量之间的典型依赖关系</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/ml_xigua_7_3.png" alt="img"></p>
+<p>我们一个一个看</p>
+<ul>
+<li>在同父结构中，给定父节点x1的取值，则x3与x4条件独立</li>
+</ul>
+<p>$$<br>P(x_1, x_3, x_4) &#x3D; P(x_1)P(x_3|x1)P(x_4|x_1)  &#x3D;&#x3D;&gt;<br>P(x_3,x_4|x_1) &#x3D; P(x_3|x_1)P(x_4|x_1)<br>$$</p>
+<ul>
+<li>在V型结构中，给定子结点x4，则x1与x2必不独立，若x4完全未知，则x1与x2独立</li>
+</ul>
+<p>$$<br>P(x1, x2) &#x3D; \sum_{x_4}P(x_1,x_2,x_4)&#x3D;\sum_{x_4}P(x_4|x_1,x_2) &#x3D; P(x_1)P(x_2)<br>$$</p>
+<ul>
+<li>在顺序结构中，给定x的值，则y与z条件独立，先要通过贝叶斯公式转化$P(x|z)$</li>
+</ul>
+<p>$$<br>P(x,y,z) &#x3D; P(z)P(x|z)P(y|x) &#x3D;&#x3D;&gt; P(y,z|x)&#x3D;P(y|x)P(z|x)<br>$$</p>
+<p>为了分析有向图中变量间的条件独立性，我们可以使用有向分离的方法将有向图转化为无向图，由上面的叙述可以知道除了V型图的非中间节点没有条件独立性之外，其它两个与依赖是否有向是无关的。</p>
+<p>基于这种事实，我们可以找出图中所有的V型结构，在V型结构的两个父节点之间加上一条无向边，并且将所有的有向边改为无向边，构成道德图(moral graph)。</p>
+<p>在道德图中，如果变量x和y能够被变量z分开，则称x和y被z有向分离，同时具有条件独立性：$x\perp y | z$</p>
+<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><p>如果得到了贝叶斯网的结构，即得到了属性间的依赖关系，那么只需要对训练样本“计数”即对贝叶斯网进行学习。因此我们的首要任务就是找出结构最“恰当”的结构。</p>
+<p>为了达到这个目的，我们定义一个评分函数（score function），来评估贝叶斯网与训练数据的契合度。给定训练集D&#x3D;{x1,x2,…,xm}，贝叶斯网B&#x3D;&lt;G, $\theta$&gt;在D上的评分函数为：<br>$$<br>s(B|D) &#x3D; f(\theta)|B| - LL(B|D)<br>$$<br>其中|B|为参数个数，$f(\theta)$为每个参数需要的字节数，至于LL(B|D)则是贝叶斯网B的对数似然，描述的是B对应的概率分布对D描述得有多好。</p>
+<h3 id="推断"><a href="#推断" class="headerlink" title="推断"></a>推断</h3><p>贝叶斯网训练好之后就能通过一些属性变量的观测值来推测其它属性变量的取值了。但直接根据贝叶斯网定义的联合概率分布来精确计算后验概率，是一个NP难的问题。</p>
+<p>在现实应用中，往往采取的是吉布斯采样（Gibbs sampling）。具体算法原理不大懂，大致的步骤就是首先产生一个与证据变量一致的样本作为初始点，然后每步从当前样本出发产生下一个样本，然后逐个地对非证据变量进行采样以改变其初值。假定经过T次后采样得到的与q一致的样本共有nq个，那么后验概率就是：<br>$$<br>P(Q&#x3D;q|E&#x3D;e) &#x3D; \frac{n_q}{T}<br>$$</p>
+<h2 id="EM算法"><a href="#EM算法" class="headerlink" title="EM算法"></a>EM算法</h2><p>前面的讨论都是基于所有属性变量的值都已经被观测到了，但很多情况下，训练样本可能是不完整的，那么我们应该怎样对参数进行估计呢。</p>
+<p>简单来说就是从某个参数值$\theta^{0}$为起点，执行以下步骤，直至收敛：</p>
+<ul>
+<li>基于$\theta^t$推断隐变量Z的期望，记为$Z^t$；</li>
+<li>基于已经观测的变量X和$Z^t$对参数$\theta$做极大似然估计；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/14/cs231n-lecture1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/14/cs231n-lecture1/" itemprop="url">cs231n@lecture1</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-14T23:36:37+08:00">
+                2018-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Course-Introduction"><a href="#Course-Introduction" class="headerlink" title="Course Introduction"></a><strong>Course Introduction</strong></h1><p>开一个坑，开始学cs231n。其实以前也在学校学过计算机视觉了，对一些算法也有一定的了解，但也仅限于实现一些opencv已有的算法，还不够深入。另外，也学过了吴恩达的机器学习课程。因此，希望以计算机视觉为切入点学一下深度学习，并全面学习计算机视觉。</p>
+<p>lecture 1主要讲的是<strong>计算机视觉的概述、历史背景以及课程计划</strong>，没什么好说的，就开个题吧。</p>
+<p>这门课的作业用的是jupyter notebook发布的，毕竟是一门神课，网上有大量的资料，甚至答案。现在2018版本已经出来了，但视频只对Stanford的学生开发，所以我打算看2017的。官方在YouTube发布了视频，但我觉得去b站看即可，还有中文字幕。网站链接：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av17204303/">https://www.bilibili.com/video/av17204303/</a></p>
+<p>等到完成了，再来写个总结吧。。。反正也没人看哈哈哈哈</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/13/%E5%9F%BA%E6%9C%AC%E5%9D%97%E4%B8%8E%E8%BD%A8%E8%BF%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/13/%E5%9F%BA%E6%9C%AC%E5%9D%97%E4%B8%8E%E8%BD%A8%E8%BF%B9/" itemprop="url">基本块与轨迹</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-13T15:14:19+08:00">
+                2018-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="基本块和轨迹"><a href="#基本块和轨迹" class="headerlink" title="基本块和轨迹"></a>基本块和轨迹</h1><p>在tree语言中含有一些与机器语言不一致的情况，但我们又必须将tree语言转换成汇编语言或者机器语言，例如</p>
+<ul>
+<li>CJUMP指令能够跳转到两个标号中的任意一个，但真正的机器指令在条件为false时是跳转到下一个指令；</li>
+<li>在表达式中使用ESEQ会很不方便，因为它会使得子树的不同计算顺序产生不同的结果；</li>
+<li>CALL指令也可能会有问题；</li>
+</ul>
+<p>因此我们必须要对任意一棵树进行转换，以避免上述情况：</p>
+<ul>
+<li>将一棵树重写成不含SEQ和ESEQ的规范树；</li>
+<li>将这一列树组合成其内不含标号和转移的基本块组合；</li>
+<li>对基本快并形成一组trace；</li>
+</ul>
+<h2 id="规范树"><a href="#规范树" class="headerlink" title="规范树"></a>规范树</h2><p>什么是规范树：</p>
+<ol>
+<li>无SEQ或者ESEQ</li>
+<li>每一个CALL的父亲不是EXP，就是MOVE</li>
+</ol>
+<h3 id="ESEQ的转换"><a href="#ESEQ的转换" class="headerlink" title="ESEQ的转换"></a>ESEQ的转换</h3><p>消除ESEQ的方法是，在树中一级一级地将它们提升，直至它们可以变成SEQ节点。</p>
+<p>下面，介绍四种情况，其中三四两种情况的不同在于s1与e能否交换：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/compiler8-1.png" alt="img"></p>
+<p>一般，常数和空语句可以与任何语句交换，其它假定不能交换。</p>
+<h3 id="一般重写规则"><a href="#一般重写规则" class="headerlink" title="一般重写规则"></a>一般重写规则</h3><p>一般而言，对于每一种tree语言或者表达式，都会有等价的子表达式。</p>
+<p>例如对于[e1, e2, ESEQ(s, e3)]，需要将s抽取出来放到e2和e1的左边。如果可以交换，则得到(s; [e1,e2,e3])，如果不能交换，则是上图中第三种情况。</p>
+<p>利用函数reorder接收一个表达式，并返回由(语句，表达式表)组成的一个偶对。其中语句必须包含所有在表达式表之前执行的操作。传入reorder的是一个链表，它会抽出所有的ESEQ。reorder对参数的链表中的每一个表达式都调用de_exp，而do_exp的实现又只是对除了ESEQ之外的任何类型的表达式建立其子表达式的地址表并调用reorder。</p>
+<h3 id="将call移到顶层"><a href="#将call移到顶层" class="headerlink" title="将call移到顶层"></a>将call移到顶层</h3><p>由于在tree语言允许call节点作为子表达式，但实际中call的实现是，每一个函数将它的结果返回到同一个规定的返回值寄存器中，那么后面的调用就可能把前面的调用给覆盖掉了。</p>
+<p>因此，我们可以重写：</p>
+<p>CALL(func, args)—&gt;ESEQ(MOVE(TEMP t, CALL(func, args)), TEMP t)</p>
+<p>在这种情况中，do_stm不会调用reorder去处理CALL节点，而是把f和args看做MOVE节点的儿子</p>
+<h3 id="线性语句表"><a href="#线性语句表" class="headerlink" title="线性语句表"></a>线性语句表</h3><p>一旦整个函数体都已经用do_stm处理完毕之后，所有的SEQ节点都集中在树的顶部。函数linearize重复施加规则，使得<strong>SEQ(SEQ(a,b),c)</strong> &#x3D;&#x3D;&gt; <strong>SEQ(a, SEQ(b,c))</strong></p>
+<p>但SEQ节点不提供任何结构性信息，只是简单列表。</p>
+<h2 id="处理条件分支"><a href="#处理条件分支" class="headerlink" title="处理条件分支"></a>处理条件分支</h2><p>tree语言与多数机器指令集不一样的是，它具有两路分支CJUMP指令。为了便于将tree转换为机器指令，我们需要重新安排CJUMP，使得CJUMP(cond, lt, lf)后面跟随的LABEL(lf)。</p>
+<p>我们分两步实现这一目的：取一颗规范树，并由它们形成基本块；对这些基本块进行排序，形成trace轨迹。</p>
+<h3 id="基本块"><a href="#基本块" class="headerlink" title="基本块"></a>基本块</h3><p>在分析程序的控制流时，任何非分支指令的程序语句对分析都没有意义，因此可以将非分支指令的序列集中到基本块中。</p>
+<p>基本块是语句组成的一个序列，只能从序列的开始进入并从结尾处退出：</p>
+<ul>
+<li>第一个语句是一个LABEL；</li>
+<li>最后一个语句是JUMP或者CJUMP；</li>
+<li>没有其他的LABEL, JUMP或者CJUMP；</li>
+</ul>
+<p>划分基本块的算法：</p>
+<blockquote>
+<p>从头到尾扫描语句序列，遇到一个LABEL就开始一个新的基本块并结束前一个基本块，遇到一个JUMP或者CJUMP就结束一个基本块；若过程遗留的基本块中，有任何基本块不是以LABEL开始的，则新生成一个标号插入到开始；若有不是以JUMP结束的，则在这个基本块的末尾假如一个转移到下一个基本块标号的指令。</p>
+</blockquote>
+<h3 id="轨迹"><a href="#轨迹" class="headerlink" title="轨迹"></a>轨迹</h3><p>由于我们以任意顺序安排基本块，程序结果都是一致的，因此我们可以合理地安排基本块，以满足每个CJUMP之后都跟随它的false标号的基本块。</p>
+<p>另外，也可以安排基本块使得JUMP之后跟随的是它们的目标标号，然后删除这些转移。</p>
+<p>还有，需要安排轨迹使得重叠的轨迹越来越少。</p>
+<h3 id="完善"><a href="#完善" class="headerlink" title="完善"></a>完善</h3><p>主要针对的是CJUMP指令：</p>
+<ul>
+<li>所有后面直接跟随的false标号的CJUMP维持不变；</li>
+<li>对任何直接跟随true标号的CJUMP，交换true标号和false标号，并将条件改为相反；</li>
+<li>如果既不是true也不是false标号直接跟随着，则新生成一个标号lf’，重写CJUMP；</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CJUMP(cond, a, b, lt, lf<span class="number">&#x27;</span>)</span><br><span class="line">LABEL(lf<span class="number">&#x27;</span>)</span><br><span class="line">JUMP(NAME lf)</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/06/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/06/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95/" itemprop="url">抽象语法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-06T22:25:00+08:00">
+                2018-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="抽象语法"><a href="#抽象语法" class="headerlink" title="抽象语法"></a>抽象语法</h1><blockquote>
+<p>Abstract: disassociated from any specific instance</p>
+</blockquote>
+<h2 id="语义动作"><a href="#语义动作" class="headerlink" title="语义动作"></a>语义动作</h2><p>每个终结符和非终结符都可关联一个语义值类型。</p>
+<h3 id="递归下降"><a href="#递归下降" class="headerlink" title="递归下降"></a>递归下降</h3><p>在递归下降的语法分析器中，semantic action是语法分析函数所返回的值，或者是这些函数所产生的副作用。</p>
+<h2 id="抽象语法分析树"><a href="#抽象语法分析树" class="headerlink" title="抽象语法分析树"></a>抽象语法分析树</h2><p>为了有利于模块化，我们尽量将语法分析和语义分析分开处理，往往的一个做法就是由语法分析器生成一种数据结构——<strong>语法分析树</strong>，编译器在后面的阶段对其进行后序遍历。但如果遇到了引入新的非终结符和文法production的情况，我们应该尽量将这些细节限制在语法分析，而不应该干扰语义分析。</p>
+<p>抽象语法就是起到了在语法分析与编译器等后面阶段之间建立接口的作用。</p>
+<h3 id="位置"><a href="#位置" class="headerlink" title="位置"></a>位置</h3><p>有只过一遍的编译器中，词法分析，语法分析和语义分析是一起进行的。因此发送错误时，我们可以取得词法分析的当前位置，因为这里是最接近错误源的位置。而如果使用了抽象语法分析树之后，进行遍历时如果出现了语义错误，就不能简单地判断此时词法分析的位置，因为此时词法分析已经到了文件末尾。</p>
+<p>因此，我们需要记录每一个节点在源程序中的位置。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/05/%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/05/%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90/" itemprop="url">语法分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T15:20:27+08:00">
+                2018-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="语法分析"><a href="#语法分析" class="headerlink" title="语法分析"></a>语法分析</h1><blockquote>
+<p>语法(syntax)：组合token以形成phrases，clauses和sentences</p>
+</blockquote>
+<p>对于某些式子的表示，比如带有嵌套深度比较大的括号时，有限自动机并不能识别出括号配对的情况，这是因为状态数为N的有限自动机无法记忆嵌套深度大于N的括号。</p>
+<h2 id="上下文无关文法"><a href="#上下文无关文法" class="headerlink" title="上下文无关文法"></a>上下文无关文法</h2><p>上下文无关文法就是说这个文法中所有的产生式左边只有一个非终结符，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">S-&gt;aSb</span><br><span class="line">S-&gt;ab</span><br></pre></td></tr></table></figure>
+
+<p>这个文法的两个production的左边都只有一个非终结符，那么只需要找到符合production右边的字符串，就可以对其进行规约。</p>
+<p>然而</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aSb-&gt;aaSbb</span><br><span class="line">S-&gt;ab</span><br></pre></td></tr></table></figure>
+
+<p>这就是上下文相关文法，因为第一个production的左边不止一个终结符，所以在匹配的时候必须要确保S有正确的“上下文”。</p>
+<h3 id="推导"><a href="#推导" class="headerlink" title="推导"></a>推导</h3><p>为了证明某个文法的类型，我们必须要进行推导（derivation），即从开始符号出发，对其右部的每一个非终止符，用该非终止符production的任一个右部替代它。</p>
+<ul>
+<li>最左推导：总是扩展最左边的非终止符；</li>
+<li>最右推导：总是扩展最右边的非终止符；</li>
+</ul>
+<h3 id="语法分析树"><a href="#语法分析树" class="headerlink" title="语法分析树"></a>语法分析树</h3><p>parse tree就是将一个推导中的各个符号连接到从它推导出来的符号而形成的。不同的推导可以得到相同的parse tree。</p>
+<h3 id="二义性文法"><a href="#二义性文法" class="headerlink" title="二义性文法"></a>二义性文法</h3><p>如果一个文法能够推导出两颗不同的parse tree，则认为该文法具有二义性。这种情况下，编译器就无法利用parse tree去解析语义。以下就是一个二义性文法的例子：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3.png" alt="img"></p>
+<p>但是二义性的文法是可以通过某些转换来消除，一般来说引入一些新的非终止符，来提高某些表达式的优先级。</p>
+<h3 id="文件结束符"><a href="#文件结束符" class="headerlink" title="文件结束符"></a>文件结束符</h3><p>语法分析器会读入文件结束符号，一般来说我们使用**$符号**表示文件的结束。</p>
+<h2 id="预测分析"><a href="#预测分析" class="headerlink" title="预测分析"></a>预测分析</h2><p>使用一种叫做梯度下降(recursive descent)的简单算法可以对grammar进行分析，它只适用于每个子表达式的第一个终结符号能够为production提供足够的信息的情况。其中每个非终结符对应的，都有一个函数。</p>
+<h3 id="FIRST集合和FOLLOW集合"><a href="#FIRST集合和FOLLOW集合" class="headerlink" title="FIRST集合和FOLLOW集合"></a>FIRST集合和FOLLOW集合</h3><p>FIRST(S)是从S可以推导出的任意字符串中的开头终结符组成的集合，因此如果两个production有着相同的左部符号，但它们的右部有着重叠的FIRST集合，那么该文法不能使用预测分析。</p>
+<p>能产生空字符串的符号，称呼为<strong>nullable</strong>。</p>
+<p>记住下列结论：</p>
+<ul>
+<li>若X可以推导出空字符串，那么nullable(X)为真；</li>
+<li>FIRST(S)是从S可以推导出的任意字符串中的开头终结符组成的集合；</li>
+<li>FOLLOW(X)是可以直接跟随于X之后的终结符集合；</li>
+</ul>
+<h3 id="构造一个预测分析器"><a href="#构造一个预测分析器" class="headerlink" title="构造一个预测分析器"></a>构造一个预测分析器</h3><p>由于非终结符X的分析函数对X的每个产生式都有一个子句，因此该函数必须根据下一个输入来选择其中的一个子句。我们需要的所有信息可以用一个二维表来表示，该表以文法的非终结符X和终结符T作为索引。</p>
+<p>对于每个属于FIRST(X)的T，在表的X行T列填入该production X-&gt;y；如果y为nullable，那么对于每个属于FOLLOW(X)的T，在表的X行T列填入该production X-&gt;y。</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-6.png" alt="img"></p>
+<p>像上图这种情况，一个表项里有多个表达式，就会产生二义性的文法。若一个文法的预测分析表不含有多重定义的项，则称为LL(1)文法。</p>
+<blockquote>
+<p>LL(1): Left to right parse; Leftmost derivation; 1-symbol lookhead</p>
+</blockquote>
+<h3 id="消除左递归"><a href="#消除左递归" class="headerlink" title="消除左递归"></a>消除左递归</h3><p>看这样的文法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;E+T</span><br><span class="line">E-&gt;T</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，将会导致LL(1)的分析表中出现了双重定义的登记项，因此任何属于FIRST(T)的tokens必然属于FIRST(E+T)，这就是左递归。</p>
+<p>为了消除左递归，我们可以这样重写：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;TE<span class="number">&#x27;</span></span><br><span class="line">E<span class="number">&#x27;</span>-&gt;+TE<span class="number">&#x27;</span></span><br><span class="line">E<span class="number">&#x27;</span>-&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="LR分析"><a href="#LR分析" class="headerlink" title="LR分析"></a>LR分析</h2><p>LL(k)的一个弱点就是，在我们仅仅看到右边的k个tokens时就需要做出预测。相比而言，LR(k)分析是一种更好的选择。</p>
+<blockquote>
+<p>LR(k): Left to right parse; Rightmost derivation; k-token lookhead</p>
+</blockquote>
+<p>来看一个典型的例子：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-7.png" alt="img"></p>
+<ul>
+<li>shift：将第一个token压进栈；</li>
+<li>reduce：选择文法规则：X-&gt;ABC，依次将C,B,A从栈中弹出来，将X压进栈；</li>
+</ul>
+<h3 id="LR分析引擎"><a href="#LR分析引擎" class="headerlink" title="LR分析引擎"></a>LR分析引擎</h3><p>LR分析器是通过DFA作用于栈，来实现reduce和shift操作的。转换操作主要有以下4种：</p>
+<ul>
+<li>sn: shift into state n</li>
+<li>gn: goto state n</li>
+<li>rk: reduce by rule k</li>
+<li>a: accept</li>
+</ul>
+<h3 id="LR-0-分析器"><a href="#LR-0-分析器" class="headerlink" title="LR(0)分析器"></a>LR(0)分析器</h3><blockquote>
+<p>LR(0)是一种只需要分析查看栈就可以进行分析的文法，它的shift、reduce操作不需要进行任何超前判断</p>
+</blockquote>
+<h3 id="SLR分析器"><a href="#SLR分析器" class="headerlink" title="SLR分析器"></a>SLR分析器</h3><p>如果用LR(0)去构造分析表：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-9.png" alt="img"></p>
+<p>在状态3的时候，遇到符号+，就会出现多重定义的项，分析器既需要shift到状态4，也需要对production2进行reduce。这是一个reduce-shift冲突。</p>
+<p>因此我们可以构造SLR分析器来解决这个问题。</p>
+<p>SLR的构造与LR(0)基本一样，除了它只在FOLLOW集指定的地方放置规约操作。</p>
+<h3 id="LR-1-项和LR-1-分析表"><a href="#LR-1-项和LR-1-分析表" class="headerlink" title="LR(1)项和LR(1)分析表"></a>LR(1)项和LR(1)分析表</h3><p>之所以使用LR(1)，是因为即便使用了SLR(0)，还是不能完美地解决所有的冲突。考虑αF.β，我们知道，F的follow集合包含字符串β的first集合。因此我们在SLR（0）中使用的follow集合不一定能正确的预测出产生式。</p>
+<p>因此，我们重新定义了项，它包含产生式，标记状态的点，超前查看符号集合。</p>
+<p>我们可以使用下面的算法计算一个状态中每一项的具体内容：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3-4-1.png" alt="img"></p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler3-3-4-2.png.png" alt="img"></p>
+<h3 id="LALR-1-分析表"><a href="#LALR-1-分析表" class="headerlink" title="LALR(1)分析表"></a>LALR(1)分析表</h3><p>由于LR(1)的状态可能太多了，因此我们可以合并那些除了超前查看的符号集合外都相同的两个状态。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/04/%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/04/%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/" itemprop="url">词法分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-04T21:55:23+08:00">
+                2018-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="词法分析"><a href="#词法分析" class="headerlink" title="词法分析"></a>词法分析</h1><blockquote>
+<p>lexical analysis：将输入分解成一个个独立的符号，即tokens</p>
+</blockquote>
+<h2 id="词法单词"><a href="#词法单词" class="headerlink" title="词法单词"></a>词法单词</h2><p>token是由字符组成的序列，例如在常见的程序设计语言都有这样的一些单词类型：</p>
+<table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ID</td>
+<td align="center">foo n14 last</td>
+</tr>
+<tr>
+<td align="center">NUM</td>
+<td align="center">11 2 34</td>
+</tr>
+<tr>
+<td align="center">IF</td>
+<td align="center">if</td>
+</tr>
+<tr>
+<td align="center">COMMA</td>
+<td align="center">,</td>
+</tr>
+<tr>
+<td align="center">LPAREN</td>
+<td align="center">（</td>
+</tr>
+</tbody></table>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>由于我们在谈论某种语言时，需要为其中的字符串赋予特别的意义，因此我们可以用正则表达式去表示。</p>
+<p>正则表达式的表达符号：</p>
+<table>
+<thead>
+<tr>
+<th>表示</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>a</td>
+<td>一个表示字符串本身的原始字符</td>
+</tr>
+<tr>
+<td>ε</td>
+<td>空字符串</td>
+</tr>
+<tr>
+<td>M|N</td>
+<td>可选，alternation，M和N之间选择</td>
+</tr>
+<tr>
+<td>M*N</td>
+<td>联结，concentration，M后面跟着N，也可以写成MN</td>
+</tr>
+<tr>
+<td>M*</td>
+<td>重复，0次或者以上</td>
+</tr>
+<tr>
+<td>M+</td>
+<td>重复，1次或以上</td>
+</tr>
+<tr>
+<td>M?</td>
+<td>选择M出现0次或者1次</td>
+</tr>
+<tr>
+<td>[a-zA-Z]</td>
+<td>字符集合</td>
+</tr>
+<tr>
+<td>.</td>
+<td>表示除了换行符外的所有字符</td>
+</tr>
+<tr>
+<td>“xxxx”</td>
+<td>引号内的字符串本身文字字符串本身</td>
+</tr>
+</tbody></table>
+<p>但是，考虑这样一个字符串<strong>if8</strong>，到底是认为其为一个标识符，还是两个tokens：if和8呢？为了消除二义性，我们可以试用一下两个规则：</p>
+<ul>
+<li>Longest match：对于输入的字符串，取可以与任意正则表达式规则匹配的字符串中最长的那一个作为下一个token；</li>
+<li>Rule priority：给正则表达式赋予某些优先权，选择优先级高的；</li>
+</ul>
+<h2 id="有限自动机"><a href="#有限自动机" class="headerlink" title="有限自动机"></a>有限自动机</h2><p>虽然用正则表达式已经可以很好地指明词法规则，但我们还需要一种能用计算机程序来实现的的形式化方法。这就是有限自动机**(DFA)**所做的事情。有限自动机包含了有限状态的集合和一些从一个状态到另一个状态的边。</p>
+<p>在DFA中，不会有从同一个状态出发的两条边却包含了相同的符号。若对n个字符的字符串，进行了n次的转换之后，如果自动机到达了一个终态，则选择接收该字符串。如果没有到达终态，或者找不到与输入字符匹配的边，则拒绝接收字符串。</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-3.png" alt="img"></p>
+<h3 id="识别最长的匹配"><a href="#识别最长的匹配" class="headerlink" title="识别最长的匹配"></a>识别最长的匹配</h3><p>为了识别一个字符串是否会被接收，词法分析器往往会选择最长的匹配，作为合法的token。因此需要两个变量来记住自动机最近一次处于final states的时机。</p>
+<h2 id="非确定有限自动机"><a href="#非确定有限自动机" class="headerlink" title="非确定有限自动机"></a>非确定有限自动机</h2><p>与确定有限自动机不同，非确定有限自动机**(NFA)<strong>需要做出选择，对从一个状态出发的</strong>多条标有相同符号**的边进行选择。</p>
+<h3 id="将正则表达式转换为NFA"><a href="#将正则表达式转换为NFA" class="headerlink" title="将正则表达式转换为NFA"></a>将正则表达式转换为NFA</h3><p>有了NFA之后，我们可以很容易地将正则表达式转化为NFA，一个正则表达式要么是一个简单的primitive，要么是由多个较小的表达式组合而成。如图：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-6.png" alt="img"></p>
+<h3 id="将NFA转换为DFA"><a href="#将NFA转换为DFA" class="headerlink" title="将NFA转换为DFA"></a>将NFA转换为DFA</h3><p>先来看NFA的模拟算法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d&lt;-closure(&#123;s1&#125;)</span><br><span class="line"><span class="keyword">for</span> i&lt;<span class="number">-1</span> to k</span><br><span class="line">	d &lt;- DFAedge(d, ci)</span><br></pre></td></tr></table></figure>
+
+<p>首先构造s1的eplison闭包，然后从该闭包的状态集合出发，吃进符号c，到达一个新的状态集合。</p>
+<p>看一个例子：</p>
+<p><img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-7.png" alt="img"></p>
+<p>以字符串in为例子，先计算出eplison闭包，即求得状态集合为{1,4,9,14}；接着要根据字符i来进行状态转换，从状态1可到状态2，4可以到5，9无处可去，14可以到15，因此得到状态集合{2,5,15}，但是我们还要计算一次闭包，因此得到最终状态集合为{2,5,6,8,15}；同理，根据字符n进行转换。</p>
+<p>这样的自动机还不是最理想的，我们还可以构造最小的自动机。我们只会在这种情况下称两个状态是等价的，如果一个开始于s1的自动机接收字符串a，当且仅当一个开始s2的自动机接收字符串a。这样我们就可以使得所有进入s2的边指向s1，并删除s2。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/25/DecisionTree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/25/DecisionTree/" itemprop="url">DecisionTree</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-25T23:14:03+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="决策树"><a href="#决策树" class="headerlink" title="决策树"></a>决策树</h1><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><p>决策树是一种常见的机器学习方法，采取的是分而治之的策略。其中每个非叶节点对应于一个属性测试，而叶子节点则对应于决策结果，也就是类别。</p>
+<p><img src="https://pic3.zhimg.com/80/v2-39d109b46ea4f34d5efbf67edc11d57d_hd.jpg" alt="img"></p>
+<p>在生成决策树的过程中，遇到以下三种情况时停止递归：</p>
+<ul>
+<li>当前节点所包含的样本完全属于同一个类别</li>
+<li>当前属性集为空，或是所有样本在所有的属性上取值相同，对于这种情况我们会将当前节点标记为叶节点，并设定类别为该节点所包含样本最多的类别</li>
+<li>当前节点的样本集合为空，同样会将该节点设置为叶节点，类别为父节点中包含样本最多的类别</li>
+</ul>
+<h2 id="划分选择"><a href="#划分选择" class="headerlink" title="划分选择"></a>划分选择</h2><p>决定决策树学习的关键在于如何选择最优的划分属性，保证每个分支节点所包含的样本尽量属于同一个类别，即节点的纯度越高。</p>
+<h3 id="信息增益-information-entropy"><a href="#信息增益-information-entropy" class="headerlink" title="信息增益(information entropy)"></a>信息增益(information entropy)</h3><p>信息熵是度量样本集合纯度的常用指标。假定当前样本集合D中第x类样本所占比例为p(x)，那么D的信息熵就是：</p>
+<p><img src="https://www.zhihu.com/equation?tex=H(X)=-%5Csum%5Climits_%7Bx%5Cin%5Cmathcal%7BX%7D%7Dp(x)%5Clog+p(x)" alt="img"></p>
+<p>信息熵的取值范围为[0, log|y|]，y为类别数目</p>
+<p>那么如何去判断某个属性对于样本集信息熵的提升呢，这里就提到了信息增益：</p>
+<p>利用总的熵减去某个分类标准对应的熵，往往我们也可以给某个分支节点赋予权重|Dv|&#x2F;|D|，Dv就是该分类标准下第v个节点对应的样本</p>
+<p><img src="https://www.zhihu.com/equation?tex=gain(X)=info(S)-info_x+(S)" alt="img"></p>
+<p>怎么去理解呢？这里表述的是：原来的总熵为info(S)，在某个划分条件下熵变为了infos(S)，又由于熵是不确定的意思，那么差值越大，就意味着这个划分选择越好。</p>
+<h3 id="增益率"><a href="#增益率" class="headerlink" title="增益率"></a>增益率</h3><p>因为在某些情况下，选择信息增益大的属性，可能会导致泛化能力减弱，比如“编号”属性可能产生n个分支，使得分支节点达到最大，但在这种情况无法进行进一步的划分。</p>
+<p>所以著名的C4.5决策树算法不直接使用信息增益，还是使用增益率：</p>
+<p><strong>Gain_ration(D, a)&#x3D; Gain(D, a)&#x2F;IV(a)</strong></p>
+<p>其中IV(a)为：</p>
+<p><img src="https://www.zhihu.com/equation?tex=Info=-%5Csum_%7Bv%5Cin+value(A)%7D%7B%5Cfrac%7Bnum(S_%7Bv%7D)+%7D%7Bnum(S)%7Dlog_2%7B%5Cfrac%7Bnum(S_%7Bv%7D+)%7D%7Bnum(S)%7D+%7D%7D+" alt="img"></p>
+<p>因为这是属性a的固有值，往往属性a的可取值树木越多，那么改值越大。由于该算法可能会倾向于选择可取值树木少的属性，所以它是这样操作的：先根据信息增益选择出高于平均水平的属性，再从其中选出增益率最高的。</p>
+<h3 id="基尼指数"><a href="#基尼指数" class="headerlink" title="基尼指数"></a>基尼指数</h3><p>先来看看基尼指数的公式：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/40658-fb638d3013c6cfa5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/522" alt="img"></p>
+<p>从公式可以看出，基尼指数反映了随机从样本中抽取两个样本，两个样本一致的概率，该概率越小意味着样本集的纯度越高。</p>
+<p>则对于属性a的基尼指数则是：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/40658-7837b7f1610b1c4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/311" alt="img"></p>
+<h2 id="剪枝处理"><a href="#剪枝处理" class="headerlink" title="剪枝处理"></a>剪枝处理</h2><p>剪枝处理的目的是提高决策树的泛化能力，以应对算法出现的过拟合。</p>
+<p>那么如何去评判泛化能力呢？我们可以将样本集分为两类：样本集和检验集，通过计算检验集的准确率来决定决策树的泛化性能</p>
+<p>剪枝分为两种：预剪枝和后剪枝</p>
+<h3 id="预剪枝"><a href="#预剪枝" class="headerlink" title="预剪枝"></a>预剪枝</h3><p>预剪枝是在决策树生成过程中，对每个节点的划分前进行估计，估计其划分是否可以可以带来决策树性能的提升。若不能，则停止划分，并将当前节点标记为叶节点。</p>
+<h3 id="后剪枝"><a href="#后剪枝" class="headerlink" title="后剪枝"></a>后剪枝</h3><p>后剪枝是生成完成的决策树之后，自底向上对节点进行考察，若替换为叶节点后泛化能力有所提升，则进行替换</p>
+<h2 id="连续与缺失值"><a href="#连续与缺失值" class="headerlink" title="连续与缺失值"></a>连续与缺失值</h2><h3 id="连续值处理"><a href="#连续值处理" class="headerlink" title="连续值处理"></a>连续值处理</h3><p>对于连续属性而言，由于可取值数目是无限的，因此我们需要采用连续属性离散化的处理思路。最简单的方法就是采用二分法对属性进行处理。</p>
+<p>给定了样本集D和连续属性a，假设a在D上出现了n个取值，对这些取值进行排序：{a1,a2,…,an}，我们可以得到一个划分点集合，里面有n个元素：</p>
+<p>Ta &#x3D; {a(i)+a(i+1)&#x2F;2 | 1&lt;&#x3D;i&lt;&#x3D;n-1}</p>
+<p>对这一系列划分点进行考察，计算各个划分点的信息增益，选择信息增益最大对应的划分点。</p>
+<h3 id="缺失值处理"><a href="#缺失值处理" class="headerlink" title="缺失值处理"></a>缺失值处理</h3><p>我们为每个样本取一个权重wx</p>
+<p>将信息增益的计算式更新为以下：</p>
+<p><img src="https://images2015.cnblogs.com/blog/528496/201607/528496-20160720113416326-954203055.png" alt="img"></p>
+<p>若样本在属性的取值已知，则将该样本划入与其取值对应的子节点，并保持权重wx；若属性取值未知，则同时划入所有子节点，并更新权重为~r_v*w_x</p>
+<h2 id="多变量决策树"><a href="#多变量决策树" class="headerlink" title="多变量决策树"></a>多变量决策树</h2><p>如果单纯地使用上面提到的决策树方法，对于多维变量而言，分类边界的每一段都是和属性对应的坐标轴平行的。</p>
+<p>但这样会带来一个问题就是：当学习任务的分类边界比较复杂时，划分的时间成本过高。因此我们考虑多变量决策树，而不是单一的属性，每个叶节点此时就是一个线性的分类器，例如对于西瓜数据集：</p>
+<p>其中一个节点，可以变成：-0.365<em>密度+-0.366</em>含糖度&lt;-0.158?</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/Clustering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/19/Clustering/" itemprop="url">Clustering.md</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T21:23:25+08:00">
+                2018-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="聚类"><a href="#聚类" class="headerlink" title="聚类"></a>聚类</h1><h2 id="聚类任务"><a href="#聚类任务" class="headerlink" title="聚类任务"></a>聚类任务</h2><p>在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。</p>
+<p>假设有样本集D &#x3D; {x1,x2…xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l&#x3D;1,2,…,k}。</p>
+<p>作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。</p>
+<h2 id="性能度量"><a href="#性能度量" class="headerlink" title="性能度量"></a>性能度量</h2><p>性能的度量主要是为了评估聚类结果的好坏，一般来说我们使用两种方法：</p>
+<ol>
+<li>将聚类结果与某个“参考模板”进行比较，也就是使用外部指标。</li>
+</ol>
+<p>假设λ与λ<em>分别表示C和C</em>对应的簇标记向量，我们将样本两两配对考虑。</p>
+<p><img src="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png" alt="img"></p>
+<blockquote>
+<p>其中集合SS包含了在C中属于相同簇，且在C<em>也属于相同簇的样本对；<br>集合SD则是包含了在C中属于相同簇，但在C</em>中不属于相同簇的样本对；<br>如此类推。。。。</p>
+</blockquote>
+<p>由于每个样本对(xi,xj)只能出现在一个集合中，因此有<strong>a+b+c+d&#x3D;C(m,2)&#x3D;m(m-1)&#x2F;2</strong>。</p>
+<p>最后导出以下的外部度量指标：</p>
+<ul>
+<li>Jaccard系数: JC &#x3D; a&#x2F;(a+b+c)</li>
+<li>FM指数：FMI &#x3D; &amp;radic;(a&#x2F;a+b)*(a&#x2F;a+c)</li>
+<li>Rand指数：RI &#x3D; 2(a+b)&#x2F;(m*(m-1))</li>
+</ul>
+<p>上述指标都在[0, 1]之间，值越大越好</p>
+<ol start="2">
+<li>直接考虑聚类结果，不参考任何的模型</li>
+</ol>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png" alt="img"></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-9.png" alt="img"></p>
+<blockquote>
+<p>其中dist(.,.)用来计算两个样本之间的距离；diam(C)表示簇C内样本间的最远距离；dmin(Ci,Cj)对应于簇Ci与Cj最近样本的距离；dcen(Ci,Cj)表示簇Ci与簇Cj中心点间的距离</p>
+</blockquote>
+<p>一般用以下的指标去评估聚类性能:</p>
+<ul>
+<li>DB指数：</li>
+</ul>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-10.png" alt="img"></p>
+<ul>
+<li>Dunn指数：</li>
+</ul>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-11.png" alt="img"></p>
+<p>显然，DBI越小越好，表示簇内距离小，簇间距离大；而DI则相反，越大越好，表示簇间距离大，簇内距离小</p>
+<h2 id="距离计算"><a href="#距离计算" class="headerlink" title="距离计算"></a>距离计算</h2><p>一般来说，我们希望函数dist(.,.)，也就是距离度量，满足以下的一些基本性质：</p>
+<ul>
+<li>非负性：dist(xi,xj)&gt;&#x3D;0</li>
+<li>同一性：dist(xi,xj)&#x3D;0，当且仅当xi&#x3D;xj</li>
+<li>对称性：dist(xi,xj)&#x3D;dist(xj,xi)</li>
+<li>直递性：dist(xi,xj)&lt;&#x3D;dist(xj,xk)+dist(xk,xj)</li>
+</ul>
+<p>在讨论距离计算时，属性是否有序很关键，例如定义域为{1,2,3}的属性，能直接在属性值上计算距离，这种就称为有序属性；而对于定义域为{飞机，火车，轮船}这些，称为无序属性</p>
+<h3 id="有序属性"><a href="#有序属性" class="headerlink" title="有序属性"></a>有序属性</h3><p>给定样本xi&#x3D;(xi1,xi2,…,xin)与xj&#x3D;(xj1,xj2,…,xjn)，最常用的就是<strong>Minkowski distance</strong></p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png" alt="img"></p>
+<p>当p&#x3D;2，也叫欧式距离</p>
+<h3 id="无序属性"><a href="#无序属性" class="headerlink" title="无序属性"></a>无序属性</h3><p>首先来看几个假设：m(u,a)表示在属性u取值为a的样本数，m(u,a,i)则是表示第i个样本簇在属性u取值为a的样本数。于是得到以下的公式(VDN)来计算距离。</p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png" alt="img"></p>
+<p>另外，还可以结合Minkowski distance和VDM，保证处理混合属性</p>
+<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png" alt="img"></p>
+<p>但对于无序属性，有可能会出现直递性失效，以“人”，“马”，“人马”为例，“人”和“马”都与“人马”很接近，但“人”与“马”差距很大，这种就叫做<strong>非度量距离</strong>。</p>
+<h2 id="原型聚类"><a href="#原型聚类" class="headerlink" title="原型聚类"></a>原型聚类</h2><p>prototype-based clustering，此类算法假设聚类结构能够基于一组原型刻画</p>
+<h3 id="k-means-算法"><a href="#k-means-算法" class="headerlink" title="k-means 算法"></a>k-means 算法</h3><p>对于一个样本集和目标簇数，我们希望最小化以下的误差，其中ui就是簇Ci的均值向量。</p>
+<p><img src="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png" alt="img"></p>
+<p>算法思想比较简单：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 随机选择k个样本作为初始的均值向量</span><br><span class="line"><span class="number">2.</span> 进入循环</span><br><span class="line"><span class="number">3.</span> 计算每个样本与各个均值向量的距离，将样本划分到距离最小的均值向量所代表的簇中</span><br><span class="line"><span class="number">4.</span> 根据划分的聚类，计算新的均值中心</span><br><span class="line"><span class="number">5.</span> 如果均值向量没有变化，则退出循环</span><br></pre></td></tr></table></figure>
+
+<h3 id="学习向量量化"><a href="#学习向量量化" class="headerlink" title="学习向量量化"></a>学习向量量化</h3><p><strong>Learning Vector Quantization</strong>是针对带有标记的数据样本的。对于这种情况，我们可以根据簇数选择一组n维向量（维度与样本一致）</p>
+<p>具体算法为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先初始化一组原型向量</span><br><span class="line"><span class="number">2.</span> 从样本集中随机抽取样本(xi,yi)</span><br><span class="line"><span class="number">3.</span> 找出与样本距离最近的一个原型向量</span><br><span class="line"><span class="number">4.</span> 比较两者类别是否一致</span><br><span class="line"><span class="number">5.</span> 一致则通过公式逼近，否则则使其离得更远</span><br><span class="line"><span class="number">6.</span> 直到迭代次数最大或者原型向量不怎么更新为止</span><br><span class="line">==========================================</span><br><span class="line"><span class="number">7.</span> 得到原型向量之后，再对样本进行相应的分类</span><br></pre></td></tr></table></figure>
+
+<p>这里的关键是如何更新原型向量：</p>
+<ul>
+<li>如果类型一致：新的向量 p &#x3D; pi + u(xj-pi);</li>
+<li>如果类型不一致： p &#x3D; pi - u(xj-pi);</li>
+</ul>
+<p>这里的u是学习率，范围为[0,1]。之所以满足逼近或者离得更远：</p>
+<blockquote>
+<p>|p-xj| &#x3D; |pi+u(xj-pi)-xj| &#x3D; (1-u)|pi-xj|</p>
+</blockquote>
+<p>由此可见，这种情况下p会在更新之后逼近xj</p>
+<h3 id="高斯混合聚类"><a href="#高斯混合聚类" class="headerlink" title="高斯混合聚类"></a>高斯混合聚类</h3><p>高斯混合聚类采用的是概率模型来表达聚类原型，我们定义高斯混合分布公式为：</p>
+<p><img src="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png" alt="img"></p>
+<p>该分布为k个高斯分布的叠加，其中ai为相应的混合系数,且权重和为1。</p>
+<p>算法步骤为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 初始化混合高斯分布的三个模型参数：ai，ui(平均值)，协方差矩阵</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> repeat：</span><br><span class="line"><span class="number">3.</span> 将样本投射到高斯分布中,计算其在各个高斯分布下的概率</span><br><span class="line"><span class="number">4.</span> 针对每一个高斯分布，计算每一个样本在该分布下的概率，即计算其对该分布的贡献。根据该贡献，重新去计算上面三个模型参数</span><br><span class="line"><span class="number">5.</span> 直到参数收敛，或者迭代次数达到最大</span><br></pre></td></tr></table></figure>
+
+<p>至于如何求解这三个参数，可以参考EM算法：<a target="_blank" rel="noopener" href="https://blog.csdn.net/u011974639/article/details/78302024">https://blog.csdn.net/u011974639/article/details/78302024</a></p>
+<p>简单概括，就是两步：</p>
+<ul>
+<li>先根据上一轮的参数来计算每个样本属于每个高斯分布的后验概率；</li>
+<li>再根据后验概率去更新参数；</li>
+</ul>
+<h2 id="密度聚类"><a href="#密度聚类" class="headerlink" title="密度聚类"></a>密度聚类</h2><p>这个算法假设聚类结构能够通过样本分布的紧密程度来确定，先来确定几个概念：</p>
+<ul>
+<li>邻域：对于样本集中的xj，邻域包含了样本集中与xj距离不大于某个值的样本</li>
+<li>核心对象：若xj的邻域包含了至少MinPts个样本，则xj就是一个核心对象</li>
+<li>密度直达：若xj位于xi的领域中，则xj由xj密度直达</li>
+<li>密度可达：若存在样本序列p1,…,pn，其中p1&#x3D;xi，pn&#x3D;xj，且pi+1可由pi密度直达，则称xj可由xi密度可达</li>
+</ul>
+<p>具体算法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先根据邻域参数选出所有的核心对象；</span><br><span class="line"><span class="number">2.</span> 从任意一个核心对象出发，找出其密度可达的样本生成聚类簇，并将簇中的核心对象从第一步找到的核心对象集合中删除；</span><br><span class="line"><span class="number">3.</span> 紧接着从更新后的核心对象集合中随机选取一个核心对象，重复第二步；</span><br></pre></td></tr></table></figure>
+
+<h2 id="层次聚类"><a href="#层次聚类" class="headerlink" title="层次聚类"></a>层次聚类</h2><p>层次聚类可以采用“自底向上”或者“自顶向下”的策略，在这里我们介绍AGNES的策略，这是一种自底向上的聚合策略。</p>
+<p>它首先将每个样本看成一个初始聚类簇，然后在每次算法运行时找出距离最近的两个聚类簇进行合并，因此这里的关键就是计算两个聚类簇之间的距离，显然最小距离由两个簇的最近样本决定，最大距离由两个簇的最远样本决定，至于平均距离则是由两个簇的所有样本共同决定。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/15/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/17/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

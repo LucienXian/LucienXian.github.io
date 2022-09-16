@@ -1,38 +1,806 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
 
-{% block page_class %}page-post-detail{% endblock %}
+  
 
 
-{% block content %}
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数据库," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="F1 Lightning: HTAP as a Service 本文介绍了F1 Lightning的设计与经验，该系统不是从头设计一个HTAP系统，而是在已有的若干个事务系统中存在着大量数据的情况，如何由一个独立的联合引擎实现对原事务系统的快速组合查询和事务操作。  INTRODUCTIONHTAP系统的研究表明，数据所有者强烈希望能处理对同一数据集的同时处理查询和事务。已经有大量与 HTAP 系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="F1 Lightning HTAP as a Service">
+<meta property="og:url" content="http://yoursite.com/2021/12/01/F1-Lightning-HTAP-as-a-Service/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="F1 Lightning: HTAP as a Service 本文介绍了F1 Lightning的设计与经验，该系统不是从头设计一个HTAP系统，而是在已有的若干个事务系统中存在着大量数据的情况，如何由一个独立的联合引擎实现对原事务系统的快速组合查询和事务操作。  INTRODUCTIONHTAP系统的研究表明，数据所有者强烈希望能处理对同一数据集的同时处理查询和事务。已经有大量与 HTAP 系">
+<meta property="og:locale">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61a657142ab3f51d91364af2.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61a657142ab3f51d91364af8.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/61a657142ab3f51d91364b02.png">
+<meta property="article:published_time" content="2021-11-30T16:56:22.000Z">
+<meta property="article:modified_time" content="2021-11-30T16:57:29.645Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/61a657142ab3f51d91364af2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/12/01/F1-Lightning-HTAP-as-a-Service/"/>
+
+
+
+
+
+  <title>F1 Lightning HTAP as a Service | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
 
   <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/12/01/F1-Lightning-HTAP-as-a-Service/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">F1 Lightning HTAP as a Service</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-01T00:56:22+08:00">
+                2021-12-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="F1-Lightning-HTAP-as-a-Service"><a href="#F1-Lightning-HTAP-as-a-Service" class="headerlink" title="F1 Lightning: HTAP as a Service"></a>F1 Lightning: HTAP as a Service</h1><blockquote>
+<p>本文介绍了F1 Lightning的设计与经验，该系统不是从头设计一个HTAP系统，而是在已有的若干个事务系统中存在着大量数据的情况，如何由一个独立的联合引擎实现对原事务系统的快速组合查询和事务操作。</p>
+</blockquote>
+<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>HTAP系统的研究表明，数据所有者强烈希望能处理对同一数据集的同时处理查询和事务。已经有大量与 HTAP 系统相关的研究和开发（甚至在“HTAP”一词出现之前很久就开始了）。其中大部分工作都是在考虑：理想的 HTAP 系统应该是什么样子，以及需要哪些技术进步才能获得良好的性能。本文则考虑了另一种方法：一个松散耦合的 HTAP 架构，支持 在不同约束条件下的HTAP工作负载。</p>
+<p>这样考虑主要是因为在Google中存在着多个事务数据存储系统来处理不同的工作负载，和与这些系统松耦合的联合查询引擎。为了避免高昂的迁移代价和提高事务存储系统的灵活性，需要一个单一的HTAP解决方案，可以跨事务存储来进行启用。</p>
+<p>本文提出的Lightning是一种松耦合的HTAP解决方案，即HTAP as-a-service。只需将事务存储中架构中的某些表标记为“Lightning表”，Lightning即可透明地提供应用程序需要的HTAP功能。创建读取优化数据副本的所有工作，都由Lightning 及其集成处理使用的联合查询引擎来提供的，业务使用上甚至不需要知道Lightning的存在。</p>
+<h2 id="RELATED-WORK"><a href="#RELATED-WORK" class="headerlink" title="RELATED WORK"></a>RELATED WORK</h2><p>现有的HTAP系统一般分为<strong>同时承载OLTP和OLAP的单一系统</strong>和<strong>单独的OLTP和OLAP系统</strong>。再进一步的，后者又分为用于OLTP和OLAP的共享存储和解耦存储，共享存储需要对OLTP系统进行修改，以利用现有的分析查询引擎来实现OLAP。又或者是维护一个单独的、离线的ETL过程，使用松解耦的存储来实现HTAP架构，但这容易带来高延迟的问题。F1 Lightning通过与变更数据捕获 (CDC) 机制的集成以及结合内存驻留和磁盘驻留存储层次结构的使用来提高数据新鲜度。</p>
+<p>文中介绍了几个类似系统的对比：SAP HANA异步并行表的复制机制；为行存储TiDb添加了一个列式存储和矢量化处理层的TiFlash。Oracle Database In-Memory则是结合OLTP 和 OLAP的单一系统代表，通过为活跃数据维护一个内存中列存储来加速HTAP工作负载，该列存储在事务上与持久行存储保持一致。LinkedIn Databus则是一个数据源不可知的分布式变更数据捕获系统，能将来自真实源系统的变更提供给下游应用程序，以构建用于不同目的的专用存储和索引。</p>
+<h2 id="SYSTEM-OVERVIEW"><a href="#SYSTEM-OVERVIEW" class="headerlink" title="SYSTEM OVERVIEW"></a>SYSTEM OVERVIEW</h2><p>该HTAP系统由三个部分组成：一个OLTP，作为数据来源并公开数据变更捕获接口；F1 Query，分布式SQL查询引擎和Lightning，维护和服务读优化的副本。</p>
+<p>在Google有两个主要的OLTP数据库：F1 DB和Spanner，前者是在后者基础上实现的。F1 Query则是一个联合查询引擎，它的查询执行依赖的是内部称为GoogleSQL（开源为 ZetaSQL）的SQL语言。F1 Query是一个联合引擎，支持许多不同的内部数据源，包括F1 DB、Spanner、Mesa、ColumnIO , 和BigTable等，用户能够编写无缝连接这些系统的查询。一般来说，F1 DB和Spanner能通过高效的面向行的存储和索引来优化OLTP工作负载，如写入和点查找查询，并且用户也会设计特定的模式以最大化写入吞吐量。虽然F1 Query能够通过多worker的方式来运行分布式分析查询，提高查询性能，但会导致大量的计算资源成本。</p>
+<p>针对这些问题，一些团队设置了pipeline，用于将F1 DB的表复制到ColumnIO文件或其他文件格式以供进一步分析。但这种实现也有几个问题，一是导致重复存储资源，多个团队各自保留自己的相同数据副本。二是ColumnIO文件不支持就地更新，副本必须作为一个整体定期全量更新，另外就是数据新鲜度比较差。三是需要显式更改查询模式，因为两个数据源来自不同的系统，具有不同的语义。最后就是权限问题，如何保持权限上的同步。</p>
+<p>为了解决这些问题，论文提到了一个新的HTAP系统Lightning，可将OLTP数据库中的数据复制为针对分析查询优化的格式。既可以为单个表启用Lightning，也可以为整个数据库启用Lightning。对于每个启用的表，Lightning的一个组件 Changepump会使用F1 DB或者Spanner公开的数据变更捕获机制来检测新的数据更改。Changepump会将这些变更转发到由单个Lightning服务器管理的分区，每个服务器会维护由分布式文件系统支持的LSM树。当Lightning摄取到这些变更时，它会将相关行数据转换为针对分析优化的列存储格式。</p>
+<p><img src="https://pic.imgdb.cn/item/61a657142ab3f51d91364af2.png"></p>
+<p>Lightning与对应OLTP数据库保持快照一致的方式来读取数据，包括F1 DB和Spanner在内的数据库都支持使用时间戳的多版本并发控制，因此提交到Lightning的每个更改也都保留其原始的提交时间戳。Lightning保证在特定时间戳下的读取将产生与在同一时间戳读取OLTP数据库相同的结果，这就为F1 Query通过重写符合条件的查询以提高性能，也就是某个查询可能会分别从Lightning和对应的OLTP数据库读取数据。</p>
+<p>将Lightning添加到查询系统中，具备以下的有点：</p>
+<ul>
+<li>提高分析查询的资源效率和降低延迟；</li>
+<li>配置简单，Lightning支持标准的流程从而更改启用HTAP；</li>
+<li>透明的用户体验：用户无需更改SQL文本，甚至无需感知Lightning的存在；</li>
+<li>数据一致性和数据新鲜度；</li>
+<li>数据安全：F1 Query在重写查询以使用Lightning 之前，会以原始OLTP数据库的访问权限为准；</li>
+<li>Lightning是一个独立的系统，无需维护其他OLTP数据库；</li>
+<li>可扩展性，原则上，Lightning可以扩展到任何提供数据变更捕获机制的OLTP数据库上运行；</li>
+</ul>
+<h2 id="LIGHTNING-ARCHITECTURE"><a href="#LIGHTNING-ARCHITECTURE" class="headerlink" title="LIGHTNING ARCHITECTURE"></a>LIGHTNING ARCHITECTURE</h2><p>Lightning由以下组件组成：</p>
+<ul>
+<li>Data storage：数据存储层负责将更改应用到Lightning副本。它会在分布式文件系统中的创建相关的读取优化文件，提并供一个 API，允许查询引擎以与OLTP数据库相同的语义读取存储的数据，并处理后台维护相关操作，如数据压缩。</li>
+<li>Change replication：Change replication负责跟踪OLTP数据库提供的事务日志，并对变更进行分区以分发到相关数据存储服务器。</li>
+<li>Metadata database：相关元数据，比如数据存储状态和Change replication组件的状态会放在该数据库中。</li>
+<li>Lightning masters：负责协调Lightning服务器之间的状态。</li>
+</ul>
+<h3 id="Read-semantics"><a href="#Read-semantics" class="headerlink" title="Read semantics"></a>Read semantics</h3><p>Lightning支持具有快照隔离的MVCC。所有针对Lightning特定表的查询都指定了一个读取时间戳，并且Lightning返回与该时间戳的OLTP数据库一致的数据。这一点主要是与Google内部的OLTP数据库保持一致。</p>
+<p>由于Lightning会异步应用来自OLTP数据库的更改日志，因此在OLTP数据库中所做的更改对Lightning上的查询可见之前会存在延迟。此外，Lightning支持控制单个查询的读取时间上限。这个上限可以是无限的（即Lightning可以存储所有的更改），但实际上大多数查询都集中在最近的数据上，限制Lightning中的数据量可以节省成本。</p>
+<p>Lightning可查询的时间戳称为安全时间戳。最大安全时间戳表示Lightning已经获取到该时间戳之前的所有更改，最小安全时间戳即表示可以查询到的最旧版本时间戳。</p>
+<h3 id="Tables-and-deltas"><a href="#Tables-and-deltas" class="headerlink" title="Tables and deltas"></a>Tables and deltas</h3><p>Lightning将数据以表的形式组织，数据库表、索引和视图在Lightning中都被视为物理表。每个Lightning表都按range partitioning划分为一组分区。每个分区都存储在多组件的LSM树中。LSM树中的每个组件称为delta。</p>
+<p>Delta包含其相应Lightning表的部分行版本数据，每个行版本由相应行的主键和该版本在OLTP数据库中提交时的时间戳标识。Lightning存储三种类型的版本，对应于对源数据所做的更改：</p>
+<ul>
+<li>Inserts：插入包含所有列的值，每行的第一个版本是一个插入。</li>
+<li>Updates：更新至少包含一个非键列的值，并省略未修改列的值。</li>
+<li>Deletes：删除不包含非键列的任何值，仅做墓碑。</li>
+</ul>
+<p>单个Delta可能包含同一键的多个版本，并且同一分区的不同Delta之间可能存在重复版本。在Delta内，部分行是由  (hkey,timestamp)唯一标识，并且为了支持对特定时间戳的快速查找，Delta按键升序、时间戳降序排序。</p>
+<h3 id="Memory-resident-deltas"><a href="#Memory-resident-deltas" class="headerlink" title="Memory-resident deltas"></a>Memory-resident deltas</h3><p>当Lightning接收更改时，生成的部分行数据首先写入内存驻留的、按行构造的B树，类似于C-Store的写优化存储。</p>
+<p>一个Memory-resident Delta最多有两个活跃的Writer，以及许多读取者。另外还有后台线程应用来自OLTP事务日志的新更改和定期运行垃圾收集过程。</p>
+<p>一旦数据写入Memory-resident Delta，它就可以立即用于查询，这取决于Changepump提供的一致性协议。Memory-resident Delta并不持久，在系统故障的情况下，存储在内存中的更改可能会丢失。Lightning会通过OLTP重放的方式恢复，同时为了提高恢复速度，会将B树按原样定期checkpoint到磁盘。</p>
+<p>当Delta变得太大时，当到达每个Delta的大小限制或者服务器内存限制时，Lightning都会将它们写入磁盘，并且会转换成为读取优化的列格式。</p>
+<h3 id="Disk-resident-deltas"><a href="#Disk-resident-deltas" class="headerlink" title="Disk-resident deltas"></a>Disk-resident deltas</h3><p>含有Lighting数据的Disk-resident deltas被存储在读取优化的文件中，Lighting通过构建了一个具有通用接口的抽象层，允许使用许多不同的文件格式来存储Delta。文中只介绍了一种文件格式，每个增量文件存储两部分：数据部分和索引部分。数据部分以PAX风格的行列混合。索引部分包含主键上的稀疏B树索引，其中叶节点跟踪每个row bundles的键范围。索引比较小，通常在缓存中。</p>
+<h3 id="Delta-merging"><a href="#Delta-merging" class="headerlink" title="Delta merging"></a>Delta merging</h3><p>Delta合并包含两个逻辑操作：merging和collapsing。merging对源Delta中的更改进行重复数据删除，还可能执行Schama变更。collapsing将同一key的多个版本合并为一个版本。</p>
+<p>此过程使用的是LSM逻辑的矢量化执行，先枚举需要参与合并的Deltas，然后从每个输入Delta读取一个Block，进行多路归并，但这里需要确认在这一轮中可以collapsing的key范围。</p>
+<p><img src="https://pic.imgdb.cn/item/61a657142ab3f51d91364af8.png"></p>
+<p>比如这两个Deltas的合并，当前轮Lightning只能collapse小于K2的数据。K2的数据可能需要等到下一轮collapse，读入下一个Block再说。</p>
+<h3 id="Schema-management"><a href="#Schema-management" class="headerlink" title="Schema management"></a>Schema management</h3><p>由于Lightning是复制OLTP数据库并透明地提供查询服务，因此它必须处理与OLTP数据具有相同语义的Schema演变。Lightning监控源数据库schema的更改并自动应用该更改。</p>
+<p>为了实现这一点，Lightning使用了两级schema抽象。第一级是逻辑架构，它将OLTP的schema映射到Lightning表schema。逻辑schema包含复杂类型、比如Protocol Buffer，还有一些简单类型。对于特定的逻辑schema，Lightning会生成一个或多个物理schema。物理schema只包含基本类型，例如整数、浮点数和字符串。Lightning的文件格式接口仅在物理schema级别运行，降低工程实现难度。</p>
+<p>如下图，逻辑schema和物理schema通过逻辑映射连接。映射指定如何将逻辑行转换为物理行，反之亦然，数据在读取期间从逻辑行转换为物理行。</p>
+<p><img src="https://pic.imgdb.cn/item/61a657142ab3f51d91364b02.png"></p>
+<p>映射的一个好处就是能为相同的逻辑数据实现使用不同的存储布局。例如，在存储protocol buffer时，有两种选择，一是序列化后存储，另一种则是将各字段单独存储，甚至可以同时存储，以提供极致的性能。映射还有助于仅元数据schema的更改。 Lightning可以适应许多常见的schema更改，而无需明确重写磁盘上的数据，比如增删一列。</p>
+<p>因此，每当发生schema更改时，Lightning都会创建一个新的逻辑schema，schema更改后创建的增量会使用新的物理schema进行写入。当schema映射关系太多时，Lighting也会在compaction时将数据转换为新schema，从而减少数据转换的开销。</p>
+<h3 id="Delta-compaction"><a href="#Delta-compaction" class="headerlink" title="Delta compaction"></a>Delta compaction</h3><p>Lightning支持四种不同的压缩方式：active compaction, minor compaction, major compaction和base compaction。</p>
+<ul>
+<li>active compaction：在Lighting服务器上进行，将内存delta持久化到磁盘上；</li>
+<li>minor compaction：压缩小的和新的磁盘deltas；</li>
+<li>major compaction：压缩大的和旧的磁盘deltas；</li>
+<li>base compaction：将最小可查询时间戳之前的数据生成新的数据snapshot；</li>
+</ul>
+<p>其他三个任务都不在Lighting服务器上进行，由Lighting服务器调度，但在专门的任务worker上执行，</p>
+<h3 id="Change-replication"><a href="#Change-replication" class="headerlink" title="Change replication"></a>Change replication</h3><p>Changepump提供跨不同OLTP源的统一接口，将各个OLTP的CDC接口细节从主要的Lightning数据存储层抽象出来，并提供了一种可扩展且有效的方式将事务变更呈现给对应的变更订阅者。作用包括了：隐藏了各个OLTP数据库的详细信息；面向事务的变更日志适应为面向分区的变更日志，一个事务可能对应不同的Lighting分区；维护事务一致性，跟踪已应用于Lightning服务器的所有更改时间戳，并发出检查点，以提高每个分区的最大安全时间戳。</p>
+<h4 id="Subscriptions"><a href="#Subscriptions" class="headerlink" title="Subscriptions"></a>Subscriptions</h4><p>对于每个partitions，Lightning都会对Changepump做一个订阅。订阅会指定partitions的表和key范围，Changepump则负责将这些更改传送到Lightning服务器。订阅会有一个开始时间戳，Changepump只会返回在该时间戳之后提交的更改。</p>
+<h4 id="Change-data"><a href="#Change-data" class="headerlink" title="Change data"></a>Change data</h4><p>Changepump订阅会返回两种数据：change updates和checkpoint timestamp updates。前者就是数据本身的修改，同一个key的修改按时间戳升序排序，跨行则没有严格顺序保证。后者则是用来表明该时间戳之前的修改都已经传递完成，方便Lighting服务器提交其最大的安全时间戳。</p>
+<h4 id="Schema-changes"><a href="#Schema-changes" class="headerlink" title="Schema changes"></a>Schema changes</h4><p>Lightning使用两种机制来检测Schema的变化：lazy detection和eager detection。前者则是在收到OLTP数据库传来的修改时，如果发现它引用了没见过的架构，则会停止对该partition的更改处理，直到加载并分析了新schema。这种机制会增加处理延时。后者则是用后台线程轮询OLTP数据库以查看是否发生了任何新的schema更改。</p>
+<h4 id="Sharding"><a href="#Sharding" class="headerlink" title="Sharding"></a>Sharding</h4><p>Changepump本身也是一个sharding的服务，单个订阅可以在内部连接到多个Changepump服务器，Changepump客户端会将多个这样的连接合并成一个单一的变更流中。与Lightning服务器不同，Changepump是根据数据量划分sharding的，后者是按全量数据量。</p>
+<h4 id="Caching"><a href="#Caching" class="headerlink" title="Caching"></a>Caching</h4><p>Changepump会对增量的修改记录做缓存，好处是方便一个partition的不同副本能够共享这些数据，另外也可以加速partition的failover。</p>
+<h4 id="Secondary-indexes-and-views"><a href="#Secondary-indexes-and-views" class="headerlink" title="Secondary indexes and views"></a>Secondary indexes and views</h4><p>Lighting还会维护二级索引和物化视图，这是与正常表同等看待的，但生成方式不一样，不是通过Changepump订阅产生，而是Lightning需要根据基础表的变更日志计算派生数据的修改。由于派生表需要按key排序，但基表可能是由不同的Lighting服务器维护的，因此Lighting的做法是将其写进BigTable。目前Lightning只能支持有限的几种物化视图。</p>
+<h4 id="Online-repartitioning"><a href="#Online-repartitioning" class="headerlink" title="Online repartitioning"></a>Online repartitioning</h4><p>Lightning支持在线重分区，以期达到负载均衡，这里的重分区方案基本是元数据操作。Lighting的分区在达到数据大小阈值或者流量瓶颈的时候，就会进行分区分裂。在分裂分区时，Lightning就会新分区标记为非活跃。这是一个meta only的操作——新分区会共享老分区的所有delta，之后新的分区会从Changepump订阅数据并应用为新的delta，直到追上所有的新数据后才会被标记为活跃。至于老的分区，则会被标记为非活跃，然后等待所有请求都服务完后再被清理掉。由于新分区是继承自老分区的，因此读取时需要一个过滤器处理超过新分区边界范围的数据。</p>
+<p>分区也会被触发合并，操作过程类似。</p>
+<h3 id="Fault-tolerance"><a href="#Fault-tolerance" class="headerlink" title="Fault tolerance"></a>Fault tolerance</h3><h4 id="Coping-with-query-failures"><a href="#Coping-with-query-failures" class="headerlink" title="Coping with query failures"></a>Coping with query failures</h4><p>对于查询失败，Lighting使用集群内和跨集群复制来处理这些故障。在一个数据中心内，Lightning为每个partition分配给多个Lightning服务器。这些Lightning服务器都从Changepump订阅相同的更改，并且它们独立维护其内存delta，但它们共享一组相同的磁盘delta和内存delta checkpoint。每个partition都只有一个主副本可以执行compaction来写入delta。当一个副本完成写入时，它会通知其他副本更新它们的LSM树。</p>
+<p>这些副本中任一个都可以为查询提供服务，查询请求可以在这些副本之间维持负载均衡，Lighting可以为流量大的partition增加更多的副本。在服务器更新，每个partition最多同时重新启动一个副本，以保持数据的高可用性，并且重启时会尝试从其他副本加载修改。</p>
+<p>Lighting也可以部署在多个数据中心。单个数据中心拥有自己的一套Changepump服务器、Lightning服务器等等。这些服务器独立于其他数据中心运行，在每个数据中心维护数据的完整副本，所有数据中心共享同一个元数据数据库（假设meta DB永远可用）。如果出现数据中心级别的故障，也可以将请求转给其他数据中心的相同partition。</p>
+<h4 id="Coping-with-ingestion-failures"><a href="#Coping-with-ingestion-failures" class="headerlink" title="Coping with ingestion failures"></a>Coping with ingestion failures</h4><p>数据摄取也会出现相关的故障，比如OLTP系统的CDC出现问题或者Changepump服务器崩溃。对于前者，Changepump会自动连接另一个datacenter的OLTP系统（Google的OLTP系统本身也是跨数据中心部署的）。对于后者，Changepump是无状态的，可以连接另一个服务器继续服务。</p>
+<p>Lightning master还会监控每个分区上所有数据中心的Changepump延迟，如果延迟过大，会重启这个数据中心的分区，使得可以从其他数据中心搬运数据过来。</p>
+<h4 id="Table-level-failover"><a href="#Table-level-failover" class="headerlink" title="Table-level failover"></a>Table-level failover</h4><p>Lighting也会配备表级别的failover，当某张表本身有问题时（比如到达资源瓶颈，或者数据坏了），系统可以自动将查询路由回 OLTP 系统。但用户可以选择是否进行这样的容错，以防AP的查询压力突然打垮TP系统。</p>
+<h2 id="CONCLUSION"><a href="#CONCLUSION" class="headerlink" title="CONCLUSION"></a>CONCLUSION</h2><p>本文提到的Lighting是HTAP系统的另一种实现方式，与同时承载OLTP和OLAP的单一系统不同，它是直接基于多个OLTP系统透明地提高HTAP性能的能力，而无需修改OLTP系统，也无需用户数据迁移到新系统。通过与F1 Query的结合，能够无感知地重写query plan（甚至在在逻辑计划阶段对查询也是生成一样的计划，到了物理计划阶段才会决定访问OLTP和OLAP系统），向量化列式处理查询请求，下推subplan。Google大规模部署Lighting后，在不影响查询语义的情况下，计算资源和查询延迟方面都实现了数量级的收益。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/10/10/Beyond-malloc-efficiency-to-fleet-efficiency/" rel="next" title="Beyond malloc efficiency to fleet efficiency">
+                <i class="fa fa-chevron-left"></i> Beyond malloc efficiency to fleet efficiency
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/12/05/Greenplum%EF%BC%9AA-Hybrid-Database-for-Transactional-and-Analytical-Workloads/" rel="prev" title="Greenplum：A Hybrid Database for Transactional and Analytical Workloads">
+                Greenplum：A Hybrid Database for Transactional and Analytical Workloads <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
 
     <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+      
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+          </div>
+          
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#F1-Lightning-HTAP-as-a-Service"><span class="nav-number">1.</span> <span class="nav-text">F1 Lightning: HTAP as a Service</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">1.1.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RELATED-WORK"><span class="nav-number">1.2.</span> <span class="nav-text">RELATED WORK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SYSTEM-OVERVIEW"><span class="nav-number">1.3.</span> <span class="nav-text">SYSTEM OVERVIEW</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LIGHTNING-ARCHITECTURE"><span class="nav-number">1.4.</span> <span class="nav-text">LIGHTNING ARCHITECTURE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Read-semantics"><span class="nav-number">1.4.1.</span> <span class="nav-text">Read semantics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tables-and-deltas"><span class="nav-number">1.4.2.</span> <span class="nav-text">Tables and deltas</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memory-resident-deltas"><span class="nav-number">1.4.3.</span> <span class="nav-text">Memory-resident deltas</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Disk-resident-deltas"><span class="nav-number">1.4.4.</span> <span class="nav-text">Disk-resident deltas</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Delta-merging"><span class="nav-number">1.4.5.</span> <span class="nav-text">Delta merging</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Schema-management"><span class="nav-number">1.4.6.</span> <span class="nav-text">Schema management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Delta-compaction"><span class="nav-number">1.4.7.</span> <span class="nav-text">Delta compaction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Change-replication"><span class="nav-number">1.4.8.</span> <span class="nav-text">Change replication</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Subscriptions"><span class="nav-number">1.4.8.1.</span> <span class="nav-text">Subscriptions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Change-data"><span class="nav-number">1.4.8.2.</span> <span class="nav-text">Change data</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Schema-changes"><span class="nav-number">1.4.8.3.</span> <span class="nav-text">Schema changes</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Sharding"><span class="nav-number">1.4.8.4.</span> <span class="nav-text">Sharding</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Caching"><span class="nav-number">1.4.8.5.</span> <span class="nav-text">Caching</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Secondary-indexes-and-views"><span class="nav-number">1.4.8.6.</span> <span class="nav-text">Secondary indexes and views</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Online-repartitioning"><span class="nav-number">1.4.8.7.</span> <span class="nav-text">Online repartitioning</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fault-tolerance"><span class="nav-number">1.4.9.</span> <span class="nav-text">Fault tolerance</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Coping-with-query-failures"><span class="nav-number">1.4.9.1.</span> <span class="nav-text">Coping with query failures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Coping-with-ingestion-failures"><span class="nav-number">1.4.9.2.</span> <span class="nav-text">Coping with ingestion failures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Table-level-failover"><span class="nav-number">1.4.9.3.</span> <span class="nav-text">Table-level failover</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONCLUSION"><span class="nav-number">1.5.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

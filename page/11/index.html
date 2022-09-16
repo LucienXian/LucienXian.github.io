@@ -1,23 +1,1970 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
 
-{% block page_class %}
-  {% if is_home() %} page-home {% endif %}
-{% endblock %}
 
-{% block content %}
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LucienXian&#39;s Garden">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LucienXian&#39;s Blog">
+<meta property="og:url" content="http://yoursite.com/page/11/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LucienXian&#39;s Garden">
+<meta property="og:locale">
+<meta property="article:author" content="LucienXian">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/page/11/"/>
+
+
+
+
+
+  <title>LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/28/Visualizing-and-Understanding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/28/Visualizing-and-Understanding/" itemprop="url">Visualizing and Understanding</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-28T01:51:38+08:00">
+                2019-01-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Visualizing-and-Understanding"><a href="#Visualizing-and-Understanding" class="headerlink" title="Visualizing and Understanding"></a>Visualizing and Understanding</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>这是cs231N的一个章节，主要讲述的是CNN可视化理解。2014年ECCV上的paper：<strong>《Visualizing and Understanding Convolutional Networks》</strong>讲述了CNN每一层到底学习到了什么特征，即可视化CNN模型。这里的可视化指的是可视化CNN模型中的卷积核。</p>
+<h2 id="利用反卷积实现特征可视化"><a href="#利用反卷积实现特征可视化" class="headerlink" title="利用反卷积实现特征可视化"></a>利用反卷积实现特征可视化</h2><p>论文里通过反卷积的方法进行可视化，反卷积就是以各层得到的特征图作为输入，进行反池化、反激活、反卷积的过程。例如一个Alexnet的conv5的特征图，通过这个过程之后，就可以把一个13*13的特征图放大回到一个与原输入图片大小的图片(227*227)。</p>
+<p><img src="http://kvfrans.com/content/images/2016/06/Screen-Shot-2016-06-15-at-10-32-01-AM.png" alt="img"></p>
+<h3 id="反池化"><a href="#反池化" class="headerlink" title="反池化"></a>反池化</h3><p>池化本身是一个不可逆的过程，但我们可以在池化过程中，将最大激活值的坐标位置记录下来。然后在反池化的时候，只把该位置的值激活，然后其它值置为0。这是一种近似的过程。</p>
+<h3 id="反激活"><a href="#反激活" class="headerlink" title="反激活"></a>反激活</h3><p>在Alexnet中，relu函数是为了保证每层输出的激活值都是正数，因此对于反向过程，我们需要保证每层的特征图为正值。因此也是直接采用relu函数即可。</p>
+<h3 id="反卷积"><a href="#反卷积" class="headerlink" title="反卷积"></a>反卷积</h3><p>对于反卷积，则是采用转置后的filter(参数一样，只不过把参数矩阵水平和垂直方向翻转了一下)进行卷积。</p>
+<h2 id="可视化结果"><a href="#可视化结果" class="headerlink" title="可视化结果"></a>可视化结果</h2><p>通过cnn学习之后，layer1和layer2学习到的特征基本是颜色、边缘等低层特征，越往上，学习到的特征将会变得更加完整，有辨别性。</p>
+<h3 id="Saliency-Maps"><a href="#Saliency-Maps" class="headerlink" title="Saliency Maps"></a>Saliency Maps</h3><p><strong>Saliency Maps</strong>关注的是当我们使用CNN去抓取图片特征或者理解图片的时候，我们神经网络真正关注的区域。而所有的Saliency Map都将一张图片中最核心表意区域勾画出来了。</p>
+<p>而计算原理，则是利用类别得分，即最后一层的梯度去计算哪一个像素对于分类的贡献最大，得到Saliency Maps。这里也可以看出像素层次的不同影响。</p>
+<p>同样，得到的图也可以用于图像分割。</p>
+<p><img src="https://analyticsindiamag.com/wp-content/uploads/2018/07/sal-1.jpg" alt="img"></p>
+<h3 id="Fooling-images"><a href="#Fooling-images" class="headerlink" title="Fooling images"></a>Fooling images</h3><p>fooling images的思想主要是在一个已经训练好的分类器的基础上，通过选择某一错误分类计算loss，然后更新梯度来更新图片pixel，从而使得分类器对图片错误分类。</p>
+<ul>
+<li>Start from an arbitrary image</li>
+<li>Pick an arbitrary class</li>
+<li>Modify the image to maximize the class</li>
+<li>Repeat until network is fooled</li>
+</ul>
+<h3 id="Class-visualization"><a href="#Class-visualization" class="headerlink" title="Class visualization"></a>Class visualization</h3><p>从随机噪音图像开始并且在目标类上执行梯度上升，我们可以生成这样一个图像，它被网络认为是目标类别。</p>
+<p>具体来说，假设$$I$$是一个图像，让$$y$$成为目标类别。假设$s_y(I)$是卷积网络初始分配给$I$的关于$y$的初始分数。最后我们生成一个图片$I^*$，其将在类别$y$上获得高的得分。<br>$$<br>I^* &#x3D; \arg\max_I s_y(I) - R(I)<br>$$<br>R是一个regularizer，一般我们可以用L2正则器：<br>$$<br>R(I) &#x3D; \lambda |I|_2^2<br>$$</p>
+<h2 id="pytorch知识点"><a href="#pytorch知识点" class="headerlink" title="pytorch知识点"></a>pytorch知识点</h2><blockquote>
+<p>a leaf Variable that requires grad has been used in an in-place operation</p>
+</blockquote>
+<p>这是<a target="_blank" rel="noopener" href="https://discuss.pytorch.org/t/leaf-variable-was-used-in-an-inplace-operation/308">因为</a></p>
+<p>A “leaf variable” is a variable you create directly, not as the result of some other operation.</p>
+<p>For example,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = torch.autograd.Variable(torch.Tensor([1, 2, 3, 4]))  # leaf variable</span><br><span class="line">y = x + 1  # not a leaf variable</span><br></pre></td></tr></table></figure>
+
+<p>An in-place operation is something which modifies the data of a variable. For example,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x += 1  # in-place</span><br><span class="line">y = x + 1 # not in place</span><br></pre></td></tr></table></figure>
+
+<p>PyTorch doesn’t allow in-place operations on variables you create directly (such as parameters of your model) because that usually isn’t correct. You can work around it by either using an operations that’s not in-place or by cloning the variable.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x2 = x.clone()  # clone the variable</span><br><span class="line">x2 += 1  # in-place operation</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/27/%E7%BB%A7%E6%89%BF%E9%9C%80%E8%A6%81%E6%8F%90%E4%BE%9B%E6%96%87%E6%A1%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/27/%E7%BB%A7%E6%89%BF%E9%9C%80%E8%A6%81%E6%8F%90%E4%BE%9B%E6%96%87%E6%A1%A3/" itemprop="url">继承需要提供文档</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-27T14:59:10+08:00">
+                2019-01-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="若要设计继承，则提供文档说明，否则禁止继承"><a href="#若要设计继承，则提供文档说明，否则禁止继承" class="headerlink" title="若要设计继承，则提供文档说明，否则禁止继承"></a>若要设计继承，则提供文档说明，否则禁止继承</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>对于那些不是为了继承，并且没有良好说明文档的外来类来说，去继承产生子类是非常危险的。</p>
+<h2 id="如何设计文档"><a href="#如何设计文档" class="headerlink" title="如何设计文档"></a>如何设计文档</h2><ol>
+<li>必须在这个类的文档里为可覆盖方法说明它的自用性</li>
+</ol>
+<p>对于每个公有方法或者受保护方法，文档里必须指明这个方法调用了哪些可覆盖方法，是以什么顺序调用的，每个调用的结果是如何影响接下来的处理过程。</p>
+<p>调用可覆盖方法的方法应该在注释末尾包含这些调用的描述，这可以由Javadoc标签@implSpec生成。</p>
+<p>以下为ava.util.AbstractCollection的remove方法的规范：</p>
+<blockquote>
+<p>Removes a single instance of the specified element from this collection, if it is present (optional operation). More formally, removes an element e such that Objects.equals(o, e), if this collection contains one or more such elements. Returns true if this collection contained the specified element (or equivalently, if this collection changed as a result of the call).</p>
+<p>**Implementation Requirements:**This implementation iterates over the collection looking for the specified element. If it finds the element, it removes the element from the collection using the iterator’s remove method. Note that this implementation throws an UnsupportedOperationException if the iterator returned by this collection’s iterator method does not implement the remove method and this collection contains the specified object.</p>
+</blockquote>
+<ol start="2">
+<li>父类必须以某种形式提供能够进入到其内部运转的hook</li>
+</ol>
+<p>这里可以选择一个受保护的方法、或者是受保护域。</p>
+<h2 id="约束条件"><a href="#约束条件" class="headerlink" title="约束条件"></a>约束条件</h2><p>若一个类允许被继承，有几点约束需要遵守：</p>
+<ol>
+<li>构造器一定不能调用可覆盖方法</li>
+</ol>
+<p>无论是直接还是间接调用，因为父类构造器在子类构造器之前运行，所以子类的覆盖方法会在子类构造器运行之前被调用。如果覆盖后的方法依赖于子类构造器的任意初始化操作，那么找哥哥方法很可能会产生非预期的行为。</p>
+<ol start="2">
+<li>如何使用Cloneable和Serializable接口</li>
+</ol>
+<p>对于Cloneable接口，由于clone方法和readObject方法的行为类似构造器，所以类似上面的约束依然存在。</p>
+<p>而对于Serializable接口，而且这个类拥有readResolve方法或writeReplace方法，你一定要把readResolve方法或writeReplace方法设为受保护的，而不是私有的。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>设计一个用来被继承的类是不容易的，我们必须在文档里说明该类的自用模式，并且为了让别人编写有效的子类，我们也需要导出一个或多个受保护的方法。</p>
+<p>除非我们知道某个类的确是要被子类化，否则最好将声明为final或者保证其没有可访问的构造器来禁止该类被继承。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/27/cuda%E5%AD%A6%E4%B9%A01%E2%80%94%E2%80%94Udacity/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/27/cuda%E5%AD%A6%E4%B9%A01%E2%80%94%E2%80%94Udacity/" itemprop="url">cuda学习1——Udacity</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-27T01:12:45+08:00">
+                2019-01-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="cuda学习1——Udacity"><a href="#cuda学习1——Udacity" class="headerlink" title="cuda学习1——Udacity"></a>cuda学习1——Udacity</h1><h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a target="_blank" rel="noopener" href="https://classroom.udacity.com/courses/cs344/lessons/55120467/concepts/670743010923">https://classroom.udacity.com/courses/cs344/lessons/55120467/concepts/670743010923</a></p>
+<h2 id="CPU与GPU"><a href="#CPU与GPU" class="headerlink" title="CPU与GPU"></a>CPU与GPU</h2><p>异构型计算机(termed heterogeneous)有两种：根据不同的处理器区分——CPU与GPU。cuda编程模型允许我们在GPU上运行。程序运行在CPU的部分成为host，在GPU的部分则是的device，并且还假设host和device有各自分开的内存。在CPU与GPU的关系中，前者占据着重要的位置，它告诉GPU应该做什么</p>
+<p>流程：</p>
+<ol>
+<li>从CPU拷贝数据到GPU</li>
+<li>从GPU拷贝数据到CPU</li>
+</ol>
+<p>这两部就是cudaMemcpy</p>
+<ol start="3">
+<li>分配GPU内存：cudaMalloc</li>
+<li>在GPU上启动内核</li>
+</ol>
+<h2 id="cuda程序例子"><a href="#cuda程序例子" class="headerlink" title="cuda程序例子"></a>cuda程序例子</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">__global__ <span class="type">void</span> <span class="title function_">square</span><span class="params">(<span class="type">float</span> * d_out, <span class="type">float</span> * d_in)</span>&#123;</span><br><span class="line">    <span class="type">int</span> idx = threadIdx.x;<span class="comment">//threadIdx is a structure</span></span><br><span class="line">    <span class="type">float</span> f = d_in[idx];</span><br><span class="line">    d_out[idx] = f * f;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> ** argv)</span> &#123;</span><br><span class="line">	<span class="type">const</span> <span class="type">int</span> ARRAY_SIZE = <span class="number">64</span>;</span><br><span class="line">	<span class="type">const</span> <span class="type">int</span> ARRAY_BYTES = ARRAY_SIZE * <span class="keyword">sizeof</span>(<span class="type">float</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// generate the input array on the host</span></span><br><span class="line">	<span class="type">float</span> h_in[ARRAY_SIZE];</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ARRAY_SIZE; i++) &#123;</span><br><span class="line">		h_in[i] = <span class="type">float</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">float</span> h_out[ARRAY_SIZE];</span><br><span class="line"></span><br><span class="line">	<span class="comment">// declare GPU memory pointers</span></span><br><span class="line">	<span class="type">float</span> * d_in;</span><br><span class="line">	<span class="type">float</span> * d_out;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// allocate GPU memory</span></span><br><span class="line">	cudaMalloc((<span class="type">void</span>**) &amp;d_in, ARRAY_BYTES);</span><br><span class="line">	cudaMalloc((<span class="type">void</span>**) &amp;d_out, ARRAY_BYTES);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// transfer the array to the GPU</span></span><br><span class="line">	cudaMemcpy(d_in, h_in, ARRAY_BYTES, cudaMemcpyHostToDevice);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// launch the kernel</span></span><br><span class="line">	square&lt;&lt;&lt;<span class="number">1</span>, ARRAY_SIZE&gt;&gt;&gt;(d_out, d_in);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// copy back the result array to the CPU</span></span><br><span class="line">	cudaMemcpy(h_out, d_out, ARRAY_BYTES, cudaMemcpyDeviceToHost);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// print out the resulting array</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i =<span class="number">0</span>; i &lt; ARRAY_SIZE; i++) &#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%f&quot;</span>, h_out[i]);</span><br><span class="line">		<span class="built_in">printf</span>(((i % <span class="number">4</span>) != <span class="number">3</span>) ? <span class="string">&quot;\t&quot;</span> : <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	cudaFree(d_in);</span><br><span class="line">	cudaFree(d_out);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置kernel启动"><a href="#设置kernel启动" class="headerlink" title="设置kernel启动"></a>设置kernel启动</h3><p>以这个为例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">square&lt;&lt;&lt;<span class="number">1</span>, ARRAY_SIZE&gt;&gt;&gt;(d_out, d_in);</span><br><span class="line"><span class="comment">//square&lt;&lt;&lt;dim3(bx, by, bz), dim3(tx, ty, tz), shmem&gt;&gt;&gt;(d_out, d_in);</span></span><br><span class="line"><span class="comment">//相对于启动了bx*by*bz个block，每个block具有tx*ty*tz个线程。sheme默认0</span></span><br></pre></td></tr></table></figure>
+
+<p>我们使用了这些启动参数1, ARRAY_SIZE，并以这些自变量d_out, d_in来启动它。</p>
+<p>在这里我们启动了64个线程，即1个带有64个线程的块。对于kernel而言：</p>
+<ul>
+<li>能够同时运行多个块；</li>
+<li>每个块带有多个线程；较新的GPU可以支持1024个线程，不要超过1024.</li>
+</ul>
+<p>threadIdx这个结构中，x, y, z分别表示线程在block中不同纬度的索引。</p>
+<p>blockDim：block的大小，有多少个线程；</p>
+<p>blockIdx：网格中block的索引；</p>
+<p>gridDim：网格大小；</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>当我们写一个程序，它看起来是运行在一个线程上；</li>
+<li>当我们启动程序的时候，我们从CPU代码启动这个内核；</li>
+<li>在内核中，每个线程都知道自己所在index；</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/%E7%BB%84%E5%90%88%E4%BC%98%E5%85%88%E4%BA%8E%E7%BB%A7%E6%89%BF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/%E7%BB%84%E5%90%88%E4%BC%98%E5%85%88%E4%BA%8E%E7%BB%A7%E6%89%BF/" itemprop="url">组合优先于继承</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:43:21+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="组合优于继承"><a href="#组合优于继承" class="headerlink" title="组合优于继承"></a>组合优于继承</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>对于继承而言，这是代码复用的一种有效途径。在同一个包中使用继承是安全的，另外，如果类是专门设计来被继承而且具有良好文档，那么采用继承进行扩展也是安全的。请注意，尽量不要跨包去继承一个普通具体的类。</p>
+<h2 id="继承违反了封装的原则"><a href="#继承违反了封装的原则" class="headerlink" title="继承违反了封装的原则"></a>继承违反了封装的原则</h2><p>一个子类依赖于父类的实现细节来实现本身的功能，这样随着父类的变化，子类将会被破坏。即便子类本身代码没有发生变化，它都必须随着父类演化。</p>
+<p>这两个问题——子类实现依赖于父类实现，父类添加方法可能出现漏洞。</p>
+<h2 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h2><p>为了避免上面的问题，可以让新类包含一个私有域，这个域指向现有类的一个实例。因为现有类成为了新类组件，新类的每个实例方法调用现有类实例的对应方法然后返回值，这就叫转发。</p>
+<p>包装者对象几乎没有缺点，但需要注意的是包装者对象不适合于回调框架。因为在回调框架里，对象需要将自身引用传给别的对象，以便别的对象在后续进行调用。因为被包装对象并不知道自己的包装者，它将一个引用传给自己同时回调也避开了包装者。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>继承虽然强大，但它存在一些问题，违反了封装，只有父类和子类之间存在真正的父子关系才会使用。为了避免子类的脆弱性，我们应该使用组合和转发，而不是继承。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/%E4%BD%BF%E5%8F%AF%E5%8F%98%E6%80%A7%E6%9C%80%E5%B0%8F%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/%E4%BD%BF%E5%8F%AF%E5%8F%98%E6%80%A7%E6%9C%80%E5%B0%8F%E5%8C%96/" itemprop="url">使可变性最小化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:41:26+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="使可变性最小化"><a href="#使可变性最小化" class="headerlink" title="使可变性最小化"></a>使可变性最小化</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>不可变类是其实例不能被修改的类，并且实例中包含的所有信息都必须在创建实例的时候提供，在整个对象生命周期中固定不变。</p>
+<h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><p>为了使类不可变，要遵守：</p>
+<ul>
+<li>不要提供任何会修改对象状态的方法；</li>
+<li>保证类不会被扩展；</li>
+<li>使所有的域都是final的；</li>
+<li>使所有的域都变成私有的；</li>
+<li>确保对于任何可变组件的互斥访问；</li>
+</ul>
+<p>由于不可变对象本质上是线程安全的，所以它们并不要求同步，这是获得线程安全最容易的方法；</p>
+<p>另外，不可变对象可以被自由地共享，甚至共享其内部信息；</p>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>不可变类最大的缺点，对于每个不同的值都需要一个单独的对象。对于大型对象的情形，创建这种对象的代价可能很高。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/%E8%B0%A8%E6%85%8E%E5%9C%B0%E8%A6%86%E7%9B%96clone/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/%E8%B0%A8%E6%85%8E%E5%9C%B0%E8%A6%86%E7%9B%96clone/" itemprop="url">谨慎地覆盖clone</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:40:53+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="谨慎地覆盖clone"><a href="#谨慎地覆盖clone" class="headerlink" title="谨慎地覆盖clone"></a>谨慎地覆盖clone</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Cloneable接口没有任何方法，它表明object允许被clone。这个接口的作用是改变clone方法的行为，使得Object中的clone方法返回对象的逐域拷贝，否则CloneNotSupportedException异常。</p>
+<p>Object的clone方法是protected的。</p>
+<h2 id="约定"><a href="#约定" class="headerlink" title="约定"></a>约定</h2><p>如果实现Cloneable接口是要对某个类起作用，那该类和它的所有超类都必须满足：无需调用构造器就可以创建对象。并且这个拷贝应该满足：</p>
+<p>x.clone() !&#x3D; x 为true</p>
+<p>x.clone().getClass() &#x3D;&#x3D; x.getClass() 为true</p>
+<p>x.clone().equals(x) 为true</p>
+<p>实际上，良好的clone方法可以调用构造器创建对象，之后再去复制内部数据。</p>
+<h2 id="super-clone"><a href="#super-clone" class="headerlink" title="super.clone()"></a>super.clone()</h2><p>假设超类提供了良好的clone方法，那么从super.clone()中得到的对象可能会接近于最终返回的对象，也可能相距甚远。如果每个域包含一个基本类型的值，或者包含一个指向不可变对象的引用，那么返回对象就可能是符合要求的。</p>
+<p>例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> PhoneNumber <span class="title function_">clone</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (PhoneNumber) <span class="built_in">super</span>.clone();</span><br><span class="line">    &#125; <span class="keyword">catch</span>(CloneNotSupportedException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AssertionError</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意，clone方法返回的是PhoneNumber，永远不要让那个客户去做类库能替用户完成的事情。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果对象中包含的域引用了可变的对象，那这种clone实现可能导致灾难性后果。因为修改原始的实例可能会破坏克隆对象的约束条件。</p>
+<p>复杂对象的克隆，需要先调用super.clone，再把结果对象中的所有域设置为空白状态，然后调用higher level去重新设置对象状态。</p>
+<p>跟构造器一样，clone不应该调用一个被覆盖的方法，因为该方法可能先执行，导致克隆对象和原始对象不一致。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>所有实现了Cloneable接口的类都应该用一个公有的方法去覆盖clone：先调用super.clone，然后修正需要的域，这意味着需要拷贝任何包含内部深层结构的可变对象。</p>
+<p>另一个实现对象拷贝的方法是提供一个拷贝构造器或者拷贝工厂。</p>
+<p>对于一个专门用于继承而设计的类，如果未能提供行为良好的protected的clone方法，那么它的子类就不可能实现Cloneable接口。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/%E4%BD%BF%E7%B1%BB%E5%92%8C%E6%88%90%E5%91%98%E7%9A%84%E5%8F%AF%E8%AE%BF%E9%97%AE%E6%80%A7%E6%9C%80%E5%B0%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/%E4%BD%BF%E7%B1%BB%E5%92%8C%E6%88%90%E5%91%98%E7%9A%84%E5%8F%AF%E8%AE%BF%E9%97%AE%E6%80%A7%E6%9C%80%E5%B0%8F/" itemprop="url">使类和成员的可访问性最小</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:40:13+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="使类和成员的可访问性最小"><a href="#使类和成员的可访问性最小" class="headerlink" title="使类和成员的可访问性最小"></a>使类和成员的可访问性最小</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>封装(encapsulation)，良好的设计应该具备隐藏其内部数据和实现细节的特点，能够把它的API与它的实现清晰地隔离开，</p>
+<h2 id="访问控制"><a href="#访问控制" class="headerlink" title="访问控制"></a>访问控制</h2><ol>
+<li>尽量使得每个类或者成员不被外界访问；</li>
+</ol>
+<ul>
+<li>如果类能被做成private的，它就应该被声明为private；</li>
+<li>如果一个private的类只有在某一个类的内部被用到，那就考虑使它成为唯一使用它的那个类的私有嵌套类；</li>
+<li>对于公有类的成员，当访问级别从包级私有变成protected级别后，会大大增加可访问性；</li>
+</ul>
+<ol start="2">
+<li><p>如果方法覆盖了超类中的一个方法，子类中的访问级别就不允许低于超类中的访问级别。这样可以保证任何使用超类实例的地方也都可以使用子类的实例；</p>
+</li>
+<li><p>实例域不能是公有的</p>
+</li>
+</ol>
+<p>如果域是非final的，或者指向一个可变对象的final引用。一旦域成为公有的，就会放弃了强制这个域不可变的能力。</p>
+<blockquote>
+<p>注意长度非零的数组总是可变的，所以类具有公有的静态final数组域，或者返回这个域的访问方法都是错的。应该实现为：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Thing[] PRIVATE_VALUES = &#123;....&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// #1</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;Thing&gt; VALUES = </span><br><span class="line">    Collections.unmodifiableList(Arrays.asList(PRIVATE_VALUES));</span><br><span class="line"></span><br><span class="line"><span class="comment">// #2</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Thing[] values() &#123;</span><br><span class="line">    <span class="keyword">return</span> PRIVATE_VALUES.clone();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/%E5%9C%A8%E5%85%AC%E6%9C%89%E7%B1%BB%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%AE%BF%E9%97%AE%E6%96%B9%E6%B3%95%E8%80%8C%E9%9D%9E%E5%85%AC%E6%9C%89%E5%9F%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/%E5%9C%A8%E5%85%AC%E6%9C%89%E7%B1%BB%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%AE%BF%E9%97%AE%E6%96%B9%E6%B3%95%E8%80%8C%E9%9D%9E%E5%85%AC%E6%9C%89%E5%9F%9F/" itemprop="url">在公有类中使用访问方法而非公有域</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:39:22+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="在公有类中使用访问方法而非公有域"><a href="#在公有类中使用访问方法而非公有域" class="headerlink" title="在公有类中使用访问方法而非公有域"></a>在公有类中使用访问方法而非公有域</h1><p>不提供封装的类，如果不改变API，就无法改变它的数据表示法，也无法强加任何约束条件；</p>
+<p>例如这种：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> x;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>如果类是包级私有的，或者是私有的嵌套类，直接暴露它的数据域并没有本质的错误</p>
+</blockquote>
+<p>Java的平台类库中有几个类违反了“公有类不应该直接暴露数据域”的告诫，比如java.awt包中的Point和Dimension类。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/%E8%80%83%E8%99%91%E5%AE%9E%E7%8E%B0Comparable%E6%8E%A5%E5%8F%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/%E8%80%83%E8%99%91%E5%AE%9E%E7%8E%B0Comparable%E6%8E%A5%E5%8F%A3/" itemprop="url">考虑实现Comparable接口</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T14:37:53+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="考虑实现Comparable接口"><a href="#考虑实现Comparable接口" class="headerlink" title="考虑实现Comparable接口"></a>考虑实现Comparable接口</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>compareTo方法并没有在Object中声明，但它是Comparable接口中唯一的方法，不仅允许进行简单的同等性比较，而且还允许进行顺序比较。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><p>一旦类实现了Comparable接口，它可以跟许多泛型算法进行协作。在Java平台类库中的所有值类都实现了Comparable接口。</p>
+<ol>
+<li>实现者必须确保所有的x和y都满足sgn(x.compareTo(y)) &#x3D;&#x3D; -sgn(y.compareTo(x))；</li>
+<li>确保比较关系可传递：x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z) &gt; 0，那么x.compareTo(z)&gt;0为true；</li>
+<li>x.compareTo(y) &#x3D;&#x3D;0 意味着所有z都满足sgn(x.compareTo(z)) &#x3D;&#x3D; sgn(y.compareTo(z))</li>
+</ol>
+<p>另外，强烈建议：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x.compareTo(y)==<span class="number">0</span>) == (x.equals(y))</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/07/Java%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E4%B8%8E%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/07/Java%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E4%B8%8E%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8/" itemprop="url">Java内存区域与内存溢出异常</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-07T14:41:02+08:00">
+                2019-01-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Java内存区域与内存溢出异常"><a href="#Java内存区域与内存溢出异常" class="headerlink" title="Java内存区域与内存溢出异常"></a>Java内存区域与内存溢出异常</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>对于Java而言，垃圾回收技术和内存动态分配是它的一大特点，本文将介绍Java虚拟机内存的各个区域。</p>
+<h2 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h2><p>Java虚拟机在执行Java程序的过程中会把它管理的内存划分为多个不同的数据区域——方法区(Method kArea)、堆(Heap)、虚拟机栈(VM Stack)、本地方法栈(Native Method Stacj)、程序计数器(Program Counter Register)。前面两个是所有线程共享的，后者则是线程独立的。</p>
+<h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><p>每个线程都有自己的程序计数器，它可以看做是当前线程执行的字节码的行号指示器，通过改变这个计数器的值就可以选取下一条需要执行的字节码指令。</p>
+<blockquote>
+<p>如果正在执行的是Native方法，这个计数器就是undefined。此内存区域没有规定任何outOfMemoryError情况。</p>
+</blockquote>
+<h3 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h3><p>同样是线程私有的，生命周期与线程相同。每个方法在执行时都会创建一个栈帧，用于存储局部变量表、操作数栈、动态链接和方法入口等。</p>
+<p>对于局部变量而言，它存放着各种编译器可知的基本数据类型、对象引用和returnAddress类型。其中64位的long和double会占据2个局部变量空间。</p>
+<p>如果线程请求的栈深度大于虚拟机允许的深度，会抛出stackOverflow异常；如果虚拟机动态扩展时无法申请到足够的内存，则会抛出outOfMemoryError。</p>
+<h3 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h3><p>这个数据区的作用与虚拟机栈类似，只不过本地方法栈是为Native方法服务的。但由于虚拟机规范对此没有强烈的限制，因此例如Sun的HotSpot虚拟机直接把两个方法去合二为一。</p>
+<h3 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h3><p>对于多数应用，heap是Java虚拟机管理内存中最大的一块，这是被所有线程共享的一块内存区域，存放的就是<strong>对象实例</strong>。</p>
+<p>根据虚拟机规范的规定，Java堆可以处于物理上不连续的内存空间中，当前主流的虚拟机都是按照可扩展来实现的——通过-Xmx和-Xms控制。</p>
+<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>方法区同样是线程共享的，存放的内容包括已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。</p>
+<p>虚拟机规范在对这个区域的限制比较宽松，除了跟堆一样可以处于物理上不连续的内存空间中，还允许不实现垃圾回收。</p>
+<ul>
+<li>运行时常量池</li>
+</ul>
+<p>这是方法区的一部分，在Class文件中，除了有类的版本字段方法接口这些信息之外，还有一项信息是常量区。</p>
+<p>运行时常量池还有另外一个重要特征——动态性。这个特性被利用的比较多的就是String#intern()方法。</p>
+<h3 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h3><p>在JDK1.4中新引入了NIO类，引入了一种基于通道和缓冲区的I&#x2F;O方式，它可以使用Native函数库直接分配堆外内存，然后通过一个存放在Java堆中的DirectByteBuffer对象作为这块内存的引用进行操作。</p>
+<h2 id="HotSpot虚拟机对象探秘"><a href="#HotSpot虚拟机对象探秘" class="headerlink" title="HotSpot虚拟机对象探秘"></a>HotSpot虚拟机对象探秘</h2><h3 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h3><p>在Java的运行过程中，无时无刻都有对象被创建出来。那么在虚拟机中，这是一个怎么样的过程呢？</p>
+<p>当虚拟机遇到一个new指令时：</p>
+<ul>
+<li>去常量池中检查是否能够定位到这个类的符号引用，并且检查这个类是否已被加载、解析和初始化过；</li>
+<li>在类加载检查通过后会去分配内存，这里有两种情况：<ul>
+<li>Java堆中内存规整，就会把所有用过的内存放一边，空闲的在另一边，中间使用指针作为分界点的指示器。每次分配内存的时候就移动指针——Bump the Pointer；</li>
+<li>非规整内存，则是维护一个空闲列表，记录哪些内存块可用；</li>
+</ul>
+</li>
+</ul>
+<p>Java堆是否规整与采用的垃圾回收器有关，CMS这种基于Mark-Sweep算法的收集器则是采用空闲列表。</p>
+<p>另外，为了解决线程安全的问题，有两种解决方法：一是采用CAS配上失败重试的方式保证更新内存操作的原子性；二是将内存分配的操作按照线程划分在不同的空间中，则提取为线程分配缓存Thread Local Allocation Buffer——TLAB；可以通过-XX:+&#x2F;-UseTLAB参数进行设定</p>
+<ul>
+<li>分配完内存后，会将内存空间中除对象头外都初始化为零值；</li>
+<li>接下来，虚拟机对对象进行必要的设置，将一些元数据信息，对象的哈希码，GC分代年龄等记录在Object Header中。</li>
+<li>最后，会执行init方法，进行对象初始化。</li>
+</ul>
+<h3 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h3><p>在HotSpot虚拟机中，对象的内存布局可以划分为三块区域——对象头、实例数据和对齐填充。</p>
+<ol>
+<li>对象头</li>
+</ol>
+<p>对象头包含两部分信息，一是存储对象自身的运行时数据，如对象的哈希码，GC分代年龄等，并且这部分数据的长度在32位和64位的虚拟机中分别为32bit和64bit，即Mark Word。例如Mark Word的32bit空间中25bit存储对象哈希码，4bit存储对象分代年龄，2bit存储锁标志位，1bit固定为0；</p>
+<p>二是类型指针，即对象指向它的类元数据的指针，这样就可以通过这个指针确定对象是哪个类的实例。</p>
+<ol start="2">
+<li>实例数据</li>
+</ol>
+<p>这就是程序代码中定义的字段内容，包括从父类继承下来的。这部分的存储策略收到虚拟机分配策略参数和字段类型在Java源码中定义的顺序影响。</p>
+<ol start="3">
+<li>对齐填充</li>
+</ol>
+<p>不是必然存在的，若对象实例数据部分不是8字节的整数倍则，需要对其填充进行补全。</p>
+<h3 id="对象的访问定位"><a href="#对象的访问定位" class="headerlink" title="对象的访问定位"></a>对象的访问定位</h3><p>创建对象是为了使用对象，Java程序是通过栈的reference数据来操作堆上对象的，因此这里有两种访问方式：</p>
+<ul>
+<li>通过句柄访问，Java堆会划分句柄池，reference存放的就是句柄的地址。这个方法的好处就是句柄地址稳定，对象被移动只会改变句柄的数据，reference本身不会被改变；</li>
+<li>直接访问，reference存放的是对象地址。这个方法的好处就是访问速度更快，这也是HotSpot采用的方式；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/10/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/12/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

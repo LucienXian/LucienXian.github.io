@@ -1,23 +1,2123 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
 
-{% block page_class %}
-  {% if is_home() %} page-home {% endif %}
-{% endblock %}
 
-{% block content %}
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LucienXian&#39;s Garden">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LucienXian&#39;s Blog">
+<meta property="og:url" content="http://yoursite.com/page/21/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LucienXian&#39;s Garden">
+<meta property="og:locale">
+<meta property="article:author" content="LucienXian">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/page/21/"/>
+
+
+
+
+
+  <title>LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-29/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-29/" itemprop="url">Effective-cpp-#29</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T19:55:38+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Strive-for-exception-safe-code"><a href="#Strive-for-exception-safe-code" class="headerlink" title="Strive for exception-safe code"></a>Strive for exception-safe code</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>我们常说的<strong>异常安全</strong>需要满足两个条件：</p>
+<ul>
+<li>不泄露任何资源</li>
+<li>不允许数据被破坏</li>
+</ul>
+<p>考虑这样一段代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">PrettyMenu::changeBackground</span><span class="params">(std::istream&amp; imgSrc)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">lock</span>(&amp;mutex);</span><br><span class="line">    <span class="keyword">delete</span> bgImage;</span><br><span class="line">    ++imageChanges;</span><br><span class="line">    bgImage = <span class="keyword">new</span> <span class="built_in">Image</span>(imgSrc);</span><br><span class="line">    <span class="built_in">unlock</span>(&amp;mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的问题就是，一旦“new Image(imgSrc)”出现了异常，那么unlock就不能执行了，互斥器就永远锁住了，则泄露了资源；另外就是这样bgImage会指向一个被删除的对象，而imageChanges被破坏了</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>解决方法其实很简单，则使用之前提及过的条例：以对象去接管资源：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">PrettyMenu::changeBackground</span><span class="params">(std::istream&amp; imgSrc)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Lock <span class="title">m1</span><span class="params">(&amp;mutex)</span></span>;</span><br><span class="line">    <span class="keyword">delete</span> bgImage;</span><br><span class="line">    ++imageChanges;</span><br><span class="line">    bgImage = <span class="keyword">new</span> <span class="built_in">Image</span>(imgSrc);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般来说，一个异常安全函数（Exception-safe function）必须提供以下的三个保证之一：</p>
+<ul>
+<li><p>基本承诺：如果异常被抛出了，那么程序的成员应该要保持有效的状态，则没有数据被破坏了。以上面的函数为例，我们可以修改程序，在函数抛出异常时，bgImage指向一个默认的对象；</p>
+</li>
+<li><p>强烈保证：保证程序只有两个状态：异常抛出，状态改变；否则就回到程序调用函数之前的状态；</p>
+</li>
+<li><p>nothrow保证：承诺永远不会抛出异常；</p>
+</li>
+</ul>
+<br>
+另外一个保证异常安全的方法是——**copy&swap**，则为你希望修改的对象构造一个副本，然后在那个副本上做一切修改，若有任何修改操作发生异常，那么原对象不受影响。待修改成功后，在交换指针。
+
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>异常安全函数即使发生异常也不会泄露资源或者允许任何数据结构被破坏；</li>
+<li>强烈保证可以通过copy&amp;swap实现出来；</li>
+<li>函数提供的“异常安全保证”通常最高只等于所调用的各个函数“异常安全保证”的最弱者；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-28/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-28/" itemprop="url">Effective-cpp-#28</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T02:07:48+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Avoid-returning-“handles”-to-object-internals"><a href="#Avoid-returning-“handles”-to-object-internals" class="headerlink" title="Avoid returning “handles” to object internals"></a>Avoid returning “handles” to object internals</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>先来看一个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span>&#123;...&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">RectData</span>&#123;</span><br><span class="line">    Point ulhc;</span><br><span class="line">    Point lrhc;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::trl::shared_ptr&lt;RectData&gt; pData;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="type">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function">Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>使用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">const</span> Rectangle <span class="title">rec</span><span class="params">(point1, point2)</span></span>;</span><br><span class="line">rec.<span class="built_in">upperLeft</span>().<span class="built_in">setX</span>(<span class="number">50</span>);</span><br></pre></td></tr></table></figure>
+
+<p>其实，这样使用编译器是不会报错的，但其出现了矛盾的情况，原因是我们在该函数后面指定了const，则希望rec是不变的。但我们可以看到，由于我们返回的是一个引用，则可以通过引用去修改对象内部的成员。<br><br><br>同理，返回指针或者迭代器这些<strong>handles</strong>，也会出现这种情况。<br><br></p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>为了解决这个问题，我们可以这样：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="type">const</span> Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="type">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function"><span class="type">const</span> Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>通过这种做法，用户可以读取对象的points，但不能修改它们。</p>
+<p>但这种用法同样会有一些问题，那就是有可能会出现<strong>dangling handles</strong>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GUIObj</span>&#123;...&#125;;</span><br><span class="line"><span class="function"><span class="type">const</span> Rectangle <span class="title">boudingBox</span><span class="params">(<span class="type">const</span> GUIObj&amp; obj)</span></span>;</span><br><span class="line"></span><br><span class="line">GUIObj* obj;</span><br><span class="line">...</span><br><span class="line"><span class="type">const</span> Point* p = &amp;(<span class="built_in">boudingBox</span>(*p).<span class="built_in">upperLeft</span>());</span><br></pre></td></tr></table></figure>
+<p>这里的问题是，由于这里够早的是一个临时Rectangle对象，也就是说，当这个语句结束时候临时对象就会被销毁，那么p所指向的Point也会被析构。也就是会发生<strong>dangling handles</strong>。</p>
+<p>这是因为<strong>返回一个handle代表对象内部成员</strong>的话，不管这个handle是指针还是引用，也不管是不是const，这里的关键是一旦这个handle传出去了，你就得承受一个风险——handle可能会比其所指向的对象有着更长的声明周期。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>避免返回任何handles指向对象的内部。另外，还要使得const成员函数的行为像个const，并且尽量避免发生<em>dangling handles</em>。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/Effective-cpp-27/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/09/Effective-cpp-27/" itemprop="url">Effective-cpp-#27</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-09T00:37:40+08:00">
+                2018-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Minimize-casting"><a href="#Minimize-casting" class="headerlink" title="Minimize casting"></a>Minimize casting</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>C++的设计目标就是要保证“类型错误”不可能发生，使得程序能够“干净地”通过编译。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>一般来说，在C++中有两种转型——“old-style casts”和”new-style casts”。</p>
+<ul>
+<li>old：(T)expression或者T(expression)；</li>
+<li>new:<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">const_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">dynamic_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">reinterpret_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="keyword">static_cast</span>&lt;T&gt;)exp</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol>
+<li>const_cast：通常用来去除对象的常量性；</li>
+<li>dynamic_cast：主要执行“安全向下转型”，但会耗费大量的运行成本；</li>
+<li>reinterpret_cast：主要是执行低级转型，实际结果取决于编译器，所以其不可移植。例如将一个<strong>pointer to int转为int</strong>；</li>
+<li>static_cast：用来强迫隐式转换，例如将non-const转为const，int转为double，同样也可以是void*转为typed指针，或者pointer to base转为pointer to derived</li>
+</ol>
+<br>
+之所以要用新式转换，有两个原因：一是很容易能够在代码中辨认出来，便于debug；二是将转型动作窄化，编译器更可能诊断出错误运用。
+<br>
+至于什么时候用旧式转换——调用一个explicit构造函数讲一个对象传递给一个函数时。例如：
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span>&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">explicit</span> <span class="title">Widget</span><span class="params">(<span class="type">int</span> size)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">doSomeWork</span><span class="params">(<span class="type">const</span> Widget&amp; w)</span></span>;</span><br><span class="line"><span class="built_in">doSomeWork</span>(<span class="built_in">Widget</span>(<span class="number">15</span>));</span><br><span class="line"><span class="built_in">doSomeWork</span>(<span class="built_in">Static_cast</span>&lt;Widget&gt;(<span class="number">15</span>));</span><br></pre></td></tr></table></figure>
+
+<p>往往，转型动作会令到编译器编译出运行期间不同执行的码。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;...&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&#123;...&#125;;</span><br><span class="line">Derived d;</span><br><span class="line">Base* pd = &amp;d;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，在这种情况下建立一个base class指针指向一个derived class对象，会有一个偏移量在运行期被施行于Derived*指针身上，用以取得正确的Base *指针值.<br><br><br><br><br>另一个有趣的事情是，如果我们希望在derived classes内的virtual函数代码第一个动作先调用base class的对应函数。使用以下的方式，其实是错误的：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Window</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SpecialWindow</span>: <span class="keyword">public</span> Windos&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="built_in">static_cast</span>&lt;Window&gt;(*<span class="keyword">this</span>).<span class="built_in">onResize</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实这种行为，调用的并不是当前对象上的函数，而是稍早转型动作所建立的一个”*this对象的base class成分”的暂时副本身上的onResize!<br><br><br><br><br><br><br>再来看看dynamic_cast，之所以需要dynamic_cast，通常是因为你只有一个“指向Base”的指针或引用，但希望在一个你认定为derived class对象身上执行derived class操作函数。<br><br>对于这种情况，有两个解决办法：<br><br>使用容器并在其中存储指向derived class对象的指针，并且尽量避免转型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> std::vector&lt;std::trl::shared_ptr&lt;SpecialWindow&gt; &gt;VPSW;</span><br><span class="line">VPSW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span> (VPSW::iterator iter = winPtrs.<span class="built_in">begin</span>();</span><br><span class="line">     iter != winPtrs.<span class="built_in">end</span>();</span><br><span class="line">     ++iter)</span><br><span class="line">    (*iter)-&gt;<span class="built_in">blink</span>();</span><br></pre></td></tr></table></figure>
+<p>但是这种方法，不能在同一个容器中存储指针“指向所有可能的Window派生类”。<br><br><br><br>另外一种做法就可以让你通过base class 接口处理“所有可能的各种Window派生类”，那就是在base class内提供virtual函数做你想对各个Window派生类做的事。当然，在base class只是提供一个“什么都不做”的缺省实现码。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>如果可以，尽量避免转型，尤其是注重效率的代码中避免使用dynamic_cast；</li>
+<li>如果转型是必要的，试着将其隐藏在某个函数背后。客户随后直接调用该函数，而不需要将转型放进自己的代码内；</li>
+<li>宁愿使用新式转型，不要使用旧式转型；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/Effective-cpp-26/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/09/Effective-cpp-26/" itemprop="url">Effective-cpp-#26</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-09T00:14:52+08:00">
+                2018-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Postpone-variable-definitions-as-long-as-possible"><a href="#Postpone-variable-definitions-as-long-as-possible" class="headerlink" title="Postpone variable definitions as long as possible"></a>Postpone variable definitions as long as possible</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>这个的条例提出的原因是——当你定义了一个带有构造函数或者析构函数的变量时，那么当程序的control flow到达这个变量的定义表达式时，你就要承受其构造的成本，同样，当离开变量作用域时，还需要承受析构成本。</p>
+<p>关键是，即便你没有使用这个变量，也要耗费这些成本</p>
+<p>考虑一个函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">encryptPassword</span><span class="params">(<span class="type">const</span> std::string&amp; password)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line">    string encrypted;</span><br><span class="line">    <span class="keyword">if</span> (password.<span class="built_in">length</span>()&lt;MinimumPasswordLength)</span><br><span class="line">        <span class="keyword">throw</span> <span class="built_in">logic_error</span>(<span class="string">&quot;Password is too short&quot;</span>);</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> encrypted;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个函数的命题是，如果有异常被抛出，那么对象encrypted就没被使用，但你仍然需要承受其构造和析构的成本；<br><br></p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>解决方法很简单，什么时候使用就什么时候定义。但这个过程需要注意的是通常情况下我们应该尽量避免使用default构造函数，应该在构造时就赋予初值。</p>
+<p>另外有一个需要注意的问题是，循环怎么办？</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Method A</span></span><br><span class="line">Widget w;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span>; i&lt;n; i++)&#123;</span><br><span class="line">    w = 取决于i的值;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Method B</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span>; i&lt;n; i++)&#123;</span><br><span class="line">    Widget w = 取决于i的值;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要衡量的是：</p>
+<ul>
+<li>方法A:1个构造函数+1个析构函数+n个赋值操作</li>
+<li>方法B:n个构造函数+n个析构函数</li>
+</ul>
+<p>通常情况下，当n比较大时，方法A比较好；否则应该选B</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>尽量延后变量定义式的出现。这样做可以增加程序的清晰度并改善程序效率；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/06/Effective-cpp-24/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/06/Effective-cpp-24/" itemprop="url">Effective-cpp-#24</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-06T16:51:15+08:00">
+                2018-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Declare-non-member-functions-when-type-conversions-should-apply-to-all-parameters"><a href="#Declare-non-member-functions-when-type-conversions-should-apply-to-all-parameters" class="headerlink" title="Declare non-member functions when type conversions should apply to all parameters"></a>Declare non-member functions when type conversions should apply to all parameters</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>通常来说，让一个类支持隐式是一个糟糕的设计，它会使得程序变得复杂。但在某些时候，我们需要隐式的转换，考虑一个有理数的类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Rational</span>(<span class="type">int</span> numerator=<span class="number">0</span>, <span class="type">int</span> denominator=<span class="number">1</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<br>
+如果希望支持算术运算符诸如加法，乘法，那么可以这样实现：
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="type">const</span> Rational <span class="keyword">operator</span>* (<span class="type">const</span> Rational&amp; rhs) <span class="type">const</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>但这种设计有个问题:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational <span class="title">oneEighth</span><span class="params">(<span class="number">1</span>, <span class="number">8</span>)</span></span>;</span><br><span class="line"><span class="function">Rational <span class="title">oneHalf</span><span class="params">(<span class="number">1</span>, <span class="number">2</span>)</span></span>;</span><br><span class="line">Rational result = oneHalf * oneEighth; <span class="comment">//可以通过</span></span><br><span class="line"></span><br><span class="line">result = oneHalf * <span class="number">2</span>; <span class="comment">//也可以通过，等同于</span></span><br><span class="line">result = oneHalf.<span class="keyword">operator</span>*(<span class="number">2</span>);</span><br><span class="line"><span class="comment">//通过的原因，编译器构造了临时对象</span></span><br><span class="line"><span class="function"><span class="type">const</span> Rational <span class="title">temp</span><span class="params">(<span class="number">2</span>)</span></span>;</span><br><span class="line">result = oneHalf*temp；</span><br><span class="line"></span><br><span class="line"><span class="comment">//而如果是想要满足乘法交换律，则会失败：</span></span><br><span class="line">result = <span class="number">2</span> * oneHalf;</span><br><span class="line"><span class="comment">//因为2没有相应的class，也就没有operator*函数。当然编译器会尝试在命名空间内或者在global作用域内调用non-member operator*,而这也找不到</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>当然，可以声明explicit 构造函数，这也就保证了一致性，但就无法满足了乘法运算。<br><br><br><br><br>为了解决这个问题，也满足了四则运算，我们可以构造一个non-member函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//构造一个non-member函数</span></span><br><span class="line"><span class="type">const</span> Rational <span class="keyword">operator</span>*(<span class="type">const</span> Rational&amp; lhs,</span><br><span class="line">                        <span class="type">const</span> Rational&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Rational</span>(lhs.<span class="built_in">numerator</span>()*rhs.<span class="built_in">numerator</span>(),</span><br><span class="line">                    lhs.<span class="built_in">denominator</span>()*lhs.<span class="built_in">denominator</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这样，就都可以通过了</span></span><br><span class="line">Rational result;</span><br><span class="line">result = oneFourth * <span class="number">2</span>;</span><br><span class="line">result = <span class="number">2</span> * oneFourth;</span><br></pre></td></tr></table></figure>
+<br>
+这样，就基本解决问题了。。。。
+<br>
+
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>如果你需要为某个函数的所有参数（包括被this指针所指的那个隐喻参数）进行类型转换，那么这个函数必须是一个non-member</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/05/Effective-cpp-23/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/05/Effective-cpp-23/" itemprop="url">Effective-cpp-#23</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-05T21:22:48+08:00">
+                2018-02-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Prefer-non-member-non-friend-functions-to-member-function"><a href="#Prefer-non-member-non-friend-functions-to-member-function" class="headerlink" title="Prefer non-member non-friend functions to member function"></a>Prefer non-member non-friend functions to member function</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>考虑两种程序组织方式：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">WebBrowser</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">clearCache</span><span class="params">()</span></span>;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">clearHistory</span><span class="params">()</span></span>;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">removeCookies</span><span class="params">()</span></span>;</span><br><span class="line">        ...</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">clearEverything</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.<span class="built_in">clearCache</span>();</span><br><span class="line">            <span class="keyword">this</span>.<span class="built_in">clearHistory</span>();</span><br><span class="line">            <span class="keyword">this</span>.<span class="built_in">removeCookies</span>();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>用一个非成员函数去封装</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">clearBrowser</span><span class="params">(WebBrowser&amp; wb)</span></span>&#123;</span><br><span class="line">    wb.<span class="built_in">clearCache</span>();</span><br><span class="line">    wb.<span class="built_in">clearHistory</span>();</span><br><span class="line">    wb.<span class="built_in">removeCookies</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到底选择哪一种好呢？我们先从封装开始考虑起，越多东西被封装，就意味着越少人可以看到它，那么就会有更大的弹性去改变它。<br>通常来说，越多函数可以访问它，就意味着数据的封装性越低。<br></p>
+<br>
+<br>
+
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>因此通常来说，如果有两个程序组织方式————member函数和non-member函数两种，而它们的机能相同，那我们应该选择封装性更大的non-member函数，<strong>因为它们不会增加”能够访问”class内的private成分的函数数量</strong></p>
+<br>
+另外，尽管我们将使用non-member函数，但这并不意味着该函数不能成为其它类的一部分，例如，我们可以另*void clearBrowser()*其成为某些工具类的static member函数
+<br>
+<br>
+通常来说，在C++中比较自然的做法是将non-member函数与类放在同一个namespace中：
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> WebBrowserStuff&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">WebBrowser</span> &#123;...&#125;;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">clearBrowser</span><span class="params">(WebBroser&amp; wb)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>宁可拿non-member non-friend 函数来替换member函数。这样做可以增加封装性，package flexibility和机能扩充性。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/05/Effective-cpp-22/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/05/Effective-cpp-22/" itemprop="url">Effective-cpp-#22</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-05T20:33:24+08:00">
+                2018-02-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Declare-data-members-private"><a href="#Declare-data-members-private" class="headerlink" title="Declare data members private"></a>Declare data members private</h1><h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><ul>
+<li>首先是避免程序员考虑应该使用括号还是不需要使用，保证一致性</li>
+<li>其次是可以保证对成员变量的精确控制，细微划分访问控制</li>
+</ul>
+<p>根据书中观点：封装性与“当其内容改变时可能造成的代码破坏量”成反比</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>切记将成员声明为private，这可赋予客户访问数据的一致性，可细微划分访问控制，允诺约束条件得到保证，并提供class作者以充分的实现弹性</li>
+<li>protected并不比public更具封装性</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/10/linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/" itemprop="url">linux进程管理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:08:30+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="linux进程管理"><a href="#linux进程管理" class="headerlink" title="linux进程管理"></a>linux进程管理</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
+<li><p>资源分配的基本单位；</p>
+</li>
+<li><p>调度的基本单位</p>
+</li>
+<li><p>当程序在系统中运行时，形成一个进程</p>
+</li>
+<li><p>组成：</p>
+<ul>
+<li>text：代码</li>
+<li>用户数据段：进程处理的数据</li>
+<li>系统数据段：包括PCB</li>
+</ul>
+</li>
+<li><p>进程状态</p>
+<ul>
+<li>TASK_RUNNING</li>
+<li>TASK_INTERRUPTIBLE</li>
+<li>TASK_UNINTERRUPTIBLE</li>
+<li>TASK_STOPPED</li>
+<li>TASK_TRACED：被跟踪，一般调式时用到</li>
+<li>EXIT_ZOMBIE：进程结束前的状态</li>
+</ul>
+</li>
+<li><p>EXIT_DEAD</p>
+</li>
+</ul>
+<h2 id="task-struct"><a href="#task-struct" class="headerlink" title="task_struct"></a>task_struct</h2><ul>
+<li>PCB的数据结构，进程存在的唯一标识</li>
+<li>进程创建时，就会建立一个task_struct，在专门存储task_struct的地方存放着。有最多进程数限制</li>
+<li>主要组成：<ul>
+<li>进程标识号，pid；</li>
+<li>进程的虚拟内存信息：struct mm_struct* mm</li>
+<li>进程打开的文件：struct files_struct *files</li>
+<li>进程映像所在的文件系统：struct files_struct *files</li>
+</ul>
+</li>
+<li>内核2.8后用thread_info替代了task_struct的位置，该结构内部有一个指向task_struct的指针</li>
+</ul>
+<h2 id="进程创建"><a href="#进程创建" class="headerlink" title="进程创建"></a>进程创建</h2><ul>
+<li>通过fork()创建</li>
+<li>子进程继承了父进程的资源（只读）</li>
+<li>写时拷贝</li>
+<li>子进程通过exec()执行真正的任务</li>
+<li>注意：<ul>
+<li>父进程执行fork()返回的是子进程的pid</li>
+<li>子进程执行fork()返回的是0</li>
+</ul>
+</li>
+</ul>
+<h2 id="linux内核线程"><a href="#linux内核线程" class="headerlink" title="linux内核线程"></a>linux内核线程</h2><ul>
+<li>linux中线程也有自己的task_struct结果</li>
+<li>但其共享进程的资源</li>
+<li>内核线程：在内核态下创建，独立执行的一个内核函数</li>
+</ul>
+<h2 id="linux的进程调度"><a href="#linux的进程调度" class="headerlink" title="linux的进程调度"></a>linux的进程调度</h2><ul>
+<li><p>抢占式，无论是内核态还是用户态都可以抢占</p>
+</li>
+<li><p>分时技术：根据进程优先级去分配时间片</p>
+</li>
+<li><p>时间片轮转：对于优先级相同的进程，使用时间片轮转的方法</p>
+</li>
+<li><p>linux有两种进程：普通进程（100<del>149）和实时进程（0</del>99）</p>
+<ul>
+<li>实时进程优先级更高：有FIFO和RR两种策略</li>
+<li>普通进程只有时间片轮转算法</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/10/linux%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" itemprop="url">linux内存管理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:45+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="linux内存管理"><a href="#linux内存管理" class="headerlink" title="linux内存管理"></a>linux内存管理</h1><h2 id="虚拟内存空间的管理"><a href="#虚拟内存空间的管理" class="headerlink" title="虚拟内存空间的管理"></a>虚拟内存空间的管理</h2><ul>
+<li>linux操作系统采用的是<strong>请求式分页虚拟内存管理</strong></li>
+<li>每个进程有独立的4GB的虚拟内存空间</li>
+</ul>
+<blockquote>
+<p>IA32体系结构具有两种内存管理模式：</p>
+<p>实模式</p>
+<p>保护模式</p>
+</blockquote>
+<ul>
+<li>逻辑地址到物理地址的转换：<ul>
+<li>逻辑地址——&gt;线性地址（虚拟地址）——&gt;物理地址</li>
+</ul>
+</li>
+<li>内核空间到物理内存的映射<ul>
+<li>内核空间由所有进程共享，存放着内核代码和数据</li>
+<li>内核空间映射到物理内存总是从最低地址开始，建立线性关系</li>
+<li>系统启动时，内核映像被装载到物理地址1MB开始的地方</li>
+</ul>
+</li>
+</ul>
+<h3 id="进程用户空间"><a href="#进程用户空间" class="headerlink" title="进程用户空间"></a>进程用户空间</h3><p>linux把进程的用户空间划分成一个个区间。</p>
+<ul>
+<li>一个进程的用户进程空间由mm_struct结构描述（对进行的整个用户空间进行描述，memory descriptor）</li>
+<li>vm_area_struct结构是虚存空间的一个连续区域，所有的该结构体组成一个单链表，在这个区域里的信息具有相同的操作和访问特性。vm_mm指针指向mm_struct结构体；vm_strart和vm_end是虚拟区域的开始和终止地址</li>
+</ul>
+<p>创建进程用户空间</p>
+<ul>
+<li>通过fork()系统调用，在创建新进程的同时，也为该进程创建完整的用户空间</li>
+<li>新进程的用户空间——copy_mm()，通过写时复制技术创建的</li>
+</ul>
+<h2 id="linux的分页内存管理机制"><a href="#linux的分页内存管理机制" class="headerlink" title="linux的分页内存管理机制"></a>linux的分页内存管理机制</h2><p>linux总是假定处理器支持三级页表结构（对于IA32，把PGD和PMD合二为一）：</p>
+<ul>
+<li>页目录PGD</li>
+<li>页中间目录PMD</li>
+<li>页表PTE</li>
+</ul>
+<blockquote>
+<p>内核2.6.11之后采用四级页表模型</p>
+</blockquote>
+<ul>
+<li><p>线性地址到物理地址映射（以IA32为例）</p>
+<ul>
+<li>页目录：高10位</li>
+<li>页表：中间10位</li>
+<li>偏移：低12位，用来表示在一个页帧中的偏移</li>
+<li>每个进程都有一个页目录。由寄存器CR3指向该页目录的基地址</li>
+</ul>
+</li>
+<li><p>缺页异常：</p>
+<ul>
+<li>编程错误</li>
+<li>操作系统故意引发的异常</li>
+<li>缺页异常的处理程序是do_page_fault()函数：该函数有两个参数：一个是发送异常地址；一个是错误码；</li>
+<li>do_page_fault()执行过程：从CR2得到发送异常的线性地址；使用LRU去换页，为每个页面设置一个age，年纪越大，越容易被换</li>
+</ul>
+</li>
+<li><p>交换机制：当物理内存小于一个固定的极限时，就会执行换出操作</p>
+</li>
+</ul>
+<h2 id="物理内存的管理"><a href="#物理内存的管理" class="headerlink" title="物理内存的管理"></a>物理内存的管理</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>页帧：物理内存是以页帧为基本单位的，IA32为4kb</p>
+<p>结点：访问速度相同的一个内存区域，与处理器相关联</p>
+<p>zone：根据用途不同，将不同结点的物理内存分成不同的zone</p>
+<blockquote>
+<p>linux对于zone曹勇buddy system管理</p>
+</blockquote>
+<h3 id="page结构"><a href="#page结构" class="headerlink" title="page结构"></a>page结构</h3><p>页帧是由page结构体表示的。</p>
+<h3 id="物理内存的分配和回收"><a href="#物理内存的分配和回收" class="headerlink" title="物理内存的分配和回收"></a>物理内存的分配和回收</h3><ul>
+<li>buddy分配</li>
+</ul>
+<p>物理内存采用的是buddy分配算法，最小的分配单位是页帧，目的是分配一组连续的物理页帧。</p>
+<p>buddy：两组连续的页帧，满足——大小相同；物理地址连续；第2个页块后面的页帧必须是2n的倍数。</p>
+<p>buddy算法把内存中的所有页帧按照2^n划分，分成1，2，4，8.。。。。1024一共11种页块，每个页块组用一个双向循环链表进行管理，也就是一共有11个链表</p>
+<blockquote>
+<p>比如free_area[0]指向1页帧块的链表</p>
+<p>比如free_area[2]指向4页帧块的链表</p>
+</blockquote>
+<ul>
+<li><p>内存回收</p>
+<ul>
+<li>回收时需要检查与该页帧相邻的空闲页块，若存在则需要合成一个连续的空闲区，按buddy算法重新分组</li>
+</ul>
+</li>
+<li><p>slab分配器</p>
+<ul>
+<li>为了解决buddy算法以页帧为基本分配单位可能造成的内部碎片</li>
+<li>基本思想：为经常使用的小对象建立缓冲，小对象的申请和释放由slab分配器管理，不与buddy系统打交道</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/10/linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" itemprop="url">linux文件系统</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:27+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="linux文件系统"><a href="#linux文件系统" class="headerlink" title="linux文件系统"></a>linux文件系统</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>linux文件系统是一种机制或者说是一种协议，它用来组织存储设备上的数据和元数据。在linux文件系统中采用了多级目录的树型层次结构去管理文件，用&#x2F;表示。linux系统的文件系统都会安装到一个目录下，并隐藏了该目录的原有内容，这个目录叫做安装目录或者安装点。</p>
+<p>linux缺省的文件系统是ext2&#x2F;ext3&#x2F;ext4，继承自unix，这种文件系统把文件名和文件控制信息分开管理，文件控制信息组成一个inode结构。</p>
+<h2 id="文件类型"><a href="#文件类型" class="headerlink" title="文件类型"></a>文件类型</h2><ul>
+<li>普通文件，文件名不超过255字符</li>
+<li>目录文件：. 为目录本身，.. 为父目录</li>
+<li>字符设备文件&#x2F;块设备文件：linux把设备的I&#x2F;O作为对文件读写</li>
+<li>管道文件：进程间通信</li>
+<li>链接文件：符号链接文件，可以实现共享文件</li>
+<li>socket：网络文件</li>
+</ul>
+<h3 id="x2F-proc文件系统"><a href="#x2F-proc文件系统" class="headerlink" title="&#x2F;proc文件系统"></a>&#x2F;proc文件系统</h3><ul>
+<li>虚拟文件系统，用来获取系统的状态信息，并且可以改变系统的配置信息</li>
+</ul>
+<h2 id="VFS虚拟文件系统"><a href="#VFS虚拟文件系统" class="headerlink" title="VFS虚拟文件系统"></a>VFS虚拟文件系统</h2><p>为了使得各种物理文件系统能够转换成具有统一共性的文件系统，对各种文件系统进行抽象，linux使用了一种虚拟文件系统。</p>
+<p>另外VFS其实不是一种实际的文件系统，因为它不是存在于外存的，VFS是仅仅存在于内存。</p>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>假如用户输入 cp &#x2F;floopy&#x2F;TEST &#x2F;tmp&#x2F;test，其中前者是MS-DOS磁盘的挂载点，后者是ext2文件系统的一个目录，但因为VFS提供了系统调用接口，使得cp不用理会两者的文件系统而进行文件操作</p>
+<h3 id="VFS文件系统的结构"><a href="#VFS文件系统的结构" class="headerlink" title="VFS文件系统的结构"></a>VFS文件系统的结构</h3><p>文件模型：</p>
+<ul>
+<li>superblock：存储了已安装系统的信息，对应于物理文件系统的文件系统超级块<ul>
+<li>VFS把不同的文件系统中的组织结构信息进行抽象，形成了统一的、兼顾各种不同文件系统的统一的超级块。</li>
+<li>在具体文件系统安装时建立，在卸载时删除</li>
+<li>结构内有两个重要变量<ul>
+<li>s_type：指向文件系统类型的指针</li>
+<li>s_op：指向超级块（一个叫super_operations的结构）操作的指针，通过指向的那个操作结构，就可以得到包含着的一系列操作指针</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>inode object：存储文件信息<ul>
+<li>VFS的inode对象存在于内存。而物理文件系统的inode对象存在于外存，并长期存在</li>
+<li>有一个i_op指向inode_operations的结构</li>
+</ul>
+</li>
+<li>dentry object：描述一个目录项<ul>
+<li>为了加速访问，VFS文件系统维护着一个目录项的缓冲</li>
+</ul>
+</li>
+<li>file object：存储一个打开文件和一个进程的关联信息<ul>
+<li>与进程相关</li>
+<li>在open()时创建，close()时销毁</li>
+</ul>
+</li>
+</ul>
+<h3 id="文件类型的注册"><a href="#文件类型的注册" class="headerlink" title="文件类型的注册"></a>文件类型的注册</h3><p>linux支持的文件系统必须先注册后才能使用，注册有两种方式：</p>
+<ul>
+<li>在系统引导时在VFS中注册</li>
+<li>把文件系统做成可装载模块，在安装时在VFS中注册</li>
+</ul>
+<p>注册后的文件系统会登记在file_system_type结构中，从而组成一个注册链表</p>
+<h3 id="文件系统的安装"><a href="#文件系统的安装" class="headerlink" title="文件系统的安装"></a>文件系统的安装</h3><p>把ext2&#x2F;3&#x2F;4文件系统的磁盘分区作为系统的根文件系统，其它文件系统则安装在根文件系统下的某个目录下，成为系统树形结构的分支</p>
+<blockquote>
+<p>安装命令： mount -t vfat &#x2F;dev&#x2F;hda5 &#x2F;mnt&#x2F;win；</p>
+<p>mount -t ext2 -i loop .&#x2F;myfs &#x2F;mnt</p>
+</blockquote>
+<h3 id="文件的管理与操作"><a href="#文件的管理与操作" class="headerlink" title="文件的管理与操作"></a>文件的管理与操作</h3><p>对于打开的文件，有两种管理方式：</p>
+<ul>
+<li>通过系统打开文件表进行统一管理<ul>
+<li>把所有进程打开的文件集中管理，组成一个双向链表，每个结点就是一个file结构</li>
+</ul>
+</li>
+<li>进程的私有数据结构进行管理<ul>
+<li>fs_struct结构记录进程所在文件系统的根目录和当前目录</li>
+<li>files_struct结构包含着进程的打开文件表，打开的文件会建立一个file结构，该结构的地址会写到fd[]数组的第一个空闲元素，因此fd数组的下标则为文件描述符</li>
+</ul>
+</li>
+</ul>
+<h3 id="文件的open操作"><a href="#文件的open操作" class="headerlink" title="文件的open操作"></a>文件的open操作</h3><ul>
+<li>对应的内核函数是sys_open()</li>
+</ul>
+<h3 id="文件的read操作"><a href="#文件的read操作" class="headerlink" title="文件的read操作"></a>文件的read操作</h3><ul>
+<li>page cache：由于需要减少IO的次数，linux在读写文件时采用了页缓冲，对文件的读写需要经过页缓冲</li>
+</ul>
+<h2 id="ext2文件系统"><a href="#ext2文件系统" class="headerlink" title="ext2文件系统"></a>ext2文件系统</h2><ul>
+<li>实现了符号链接的方式</li>
+<li>ext2分区的第一个磁盘块用于引导</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/20/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><span class="page-number current">21</span><a class="page-number" href="/page/22/">22</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/22/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
