@@ -2396,14 +2396,14 @@
 
   
   <url>
-    <loc>http://yoursite.com/tags/Unix/</loc>
+    <loc>http://yoursite.com/tags/DesignPattern/</loc>
     <lastmod>2022-09-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/DesignPattern/</loc>
+    <loc>http://yoursite.com/tags/Unix/</loc>
     <lastmod>2022-09-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
