@@ -264,6 +264,159 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/07/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E8%B7%B3%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/08/07/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E8%B7%B3%E8%A1%A8/" itemprop="url">redis设计与实现——跳表</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-07T01:23:58+08:00">
+                2019-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="redis设计与实现——跳表"><a href="#redis设计与实现——跳表" class="headerlink" title="redis设计与实现——跳表"></a>redis设计与实现——跳表</h1><p>skiplist跳跃表是一种有序数据结构，通过在每个节点中维持多个节点中维持多个指向其他节点的指针。节点查找的时间复杂度，平均是O(logN)，最坏是O(N)，还可以批量操作处理节点。关于skiplist，可以参考<a target="_blank" rel="noopener" href="https://epaperpress.com/sortsearch/download/skiplist.pdf">论文</a>。</p>
+<p>在Redis中，跳跃表是作为有序集合键的底层实现基础。</p>
+<h2 id="跳跃表的实现"><a href="#跳跃表的实现" class="headerlink" title="跳跃表的实现"></a>跳跃表的实现</h2><p>Redis的跳跃表是在server.h&#x2F;zskiplistNode和server.h&#x2F;zskiplist两个结构体中定义的，其中前者表示表节点，后者用来保存节点的数量，头部和尾部节点指针等相关信息。</p>
+<p><img src="https://puui.qpic.cn/fans_admin/0/3_1218999906_1564163295350/0" alt="img"></p>
+<h3 id="跳跃表节点"><a href="#跳跃表节点" class="headerlink" title="跳跃表节点"></a>跳跃表节点</h3><p>跳跃表节点的结构体定义为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* ZSETs use a specialized version of Skiplists */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> &#123;</span></span><br><span class="line">    sds ele;</span><br><span class="line">    <span class="type">double</span> score;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">backward</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistLevel</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">forward</span>;</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span> span;</span><br><span class="line">    &#125; level[];</span><br><span class="line">&#125; zskiplistNode;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>level：这是跳跃表节点的level数组，包含了多个元素，每个元素都不包含了一个指向前方其他节点的指针。span则是跨度，如上图所示，箭头上方的就是跨度数值，在查找某个节点的过程中，将沿途访过的所有层的跨度累积起来，就是当前节点所在的排位；</li>
+<li>backward：后退指针，只有一个后退指针意味着每次只能往前一个节点；</li>
+<li>score：跳跃表中所有节点按照分数值从小到大排序；</li>
+<li>ele：指向一个SDS字符对象，ele是唯一的，因此score相同时，需要按照sds在字典序中的大小排序；</li>
+</ul>
+<h3 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h3><p>跳跃表的结构体定义为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplist</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">header</span>, *<span class="title">tail</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> length;</span><br><span class="line">    <span class="type">int</span> level;</span><br><span class="line">&#125; zskiplist;</span><br></pre></td></tr></table></figure>
+
+<p>redis使用zskiplist来管理所有的节点，比如表头节点和表尾节点，跳跃表长度以及level则表示在O(1)复杂度内获取跳跃表中层高最大的那个节点的层数量。</p>
+<p>另外表头节点虽然与其他节点构造一样，但其后退指针、分值和ele等属性都不使用，并且不参与zskiplist中level的计算。</p>
+<h2 id="创建跳跃表"><a href="#创建跳跃表" class="headerlink" title="创建跳跃表"></a>创建跳跃表</h2><p>创建跳跃表的操作主要是完成一些初始化的操作，其时间复杂度为O(1)。创建操作主要依赖两个函数：zslCreate()和zslCreateNode()。其中redis默认跳跃表的最大层级为64。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Should be enough for 2^64 elements */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ZSKIPLIST_MAXLEVEL 64 <span class="comment">// zskiplist的最大层级为64</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Create a new skiplist. */</span></span><br><span class="line">zskiplist *<span class="title function_">zslCreate</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> j;</span><br><span class="line">    zskiplist *zsl;</span><br><span class="line"></span><br><span class="line">    zsl = zmalloc(<span class="keyword">sizeof</span>(*zsl));</span><br><span class="line">    zsl-&gt;level = <span class="number">1</span>;</span><br><span class="line">    zsl-&gt;length = <span class="number">0</span>;</span><br><span class="line">    zsl-&gt;header = zslCreateNode(ZSKIPLIST_MAXLEVEL,<span class="number">0</span>,<span class="literal">NULL</span>);<span class="comment">//创建一个节点</span></span><br><span class="line">  	<span class="comment">// 表头指针的后退指针和分值，ele都不作使用</span></span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; ZSKIPLIST_MAXLEVEL; j++) &#123;</span><br><span class="line">        zsl-&gt;header-&gt;level[j].forward = <span class="literal">NULL</span>;</span><br><span class="line">        zsl-&gt;header-&gt;level[j].span = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    zsl-&gt;header-&gt;backward = <span class="literal">NULL</span>;</span><br><span class="line">    zsl-&gt;tail = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> zsl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Create a skiplist node with the specified number of levels.</span></span><br><span class="line"><span class="comment"> * The SDS string &#x27;ele&#x27; is referenced by the node after the call. */</span></span><br><span class="line">zskiplistNode *<span class="title function_">zslCreateNode</span><span class="params">(<span class="type">int</span> level, <span class="type">double</span> score, sds ele)</span> &#123;</span><br><span class="line">    zskiplistNode *zn =</span><br><span class="line">        zmalloc(<span class="keyword">sizeof</span>(*zn)+level*<span class="keyword">sizeof</span>(<span class="keyword">struct</span> zskiplistLevel));</span><br><span class="line">    zn-&gt;score = score;</span><br><span class="line">    zn-&gt;ele = ele;</span><br><span class="line">    <span class="keyword">return</span> zn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="插入新节点"><a href="#插入新节点" class="headerlink" title="插入新节点"></a>插入新节点</h2><p>新节点的插入是通过zslInsert实现的，给定分数值和ele元素则可返回新的跳跃表节点。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">zskiplistNode *<span class="title function_">zslInsert</span><span class="params">(zskiplist *zsl, <span class="type">double</span> score, sds ele)</span> &#123;</span><br><span class="line">    zskiplistNode *update[ZSKIPLIST_MAXLEVEL], *x;</span><br><span class="line">    <span class="comment">// 记录每一层插入节点的前面一个节点在skiplist中的排名</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> rank[ZSKIPLIST_MAXLEVEL];</span><br><span class="line">    <span class="type">int</span> i, level;</span><br><span class="line"></span><br><span class="line">    serverAssert(!isnan(score));</span><br><span class="line">    x = zsl-&gt;header;</span><br><span class="line">  	<span class="comment">// 计算待插入点的位置</span></span><br><span class="line">    <span class="keyword">for</span> (i = zsl-&gt;level<span class="number">-1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="comment">/* store rank that is crossed to reach the insert position */</span></span><br><span class="line">        rank[i] = i == (zsl-&gt;level<span class="number">-1</span>) ? <span class="number">0</span> : rank[i+<span class="number">1</span>];</span><br><span class="line">      	<span class="comment">// 先根据score比较，相等即根据sds的字符串字典序比较</span></span><br><span class="line">        <span class="keyword">while</span> (x-&gt;level[i].forward &amp;&amp;</span><br><span class="line">                (x-&gt;level[i].forward-&gt;score &lt; score ||</span><br><span class="line">                    (x-&gt;level[i].forward-&gt;score == score &amp;&amp;</span><br><span class="line">                    sdscmp(x-&gt;level[i].forward-&gt;ele,ele) &lt; <span class="number">0</span>)))</span><br><span class="line">        &#123;</span><br><span class="line">            rank[i] += x-&gt;level[i].span;</span><br><span class="line">            x = x-&gt;level[i].forward;</span><br><span class="line">        &#125;</span><br><span class="line">        update[i] = x;<span class="comment">// 每一个层级的待插入位置，即当前层最后一个小于x的点</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 重复插入相同的元素，这种情况是不会发生的</span></span><br><span class="line"><span class="comment">     * 如果元素在内部，则zslInsert()的调用者应该在哈希表中进行测试是否在里面 */</span></span><br><span class="line">    level = zslRandomLevel();</span><br><span class="line">  	<span class="comment">// 如果计算出来的层级比当前层级高，则重设超出zsl原来层级的指针</span></span><br><span class="line">    <span class="keyword">if</span> (level &gt; zsl-&gt;level) &#123;</span><br><span class="line">        <span class="keyword">for</span> (i = zsl-&gt;level; i &lt; level; i++) &#123;</span><br><span class="line">            rank[i] = <span class="number">0</span>;</span><br><span class="line">            update[i] = zsl-&gt;header;</span><br><span class="line">            update[i]-&gt;level[i].span = zsl-&gt;length;</span><br><span class="line">        &#125;</span><br><span class="line">        zsl-&gt;level = level;</span><br><span class="line">    &#125;</span><br><span class="line">    x = zslCreateNode(level,score,ele); <span class="comment">// 创建新的节点</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; level; i++) &#123;</span><br><span class="line">      	<span class="comment">// 插入到当前位置(update[i]的前面)</span></span><br><span class="line">        x-&gt;level[i].forward = update[i]-&gt;level[i].forward;</span><br><span class="line">        update[i]-&gt;level[i].forward = x;</span><br><span class="line">				</span><br><span class="line">      	<span class="comment">/* rank[0] - rank[i] 是x在第i层的前一个节点与x之间的距离*/</span></span><br><span class="line">        <span class="comment">/* 更新插入点的跨度 */</span></span><br><span class="line">        x-&gt;level[i].span = update[i]-&gt;level[i].span - (rank[<span class="number">0</span>] - rank[i]);</span><br><span class="line">      	<span class="comment">/* 更新插入点前一个节点的跨度 */</span></span><br><span class="line">        update[i]-&gt;level[i].span = (rank[<span class="number">0</span>] - rank[i]) + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 自增没有到达的层级的span */</span></span><br><span class="line">    <span class="keyword">for</span> (i = level; i &lt; zsl-&gt;level; i++) &#123;</span><br><span class="line">        update[i]-&gt;level[i].span++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    x-&gt;backward = (update[<span class="number">0</span>] == zsl-&gt;header) ? <span class="literal">NULL</span> : update[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">if</span> (x-&gt;level[<span class="number">0</span>].forward)</span><br><span class="line">        x-&gt;level[<span class="number">0</span>].forward-&gt;backward = x;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        zsl-&gt;tail = x;</span><br><span class="line">    zsl-&gt;length++;</span><br><span class="line">    <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中随机层级的实现如下，<em>redis</em>的跳跃表最大层数为64，能够足够支撑优化2^64个元素的查找。其中获取随机层级时，越高的层级数出现的几率越小，而且每往上一个层级，其概率为1&#x2F;4。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Returns a random level for the new skiplist node we are going to create.</span></span><br><span class="line"><span class="comment"> * The return value of this function is between 1 and ZSKIPLIST_MAXLEVEL</span></span><br><span class="line"><span class="comment"> * (both inclusive), with a powerlaw-alike distribution where higher</span></span><br><span class="line"><span class="comment"> * levels are less likely to be returned. */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">zslRandomLevel</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> level = <span class="number">1</span>;</span><br><span class="line">  	<span class="comment">// #define ZSKIPLIST_P 0.25      /* Skiplist P = 1/4 */</span></span><br><span class="line">  	<span class="comment">// random()&amp;0xFFFF的结果就是一个0-65535的数</span></span><br><span class="line">    <span class="keyword">while</span> ((random()&amp;<span class="number">0xFFFF</span>) &lt; (ZSKIPLIST_P * <span class="number">0xFFFF</span>))</span><br><span class="line">        level += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> (level&lt;ZSKIPLIST_MAXLEVEL) ? level : ZSKIPLIST_MAXLEVEL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h2><ul>
+<li>跳跃表时有序集合的底层实现之一；</li>
+<li>Redis跳跃表时由在server.h的zskiplistNode和zskiplist实现的；</li>
+<li>每个跳跃表节点层高都是1-64的随机数；</li>
+<li>多个节点可以包含相同的score，但ele时唯一的；</li>
+</ul>
+<h2 id="源码版本"><a href="#源码版本" class="headerlink" title="源码版本"></a>源码版本</h2><p>截至2019&#x2F;07&#x2F;27，5.0之后的版本，commitId为：505a855000ef8f1fbea9cb41841fa8708175bba4</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/01/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E2%80%94%E2%80%94%E5%AD%97%E5%85%B8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1785,183 +1938,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/19/C-11-unordered-map/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/19/C-11-unordered-map/" itemprop="url">C++11:unordered_map</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-19T16:52:22+08:00">
-                2019-05-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Unordered-Map"><a href="#Unordered-Map" class="headerlink" title="Unordered Map"></a>Unordered Map</h1><h2 id="Basic-Usage-Detail-and-Example"><a href="#Basic-Usage-Detail-and-Example" class="headerlink" title="Basic Usage Detail and Example"></a>Basic Usage Detail and Example</h2><p>Unordered map是C++11新出的特性，它提供了一种map的实现机制，可以存储键值对。Unordered map内部实现了哈希函数，当我们插入一个新的元素时：</p>
-<ul>
-<li>首先对key做哈希函数处理，然后选择一个合适的bucket；</li>
-<li>比较该bucket下的key是否重复；</li>
-<li>在不重复的情况下，添加该元素到bucket中；</li>
-</ul>
-<p>因此Unordered map时无序的，并且其搜索元素的时间复杂度为O(1)。</p>
-<h2 id="Different-Ways-to-initialize-an-unordered-map"><a href="#Different-Ways-to-initialize-an-unordered-map" class="headerlink" title="Different Ways to initialize an unordered_map"></a>Different Ways to initialize an unordered_map</h2><p>unordered map提供了三种不同的重载构造器：</p>
-<ul>
-<li>通过initializer_list初始化</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; <span class="title">wordMap</span><span class="params">(&#123;</span></span></span><br><span class="line"><span class="params"><span class="function">												  &#123; <span class="string">&quot;First&quot;</span>, <span class="number">1</span> &#125;,</span></span></span><br><span class="line"><span class="params"><span class="function">												  &#123; <span class="string">&quot;Second&quot;</span>, <span class="number">2</span> &#125;,</span></span></span><br><span class="line"><span class="params"><span class="function">												  &#123; <span class="string">&quot;Third&quot;</span>, <span class="number">3</span> &#125; &#125;)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用iterable range初始化</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; <span class="title">wordMap_2</span><span class="params">(wordMap.begin(), wordMap.end())</span></span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用另一个unordered_map初始化</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; <span class="title">wordMap_3</span><span class="params">(wordMap)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Searching-in-unordered-map"><a href="#Searching-in-unordered-map" class="headerlink" title="Searching in unordered_map"></a>Searching in unordered_map</h2><p>unordered_map提供了一个成员函数find()，改函数接受一个key作为参数，在找到元素的时候就会返回一个相对应的迭代器，否则会返回map的尾部迭代器。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">find</span> <span class="params">( <span class="type">const</span> key_type&amp; k )</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Different-ways-to-insert-elements-in-an-unordered-map"><a href="#Different-ways-to-insert-elements-in-an-unordered-map" class="headerlink" title="Different ways to insert elements in an unordered_map"></a>Different ways to insert elements in an unordered_map</h2><p>unordered_map提供了多种insert()成员函数的重载版本，我们来一一讨论：</p>
-<ul>
-<li>通过initializer_list插入多个元素；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">insert</span> <span class="params">( initializer_list&lt;value_type&gt; il )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Example</span></span><br><span class="line">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; wordMap;</span><br><span class="line"><span class="comment">// Inserting elements through an initializer_list</span></span><br><span class="line">wordMap.<span class="built_in">insert</span>(&#123; &#123;<span class="string">&quot;First&quot;</span>, <span class="number">1</span>&#125;, &#123;<span class="string">&quot;Second&quot;</span>, <span class="number">2</span>&#125;, &#123;<span class="string">&quot;Third&quot;</span>, <span class="number">3</span>&#125; &#125; );</span><br></pre></td></tr></table></figure>
-
-<p>这种插入方式有一个缺点，因为insert()返回的是void类型，因此在添加重复key的元素时，用户无法确定插入是否成功。</p>
-<ul>
-<li>unordered_map提供了一个重载版本，它接受std::pair of key – value 作为参数，并返回一对迭代器和bool变量，通过该bool变量我们就可以判断插入是否成功；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">pair&lt;iterator,<span class="type">bool</span>&gt; <span class="title">insert</span> <span class="params">( <span class="type">const</span> value_type&amp; val )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> std::unordered_map&lt;std::string, <span class="type">int</span>&gt;::iterator UOMIterator;</span><br><span class="line"><span class="comment">// Pair of Map Iterator and bool value</span></span><br><span class="line">std::pair&lt; UOMIterator , <span class="type">bool</span>&gt; result;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Inserting an element through pair</span></span><br><span class="line">result = wordMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>&lt;std::string, <span class="type">int</span>&gt;(<span class="string">&quot;Second&quot;</span>, <span class="number">6</span>));</span><br><span class="line"><span class="keyword">if</span>(result.second == <span class="literal">false</span>)</span><br><span class="line">      std::cout&lt;&lt;<span class="string">&quot;Element &#x27;Second&#x27; not inserted again&quot;</span>&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Erasing-an-element"><a href="#Erasing-an-element" class="headerlink" title="Erasing an element"></a>Erasing an element</h2><p>要想从unordered_map中删除元素，其提供了两种方式，如下：</p>
-<ul>
-<li>通过提供key类型，即可删除该元素；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">size_type <span class="title">erase</span> <span class="params">( <span class="type">const</span> key_type&amp; k )</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p>它的返回值为0或1，对应的是被删除的元素数量</p>
-<ul>
-<li>通过迭代器删除元素；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">erase</span> <span class="params">( const_iterator pos )</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p>改函数接收一个迭代器对象，并删除其对应的元素。在删除1，返回指向被删除元素对应的下一个元素的迭代器。因此需要注意的是，在遍历迭代器的过程中删除元素，其返回值是一个有效的迭代器，为被删除元素的下一个。</p>
-<h2 id="std-map-vs-std-unordered-map"><a href="#std-map-vs-std-unordered-map" class="headerlink" title="std::map vs std::unordered_map"></a>std::map vs std::unordered_map</h2><p>本节主要讨论std::map与std::unordered_map的区别，它们虽然都是存储键值对与实现了有效插入、搜索和删除操作，但有着以下的不同：</p>
-<ul>
-<li>内部实现：与std::unordered_map不同，std::map是通过二叉搜索树存储元素的，因此它能通过key进行排序；</li>
-<li>内存使用：std::unordered_map需要更多的内存来存储哈希表；</li>
-<li>搜索的时间复杂度：由于std::map是树的结构，因此其时间复杂度为O(log n)，而std::unordered_map最好的时间复杂度是O(1)，最坏的情况是O(n)，即所有元素在同一个bucket；</li>
-<li>自定义key的使用方法：使用自定义key时，对于std::map来说，需要重载&lt;操作符或者传入外部的comparator比较器，对于std::unordered_map则需要提供std::hash&lt;K&gt;，同时我们还需要重载&#x3D;&#x3D;操作符；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2012,7 +1988,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-count">265</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

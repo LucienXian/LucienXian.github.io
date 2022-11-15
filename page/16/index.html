@@ -264,6 +264,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/29/cs231n-lecture3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/29/cs231n-lecture3/" itemprop="url">cs231n@lecture3</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-29T23:14:20+08:00">
+                2018-05-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="损失函数与优化"><a href="#损失函数与优化" class="headerlink" title="损失函数与优化"></a>损失函数与优化</h1><p>##损失函数</p>
+<p>线性分类器：高维空间下的线性决策边界。</p>
+<p>loss function：判断我们分类器的效果，损失函数有多种版本：softmax和svm</p>
+<p>svm的实现公式如下：<br>$$<br>L &#x3D; \frac1N\sum_{i}\sum_{j\neq y_i} [max (0, f(x_i, W)<em>j - f(x_i, W)</em>{y_i} + 1)] + \alpha R(W)<br>$$<br>通过上面的公式可看到，如果基于参数集W做出的分类预测与真实情况比较接近，那么计算出来的L就会比较小。因此，我们需要做<strong>Optimization</strong>，寻找使得顺势函数最小化的参数W的过程。</p>
+<h3 id="multiclass-svm"><a href="#multiclass-svm" class="headerlink" title="multiclass svm"></a>multiclass svm</h3><p>如果真实分类的分数比其他类分数高很多（一般我们可以加上一个边界），我们是满意的；否则，我们认为会得到一些loss。</p>
+<p>svn损失函数最小值为0，最大值是无穷大，看hinge图。</p>
+<p>如果所有的score都接近0，并且相差不大，那么损失函数为C-1。</p>
+<p>使得loss为0的W不是唯一的，可以加倍，那么边界也会加倍。</p>
+<p>不需要关心分类器在训练集上的表现，避免过拟合。因此，我们可以对loss进行正则化，增加一个正则项。</p>
+<ul>
+<li>L2正则化、L1正则化</li>
+</ul>
+<h3 id="softmax-classifier"><a href="#softmax-classifier" class="headerlink" title="softmax classifier"></a>softmax classifier</h3><p>使得概率接近1</p>
+<p>刚开始应该是-logC</p>
+<h2 id="最优化"><a href="#最优化" class="headerlink" title="最优化"></a>最优化</h2><p>SVM损失函数是一个凸函数，但我们最终的目标并不仅仅是对凸函数进行优化，而是能够最优化一个神经网络。</p>
+<p>我们使用的策略是<strong>follow the slope</strong>。即根据梯度在权重空间W中寻找一个方向，沿着该方向能够降低损失函数的损失值。</p>
+<p>计算梯度有两种方法：</p>
+<ul>
+<li>有限差分法</li>
+</ul>
+<p>为了计算梯度，我们是在梯度负方向进行更新，这样才能使得损失函数值降低；另外，我们要注意步长的影响，梯度指明了函数在哪个方向是变化率最大的，但步长则指明了在这个方向上走多远。步长也叫学习率。小步长下降稳定，但进度慢，大步长则是进展快，但风险高，容易错过最优点。</p>
+<p>从效率来看，有限差分法每走一步就需要计算n次损失函数的梯度（n为参数数量），这是一种效率极低的策略</p>
+<ul>
+<li>微积分计算梯度</li>
+</ul>
+<p>用SVM的损失函数在某个数据点上的计算为例：<br>$$<br>L_i &#x3D; \sum_{j\neq y_i} \left[ \max(0, w_j^Tx_i - w_{y_i}^Tx_i + \Delta) \right]<br>$$<br>然后对函数进行微分。比如对$w_{y_i}$进行微分：<br>$$<br>\nabla_{w_{y_i}} L_i &#x3D; - \left( \sum_{j\neq y_i} \mathbb{1}(w_j^Tx_i - w_{y_i}^Tx_i + \Delta &gt; 0) \right) x_i<br>$$<br>其中<strong>1</strong>是一个示性函数，如果括号中的条件为真，那么函数值为1，如果为假，则函数值为0。这是对正确分类的梯度，至于不正确的分类的梯度计算：<br>$$<br>\nabla_{w_j} L_i &#x3D; \mathbb{1}(w_j^Tx_i - w_{y_i}^Tx_i + \Delta &gt; 0) x_i<br>$$<br>以下就是，在梯度下降过程中，我们计算权重的梯度，然后使用它们来实现参数的更新</p>
+<p><img src="https://pic2.zhimg.com/80/03b3eccf18ee3760e219f9f95ec14305_hd.jpg" alt="img"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/29/cs231n-lecture2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1744,225 +1890,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/Clustering/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/19/Clustering/" itemprop="url">Clustering.md</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T21:23:25+08:00">
-                2018-04-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="聚类"><a href="#聚类" class="headerlink" title="聚类"></a>聚类</h1><h2 id="聚类任务"><a href="#聚类任务" class="headerlink" title="聚类任务"></a>聚类任务</h2><p>在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。</p>
-<p>假设有样本集D &#x3D; {x1,x2…xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l&#x3D;1,2,…,k}。</p>
-<p>作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。</p>
-<h2 id="性能度量"><a href="#性能度量" class="headerlink" title="性能度量"></a>性能度量</h2><p>性能的度量主要是为了评估聚类结果的好坏，一般来说我们使用两种方法：</p>
-<ol>
-<li>将聚类结果与某个“参考模板”进行比较，也就是使用外部指标。</li>
-</ol>
-<p>假设λ与λ<em>分别表示C和C</em>对应的簇标记向量，我们将样本两两配对考虑。</p>
-<p><img src="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png" alt="img"></p>
-<blockquote>
-<p>其中集合SS包含了在C中属于相同簇，且在C<em>也属于相同簇的样本对；<br>集合SD则是包含了在C中属于相同簇，但在C</em>中不属于相同簇的样本对；<br>如此类推。。。。</p>
-</blockquote>
-<p>由于每个样本对(xi,xj)只能出现在一个集合中，因此有<strong>a+b+c+d&#x3D;C(m,2)&#x3D;m(m-1)&#x2F;2</strong>。</p>
-<p>最后导出以下的外部度量指标：</p>
-<ul>
-<li>Jaccard系数: JC &#x3D; a&#x2F;(a+b+c)</li>
-<li>FM指数：FMI &#x3D; &amp;radic;(a&#x2F;a+b)*(a&#x2F;a+c)</li>
-<li>Rand指数：RI &#x3D; 2(a+b)&#x2F;(m*(m-1))</li>
-</ul>
-<p>上述指标都在[0, 1]之间，值越大越好</p>
-<ol start="2">
-<li>直接考虑聚类结果，不参考任何的模型</li>
-</ol>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png" alt="img"></p>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png" alt="img"></p>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png" alt="img"></p>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-9.png" alt="img"></p>
-<blockquote>
-<p>其中dist(.,.)用来计算两个样本之间的距离；diam(C)表示簇C内样本间的最远距离；dmin(Ci,Cj)对应于簇Ci与Cj最近样本的距离；dcen(Ci,Cj)表示簇Ci与簇Cj中心点间的距离</p>
-</blockquote>
-<p>一般用以下的指标去评估聚类性能:</p>
-<ul>
-<li>DB指数：</li>
-</ul>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-10.png" alt="img"></p>
-<ul>
-<li>Dunn指数：</li>
-</ul>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-11.png" alt="img"></p>
-<p>显然，DBI越小越好，表示簇内距离小，簇间距离大；而DI则相反，越大越好，表示簇间距离大，簇内距离小</p>
-<h2 id="距离计算"><a href="#距离计算" class="headerlink" title="距离计算"></a>距离计算</h2><p>一般来说，我们希望函数dist(.,.)，也就是距离度量，满足以下的一些基本性质：</p>
-<ul>
-<li>非负性：dist(xi,xj)&gt;&#x3D;0</li>
-<li>同一性：dist(xi,xj)&#x3D;0，当且仅当xi&#x3D;xj</li>
-<li>对称性：dist(xi,xj)&#x3D;dist(xj,xi)</li>
-<li>直递性：dist(xi,xj)&lt;&#x3D;dist(xj,xk)+dist(xk,xj)</li>
-</ul>
-<p>在讨论距离计算时，属性是否有序很关键，例如定义域为{1,2,3}的属性，能直接在属性值上计算距离，这种就称为有序属性；而对于定义域为{飞机，火车，轮船}这些，称为无序属性</p>
-<h3 id="有序属性"><a href="#有序属性" class="headerlink" title="有序属性"></a>有序属性</h3><p>给定样本xi&#x3D;(xi1,xi2,…,xin)与xj&#x3D;(xj1,xj2,…,xjn)，最常用的就是<strong>Minkowski distance</strong></p>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png" alt="img"></p>
-<p>当p&#x3D;2，也叫欧式距离</p>
-<h3 id="无序属性"><a href="#无序属性" class="headerlink" title="无序属性"></a>无序属性</h3><p>首先来看几个假设：m(u,a)表示在属性u取值为a的样本数，m(u,a,i)则是表示第i个样本簇在属性u取值为a的样本数。于是得到以下的公式(VDN)来计算距离。</p>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png" alt="img"></p>
-<p>另外，还可以结合Minkowski distance和VDM，保证处理混合属性</p>
-<p><img src="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png" alt="img"></p>
-<p>但对于无序属性，有可能会出现直递性失效，以“人”，“马”，“人马”为例，“人”和“马”都与“人马”很接近，但“人”与“马”差距很大，这种就叫做<strong>非度量距离</strong>。</p>
-<h2 id="原型聚类"><a href="#原型聚类" class="headerlink" title="原型聚类"></a>原型聚类</h2><p>prototype-based clustering，此类算法假设聚类结构能够基于一组原型刻画</p>
-<h3 id="k-means-算法"><a href="#k-means-算法" class="headerlink" title="k-means 算法"></a>k-means 算法</h3><p>对于一个样本集和目标簇数，我们希望最小化以下的误差，其中ui就是簇Ci的均值向量。</p>
-<p><img src="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png" alt="img"></p>
-<p>算法思想比较简单：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 随机选择k个样本作为初始的均值向量</span><br><span class="line"><span class="number">2.</span> 进入循环</span><br><span class="line"><span class="number">3.</span> 计算每个样本与各个均值向量的距离，将样本划分到距离最小的均值向量所代表的簇中</span><br><span class="line"><span class="number">4.</span> 根据划分的聚类，计算新的均值中心</span><br><span class="line"><span class="number">5.</span> 如果均值向量没有变化，则退出循环</span><br></pre></td></tr></table></figure>
-
-<h3 id="学习向量量化"><a href="#学习向量量化" class="headerlink" title="学习向量量化"></a>学习向量量化</h3><p><strong>Learning Vector Quantization</strong>是针对带有标记的数据样本的。对于这种情况，我们可以根据簇数选择一组n维向量（维度与样本一致）</p>
-<p>具体算法为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先初始化一组原型向量</span><br><span class="line"><span class="number">2.</span> 从样本集中随机抽取样本(xi,yi)</span><br><span class="line"><span class="number">3.</span> 找出与样本距离最近的一个原型向量</span><br><span class="line"><span class="number">4.</span> 比较两者类别是否一致</span><br><span class="line"><span class="number">5.</span> 一致则通过公式逼近，否则则使其离得更远</span><br><span class="line"><span class="number">6.</span> 直到迭代次数最大或者原型向量不怎么更新为止</span><br><span class="line">==========================================</span><br><span class="line"><span class="number">7.</span> 得到原型向量之后，再对样本进行相应的分类</span><br></pre></td></tr></table></figure>
-
-<p>这里的关键是如何更新原型向量：</p>
-<ul>
-<li>如果类型一致：新的向量 p &#x3D; pi + u(xj-pi);</li>
-<li>如果类型不一致： p &#x3D; pi - u(xj-pi);</li>
-</ul>
-<p>这里的u是学习率，范围为[0,1]。之所以满足逼近或者离得更远：</p>
-<blockquote>
-<p>|p-xj| &#x3D; |pi+u(xj-pi)-xj| &#x3D; (1-u)|pi-xj|</p>
-</blockquote>
-<p>由此可见，这种情况下p会在更新之后逼近xj</p>
-<h3 id="高斯混合聚类"><a href="#高斯混合聚类" class="headerlink" title="高斯混合聚类"></a>高斯混合聚类</h3><p>高斯混合聚类采用的是概率模型来表达聚类原型，我们定义高斯混合分布公式为：</p>
-<p><img src="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png" alt="img"></p>
-<p>该分布为k个高斯分布的叠加，其中ai为相应的混合系数,且权重和为1。</p>
-<p>算法步骤为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 初始化混合高斯分布的三个模型参数：ai，ui(平均值)，协方差矩阵</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> repeat：</span><br><span class="line"><span class="number">3.</span> 将样本投射到高斯分布中,计算其在各个高斯分布下的概率</span><br><span class="line"><span class="number">4.</span> 针对每一个高斯分布，计算每一个样本在该分布下的概率，即计算其对该分布的贡献。根据该贡献，重新去计算上面三个模型参数</span><br><span class="line"><span class="number">5.</span> 直到参数收敛，或者迭代次数达到最大</span><br></pre></td></tr></table></figure>
-
-<p>至于如何求解这三个参数，可以参考EM算法：<a target="_blank" rel="noopener" href="https://blog.csdn.net/u011974639/article/details/78302024">https://blog.csdn.net/u011974639/article/details/78302024</a></p>
-<p>简单概括，就是两步：</p>
-<ul>
-<li>先根据上一轮的参数来计算每个样本属于每个高斯分布的后验概率；</li>
-<li>再根据后验概率去更新参数；</li>
-</ul>
-<h2 id="密度聚类"><a href="#密度聚类" class="headerlink" title="密度聚类"></a>密度聚类</h2><p>这个算法假设聚类结构能够通过样本分布的紧密程度来确定，先来确定几个概念：</p>
-<ul>
-<li>邻域：对于样本集中的xj，邻域包含了样本集中与xj距离不大于某个值的样本</li>
-<li>核心对象：若xj的邻域包含了至少MinPts个样本，则xj就是一个核心对象</li>
-<li>密度直达：若xj位于xi的领域中，则xj由xj密度直达</li>
-<li>密度可达：若存在样本序列p1,…,pn，其中p1&#x3D;xi，pn&#x3D;xj，且pi+1可由pi密度直达，则称xj可由xi密度可达</li>
-</ul>
-<p>具体算法：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先根据邻域参数选出所有的核心对象；</span><br><span class="line"><span class="number">2.</span> 从任意一个核心对象出发，找出其密度可达的样本生成聚类簇，并将簇中的核心对象从第一步找到的核心对象集合中删除；</span><br><span class="line"><span class="number">3.</span> 紧接着从更新后的核心对象集合中随机选取一个核心对象，重复第二步；</span><br></pre></td></tr></table></figure>
-
-<h2 id="层次聚类"><a href="#层次聚类" class="headerlink" title="层次聚类"></a>层次聚类</h2><p>层次聚类可以采用“自底向上”或者“自顶向下”的策略，在这里我们介绍AGNES的策略，这是一种自底向上的聚合策略。</p>
-<p>它首先将每个样本看成一个初始聚类簇，然后在每次算法运行时找出距离最近的两个聚类簇进行合并，因此这里的关键就是计算两个聚类簇之间的距离，显然最小距离由两个簇的最近样本决定，最大距离由两个簇的最远样本决定，至于平均距离则是由两个簇的所有样本共同决定。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2013,7 +1940,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-count">265</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -264,6 +264,137 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-30/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/11/Effective-cpp-30/" itemprop="url">Effective-cpp-#30</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T20:14:37+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Understand-the-ins-and-outs-of-inlining"><a href="#Understand-the-ins-and-outs-of-inlining" class="headerlink" title="Understand the ins and outs of inlining"></a>Understand the ins and outs of inlining</h1><p>inline函数，不是第一次接触这个概念了。编译器的最优化机制会被设计用来执行语境相关的最优化。但有利有弊，由于inline函数的主体会被插到调用处。这样一来，你的目标码会变得越来越大，有可能导致额外的paging行为。</p>
+<br>
+
+<p>通常来说，inline函数有两种定义方法——一是在类内定义函数，这是一种隐喻的方式；二是在定义式前加inline关键字。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>inline函数尽量置于头文件内，因为大多数build environment通常会在编译时进行inlining，这是因为为了将一个“函数调用”替换为“被调用函数的本体”，编译器必须知道那个函数长什么样子。</p>
+<p>template的具体化与inline无关，我们需要的考虑的是——是否希望每一个具体实现的函数都是inline的，毕竟这有可能会引发代码膨胀。</p>
+<p>关于编译器的问题，编译器不一定就真的会对inline函数进行inline行为，例如编译器通常不会对“通过函数指针而进行的函数调用”进行inline行为。另外，如果程序要调用某个inline函数，往往，编译器会生成一个outlined函数本体</p>
+<p>最后一个需要注意的问题是，<strong>inline函数无法随着程序库的升级而升级</strong>。假设f是一个inline函数，而设计者修改了这个函数f，那么所有用到f的客户端程序都必须重新编译，而对于non-inline函数，客户端只需要重新链接即可，这比重新变异的负担少。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><ul>
+<li>将大多数inline限制在小型的、被频繁调用的函数身上。这可以使得日后的调试和二进制升级更加容易，也可以使得潜在的代码膨胀问题最小化；</li>
+<li>不要只因为function template出现在头文件，就将它们声明为inline；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-29/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1624,201 +1755,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/10/linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" itemprop="url">linux文件系统</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:27+08:00">
-                2018-01-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="linux文件系统"><a href="#linux文件系统" class="headerlink" title="linux文件系统"></a>linux文件系统</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>linux文件系统是一种机制或者说是一种协议，它用来组织存储设备上的数据和元数据。在linux文件系统中采用了多级目录的树型层次结构去管理文件，用&#x2F;表示。linux系统的文件系统都会安装到一个目录下，并隐藏了该目录的原有内容，这个目录叫做安装目录或者安装点。</p>
-<p>linux缺省的文件系统是ext2&#x2F;ext3&#x2F;ext4，继承自unix，这种文件系统把文件名和文件控制信息分开管理，文件控制信息组成一个inode结构。</p>
-<h2 id="文件类型"><a href="#文件类型" class="headerlink" title="文件类型"></a>文件类型</h2><ul>
-<li>普通文件，文件名不超过255字符</li>
-<li>目录文件：. 为目录本身，.. 为父目录</li>
-<li>字符设备文件&#x2F;块设备文件：linux把设备的I&#x2F;O作为对文件读写</li>
-<li>管道文件：进程间通信</li>
-<li>链接文件：符号链接文件，可以实现共享文件</li>
-<li>socket：网络文件</li>
-</ul>
-<h3 id="x2F-proc文件系统"><a href="#x2F-proc文件系统" class="headerlink" title="&#x2F;proc文件系统"></a>&#x2F;proc文件系统</h3><ul>
-<li>虚拟文件系统，用来获取系统的状态信息，并且可以改变系统的配置信息</li>
-</ul>
-<h2 id="VFS虚拟文件系统"><a href="#VFS虚拟文件系统" class="headerlink" title="VFS虚拟文件系统"></a>VFS虚拟文件系统</h2><p>为了使得各种物理文件系统能够转换成具有统一共性的文件系统，对各种文件系统进行抽象，linux使用了一种虚拟文件系统。</p>
-<p>另外VFS其实不是一种实际的文件系统，因为它不是存在于外存的，VFS是仅仅存在于内存。</p>
-<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>假如用户输入 cp &#x2F;floopy&#x2F;TEST &#x2F;tmp&#x2F;test，其中前者是MS-DOS磁盘的挂载点，后者是ext2文件系统的一个目录，但因为VFS提供了系统调用接口，使得cp不用理会两者的文件系统而进行文件操作</p>
-<h3 id="VFS文件系统的结构"><a href="#VFS文件系统的结构" class="headerlink" title="VFS文件系统的结构"></a>VFS文件系统的结构</h3><p>文件模型：</p>
-<ul>
-<li>superblock：存储了已安装系统的信息，对应于物理文件系统的文件系统超级块<ul>
-<li>VFS把不同的文件系统中的组织结构信息进行抽象，形成了统一的、兼顾各种不同文件系统的统一的超级块。</li>
-<li>在具体文件系统安装时建立，在卸载时删除</li>
-<li>结构内有两个重要变量<ul>
-<li>s_type：指向文件系统类型的指针</li>
-<li>s_op：指向超级块（一个叫super_operations的结构）操作的指针，通过指向的那个操作结构，就可以得到包含着的一系列操作指针</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>inode object：存储文件信息<ul>
-<li>VFS的inode对象存在于内存。而物理文件系统的inode对象存在于外存，并长期存在</li>
-<li>有一个i_op指向inode_operations的结构</li>
-</ul>
-</li>
-<li>dentry object：描述一个目录项<ul>
-<li>为了加速访问，VFS文件系统维护着一个目录项的缓冲</li>
-</ul>
-</li>
-<li>file object：存储一个打开文件和一个进程的关联信息<ul>
-<li>与进程相关</li>
-<li>在open()时创建，close()时销毁</li>
-</ul>
-</li>
-</ul>
-<h3 id="文件类型的注册"><a href="#文件类型的注册" class="headerlink" title="文件类型的注册"></a>文件类型的注册</h3><p>linux支持的文件系统必须先注册后才能使用，注册有两种方式：</p>
-<ul>
-<li>在系统引导时在VFS中注册</li>
-<li>把文件系统做成可装载模块，在安装时在VFS中注册</li>
-</ul>
-<p>注册后的文件系统会登记在file_system_type结构中，从而组成一个注册链表</p>
-<h3 id="文件系统的安装"><a href="#文件系统的安装" class="headerlink" title="文件系统的安装"></a>文件系统的安装</h3><p>把ext2&#x2F;3&#x2F;4文件系统的磁盘分区作为系统的根文件系统，其它文件系统则安装在根文件系统下的某个目录下，成为系统树形结构的分支</p>
-<blockquote>
-<p>安装命令： mount -t vfat &#x2F;dev&#x2F;hda5 &#x2F;mnt&#x2F;win；</p>
-<p>mount -t ext2 -i loop .&#x2F;myfs &#x2F;mnt</p>
-</blockquote>
-<h3 id="文件的管理与操作"><a href="#文件的管理与操作" class="headerlink" title="文件的管理与操作"></a>文件的管理与操作</h3><p>对于打开的文件，有两种管理方式：</p>
-<ul>
-<li>通过系统打开文件表进行统一管理<ul>
-<li>把所有进程打开的文件集中管理，组成一个双向链表，每个结点就是一个file结构</li>
-</ul>
-</li>
-<li>进程的私有数据结构进行管理<ul>
-<li>fs_struct结构记录进程所在文件系统的根目录和当前目录</li>
-<li>files_struct结构包含着进程的打开文件表，打开的文件会建立一个file结构，该结构的地址会写到fd[]数组的第一个空闲元素，因此fd数组的下标则为文件描述符</li>
-</ul>
-</li>
-</ul>
-<h3 id="文件的open操作"><a href="#文件的open操作" class="headerlink" title="文件的open操作"></a>文件的open操作</h3><ul>
-<li>对应的内核函数是sys_open()</li>
-</ul>
-<h3 id="文件的read操作"><a href="#文件的read操作" class="headerlink" title="文件的read操作"></a>文件的read操作</h3><ul>
-<li>page cache：由于需要减少IO的次数，linux在读写文件时采用了页缓冲，对文件的读写需要经过页缓冲</li>
-</ul>
-<h2 id="ext2文件系统"><a href="#ext2文件系统" class="headerlink" title="ext2文件系统"></a>ext2文件系统</h2><ul>
-<li>实现了符号链接的方式</li>
-<li>ext2分区的第一个磁盘块用于引导</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1869,7 +1805,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-count">265</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

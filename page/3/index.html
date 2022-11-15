@@ -264,6 +264,189 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/02/18/Bitcoin-A-Peer-to-Peer-Electronic-Cash-System%E2%80%94%E2%80%94MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/02/18/Bitcoin-A-Peer-to-Peer-Electronic-Cash-System%E2%80%94%E2%80%94MIT6-824/" itemprop="url">Bitcoin: A Peer-to-Peer Electronic Cash System——MIT6-824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-18T20:23:44+08:00">
+                2021-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Bitcoin-A-Peer-to-Peer-Electronic-Cash-System"><a href="#Bitcoin-A-Peer-to-Peer-Electronic-Cash-System" class="headerlink" title="Bitcoin: A Peer-to-Peer Electronic Cash System"></a>Bitcoin: A Peer-to-Peer Electronic Cash System</h1><blockquote>
+<p>一个纯粹的p2p电子支付能够绕过第三方金融机构直接从一方发到另外一方。数字签名能解决部分场景问题，但还不够好，因为仍旧需要一个信任的第三方去防止双重支付。因此论文提出一种解决方案来解决双重支付问题，即使用了一个点对点网络。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>目前网上的电子支付越来越依赖金融机构来充当可信的第三方机构，但这种基于信任的第三方机构具有天生的缺点：由于不可逆的交易并不存在，金融机构需要协调买卖双方的争端，产生的成本最终会转嫁到买家头上。而通过使用现金，由于可以一手交货一手交钱，这些成本可以进一步避免，但由于交易双方天生互不信任，在没有可信第三方机构的前提下，仍旧缺乏一个可靠的机制来保障交易的进行。总结来说，第三方的可信与否，现在的这套体系需要付出巨大的成本来处理，这是目前这套体系的“天然缺陷”。</p>
+<p>论文提出的电子支付系统就是一个基于密码学证明而非信任的系统，允许双方在不需要第三方机构的前提下进行直接的交易。计算上的不可逆性能保证卖家不被欺骗，而常规的第三方托管机构可以轻松地被使用来保护买家（卖家比买家更有优势？）。在论文里提出了一种方案来解决双重支付问题：使用一种p2p的分布式时间戳服务，生成交易的时间顺序的可计算证明。只要诚实节点共同控制的算力比攻击节点组织控制的算力大，那么整个系统就是安全。</p>
+<h2 id="Transactions"><a href="#Transactions" class="headerlink" title="Transactions"></a>Transactions</h2><p>论文对电子货币的定义就是一个带有数字签名的链表，每一个货币拥有者交易给下一个人时，先是通过对上一个交易的输出和接受者公钥进行hash后，然后货币拥有者再用自己的私钥对hash值进行数字签名，这样收款人就可以通过验证签名来进行溯源。</p>
+<p><img src="https://img.imgdb.cn/item/600bdec03ffa7d37b3aef39f.png"></p>
+<p>但这个过程有一个问题就是，无法验证付款人有没有双重支付，即这个付款人有没有同时转账给了另一个人。一个可靠的方法是引入一个中央机构，在每一笔交易后，这个货币必须被中央机构回收从而发行一个新的货币，并且只有货币是被直接从可信的中央机构发行才能保证不被双重支付，但这又回到了前面的银行老路了。</p>
+<p>论文的做法是，每一笔交易必须被公开广播出来，收款人需要确保，这笔交易是大多数节点所公认的第一次出现，第一次被接收。因为需要一个系统让所有参与者公认一个唯一的历史序列。</p>
+<h2 id="Timestamp-Server"><a href="#Timestamp-Server" class="headerlink" title="Timestamp Server"></a>Timestamp Server</h2><p>论文提出的解决方案先从时间服务器开始，其工作过程是把一组数据形成的区块hash结果加盖上时间戳并广播这个hash。这个时间戳就证明，这些数据在这个时刻一定是存在的。每一个时间戳在hash过程中都包含前面一个时间戳，随着每个新增的时间戳加强了可信度，让每一个区块都包含了前面所有区块的时间戳，这样构成了一个链条。</p>
+<p><img src="https://img.imgdb.cn/item/600be4823ffa7d37b3b17413.png"></p>
+<h2 id="Proof-of-Work"><a href="#Proof-of-Work" class="headerlink" title="Proof-of-Work"></a>Proof-of-Work</h2><p>为了实现一个基于p2p的分布式时间戳服务器，将会需要使用一个工作量证明系统。在hash的时候，工作量证明机制将参与扫描一个值，这个hash从一串0bits开始，平均工作量随着0的增长将呈指数级增长，然而只执行一个hash运算就能验证这个hash值。</p>
+<p>对于时间戳网络，我们通过在区块中增加一个随机数来实现这个工作量证明，直到一个指定块的hash所需要的0-bits值被找到。只要CPU效率被花费来作为工作量证明，除非重新做一遍相当的工作量，否则这个区块就不能再被改变。简单来说就是做的工作越多，找到这个随机数的概率就越大，这样就构建了一个工作量证明机制。</p>
+<p>工作量证明机制同时解决了大多数代表的问题，论文解释了不考虑一个IP一票的这种模式，因为这个机制很容易被拥有大多数IP的给颠覆。工作量证明本质上是一CPU一票，最长的链就表示了大多数，同时也有最大的工作量。如果一个大多数CPU的算力都被诚实节点所控制，那么该链就会增长得最快且超过其他任何链。想要改变一个过去的块，攻击者需要重做这个块和所有在这个块后的块工作量证明，之后还要追赶上并超过现在所有诚实节点的工作。一个更慢的攻击者想要追上不断延伸的区块链，可能性是呈指数级下降的。</p>
+<p><img src="https://img.imgdb.cn/item/600c44fd3ffa7d37b3e712cb.png"></p>
+<p>同时为了抵消硬件速度提升和节点变化的影响，工作量的困难度是由一个变化的平均目标决定的——每一个小时的平均区块，全网只按一个平均时间来生成一个区块。如果块生成的速度更快了，单位时间所需要的工作量就会变得更大，在同等算力下，计算随机数的难度更大了。</p>
+<h2 id="Network"><a href="#Network" class="headerlink" title="Network"></a>Network</h2><p>网络运行的步骤如下：</p>
+<ol>
+<li>新的交易被广播到所有节点；</li>
+<li>每一个节点都把新交易收集进入到一个块；</li>
+<li>每一个节点都为自己的块去找到那个工作量证明；</li>
+<li>节点找到后，将块广播给所有的节点；</li>
+<li>其他所有节点认可这个块的所有交易合法，并且接受这个块；</li>
+<li>节点开始使用该块的hash作为prev hash，开始转向下一个块的工作量证明；</li>
+</ol>
+<p>节点总是只认可最长的链，如果2个节点同时广播不同版本的块，一些节点会首先收到其中一个块，并为第一个收到块工作，但同时也保存下另一个块。当下一个工作量证明被发现的时候且这时另一条分支会变得更长，在其他分支工作的节点们也将会转换到这个最长的分支上，即块重组。</p>
+<p>新交易是没必要广播到所有的节点上，只要交易到达了许多节点上，它们就会进入到一个区块中。并且块的广播能够容忍被丢失的信息，节点意识到那一块缺失就可以进行请求。</p>
+<h2 id="Incentive"><a href="#Incentive" class="headerlink" title="Incentive"></a>Incentive</h2><p>一般来说，这里存在两种激励。</p>
+<p>一个块里面第一笔交易信息是一个特别的交易，它开始了一个新的币，这个币属于这个块的创造者，这就是系统对这个节点的激励，提供了一个方式来初始化货币进入到整个系统当中。</p>
+<p>另一种激励就是手续费了。如果一个交易的输出值小于输入值，那么这个差值就是交易的手续费，手续费被附加到包含交易信息的块中。一旦所有货币进入流通，这个激励机制就可完全地转变为交易手续费，并且可以完全避免通货膨胀。</p>
+<p>另外，激励可以帮助鼓励节点保持诚实。如果一个贪婪的攻击者能够收集到比所有诚实节点更多的CPU算力，他就面临一个选择：要么用这个算力进行二次支付来欺骗别人，或者使用算力来生成更多的货币。后者的收益更大，这就是一个博弈关系。</p>
+<h2 id="Reclaiming-Disk-Space"><a href="#Reclaiming-Disk-Space" class="headerlink" title="Reclaiming Disk Space"></a>Reclaiming Disk Space</h2><p>一旦一个货币最新的交易收入进入足够多的块中，那么在这笔交易之前的交易信息就能够被抛弃来节省硬盘资源。为了不损害块的hash，交易信息被hash成一种Merkle树的形态，只有root节点被包含进了这个区块的hash。通过拔除Merkle树的分支，不保存内部的hash值，以此来压缩块。</p>
+<p>此时一个块的头部大概会是80byte大小。假设块每10分钟就生成一个，那么每年产生<code>80bytes * 6 * 25 * 365 = 4.2MB</code>的数据。</p>
+<p><img src="https://img.imgdb.cn/item/600da6543ffa7d37b3902338.png"></p>
+<h2 id="Simplified-Payment-Verification"><a href="#Simplified-Payment-Verification" class="headerlink" title="Simplified Payment Verification"></a>Simplified Payment Verification</h2><p>支付验证不需要运行所有的网络节点，有些节点已经不再持有全部的块信息，但用户可以通过向网络节点发起询问从而拿到最长工作量证明链条上的块副本，从而得到了Merkle树的分支，连接到这个用户的交易被加上时间戳的地方。用户自己不能验证交易，但可以通过把交易连接到Merkle树的分支。就可以看见一个可以看到一个网络节点曾经接受过它，在它后面增加的块也能证明网络曾经接收过它。</p>
+<p><img src="https://img.imgdb.cn/item/600dae9e3ffa7d37b394b331.png"></p>
+<p>因而只要有多数诚实节点控制网络，支付的验证就是可靠的，而一旦网络被攻击者控制，一个简单的验证方法就是：当这些网络节点监测到一个非法的块，就会提醒用户去下载相关的全部区块，进行独立的安全验证。</p>
+<h2 id="Combining-and-Splitting-Value"><a href="#Combining-and-Splitting-Value" class="headerlink" title="Combining and Splitting Value"></a>Combining and Splitting Value</h2><p>虽然可以独立的处理电子货币，但在一次转账中为每一分钱都构造一个独立的交易是不明智的。为了能让价值能够分割和组合，交易包含了多个输入和输出。通常情况，前面的交易要么是一大笔单一的输入或者是包括很多小额的多笔输入，输出也有两种，一个是付款，另一个是找零。bitcoin只关心差额，不关心货币最小单元。</p>
+<p><img src="https://img.imgdb.cn/item/600db0e83ffa7d37b395e1a6.png"></p>
+<h2 id="Privacy"><a href="#Privacy" class="headerlink" title="Privacy"></a>Privacy</h2><p>传统的银行系统实现隐私的保护是通过限制访问信息被提供给相关的参与者和第三方。像现在的场景需要将全部交易公开广播的时候，就不能使用这种方法了。这里的做法是公钥匿名，公众可以看到有一个人转账给另一个人，但是没有信息能把交易和人联系在一起。</p>
+<p><img src="https://img.imgdb.cn/item/600db2213ffa7d37b396c40a.png"></p>
+<p>还有一个额外的防范机制，就是每次有新的交易，进来都使用一个新的密钥对。但一旦用户的公私密钥被泄漏，由于信息是全网公开的，通过多笔的输入交易，仍然可能推测出这个人是谁。</p>
+<h2 id="Calculations"><a href="#Calculations" class="headerlink" title="Calculations"></a>Calculations</h2><p>接下来我们考虑一个场景，一个攻击者尝试生成一条比目前诚实链还长的替换链。即便这样能实现，也不代表整个系统完全受制于攻击者。节点是不会接受无效的交易作为支付的，攻击者只能只能尝试修改他自己的交易信息，从而要回自己花掉的钱。</p>
+<p>诚实链和攻击链的竞争可以看作是一个Binomial RandomWalk，这是指随机漫步有两个方向的概率模型，要么是诚实链领先，要么是攻击链领先。成功事件是诚实链延长了一个块，使其+1领先，同时失败事件是攻击链延长一个块，使得差距-1。攻击者从一个既定的差距中追上的可能性可以看作是一个Gambler’s Ruinproblem。一个攻击者要追上诚实链，如下所示：</p>
+<ul>
+<li><p>P&#x3D;诚实链发现下一个区块的概率</p>
+</li>
+<li><p>q&#x3D;攻击者发现下一个区块的概率</p>
+</li>
+<li><p>qz&#x3D;攻击者花费了z个区块追赶上了</p>
+</li>
+</ul>
+<p><img src="https://img.imgdb.cn/item/600ef71e3ffa7d37b32d909f.png"></p>
+<p>假设p&gt;q，那么攻击者追上的概率就会随着块数目的增加而指数下降。现在可以考虑一个新的交易能够被充分地确认发送方不能再更改交易的情况要等多久，即不能再追上。假设付款人是一个攻击者，他希望收款方认为他已经付过款了，并且在之后把这个钱在付款后拿回来。收款方在这件事情发生的时候会被通知警告，但是付款方希望这件事情很久才发生。</p>
+<p>接收方生成了一个新密钥对并在短时间内把这个公钥给了付款方，这能有效防止付款方事先准备好一个在时间之前的区块链。</p>
+<p>一旦交易被发送，这个不诚实的发送者开始为包含替换他交易版本的并行链而秘密工作。事实上接收方不知道攻击者确切地进展了多少块。假设诚实块是花费平均时间来产生的，那么攻击者的潜在进展会呈现一种泊松密度分布，期望值λ是：</p>
+<p><img src="https://img.imgdb.cn/item/600ef91d3ffa7d37b32e42ca.png"></p>
+<p>为了得到攻击者能追上的概率，将泊松密度乘以从该点追上的概率得到：</p>
+<p><img src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e32.png"></p>
+<p><img src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e35.png"></p>
+<p>附上一段代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;math.h&gt;</span> </span></span><br><span class="line">doubleAttackerSuccessProbability(<span class="type">double</span> q, <span class="type">int</span> z)&#123;</span><br><span class="line">      <span class="type">double</span> p= <span class="number">1.0</span> - q;</span><br><span class="line">      doublelambda = z * (q / p);</span><br><span class="line">      doublesum = <span class="number">1.0</span>;</span><br><span class="line">      <span class="type">int</span> i, k;</span><br><span class="line">      <span class="keyword">for</span> (k =<span class="number">0</span>; k &lt;= z; k++)</span><br><span class="line">      &#123;</span><br><span class="line">             doublepoisson = <span class="built_in">exp</span>(-lambda);</span><br><span class="line">             <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= k; i++) </span><br><span class="line">                   poisson *= lambda / i; </span><br><span class="line">                   sum -= poisson * (<span class="number">1</span> - <span class="built_in">pow</span>(q / p, z - k));</span><br><span class="line">      &#125;    </span><br><span class="line">      <span class="keyword">return</span> sum; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>论文提出了一个不依赖信任的电子交易系统，为了解决双重支付的问题，提出了一种p2p的网络，并采用工作量证明机制来记录交易的历史。当大多数节点控制主要的CPU算力，攻击者就不会通过计算去修改。整个网络还是比较鲁棒的，独立工作不需要太多协调，不需要被认证，可随意离开或加入网络，通过CPU算力投票进行工作从而延长区块链，以此表达他们对有效区块的接受。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/18/Don%E2%80%99t-Settle-for-Eventual-Scalable-Causal-Consistency-for-Wide-Area-Storage-with-COPS%E2%80%94%E2%80%94MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1977,186 +2160,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/07/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing%E2%80%94%E2%80%94MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/12/07/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing%E2%80%94%E2%80%94MIT6-824/" itemprop="url">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing——MIT6.824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-07T23:54:18+08:00">
-                2019-12-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing"><a href="#Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing" class="headerlink" title="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing"></a>Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>本文介绍了弹性的分布式数据集，这是一种分布式的内存抽象形式，它可以让程序员以一种容错的方式在大型集群中进行内存计算。</p>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>尽管想MapReduce之类的框架已经提供了关于访问集群的计算资源的抽象，但仍然缺乏对于分布式内存的抽象，这使得它们在处理需要重用多个计算中中间结果的应用程序上不够高效。像一些机器学习算法、图算法，交互式数据挖掘都需要对数据子集做临时的查询，但那些框架的做法往往是将其写入到外部的存储系统里，这里IO、序列化之类的开销非常大。</p>
-<p>本文提出了一种弹性的分布式数据集的新抽象。其可以将中间结果明确地保存在内存中，控制其分区进行优化放置，并使用一组丰富的运算符进行操作。</p>
-<p>Apache Spark应运而生。</p>
-<h2 id="Resilient-Distributed-Datasets-RDDs"><a href="#Resilient-Distributed-Datasets-RDDs" class="headerlink" title="Resilient Distributed Datasets (RDDs)"></a>Resilient Distributed Datasets (RDDs)</h2><h3 id="RDD-Abstraction"><a href="#RDD-Abstraction" class="headerlink" title="RDD Abstraction"></a>RDD Abstraction</h3><p>所谓的弹性的分布式数据集，这里的弹性指的是在任何时候都可以进行重算，让用户不会感知到某部分内容曾经丢失过，这是Spark的核心抽象，是一种只读的、分区的数据记录集合。RDD的产生，要么通过从确定存储中获取，要么就是通过其它的RDD进行转换获取，这里的转换包括map、filter和join。</p>
-<p>RDD应该有足够的信息，去记录自身是如何从其它数据集派生而来的。用户可以控制RDD的持久化和分区，比如指示重用的RDD和存储策略，也可以命令RDD的元素进行分区。分区依照特定规则将具有相同属性的数据记录放在一起，每个分区相当于一个数据集片段。</p>
-<h3 id="Spark-Programming-Interface"><a href="#Spark-Programming-Interface" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h3><p>Spark会使用集成API的方式暴露RDD，其中每个数据集标示为一个对象，并使用对象上的方法进行调用转换。</p>
-<p>首先是会对稳定存储中的数据通过转换的方式定义一个或多个RDD，然后在操作中使用这些RDD，比如是返回数据给应用程序，还是导出到存储系统。此外，还可以对RDD进行持久化来指示哪些RDD是需要重用的，默认将持久性RDD保存在内存中，在RAM不够的话，将会将其溢出到磁盘，当然还有很多种持久化策略。</p>
-<h3 id="Advantages-of-the-RDD-Model"><a href="#Advantages-of-the-RDD-Model" class="headerlink" title="Advantages of the RDD Model"></a>Advantages of the RDD Model</h3><p>RDD与分布式共享内存最大的区别就是，RDD只能通过粗粒度的转换得来，而DSM则可以读取&#x2F;写入到每一个内存位置。这样RDD在处理容错时，就不会产生额外的有关checkpoint的开销，如果有分区丢失，RDD可以在不同的节点并行地重建，而不需要回滚整个系统。</p>
-<p>由于RDD的不可变特性，系统可以通过运行较慢的备份副本来缓解慢速节点，而DSM在这种情况会因为多副本访问相同内存位置，而产生干扰更新。</p>
-<h3 id="Applications-Not-Suitable-for-RDDs"><a href="#Applications-Not-Suitable-for-RDDs" class="headerlink" title="Applications Not Suitable for RDDs"></a>Applications Not Suitable for RDDs</h3><p>RDD更适用于在批处理应用程序中对全集数据执行相同的操作，在这种情况下，RDD能够很好地记录每一步的转换，并且能够在分区丢失时快速恢复。</p>
-<p>而对于那些需要对共享状态进行异步更新的应用，RDD则不适合。</p>
-<h2 id="Spark-Programming-Interface-1"><a href="#Spark-Programming-Interface-1" class="headerlink" title="Spark Programming Interface"></a>Spark Programming Interface</h2><p>为了使用Spark，开发人员编写了一个驱动程序，用以连接到一组worker，并通过一个或多个RDD来调用action，同时该驱动程序上的Spark代码还可以跟踪RDD的lineage（血统？）。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0"></p>
-<p>这些worker是一个长期活跃的进程，在内存中存着RDD分区。</p>
-<h3 id="RDD-Operations-in-Spark"><a href="#RDD-Operations-in-Spark" class="headerlink" title="RDD Operations in Spark"></a>RDD Operations in Spark</h3><p>下表列出了Spark中可用的RDD转换和可用操作：</p>
-<p><img src="https://pic1.superbed.cn/item/5de5470ef1f6f81c50404c93.png"></p>
-<h2 id="Representing-RDDs"><a href="#Representing-RDDs" class="headerlink" title="Representing RDDs"></a>Representing RDDs</h2><p>论文中提到使用了大约14000行Scala代码实现了Spark，这个系统在Mesos集群上运行。每个Spark程序都作为一个单独的Mesos应用程序，具有独立的驱动程序和worker程序，并且这些应用程序之间的资源共享由Mesos处理。</p>
-<p>论文中提到RDD的表示是一种基于图的表示。因此对于RDD的表示，则是通过暴露5个接口方法来实现的。</p>
-<p><img src="https://pic.superbed.cn/item/5de7e86ff1f6f81c50a2a07f.png"></p>
-<ul>
-<li>Partions：数据集的原子结构；</li>
-<li>preferredLocations：能更快访问分区的系列节点；</li>
-<li>dependencies：记录父子RDD的记录；</li>
-<li>iterator：用于从父RDD计算子RDD；</li>
-<li>patitioner：数据分区的元信息；</li>
-</ul>
-<p>至于如何表示RDD的关系，由于RDD在物理上是分区的，散列在集群不同机器的内存上的，文中将其定义为窄依赖（Narrow Dependency）和宽依赖（Wide Dependency）两种。</p>
-<ul>
-<li>宽依赖：父RDD中的分区可能被子RDD中的多个分区所依赖；</li>
-<li>窄依赖：父RDD的每个分区至多被子RDD中的一个分区所依赖；像map&#x2F;filter这些操作都属于窄依赖；</li>
-</ul>
-<p><img src="https://pic2.superbed.cn/item/5de7ea33f1f6f81c50a2e1cc.png"></p>
-<p>这两种依赖的差别在于：窄依赖可以pipeline执行，在失败时只需要重新执行对应的父RDD即可；而宽依赖则需要shuffle，并且如果出现故障恢复则需要重算所有父RDD；</p>
-<h3 id="Job-Scheduling"><a href="#Job-Scheduling" class="headerlink" title="Job Scheduling"></a>Job Scheduling</h3><p>每当用户在RDD执行action的时候，调度器就会检查RDD的谱系图，以构建要执行的DAG（有向无环图）。如下图所示：</p>
-<p><img src="https://pic.superbed.cn/item/5de7edaaf1f6f81c50a37d20.png"></p>
-<p>每个stage内部都包含尽可能多的具有窄依赖的操作。这些stage的边界是宽依赖所必需执行的shuffle操作，另外任何已经计算出的分区都可以使父RDD的计算短路。调度程序会集群上启动任务以计算每个阶段中缺少的分区，直到它计算出目标RDD。</p>
-<p>调度器会根据数据局部性的原则来执行delay scheduling算法：</p>
-<ul>
-<li>如果任务需要的数据分区在某节点的内存中，则将任务发送到节点上执行；</li>
-<li>否则，如果该分区有指定的位置，则直接发送给它；</li>
-</ul>
-<p>对于宽依赖，Spark会在存有父分区的节点上暂存shuffle的中间记录，以便做容灾处理，就像mapreduce存下map的输出一样。</p>
-<p>如果任务失败，只要stage的父stage还是可用的，就可以将task调度到另一个节点上重新运行即可。如果父stage也失效了，就会重新提交一个计算父stage数据的Task来并行计算丢失的分区。但论文也提到了Spark没有考虑调度器本身的高可用。</p>
-<h3 id="Interpreter-Integration"><a href="#Interpreter-Integration" class="headerlink" title="Interpreter Integration"></a>Interpreter Integration</h3><p>Scala包含了交互shell，可以让用户从解释器中交互地运行Spark以查询大数据集。</p>
-<p>Scala解释器通常会为用户输入的每一行编译一个类，并将其加载到JVM中通过调用一个函数来进行操作。该类会包含一个单例对象，对象则包含该行上的变量或者函数，并以初始化的方式运行该行代码。</p>
-<p>另外，Spark的解释器还做了两处修改：</p>
-<ol>
-<li>类传递：为了让工作节点能够获取在每一行上创建的类的字节码，解释器会通过HTTP为这些类提供服务；</li>
-<li>修改代码的生成：因为每行代码的单例对象都是通过对应的静态方法访问，这意味着无法引用上一行定义的变量。因此需要修改代码的生成，以便直接引用每行对象的实例，如下图：</li>
-</ol>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0"></p>
-<h3 id="Memory-Management"><a href="#Memory-Management" class="headerlink" title="Memory Management"></a>Memory Management</h3><p>Spark提供了三种对持久化RDD的存储策略：</p>
-<ul>
-<li>未序列化Java对象存在内存；</li>
-<li>序列化的数据存于内存；</li>
-<li>磁盘存储；</li>
-</ul>
-<p>第一种性能最好，因为可以直接访问在Java虚拟机内存里的RDD对象；第二种性能会降低，在空间有限的情况下可以让用户选择比Java对象图更高效的内存表示方式；第三种则是针对RDD太大无法保留在内存中，但每次使用都需要重新计算开销很大时，这个方法会很有用；</p>
-<p>为了管理可用的有限内存，Spark在RDD级别使用了LRU逐出策略。当计算了一个新的RDD分区但没有足够存储空间时，就会通过LRU的方式逐出一个分区。除非是该RDD便是新分区对应的RDD，在这种情况下，Spark会将旧的分区保留在内存，避免同一个RDD的分区被循环地调进调出。</p>
-<h3 id="Support-for-Checkpointing"><a href="#Support-for-Checkpointing" class="headerlink" title="Support for Checkpointing"></a>Support for Checkpointing</h3><p>虽然lineage机制可以满足失败后RDD的重建恢复，但对于具有很长链条的RDD来说，恢复时间会很长。特别是包含了宽依赖的长lineage的RDD，因此能设置检查点的操作就会非常有用。Spark当前提供了为RDD设置检查点操作的API，可以用一个REPLICATE标志来持久化，用户自行决定使用方式。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2207,7 +2210,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">264</span>
+                <span class="site-state-item-count">265</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
