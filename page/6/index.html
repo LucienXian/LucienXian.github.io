@@ -264,6 +264,162 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/21/Designing-Callbacks-in-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/21/Designing-Callbacks-in-C/" itemprop="url">Designing Callbacks in C++</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-21T17:55:36+08:00">
+                2019-05-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Designing-Callbacks-in-C"><a href="#Designing-Callbacks-in-C" class="headerlink" title="Designing Callbacks in C++"></a>Designing Callbacks in C++</h1><h2 id="Function-Pointers"><a href="#Function-Pointers" class="headerlink" title="Function Pointers"></a>Function Pointers</h2><p>首先来看一下什么是callback，callback实际上是一个函数，以参数的形式传递进另一个API中，在往后的某个时间点里面调用我们提供的callback。</p>
+<p>callback的三种类型：</p>
+<ul>
+<li>Function Pointer</li>
+<li>Function Objects&#x2F;Functors</li>
+<li>Lambda functions</li>
+</ul>
+<p>假设我们的框架中存在一个API可以从提供的原生数据构建一个API，API执行以下的步骤：</p>
+<ol>
+<li>对原生数据添加头部和尾部；</li>
+<li>加密；</li>
+<li>返回信息；</li>
+</ol>
+<p>现在这个API知道头部和尾部如何添加，但不了解如何进行加密，这个API可以接受一个函数指针回调如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">buildCompleteMessage</span><span class="params">(std::string rawData, std::string (* encrypterFunPtr)(std::string) )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Add some header and footer to data to make it complete message</span></span><br><span class="line">    rawData = <span class="string">&quot;[HEADER]&quot;</span> + rawData + <span class="string">&quot;[FooTER]&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Call the callBack provided i.e. function pointer to encrypt the</span></span><br><span class="line">    rawData = <span class="built_in">encrypterFunPtr</span>(rawData);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> rawData;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们提供的加密方式如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">encryptDataByLetterInc</span><span class="params">(std::string data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; data.<span class="built_in">size</span>(); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>( (data[i] &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;z&#x27;</span> ) || (data[i] &gt;= <span class="string">&#x27;A&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;Z&#x27;</span> ) )</span><br><span class="line">            data[i]++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么我们的API就可以这样调用了：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::string msg = <span class="built_in">buildCompleteMessage</span>(<span class="string">&quot;SampleString&quot;</span>, &amp;encryptDataByLetterInc);</span><br><span class="line">    std::cout&lt;&lt;msg&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Function-Objects-amp-Functors"><a href="#Function-Objects-amp-Functors" class="headerlink" title="Function Objects &amp; Functors"></a>Function Objects &amp; Functors</h2><p>首先来看看什么是函数对象，实际上就是一个带状态的回调。一个重载了operator()的类对应的对象就是 Function Object or Functor，比如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyFunctor</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">int</span> a , <span class="type">int</span> b)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a+b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//调用时</span></span><br><span class="line">MyFunctor funObj;</span><br><span class="line">std::cout&lt;&lt;<span class="built_in">funObj</span>(<span class="number">2</span>,<span class="number">3</span>)&lt;&lt;std::endl;</span><br><span class="line">funObj.<span class="built_in">operator</span>()(<span class="number">2</span>,<span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+<p>还是以上面的API为例子，假设我们系统API以三种不同的加密方式调用，加密方式分别是对每个字母加一、加二或者减一。如果是用函数指针的方式，我们需要定义三个不同函数，但实际上函数体是类似的。</p>
+<p>但如果使用函数对象，那就可以在类里面绑定状态变量。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Encryptor</span> &#123;</span><br><span class="line">    <span class="type">bool</span> m_isIncremental;</span><br><span class="line">    <span class="type">int</span> m_count;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Encryptor</span>() &#123;</span><br><span class="line">        m_isIncremental = <span class="number">0</span>;</span><br><span class="line">        m_count = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Encryptor</span>(<span class="type">bool</span> isInc, <span class="type">int</span> count) &#123;</span><br><span class="line">        m_isIncremental = isInc;</span><br><span class="line">        m_count = count;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">operator</span><span class="params">()</span><span class="params">(std::string data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; data.<span class="built_in">size</span>(); i++)</span><br><span class="line">            <span class="keyword">if</span> ((data[i] &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;z&#x27;</span>)</span><br><span class="line">                    || (data[i] &gt;= <span class="string">&#x27;A&#x27;</span> &amp;&amp; data[i] &lt;= <span class="string">&#x27;Z&#x27;</span>))</span><br><span class="line">                <span class="keyword">if</span> (m_isIncremental)</span><br><span class="line">                    data[i] = data[i] + m_count;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    data[i] = data[i] - m_count;</span><br><span class="line">        <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>修改一下API的参数类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">buildCompleteMessage</span><span class="params">(std::string rawData,</span></span></span><br><span class="line"><span class="params"><span class="function">        Encryptor encyptorFuncObj)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Add some header and footer to data to make it complete message</span></span><br><span class="line">    rawData = <span class="string">&quot;[HEADER]&quot;</span> + rawData + <span class="string">&quot;[FooTER]&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Call the callBack provided i.e. function pointer to encrypt the</span></span><br><span class="line">    rawData = <span class="built_in">encyptorFuncObj</span>(rawData);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> rawData;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用的时候只需要传递不同的参数到函数对象的构造器即可：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">buildCompleteMessage</span>(<span class="string">&quot;SampleString&quot;</span>, <span class="built_in">Encryptor</span>(<span class="literal">true</span>, <span class="number">1</span>));</span><br><span class="line"><span class="comment">// buildCompleteMessage(&quot;SampleString&quot;, Encryptor(true, 2));</span></span><br><span class="line"><span class="comment">// buildCompleteMessage(&quot;SampleString&quot;, Encryptor(false, 1));</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/19/C-11-unordered-map/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1641,144 +1797,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/29/Condition-Variables-Explained/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/29/Condition-Variables-Explained/" itemprop="url">Condition Variables Explained</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-29T15:25:51+08:00">
-                2019-04-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Condition-Variables-Explained"><a href="#Condition-Variables-Explained" class="headerlink" title="Condition Variables Explained"></a>Condition Variables Explained</h1><h2 id="Condition-Variables"><a href="#Condition-Variables" class="headerlink" title="Condition Variables"></a>Condition Variables</h2><p>条件变量是一种用于在若干个线程之间发送信号的事件，一个或者多个线程可以等待其他线程发出信号。条件变量在C++11的头文件是：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;condition_variable&gt;</span></span></span><br></pre></td></tr></table></figure>
-
-<p>条件变量往往与锁一起工作。</p>
-<p><strong>How things actually work with condition variable,</strong></p>
-<ul>
-<li>线程1调用条件变量的wait，改变量在内部获取互斥锁并检查是否满足所需条件；</li>
-<li>如果不满足。则释放锁并等待条件变量发出信号，此时现场阻塞。条件变量的wait函数以原子的方式提供这两个操作；</li>
-<li>如果条件满足，线程2会向条件变量发出信号；</li>
-<li>一旦条件变量发出信号，正在等待它的线程1恢复，获取互斥锁，并检查是否实际满足与条件变量相关的条件，或者它是否是上级调用。如果有多个线程在等待，那么notify_one()将只解除阻塞一个线程；</li>
-<li>如果它是一个上级调用，那么它再次调用wait()函数；</li>
-</ul>
-<p><strong>Main member functions for std::condition_variable are</strong></p>
-<h3 id="Wait"><a href="#Wait" class="headerlink" title="Wait()"></a>Wait()</h3><p>该函数使得当前线程阻塞，直到条件变量发出信号或者发生虚假唤醒。</p>
-<p>其以原子方式释放附属的的互斥锁，阻塞当前线程，并将其添加到等待当前条件变量对象的线程列表中。当某个线程在相同的条件变量对象上调用notify_one()或notify_all()时，该线程将被解除阻塞。 </p>
-<p>回调作为参数传递给该函数，回调将被调用以检查它是否属于虚假调用或真的满足条件。</p>
-<p>当线程解锁时，wait()函数重新获取互斥锁并检查是否满足实际条件。如果不满足条件，则再次以原子方式释放附加的互斥锁，阻塞当前线程，并将其添加到等待当前条件变量对象的线程列表中。</p>
-<h3 id="notify-one"><a href="#notify-one" class="headerlink" title="notify_one()"></a>notify_one()</h3><p>如果存在线程正在等待相同的条件变量对象，则notify_one将解除其中一个等待线程的阻塞。</p>
-<h3 id="notify-all"><a href="#notify-all" class="headerlink" title="notify_all()"></a>notify_all()</h3><p>如果存在线程正在等待相同的条件变量对象，则notify_all将解除阻塞所有等待的线程。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1829,7 +1847,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">265</span>
+                <span class="site-state-item-count">266</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1891,7 +1909,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

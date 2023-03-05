@@ -264,6 +264,191 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/03/06/Cloud-Native-Transactions-and-Analytics-in-SingleStore/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2023/03/06/Cloud-Native-Transactions-and-Analytics-in-SingleStore/" itemprop="url">Cloud-Native Transactions and Analytics in SingleStore</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-03-06T02:27:12+08:00">
+                2023-03-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Cloud-Native-Transactions-and-Analytics-in-SingleStore"><a href="#Cloud-Native-Transactions-and-Analytics-in-SingleStore" class="headerlink" title="Cloud-Native Transactions and Analytics in SingleStore"></a>Cloud-Native Transactions and Analytics in SingleStore</h1><blockquote>
+<p>论文介绍了一个前身为MemSQL的分布式通用SQL数据库，现在叫SinglestoreDB (S2DB)。它是市场上最早的分布式HTAP数据库之一，可以做横向扩展以有效利用100台主机、1000个核心和10TB的RAM，同时保持类似于Oracle或SQL Server等单机数据库的用户体验。 S2DB的表存储通过快速扫描、查找、过滤、聚合和更新等操作有效地满足TP和AP负载。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>当前市场上存在着各种针对特定场景的数据库，这其中有两个趋势推动了这些新数据库的发展，一是利用弹性的云原生架构，像blob存储S3和块存储EBS允许数据库利用几乎无限的、高可用性和持久的数据存储，而弹性计算实例如EC2则允许数据库弹性扩缩容提供更多计算以处理复杂查询或吞吐量峰值。二是开发者需要存储更多数据并以更低的延迟和更高的吞吐量访问数据库，这种性能和容量，访问模式相结合，导致应用程序对数据库的要求非常高。</p>
+<p>解决这些要求的常用方法是为应用程序的不同组件使用特定的数据库。相比之下，S2DB团队认为可以设计一个数据库，充分利用弹性云基础设施，同时满足AP和TO负载的需求。这样一个可以处理多种应用程序类型的、集成的、可扩展的数据库对用户有很多好处，能减少成本，减少对开发者的要求等。</p>
+<p>本文介绍了SingleStore数据库引擎的架构，作为一个云原生数据库，其擅长在大型数据集（100 TB）上运行复杂的交互式查询，以及以可预测的响应时间运行高吞吐量、低延迟的读写查询（每秒写入或更新数百万行）。相同的SingleStore数据库引擎用于 SingleStore Managed Service（一种云数据库服务）和 SingleStoreDB (S2DB) 数据库产品上。S2DB可以通过仅将冷数据推送到Blob存储并在运行查询时智能地使用本地状态来最大程度地减少网络使用，从而支持减轻存储上的各种工作负载。</p>
+<p>对于S2DB而言，有两个部分对AP和TP的云原生负载很重要：</p>
+<ul>
+<li>存算分离：与大多数云原生数据库一样，S2DB也会利用blob存储作为共享的远程存储，但S2DB会根据数据热度充分利用本地内存、本地磁盘和Blob存储，在本地磁盘上提交再将数据异步推送到blob存储，从而避免较高的写入延迟。在 blob存储中还可以保留历史记录比如已删除的数据，这可以按时间点还原到过去的数据库状态，而无需在还原时进行显式备份或复制任何数据。另外还可以通过blob存储创建相关的只读副本。</li>
+<li>统一的表存储：S2DB的表同时需要列存储的扫描性能（每秒扫描数百万到数万亿行）和行存储索引的查找性能以加快点读和写入事务。在S2DB中，OLAP和 OLTP工作负载都使用单一的统一表存储设计，不需要像其他HTAP系统那样将数据复制到不同的数据布局中。统一表存储在内部同时使用了行存储和列存储格式，但这个对用户是透明的。在较高层次上该设计仍然是列存储的设计，但经过修改后能更好地支持读取和写入，并且对列存储的压缩和表扫描性能影响很小。列存储数据组织为LSM，支持二级哈希索引以加速TP查询</li>
+</ul>
+<h2 id="Background-on-SingleStoreDB"><a href="#Background-on-SingleStoreDB" class="headerlink" title="Background on SingleStoreDB"></a>Background on SingleStoreDB</h2><p>S2DB是一个水平分区、shared-nothing架构的DBMS，同时也可以使用存放冷数据的blob存储作为共享存储。S2DB集群由协调查询的聚合器节点和保存数据分区副本并负责大量查询计算的叶节点组成。每个叶子包含几个数据分区，每个分区要么是提供读写的主副本，要么是只读副本。</p>
+<p>表通过一组叫shard key的东西来做hash分区，这使得点读足够快速并且查询形态上也不需要移动数据。当join的条件或者group-by列满足它们引用表的shard keys时，S2DB会将执行下推到各个分区，从而避免任何数据移动。否则，S2DB会在查询期间通过broadcast或reshuffle来重新分配数据。</p>
+<p>SingleStore还支持基于中间字节码通过LLVM编译成的native code去查询。</p>
+<h3 id="Table-storage-formats"><a href="#Table-storage-formats" class="headerlink" title="Table storage formats"></a>Table storage formats</h3><p>S2DB在内部使用两种存储类型：由无锁跳表支持的内存行存储和基于磁盘的列存储。下文描述的统一表存储在内部结合了这两种格式，以使用单一存储设计支持OLAP和OLTP工作负载。</p>
+<h4 id="Rowstore-storage"><a href="#Rowstore-storage" class="headerlink" title="Rowstore storage"></a>Rowstore storage</h4><p>内存行存储是使用无锁跳表来进行索引的，跳表的一个节点对应着一行，每个节点都会存储行的版本链表，从而实现MVCC，使得读无需等待写。写入使用的是悲观并发控制，通过跳表节点的行锁来处理对同一行的并发写入。除了写入内存的跳表之外，写入操作还会在提交之前将相关的信息写入日志。这个日志也是比较常规的设计，磁盘存储，每个数据库分区一个日志。节点重启时，数据库分区的状态通过重放恢复。后台进程定期创建快照，减少恢复过程中重放日志需要的时间。</p>
+<h4 id="Columnstore-storage"><a href="#Columnstore-storage" class="headerlink" title="Columnstore storage"></a>Columnstore storage</h4><p>列存储表的数据按segment组织，其中每个segment都将不相交的行子集存储为磁盘上的一组数据文件。在一个段中，每一列都以相同的行顺序存储，单独压缩。列的压缩支持多种编码方式，包括bit packing, dictionary, run-length encoding, and LZ4。段元数据存储在持久的内存行存储表中，其中包括文件位置、编码方式和每列的最小&#x2F;最大值在内的信息，另外还有一个bitvector来表示段中被删除的行。</p>
+<p>这种结构主要针对了OLAP进行了优化，为了加快 OLTP 工作负载中常见的点读取操作，每个列编码都实现为可搜索的，以允许在特定行偏移处进行有效读取，而无需解码所有行。存储最小&#x2F;最大值允许使用内存中的元数据执行段消除，以跳过获取没有匹配行的段。</p>
+<p>可以在每个列存储表上指定排序键，以实现更有效的段消除。如果指定了排序键，行将按每个段内的排序键进行排序，跨段的排序顺序与LSM 类似，后台合并则用来增量合并段。</p>
+<p>对于每个列存储表，S2DB都会创建一个行存储表作为写入优化存储，这类似于RocksdDB的MemTable，后台线程定期从行存储中删除行并将这些行转换为事务中的列存储段。</p>
+<p>另外，列存储表还支持向量化执行，在适当时使用SIMD指令来加速过滤和聚合操作。</p>
+<h2 id="Separation-of-storage-and-compute"><a href="#Separation-of-storage-and-compute" class="headerlink" title="Separation of storage and compute"></a>Separation of storage and compute</h2><p>S2DB支持带blob存储和不带blob存储运行，对于后者，S2DB就像一个常规的shared-nothing分布式数据库，使用本地磁盘来持久化数据。对于前者则有点不同，S2DB新写入的数据会现在本地持久化，然后异步地备份到blob存储。这种设计使得S2DB的写入延迟更低，并且由于冷数据在blob存储上，也充分利用了blob存储的有点，包括更好扩展，成本更低，容量更大，支持按时间点恢复等。</p>
+<p>集群的持久化是通过每个分区的复制实现的，集群内的复制速度很快，log page可以无序复制，无序等待事务提交。默认情况下，当数据在内存中复制到每个master分区中至少一个副本分区时，数据就会被认为已提交。如果一个分区的所有副本都发生节点故障，只有最近新写入的内存中数据会被丢失。默认情况下，S2DB不会将事务同步提交到本地磁盘（是指不同步等log写完再更新memtable？），这是考虑到在云环境中host的损失往往意味着附加的磁盘也会丢失。</p>
+<p>下图展示了列存储的表分区数据如何以LSM的形式去表示，顶层是内存行存储，下层是HTAP优化的列存数据。数据写满了，就会被被转换为列存储段，然后flush来创建以log page命名的data files。data files是不可变的，所以如果是从段中删除一行，仅会更新段元数据以将该行标记为已删除。当然这个过程中的所有操作都需要写log。</p>
+<p><img src="https://pic.imgdb.cn/item/6404deb8f144a0100735cd25.png"></p>
+<h3 id="Staging-Data-from-Local-to-Remote-Storage"><a href="#Staging-Data-from-Local-to-Remote-Storage" class="headerlink" title="Staging Data from Local to Remote Storage"></a>Staging Data from Local to Remote Storage</h3><p>S2DB的存算分离设计如下所示，概括而言就是：</p>
+<ul>
+<li>无论开不开启blob storage，S2DB的事务提交只需要追加log并且等其复制到其他节点，这个过程不需要同步写blob；</li>
+<li>新提交的列存储数据文件会尽快异步上传到blob存储；</li>
+<li>待日志复制到多个节点之后，事务日志会以chunk的方式上传到Blob存储；</li>
+<li>master节点会在blob上对行存数据做snapshot（即MemTable）。一个新的副本或者落后的副本可以从Blob获取需要的快照和日志，还有master获取还没上传的log tail来完成数据追赶；</li>
+</ul>
+<p><img src="https://pic.imgdb.cn/item/6404deb8f144a0100735cd3c.png"></p>
+<p>这种设计的一大优点是，写入事务不需要写Blob，并且Blob的故障不会影响对于热数据的访问（论文认为Blob的可用性远低于其保证的那样）。缺点就是本地磁盘或者内存保存的状态需要一些高性能的复制和恢复协议，并且存算不够解耦，添加或者删除主机都需要移动本地数据。另外就是节点大规模故障会有丢掉还没上传到blob的那部分数据的风险。这个设计更多数的云数据库不大一样，S2DB的节点相对会比较重，并且持久性和可用性会有风险。</p>
+<h3 id="Capabilities-Enabled-by-Separated-Storage"><a href="#Capabilities-Enabled-by-Separated-Storage" class="headerlink" title="Capabilities Enabled by Separated Storage"></a>Capabilities Enabled by Separated Storage</h3><p>这章主要介绍远程存储启用的一些功能作用：</p>
+<ul>
+<li>S2DB使用更快的SSD来做临时的本地存储，而不像其他云数据库使用昂贵且更慢的EBS，这带来更高的IOPS；</li>
+<li>S2DB能保存数月的历史记录，因为Blob存储的成本很低。另外还支持通过PITR命令将数据库恢复到过去特定时间的状态，而不需显式备份。S2DB会找到跟给定PITR最接近的事务一致点，然后往前找到第一个snapshot，对每个分区进行分别恢复，一直重放到相关的事务一致点。不过S2DB不支持time travel querying，只是相当于回滚数据库状态；</li>
+<li>S2DB支持创建只读workspaces，即一组只读副本，从可写的主副本中异步复制最近写入的数据。这样的优点是提供更高的读并发，还支持创建一个独立的环境来运行繁重的ap查询；</li>
+</ul>
+<p>总的来说，S2DB的存算分离即利用了传统云数仓的设计来满足可用性和弹性，并提供几乎无限的持久化存储，也有一定的灵活性来扩展计算能力，并规避了传统云数仓可能带来的写入延迟。</p>
+<h2 id="Unified-table-storage"><a href="#Unified-table-storage" class="headerlink" title="Unified table storage"></a>Unified table storage</h2><p>考虑到大多数用户没办法很好决定自己的访问模式是更适合行存还是列存，S2DB提出了一种Unified table storage，简单来说就是基于原来的列存做优化，从而更好地支持TP，并且不会牺牲对于AP的支持。</p>
+<ul>
+<li>No merge-based reconciliation during reads</li>
+</ul>
+<p>与常规的LSM实现不同，S2DB在内存中实现了一个bit vector来表示删除，而像RocksDB、Cassandra和BigTable往往是在每一层的LSM使用tombstone entries来表示删除，S2DB的实现避免了merge on read带来的读放大。</p>
+<ul>
+<li>Minimize disk access and blocking during writes</li>
+</ul>
+<p>与常规的LSM一样，S2DB仍然需要在内存中写入，除此之外还需要修改segment的元数据，来避免tombstone records。需要注意避免对同一个segment的并发修改带来的阻塞。</p>
+<h3 id="Secondary-indexes"><a href="#Secondary-indexes" class="headerlink" title="Secondary indexes"></a>Secondary indexes</h3><p>如下图所示，S2DB还构建了基于LSM实现的二级索引来满足高效的点查。</p>
+<p><img src="https://pic.imgdb.cn/item/6404deb8f144a0100735cd53.png"></p>
+<ul>
+<li>对于每个segment都会构建一个倒排索引以将索引列的值映射到一个posting list，该列表存储该segment中具有该值的行偏移量。</li>
+<li>另外还有一个全局索引将索引列的值映射到具有该值的segment id，以及每个segment的倒排索引中相应posting list的起始位置。</li>
+</ul>
+<h4 id="Multi-column-secondary-index"><a href="#Multi-column-secondary-index" class="headerlink" title="Multi-column secondary index"></a>Multi-column secondary index</h4><p>为了在最小化存储成本的同时支持多列二级索引，S2DB为每个索引列构建一个二级索引，并允许单列索引在引用相同列的多索引时被共享。以对列(a,b,c)构建二级索引为例：</p>
+<ul>
+<li>先分别对a, b, c的每段构建倒排索引；</li>
+<li>分别对a, b, c的构建全剧索引；</li>
+<li>对索引列(a,b,c)元组构建全剧索引，每组(value_a, value_b, value_c)都映射到(value_a, value_b, value_c)相应每列的postings lists起始位置；</li>
+</ul>
+<p>前面两步可以满足对组合索引列子集中某些列的查询需求，第三步则可以直接跳过与所有索引列匹配的行对应的segment，从而加速查询。</p>
+<h4 id="Uniqueness-enforcement"><a href="#Uniqueness-enforcement" class="headerlink" title="Uniqueness enforcement"></a>Uniqueness enforcement</h4><p>大多数列存实现都不支持唯一性约束，S2DB通过二级索引可以满足需求。具体的实现就是在插入之前读一下全剧索引判断是否存在，再根据重复与否来决定用户的行为。</p>
+<h3 id="Row-level-locking"><a href="#Row-level-locking" class="headerlink" title="Row-level locking"></a>Row-level locking</h3><p>由于针对segment元数据的修改存在并发的可能性，如果是直接使用segment级别的锁会阻止可能上百万行的修改，降低吞吐。因此S2DB实现了行锁机制来降低事务负载，将内存行存储的主键作为lock管理器，其中插入行的副本会锁定行，防止并发修改，然后通过合并事务来降低blocking。</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>S2DB旨在通过统一的表存储满足ap和tp负载，并使用了倒排索引来提高点查能力，其使用blob存储实现了shard disk的成本、持久性和弹性优势，并且尽量避免了blob存储通常会带来的高延迟、低吞吐量写入事务的问题。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/11/16/Building-a-Fast-and-Efficient-LSM-tree-Store-by-Integrating-Local-Storage-with-Cloud-Storage/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1878,157 +2063,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/08/01/Rocksdb%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E4%B8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/08/01/Rocksdb%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E4%B8%80/" itemprop="url">RocksDB源码学习一</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-01T23:59:54+08:00">
-                2021-08-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>第一章先来看一下Rocksdb的编码情况，具体的实现在：<code>util/coding.cc, util/coding.h, util/coding_lean.h</code>。Rocksdb的编码实现与leveldb基本一致的，由于需要将Key、Value等数据按序写入到内存中，并最终flush到磁盘上，因此需要一个高效的编解码实现。这里的编解码很多会用在key size、value size的整型编码上面。</p>
-<p>Rocksdb的整型编码方式很简单，主要支持两种方案：定长编码和变长编码。</p>
-<ul>
-<li>定长编码：定长编码的实现比较简单，比如可以直接将4字节&#x2F;8字节的整型直接按序写入到指定的位置；</li>
-<li>变长编码：节省空间，如果用定长编码的方式，实际上对于小数来说，很多位其实是没必要存储。结合ASCII码的特点，所有字符ASCII码的最高位都是0，可以利用最高位去做一些特别的标记；</li>
-</ul>
-<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><h4 id="字节端序"><a href="#字节端序" class="headerlink" title="字节端序"></a>字节端序</h4><p>关于编码，首先需要了解计算机在存储字节时分为大端字节序和小端字节序两种，Rocksdb是用小端序存储（低位放在较小的地址处，高位放在较大的地址处）的，因此需要提供根据不同平台对内存存储模型进行转换的选项。</p>
-<p>在port&#x2F;port.h文件内包含了一些平台相关的的头文件：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> defined(ROCKSDB_PLATFORM_POSIX)</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;port/port_posix.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">elif</span> defined(OS_WIN)</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;port/win/port_win.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
-
-<p>以<code>port_posix.h</code>为例，这里包含了posix平台关于大小端的定义：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">undef</span> PLATFORM_IS_LITTLE_ENDIAN</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(OS_MACOSX)</span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;machine/endian.h&gt;</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">if</span> defined(__DARWIN_LITTLE_ENDIAN) &amp;&amp; defined(__DARWIN_BYTE_ORDER)</span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> PLATFORM_IS_LITTLE_ENDIAN \</span></span><br><span class="line"><span class="meta">        (__DARWIN_BYTE_ORDER == __DARWIN_LITTLE_ENDIAN)</span></span><br><span class="line">  <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">elif</span> defined(OS_SOLARIS)</span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/isa_defs.h&gt;</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">ifdef</span> _LITTLE_ENDIAN</span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> PLATFORM_IS_LITTLE_ENDIAN true</span></span><br><span class="line">  <span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> PLATFORM_IS_LITTLE_ENDIAN false</span></span><br><span class="line">  <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;alloca.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">elif</span> defined(OS_AIX)</span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/nameser_compat.h&gt;</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">define</span> PLATFORM_IS_LITTLE_ENDIAN (BYTE_ORDER == LITTLE_ENDIAN)</span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;alloca.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">elif</span> defined(OS_FREEBSD) || defined(OS_OPENBSD) || defined(OS_NETBSD) || \</span></span><br><span class="line"><span class="meta">    defined(OS_DRAGONFLYBSD) || defined(OS_ANDROID)</span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/endian.h&gt;</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">define</span> PLATFORM_IS_LITTLE_ENDIAN (_BYTE_ORDER == _LITTLE_ENDIAN)</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;endian.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">bool</span> kLittleEndian = PLATFORM_IS_LITTLE_ENDIAN;</span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> PLATFORM_IS_LITTLE_ENDIAN</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="定长编码"><a href="#定长编码" class="headerlink" title="定长编码"></a>定长编码</h4><p>定长编码比较简单，首先判断大小端序，对于小端，value本身就是按小端排放的，可以直接拷贝；对于大端，则是将value的最低位放置在内存的最低地址端。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">EncodeFixed32</span><span class="params">(<span class="type">char</span>* buf, <span class="type">uint32_t</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (port::kLittleEndian) &#123;</span><br><span class="line">    <span class="built_in">memcpy</span>(buf, &amp;value, <span class="built_in">sizeof</span>(value));</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    buf[<span class="number">0</span>] = value &amp; <span class="number">0xff</span>;</span><br><span class="line">    buf[<span class="number">1</span>] = (value &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">    buf[<span class="number">2</span>] = (value &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">    buf[<span class="number">3</span>] = (value &gt;&gt; <span class="number">24</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>解码也一样，Rocksdb提供了三种整型编解码：<code>uint16_t,uint32_t,uint64_t</code>。解码时，gcc会优化里面的memcpy的操作，变成inline copy loops，提高效率。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">uint32_t</span> <span class="title">DecodeFixed32</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* ptr)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (port::kLittleEndian) &#123;</span><br><span class="line">    <span class="comment">// Load the raw bytes</span></span><br><span class="line">    <span class="type">uint32_t</span> result;</span><br><span class="line">    <span class="built_in">memcpy</span>(&amp;result, ptr, <span class="built_in">sizeof</span>(result));  <span class="comment">// gcc optimizes this to a plain load</span></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">return</span> ((<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">0</span>]))) |</span><br><span class="line">            (<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">1</span>])) &lt;&lt; <span class="number">8</span>) |</span><br><span class="line">            (<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">2</span>])) &lt;&lt; <span class="number">16</span>) |</span><br><span class="line">            (<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">3</span>])) &lt;&lt; <span class="number">24</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="变长编码"><a href="#变长编码" class="headerlink" title="变长编码"></a>变长编码</h4><p>前面提到的，为了节省空间，Rocksdb使用变长的编码方式<em>varint</em>。Rocksdb使用最高位来表示编码是否结束，而低7bit则存储实际的数据。根据统计来说，小整型出现的概率更高，这样就能节省更多的空间，比如0-127的整数都可以只用一个字节来表示，而uint32较大的数字则需要5个字节。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">0001 0001 ====&gt;&gt; 表示33</span><br><span class="line">^                           A: 最高位为0，表示结束；</span><br><span class="line">A</span><br><span class="line">=======================================================</span><br><span class="line">1000 0011 0110 1111 ====&gt;&gt; 表示1007</span><br><span class="line">^         ^                 A: 最高位为1，表示未结束，实际值是000 0011；</span><br><span class="line">A         B                 B: 最高位为0，表示结束，实际值是110 1111；</span><br></pre></td></tr></table></figure>
-
-<p>具体的编码以<code>uint32_t</code>为例，将<code>uint32_t</code>编码成变长字符：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">char</span>* <span class="title">EncodeVarint32</span><span class="params">(<span class="type">char</span>* dst, <span class="type">uint32_t</span> v)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Operate on characters as unsigneds</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">char</span>* ptr = <span class="built_in">reinterpret_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>*&gt;(dst);</span><br><span class="line">  <span class="type">static</span> <span class="type">const</span> <span class="type">int</span> B = <span class="number">128</span>;</span><br><span class="line">  <span class="keyword">if</span> (v &lt; (<span class="number">1</span> &lt;&lt; <span class="number">7</span>)) &#123;</span><br><span class="line">    *(ptr++) = v;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (v &lt; (<span class="number">1</span> &lt;&lt; <span class="number">14</span>)) &#123;</span><br><span class="line">    *(ptr++) = v | B;</span><br><span class="line">    *(ptr++) = v &gt;&gt; <span class="number">7</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (v &lt; (<span class="number">1</span> &lt;&lt; <span class="number">21</span>)) &#123;</span><br><span class="line">    *(ptr++) = v | B;</span><br><span class="line">    *(ptr++) = (v &gt;&gt; <span class="number">7</span>) | B;</span><br><span class="line">    *(ptr++) = v &gt;&gt; <span class="number">14</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (v &lt; (<span class="number">1</span> &lt;&lt; <span class="number">28</span>)) &#123;</span><br><span class="line">    *(ptr++) = v | B;</span><br><span class="line">    *(ptr++) = (v &gt;&gt; <span class="number">7</span>) | B;</span><br><span class="line">    *(ptr++) = (v &gt;&gt; <span class="number">14</span>) | B;</span><br><span class="line">    *(ptr++) = v &gt;&gt; <span class="number">21</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    *(ptr++) = v | B;</span><br><span class="line">    *(ptr++) = (v &gt;&gt; <span class="number">7</span>) | B;</span><br><span class="line">    *(ptr++) = (v &gt;&gt; <span class="number">14</span>) | B;</span><br><span class="line">    *(ptr++) = (v &gt;&gt; <span class="number">21</span>) | B;</span><br><span class="line">    *(ptr++) = v &gt;&gt; <span class="number">28</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">reinterpret_cast</span>&lt;<span class="type">char</span>*&gt;(ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>uint64_t</code>的变长编码实现，作者用了循环来编码，每7bit一组，并在最低位判断是否需要置位1。因此对于64位整型，最多需要10个字节：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">char</span>* <span class="title">EncodeVarint64</span><span class="params">(<span class="type">char</span>* dst, <span class="type">uint64_t</span> v)</span> </span>&#123;</span><br><span class="line">  <span class="type">static</span> <span class="type">const</span> <span class="type">unsigned</span> <span class="type">int</span> B = <span class="number">128</span>;</span><br><span class="line">  <span class="type">unsigned</span> <span class="type">char</span>* ptr = <span class="built_in">reinterpret_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>*&gt;(dst);</span><br><span class="line">  <span class="keyword">while</span> (v &gt;= B) &#123;</span><br><span class="line">    *(ptr++) = (v &amp; (B - <span class="number">1</span>)) | B; <span class="comment">// leveldb的实现是v | B; 不明白区别在哪</span></span><br><span class="line">    v &gt;&gt;= <span class="number">7</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  *(ptr++) = <span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(v);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">reinterpret_cast</span>&lt;<span class="type">char</span>*&gt;(ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>解码的实现也有一些优化，主要是利用内联函数提高效率，当数字小于等于127时，直接返回结果：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">const</span> <span class="type">char</span>* <span class="title">GetVarint32Ptr</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* p,</span></span></span><br><span class="line"><span class="params"><span class="function">                                  <span class="type">const</span> <span class="type">char</span>* limit,</span></span></span><br><span class="line"><span class="params"><span class="function">                                  <span class="type">uint32_t</span>* value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (p &lt; limit) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> result = *(<span class="built_in">reinterpret_cast</span>&lt;<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*&gt;(p));</span><br><span class="line">    <span class="keyword">if</span> ((result &amp; <span class="number">128</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">      *value = result;</span><br><span class="line">      <span class="keyword">return</span> p + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">GetVarint32PtrFallback</span>(p, limit, value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">GetVarint32PtrFallback</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* p, <span class="type">const</span> <span class="type">char</span>* limit,</span></span></span><br><span class="line"><span class="params"><span class="function">                                   <span class="type">uint32_t</span>* value)</span> </span>&#123;</span><br><span class="line">  <span class="type">uint32_t</span> result = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">uint32_t</span> shift = <span class="number">0</span>; shift &lt;= <span class="number">28</span> &amp;&amp; p &lt; limit; shift += <span class="number">7</span>) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> byte = *(<span class="built_in">reinterpret_cast</span>&lt;<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*&gt;(p));</span><br><span class="line">    p++;</span><br><span class="line">    <span class="keyword">if</span> (byte &amp; <span class="number">128</span>) &#123;</span><br><span class="line">      <span class="comment">// More bytes are present</span></span><br><span class="line">      result |= ((byte &amp; <span class="number">127</span>) &lt;&lt; shift);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      result |= (byte &lt;&lt; shift);</span><br><span class="line">      *value = result;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">reinterpret_cast</span>&lt;<span class="type">const</span> <span class="type">char</span>*&gt;(p);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>编解码这里还是比较简单和高效的，比较有意思的是实现了一个variant编码，源码值得一看。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2079,7 +2113,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">265</span>
+                <span class="site-state-item-count">266</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2141,7 +2175,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

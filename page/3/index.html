@@ -264,6 +264,210 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/07/Better-I-O-Through-Byte-Addressable-Persistent-Memory%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/03/07/Better-I-O-Through-Byte-Addressable-Persistent-Memory%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/" itemprop="url">Better I/O Through Byte-Addressable, Persistent Memory——论文学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-07T01:26:02+08:00">
+                2021-03-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Better-I-x2F-O-Through-Byte-Addressable-Persistent-Memory"><a href="#Better-I-x2F-O-Through-Byte-Addressable-Persistent-Memory" class="headerlink" title="Better I&#x2F;O Through Byte-Addressable, Persistent Memory"></a>Better I&#x2F;O Through Byte-Addressable, Persistent Memory</h1><blockquote>
+<p>现代的计算机系统一般是通过基于块的接口来缓慢地访问持久性存储的，但近年来，像Phase-Change Memory这种基于字节寻址的持久性存储技术提供了更快速、和更细粒度的访问方式。本论文介绍了新的文件系统和硬件体系结构，具备基于字节寻址持久性内存的属性。</p>
+</blockquote>
+<h2 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h2><p>新的基于字节寻址的持久性存储技术（BPRAM）消除了volatile和non- volatile存储之间的许多传统差异，尤其是随着Phase-Change Memory和memristors等技术的发展，也可像DRAM一样按字节寻址，同时能够像磁盘一样持久化。</p>
+<p>本文通过研究文件系统来探索BPRAM的好处，并为BPRAM线了一个新的文件系统BPFS，提供了远快于传统基于块存储设备的文件系统的速度。此外，与现有系统相比，BPFS通过一种short-circuit shadow paging的新技术来提供了强大的安全性和一致性保证。</p>
+<p>BPFS的存储方法在一些重要方面与传统文件系统也存在不同，包括不将DRAM缓冲区高速缓存用于文件系统数据，针对小型随机写入进行优化，减小了尚未持久的数据漏洞窗口。</p>
+<h2 id="DESIGN-PRINCIPLES"><a href="#DESIGN-PRINCIPLES" class="headerlink" title="DESIGN PRINCIPLES"></a>DESIGN PRINCIPLES</h2><p>论文主要关注两个目标：</p>
+<ul>
+<li>设计对BPRAM的体系结构支持；</li>
+<li>设计一个文件系统，以利用BPRAM的属性来提高性能和可靠性；</li>
+</ul>
+<h3 id="Expose-BPRAM-Directly-to-the-CPU"><a href="#Expose-BPRAM-Directly-to-the-CPU" class="headerlink" title="Expose BPRAM Directly to the CPU"></a>Expose BPRAM Directly to the CPU</h3><p>传统的永久性存储位于总线控制器和存储控制器的后面，由于对这些控制器的访问带来的性能损耗，即使是最快的NAND闪存SSD，延迟也要几十微秒。</p>
+<p>论文的做法是，将BPRAM直接与DRAM并排放置在内存总线上，使得CPU能够在BPRAM的地址上加载和存储，降低访问延迟。另外，BPRAM的可寻址还能够利用高速缓存的层次结构来提高对持久性存储器的写入性能。</p>
+<p>但将BPRAM放在内存总线上也是有一些缺点：</p>
+<ul>
+<li>BPRAM的流量有可能会干扰易失性存储器的访问并进一步损害整体系统性能；</li>
+<li>系统中可用的BPRAM数量受BPRAM密度和计算机中可用DIMM插槽数量的限制；</li>
+<li>若应用或驱动程序存在缺陷，则可能导致杂散写入，即stray write；</li>
+</ul>
+<p>因此不建议用BPRAM完全替代DRAM，虽然论文也提到一些论据证明这几个缺点不是很大问题的。</p>
+<h3 id="Enforce-Ordering-and-Atomicity-in-Hardware"><a href="#Enforce-Ordering-and-Atomicity-in-Hardware" class="headerlink" title="Enforce Ordering and Atomicity in Hardware"></a>Enforce Ordering and Atomicity in Hardware</h3><p>为了保证安全性和一致性，文件系统需要清楚写入持久性存储的顺序和时间。但执行强制性的排序约束会对性能有一定的影响。文中提出了一种软件机制来声明对硬件的排序约束，软件可以发出特殊的写屏障，以分隔一组epoch的写操作，而硬件将保证每个epoch都按顺序写回到主存器中。</p>
+<p>除了对顺序的限制外，文件系统还考虑对应对故障原子性的问题，如果由于电源故障而中断对持久性存储的写操作，则该存储器可能会处于中间状态，从而破坏了一致性。借助BPRAM，可以直接在硬件中提供一个简单的原子写入基元。</p>
+<h3 id="Use-Short-Circuit-Shadow-Paging"><a href="#Use-Short-Circuit-Shadow-Paging" class="headerlink" title="Use Short-Circuit Shadow Paging"></a>Use Short-Circuit Shadow Paging</h3><p>大多数存储系统都使用以下两种方式来确保可靠性：WAL预写日志和影子分页shadow paging。WAL会使得大多数写入需要进行两次操作，而shadow paging则是实用写时复制来执行所有更新。由于shadow paging每次写入都会因为传播到文件系统根目录树而输出多个块，shadow paging的副本成本远超日志记录，因此目前应用都是使用前者。</p>
+<p>但BPRAM的字节寻址能力和快速的随机写入使影子分页成为文件系统设计的一种高效方法，BPFS通过实现一种称为短路影子寻呼（SCSP）的新技术，允许BPFS在文件系统树中的任何位置提交更新，从而避免了将副本传播到文件系统根目录所产生的开销。</p>
+<h2 id="BPFS-DESIGN-AND-IMPLEMENTATION"><a href="#BPFS-DESIGN-AND-IMPLEMENTATION" class="headerlink" title="BPFS DESIGN AND IMPLEMENTATION"></a>BPFS DESIGN AND IMPLEMENTATION</h2><h3 id="File-System-Layout"><a href="#File-System-Layout" class="headerlink" title="File System Layout"></a>File System Layout</h3><p>BPFS的持久数据结构组织成了一个具备固定大小的块的树，使得能够原子更新树的任意部分，并且块大小固定使得释放和分配都比较方便。</p>
+<p>BPFS数据结构由三种文件组成，每种文件都由相同的树数据结构表示。</p>
+<ul>
+<li>索引节点文件是一个包含固定大小的索引节点数组的单个文件，每个索引节点表示文件系统中的某个文件或目录；</li>
+<li>目录文件包含目录项数组，该目录项数组由inumber（即inode文件中inode的索引）和相应文件的名称组成；</li>
+<li>数据文件仅包含用户数据；</li>
+</ul>
+<p>所有文件都是由相同的数据结构组成的，即一棵全由4K块组成的树。树的叶节点代表文件的数据（即用户数据，目录条目或索引节点），每棵树的内部节点包含了指向树的下一级的512个64位指针。文件系统的根结点就是inode文件。</p>
+<p><img src="https://img.imgdb.cn/item/601ed79e3ffa7d37b3abbef5.png"></p>
+<p>每个树的高度由树的根指针的低位所表示，这使得BPFS可以通过记住从中获取的数来确定给定的块是内部节点还是叶子节点。对于高度为0的树，根指针直接指向一个数据块，该数据块最多可以包含4KB的文件数据。在高度树为1的情况下，根指针指向512个指针的内部块，每个指针指向4KB数据块，总共2 MB。以此类推。内部节点没有存储文件数据。</p>
+<p>为了简化将数据写入文件中间的任务，我们在树的任何级别使用空指针，以此表示该指针跨越的文件某个范围内的零数据。例如，如果文件的根指针是高度为5的空指针，则它表示一个空的256TB文件。空指针也可以出现在内部节点上，此文件就可以实现大型的稀疏文件的紧凑表示形式。另外，还会存储每个文件的大小以及每个根指针，若文件较大，则假定文件的尾部为零；若文件较小，则忽略文件末尾在树中的任何数据。这样能够在不更新树本身的情况下更改文件大小。</p>
+<h3 id="Persistent-Data-Updates"><a href="#Persistent-Data-Updates" class="headerlink" title="Persistent Data Updates"></a>Persistent Data Updates</h3><p>Short-circuit shadow paging通过三种不同的方法来更新持久性数据：</p>
+<ul>
+<li>就地更新：由于硬件能保证这些更新是原子的，因此能对64位或更少位数的写入执行就地更新。</li>
+<li>就地追加：就地追加利用了每个文件的根指针附带着文件大小变量。由于超出文件大小的所有数据都将被忽略，因此可以安全地就地写入这些位置，并且一旦写入了所有数据，我们就可以自动更新文件大小来扩展有效数据范围；</li>
+<li>写时复制：在将受此操作影响的树的所有部分上执行写时复制，直到可以通过一次写操作可以提交变更的最少部分。</li>
+</ul>
+<p><img src="https://img.imgdb.cn/item/60217ded3ffa7d37b3d71967.png"></p>
+<p>对于所有这些操作，必须要在提交该操作的原子写入之前和之后发出epoch barriers。这些屏障确保了提交之前所有写操作都先将被刷新到BPRAM，并且任何后续的文件系统操作都将在提交之后进行。</p>
+<h3 id="Volatile-Data-Structures"><a href="#Volatile-Data-Structures" class="headerlink" title="Volatile Data Structures"></a>Volatile Data Structures</h3><p>该文件系统布局允许对持久状态进行高效可靠的更新，因此暂不允许将诸如哈希表之类的复杂数据结构存储在持久内存中。但考虑到这些复杂数据结构可以提高性能，因此在易失性内存中维护一些派生的数据结构。这里介绍了三个：</p>
+<ul>
+<li>在DRAM中存储的空闲BPRAM块列表以及释放或者分配的inumber列表，这些数据结构在每次启动时都从文件系统元数据初始化。</li>
+<li>正在进行的写时复制操作中已释放和已分配的块列表。</li>
+<li>第三个数据结构存储用户打开的每个目录中目录条目的缓存。</li>
+</ul>
+<h3 id="File-System-Operations"><a href="#File-System-Operations" class="headerlink" title="File System Operations"></a>File System Operations</h3><p>由于所有BPFS文件类型都使用BPFS树数据结构，因此的论文实现了一组核心routines——crawler，它们可以遍历这些树并可以对三种文件执行读写操作。为了执行这些操作，需要为crawler提供根指针，树的高度，文件偏移范围和回调函数。crawler到达叶节点后，它将使用适当的地址调用回调。</p>
+<p>crawler负责更新树的高度和内部指针。更新高度的操作：先查看请求的文件偏移量是否超出当前文件树所覆盖的偏移量，如果超过了，则以原子操作使树的高度增加适当的数量。</p>
+<p>在叶节点上，crawler将调用一个回调，如果该回调希望执行写时复制操作，它将分配一个新块，执行任何必要的更新，然后必须适当地更新任何内部节点。如果回调未进行任何修改，则crawler将返回未触及的现有指针块。如果回调仅修改了一个指针，那么crawler将就地提交该操作。如果修改了多个指针，crawler将对该指针块进行完整复制，将提交推迟到树中的高层节点。</p>
+<p>下面是单个的文件系统操作：</p>
+<ul>
+<li>Open：打开文件后，BPFS会解析路径并使用目录项缓存来查找目标文件或目录；如果该文件不存在，并且请求创建，则从可用列表中声明一个新的inumber，然后以适当的偏移量将一个新的inode写入inode文件。写完后，将一个新目录项写入包含文件的目录中，最后更新易失性存储器中的目录条目缓存；</li>
+<li>Read：读取文件时，BPFS在文件的适当范围内调用crawler。读取的回调将数据块中的数据复制到用户提供的缓冲区中，然后使用就地原子写入来更新访问时间；读取目录则是将目录加载到目录条目缓存（如果尚未缓存）中；</li>
+<li>Write：写入文件时，可能需要对inode本身执行写时复制操作。顶层crawler对inode文件进行操作，并找到目标文件的inode，然后在此文件的适当范围上调用写crawler，并确定是否可以就地更新，如果不可以则使用写时复制。如果需要同时更新文件大小和inode内文件的根指针，将对inode块本身执行写时复制，然后将新版本返回给inode文件；</li>
+<li>Close：关闭文件或目录后，BPFS会检查该文件或目录是否已标记为删除。如果是，crawler则到目录条目的位置写入inumber为0来表示删除。最后则更新易失性数据结构，包括空闲块列表和空闲inumber列表；</li>
+</ul>
+<h3 id="Multiprocessor-Operation"><a href="#Multiprocessor-Operation" class="headerlink" title="Multiprocessor Operation"></a>Multiprocessor Operation</h3><p>BPFS保证将更新按顺序提交给BPRAM。在单处理器系统上，epoch barrier通过按照创建它们的顺序将从缓存子系统中拿到epoch来强制执行此保证。</p>
+<p>对于多处理器的情况，硬件修改可确保如果在两个不同的CPU上发出了共享状态的两个epoch，那么这些epoch将被序列化。但如果进程或线程在两个不同的CPU上执行时更新了两个不同的状态，则可以按任何顺序将更新写回PCM。为了正确实现这些更新，必须考虑三种情况：</p>
+<ul>
+<li>可以在单个文件系统操作期间在多个CPU上调度线程；</li>
+<li>可以在两个不同的文件系统操作之间将线程切换到新的CPU；</li>
+<li>两个进程可以在两个不同的CPU中更新文件系统中的两个不同位置；</li>
+</ul>
+<p>BPFS的当前实现尚未强制执行前两个约束。</p>
+<h3 id="Limitations"><a href="#Limitations" class="headerlink" title="Limitations"></a>Limitations</h3><p>BPFS也存在一些局限性：</p>
+<ul>
+<li>其一是写入时间不像写入本身进行原子更新，这是基于性能的折衷考虑；</li>
+<li>另一个局限性是跨越树一大块的原子操作可能需要大量额外的副本；</li>
+<li>还有一个局限是BPRAM的整体接口实现了新的文件系统，并没有提供持久化的用户级堆；</li>
+</ul>
+<h2 id="HARDWARE-SUPPORT"><a href="#HARDWARE-SUPPORT" class="headerlink" title="HARDWARE SUPPORT"></a>HARDWARE SUPPORT</h2><h3 id="Phase-Change-Memory"><a href="#Phase-Change-Memory" class="headerlink" title="Phase Change Memory"></a>Phase Change Memory</h3><p>Phase change memory即PCM是一种非易失性且基于字节寻址的新型存储技术，能提供与DRAM相近的访问速度，也可以组织成类似于DRAM的阵列结构。本论文的假设是基于PCM的存储系统被组织成放置在与DDR兼容的DIMM中一组PCM芯片。</p>
+<h3 id="Wear-Leveling-and-Write-Failures"><a href="#Wear-Leveling-and-Write-Failures" class="headerlink" title="Wear Leveling and Write Failures"></a>Wear Leveling and Write Failures</h3><p>尽管PCM比一般的NAND闪存的写耐久性更高，但考虑到PCM放置在存储器总线上而不是I&#x2F;O总线上，单元将暴露于更大更多的写入活动，因此需要进行耗损均衡：</p>
+<ul>
+<li>最小化写入的方式设计PCM阵列，延长使用寿命；</li>
+<li>在每个页面内，通过旋转内存控制器级别的位来使损耗均匀；</li>
+<li>在页面之间，可以通过定期交换虚拟页面到物理页面来使损耗均匀映射；</li>
+</ul>
+<h3 id="Enforcing-Atomicity"><a href="#Enforcing-Atomicity" class="headerlink" title="Enforcing Atomicity"></a>Enforcing Atomicity</h3><p>为了对8字节的写入保证原子性，必须要确保在电源故障的情况下，写入要么完全完成（所有位适当更新），要么完全失败（所有位都处于原始状态）。论文建议通过增加DIMM的容量来增强原子性，使得该电容器具有足够的能量来完成PCM子系统中正在进行的最大写入事务数。</p>
+<h3 id="Enforcing-Ordering"><a href="#Enforcing-Ordering" class="headerlink" title="Enforcing Ordering"></a>Enforcing Ordering</h3><p>现代的高速缓存和内存控制器可以重新排列从CPU到内存的写入顺序。考虑到使用BPRAM代替DRAM，写回发生的顺序会变的很重要，例如如果高速缓存控制器在选择在写回缓冲区之前先写回指针更新，则BPRAM中的文件系统将不一致，这种不一致性一般会因为高速缓存一致性和内存屏障机制变得不可见。但如果在所有数据都写回到BPRAM之前发生电源故障，则重新引导计算机时文件系统将变得不一致。为了避免这种情况，需要遵守任何排序约束。</p>
+<p>强制排序有多种选择。一种可能是使用直写式缓存；第二种是在每个内存屏障处刷新整个缓存，以确保所有数据都以正确的顺序到达非易失性内存中；第三种是跟踪在操作期间已修改的所有高速缓存行，以便仅刷新包含脏文件系统数据的行。</p>
+<p>这几种方法都有明显的问题，论文的解决方法是允许软件将排序约束明确地传达给硬件，即epoch barrier。epoch是从同一线程向持久性存储器进行写入的序列，由软件发出的新型存储器屏障来界定。</p>
+<h2 id="CONCLUSION"><a href="#CONCLUSION" class="headerlink" title="CONCLUSION"></a>CONCLUSION</h2><p>本文主要介绍了一种文件系统，支持按字节寻址和持久化内存，同时也介绍了一种硬件体系来确保原子性和顺序保证。新型文件系统使用了short-circuit shadow paging的技术来提供较强的安全性和一致性保证。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/02/18/Bitcoin-A-Peer-to-Peer-Electronic-Cash-System%E2%80%94%E2%80%94MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1948,218 +2152,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/15/Scaling-Distributed-Machine-Learning-with-the-Parameter-Server%E2%80%94%E2%80%94MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/12/15/Scaling-Distributed-Machine-Learning-with-the-Parameter-Server%E2%80%94%E2%80%94MIT6-824/" itemprop="url">Scaling Distributed Machine Learning with the Parameter Server——MIT6.824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-15T01:32:15+08:00">
-                2019-12-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Scaling-Distributed-Machine-Learning-with-the-Parameter-Server"><a href="#Scaling-Distributed-Machine-Learning-with-the-Parameter-Server" class="headerlink" title="Scaling Distributed Machine Learning with the Parameter Server"></a>Scaling Distributed Machine Learning with the Parameter Server</h1><blockquote>
-<p>这篇论文提出了一种用于解决分布式机器学习问题的参数服务器框架。通过将数据和工作负载均匀地分布在所有工作节点上，服务器节点则用来维护全局共享的参数（即一些向量和矩阵）。这个框架能够很好地管理节点之间的异步数据通信，并保持了灵活的一致性、弹性可伸缩性和容错能力。</p>
-<p>这是它的开源实现：<a target="_blank" rel="noopener" href="https://github.com/dmlc/parameter_server">https://github.com/dmlc/parameter_server</a></p>
-</blockquote>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>分布式的优化和推理正成为解决大规模机器学习问题的先决条件，因为数据的增长和模型复杂，很难通过单机去快速解决这些问题。因此，如此大量的计算工作和数据都需要仔细的系统设计，</p>
-<p>而这些复杂的模型需要在所有工作节点中进行全局共享，由于需要经常访问共享参数，因此这会带来三个挑战：</p>
-<ul>
-<li>访问参数需要大量的网络带宽；</li>
-<li>许多机器学习算法都是顺序执行的，如果同步和机器延迟成本很高，对性能影响很大；</li>
-<li>大规模的容错能力；因为机器学习任务通常在云环境中执行，而云环境不够稳定可靠；</li>
-</ul>
-<h3 id="Contributions"><a href="#Contributions" class="headerlink" title="Contributions"></a>Contributions</h3><p>参数服务器（Parameter Server）在学术界和工业界已经有了一定的影响力。本文主要描述其第三代开源实现。其注重于分布式推理的实现，提供了5个关键功能：</p>
-<ol>
-<li>高效的通信：使用了不会阻塞计算的异步通信模型；</li>
-<li>灵活的一致性模型：较为宽松的一致性降低了同步成本和延迟；</li>
-<li>弹性可伸缩行：主要是在运行时添加新节点，无需重启；</li>
-<li>容错性和耐用性：秒级恢复故障机器，不会中断计算，并使用向量明确网络分区和故障行为；</li>
-<li>计算更简单：全局共享的参数是向量和矩阵的形式；</li>
-</ol>
-<h2 id="Machine-Learning"><a href="#Machine-Learning" class="headerlink" title="Machine Learning"></a>Machine Learning</h2><p>该论文因为要在非常大型的训练数据中证明参数服务器的有效性，因此介绍了两种广泛使用的机器学习技术。</p>
-<h3 id="Risk-Minimization"><a href="#Risk-Minimization" class="headerlink" title="Risk Minimization"></a>Risk Minimization</h3><p>risk minimization是机器学习中最直观的一个问题，大概意思就是对预测误差的衡量，即通过risk minimization的模型来预测自变量x的值y。训练数据量与模型大小的有着重要的联系，详细的模型可能提高了准确性，却导致过拟合，反之则可能是欠拟合。为了解决这个问题，则通过正则化来实现在模型复杂度和训练误差之间取得平衡，即最小化训练数据预测误差损失和惩罚模型复杂度的正则器。</p>
-<p>虽然这两个对于机器学习算法的性能有着很重要的影响，但不是评估参数服务器的关键，因此这里采用了比较简单的算法，一种叫次梯度的分布式下降算法（ <em>distributed subgradient descent</em>）</p>
-<p>在参数服务器中，训练数据分配到所有的worker，共同学习参数向量w。算法在每次迭代的时候，每个worker会独立地使用自己的训练数据来计算Δwi，这就是subgradient，参数向量w的移动方向，然后使用所有的subgradient来表示最终w的梯度。为了快速收敛，需要设计有效的学习率。算法如下所示</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_500685383_1571329244934/0" alt="img"></p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1389210464_1571329354280/0"></p>
-<p>由于计算梯度的成本比较高，如果w的维度很高的话，计算将无法执行，因此每个worker都需要知道其训练数据所依赖的w的坐标范围，从而减少计算量。</p>
-<p>论文的实验结果是，随着worker的增长，单机所需内存也在下降。如下图，对于100个worker，每个worker只需要使用参数的7.8％。拥有10,000名工人，这一比例降低到0.15％。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_775863512_1571329775763/0"></p>
-<h3 id="Generative-Models"><a href="#Generative-Models" class="headerlink" title="Generative Models"></a>Generative Models</h3><p>另一类主要的机器学习算法就是使用非监督算法来捕获数据的基础结构，具体不表，也是通过学习部分参数，然后进行聚合，但可能有点不同的是，有些算法不是使用的梯度下降，而是其它的比较方法。</p>
-<h2 id="Architecture"><a href="#Architecture" class="headerlink" title="Architecture"></a>Architecture</h2><p>参数服务器可以同时运行多种算法，其将节点分为server group和好几个worker group。如下图所示，server group中的server节点负责维护全局共享的部分参数，而这些节点则通过相互通信完成参数迁移和复制，同时通过维护诸如节点状态和参数分配等原数据的一致性视图。</p>
-<p>每个worker都运行一个应用程序，存储着部分的训练数据，worker之间是不能通讯的，只能与server节点交流，从而更新和检索参数。每个worker都有一个叫task scheduler的节点，负责为worker节点分配任务和监视进度。当有workers新增或移除节点·时，task scheduler负责重新分配未完成的任务。</p>
-<p>参数服务器支持独立的参数名称空间，也允许多个worker group共享同一个名称空间。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_775863512_1571331119626/0"></p>
-<h3 id="Key-Value-Vectors"><a href="#Key-Value-Vectors" class="headerlink" title="(Key,Value) Vectors"></a>(Key,Value) Vectors</h3><p>节点之间的共享模型可以表示为一组键值对，并且假设所有的key都是有序的，例如损失函数最小化问题中，键值对是特征ID及其权重，对于LDA，则是单词ID和主题ID以及计数的组合。</p>
-<h3 id="Range-Push-and-Pull"><a href="#Range-Push-and-Pull" class="headerlink" title="Range Push and Pull"></a>Range Push and Pull</h3><p>参数服务器中，worker与server的节点之间发送数据是通过推拉操作完成的，并且支持基于范围的推拉。worker将计算好的梯度push到server，然后worker从server读取新的参数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">w.push(R, dest) <span class="comment">// 将key范围中w的所有现存项全部发往目的，这里的目的可以是特定节点，也可以是节点组</span></span><br><span class="line">w.pull(R, dest) <span class="comment">// 从目的位置读取key范围中w的所有现存项</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="User-Defined-Functions-on-the-Server"><a href="#User-Defined-Functions-on-the-Server" class="headerlink" title="User-Defined Functions on the Server"></a>User-Defined Functions on the Server</h3><p>除了从worker聚合数据之外，server节点还可以执行用户自定义的功能，这里的好处是因为server节点往往具有共享参数更加完整更加新的的信息。</p>
-<h3 id="Asynchronous-Tasks-and-Dependency"><a href="#Asynchronous-Tasks-and-Dependency" class="headerlink" title="Asynchronous Tasks and Dependency"></a>Asynchronous Tasks and Dependency</h3><p>task是通过远程调用发出的，worker向server发出的消息是pull或者push其中一种，也可以是由调度程序发给任何节点的用户自定义功能。另外task可能包含任意数量的子task。</p>
-<p>task是异步执行的，发出task之后，caller可以马上执行进一步的计算，caller仅在收到callee答复才能标记任务完成。默认情况下，callee并行执行任务，如果要实现序列化，则可以在task之间执行一个依赖关系。如下图就指示了三个迭代例子，其中10和11是独立的，但12依赖于11，因此callee在10中完成计算局部梯度之后可以立即开始11，但12则需要等到11的计算完成，返回数据之后才能开始。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1218999906_1571418637302/0"></p>
-<h3 id="Flexible-Consistency"><a href="#Flexible-Consistency" class="headerlink" title="Flexible Consistency"></a>Flexible Consistency</h3><p>独立的任务虽然可以通过并行化CPU的使用，磁盘和网络带宽的方式提高系统效率，但也可能带来节点间数据不一致的问题，从而降低算法收敛速度，因此需要在系统效率和算法收敛速度之间进行取舍，但这里的权衡取舍又会依赖于以下几种因素：</p>
-<ul>
-<li>算法对数据不一致的敏感度；</li>
-<li>训练数据的特征相关性；</li>
-<li>硬件组件的容量差异；</li>
-</ul>
-<p>参数服务器为算法设计人员提供了定义一致性模型的灵活性，下图就是通过任务依赖关系实现的三种不同模型：</p>
-<p><img src="https://pic.superbed.cn/item/5da9f4df451253d1784d57cd.png" alt="img"></p>
-<p><strong>Sequential</strong>：顺序执行所有任务，当前一个任务执行完成，才能启动下一个任务；</p>
-<p><strong>Eventual</strong>：所有任务同时执行，这只有在对延时敏感度很robust的算法中才会被使用；</p>
-<p><strong>Bounded Delay</strong>：就是前两种模型的折衷，即使用一个最大延时t，在t时刻之前完成前一个任务才能启动下一个任务。t&#x3D;0就是Eventual，t&#x3D;∞即Sequential；</p>
-<p>另外，tasks之间的依赖关系可能是动态的，即可以根据系统情况来改变最大延时以平衡系统效率和优化算法的收敛性。</p>
-<h3 id="User-defined-Filters"><a href="#User-defined-Filters" class="headerlink" title="User-defined Filters"></a>User-defined Filters</h3><p>作为调度程序控制流的一个拓展，参数服务器支持用户自定义filter，以选择性地在节点之间同步各个键值对，从而更加细粒度地控制数据。这里的关键是，要明确优化算法本身拥有的跟参数有关的信息是什么。例如有些filter只会push自上次同步依赖变化超过阈值的item，有些则利用filterpush仅仅可能影响server权重的梯度。</p>
-<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>参数服务器使用一致性哈希来存储参数，并使用链式复制来备份内容，同时对基于key范围的通信进行了优化。</p>
-<h3 id="Vector-Clock"><a href="#Vector-Clock" class="headerlink" title="Vector Clock"></a>Vector Clock</h3><p>参数服务器会将每个键值对与矢量时钟关联起来，该时钟会记录每个节点在该键值对上的时间，矢量时钟的一个好处就是可以用来跟踪聚合状态或者是拒绝重复发送数据。但矢量时钟的最初版需要O(mn)的空间来处理n个节点和m个参数，这样的成本太高了。</p>
-<p>但由于参数服务器可以进行基于范围的通信模式，这样就会使得许多参数具有相同的时间戳，这样就可以将矢量时钟进行压缩。</p>
-<p>一开始，所有的节点都共享一个range vector clock，覆盖了整个参数键空间，其最初的时间戳为0。每个range key都可以抽取子range，并最多创建3个新的矢量时钟，参考下面的算法，这样就可以大大降低参数数量：</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571498105511/0"></p>
-<h3 id="Messages"><a href="#Messages" class="headerlink" title="Messages"></a>Messages</h3><p>节点可以将消息发送给耽搁节点或者是节点组，一条消息由key范围R中的键值对列表和相关范围的矢量时钟组成，这是参数服务器的基本通信格式，不仅用于共享参数，也会应用于任务。而对于任务，键值对则可能表示为（taskID，参数&#x2F;返回值）。</p>
-<blockquote>
-<p>参数服务器基本通信格式：[vc(R), (k1,v1), …, (kp,vp)] kj ∈ R and j ∈ {1,…p}</p>
-</blockquote>
-<p>由于机器学习问题往往需要高带宽，因此需要进行消息压缩：</p>
-<ol>
-<li>如果迭代之间的训练数据保持不变，则可以要求接收节点缓存key列表，以后发送节点只需要发送该key的hash值即可。</li>
-<li>由于键值对的value本身可能包含许多零项，另外用户定义的过滤器也可以将部分值归零，因此可以只发送非零的键值对即可。</li>
-</ol>
-<h3 id="Consistent-Hashing"><a href="#Consistent-Hashing" class="headerlink" title="Consistent Hashing"></a>Consistent Hashing</h3><p>参数服务器将key的分区方式是通过将key和服务器节点ID插入到哈希环中，如下：</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571499394673/0"></p>
-<p>每个服务器节点管理一定的key范围，每个服务器节点都管理者它按逆时针方向到下一个节点之间的key range，这就是该key range的主节点。同样，每个节点都复制了按逆时针方向的k个节点的key range。另外为了改善平衡和提高恢复效率，物理服务器通过多个”虚拟服务器”在环中表示。例如k&#x3D;2时，S1就会复制S2和S3管理的key range，这时S1就是这两个key range的slave</p>
-<h3 id="Replication-and-Consistency"><a href="#Replication-and-Consistency" class="headerlink" title="Replication and Consistency"></a>Replication and Consistency</h3><p>Worker仅与该key range的master进行通信，在主server节点的修改和时间戳都需要复制到slave服务器。下面的左图就是这样的一个情况，</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571501296060/0"></p>
-<p>Worker1会push x到server1，server1执行完用户自定义函数后同步到slave server2，同步完成后，任务才算结束。</p>
-<p>但简单的同步复制可能会使网络流量增加k倍，这对很多依赖于高网络带宽的机器学习应用是很致命的。因此参数服务器框架做了一个重要的优化：聚合后的复制，即servers先聚合从workers接收到的数据后再复制到slaves。如上右图所示，对于n个workers来说，复制带宽将会降低n倍。</p>
-<h3 id="Server-Management"><a href="#Server-Management" class="headerlink" title="Server Management"></a>Server Management</h3><p>为了实现容错和动态扩展，参数服务器还必须支持添加和删除节点，为了方便起见，将会引入虚拟服务器。server 节点加入后，将会发生：</p>
-<ol>
-<li>server管理器为新节点分配一个key range以用作master节点。这可能会导致另一个key range分裂或者从某个终止节点中删除；</li>
-<li>新加入的节点会获取k个key range，自身成为这些key range的slave；</li>
-<li>server管理器广播节点更改，接收方server将移除不属于自己管理的key range的数据，并将未完成的任务重新提交给新节点；</li>
-</ol>
-<h3 id="Worker-Management"><a href="#Worker-Management" class="headerlink" title="Worker Management"></a>Worker Management</h3><p>添加新的worker节点与添加server节点类似，但更简单：</p>
-<ol>
-<li>task调度器为新节点分配数据范围；</li>
-<li>该节点从网络文件系统或者现有的工作程序中加载训练数据，接下来则是从server节点pull共享参数；</li>
-<li>task调度器广播修改，这可能会使部分workers释放部分训练数据；</li>
-</ol>
-<p>当worker节点挂掉后，参数服务器提供了选项，用户可以自行控制恢复程序，这是因为：</p>
-<ul>
-<li>如果训练数据量巨大，则恢复worker节点可能比恢复server节点的成本更高；</li>
-<li>在优化过程中丢失少量训练数据通常只会对模型造成少许影响；</li>
-</ul>
-<p>因此，算法设计者可能更喜欢继续操作而不替换失败的工作程序。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2210,7 +2202,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">265</span>
+                <span class="site-state-item-count">266</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2272,7 +2264,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
