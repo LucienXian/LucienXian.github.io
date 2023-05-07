@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,7 +332,8 @@
       
 
       
-        <h1 id="implementation-of-lexical-analysis">Implementation of Lexical Analysis</h1>
+        <h1 id="implementation-of-lexical-analysis">Implementation of Lexical
+Analysis</h1>
 <h2 id="regular-languages">Regular languages</h2>
 <ul>
 <li>Epsilon: a simple string namely the empty string</li>
@@ -345,9 +344,11 @@
 <p>正则表达式可能有多个表示方式</p>
 <h2 id="formal-languages">Formal languages</h2>
 <p>alphabet 表示一系列的字符，adcii码</p>
-<p>meaning function L : maps syntax to semantics，将表达式映射到字符串的集合。比如：</p>
+<p>meaning function L : maps syntax to
+semantics，将表达式映射到字符串的集合。比如：</p>
 <p>L(epison) = {""} L('c') = {"c"} L(A+B) = L(A) U L(B)</p>
-<p>Reason for meaning function：有时候一个semantics可以用多个syntax表示，可能是多对一的映射关系。用于不会有一对多的关系。</p>
+<p>Reason for meaning
+function：有时候一个semantics可以用多个syntax表示，可能是多对一的映射关系。用于不会有一对多的关系。</p>
 <h2 id="lexical-specification">lexical specification</h2>
 <ul>
 <li>letter = [a-zA-Z]</li>
@@ -359,7 +360,8 @@
 </ul>
 <p>考虑如何匹配一个邮箱地址：anyone@cs.stanford.edu(考虑前面只由字母组成)</p>
 <ul>
-<li>得到这样的正则表达式：letter+ '@' letter+ '.' letter+ '.' letter+</li>
+<li>得到这样的正则表达式：letter+ '@' letter+ '.' letter+ '.'
+letter+</li>
 </ul>
 <p>注意:</p>
 <ul>
@@ -400,7 +402,8 @@
 <li>which token is used?</li>
 </ul>
 <p>x1..xi 属于L(R); R = R1+R2...Rn。</p>
-<p>如果有x1...xi属于L(Ri),也有x1...xi属于L(Rj),那么采用priority choose。例如if应该是keyword，不是identifier。</p>
+<p>如果有x1...xi属于L(Ri),也有x1...xi属于L(Rj),那么采用priority
+choose。例如if应该是keyword，不是identifier。</p>
 <h2 id="finite-automa">Finite Automa</h2>
 <ul>
 <li>Regular expressions = specification</li>
@@ -416,21 +419,27 @@
 </ul>
 <p>from state1, inpute a, go to state2;</p>
 <p>如果输入完之后还处于接收状态，就接收；</p>
-<p>否则，就拒绝：处于结束状态（terminate states，no transitions）；遇到错误匹配</p>
+<p>否则，就拒绝：处于结束状态（terminate states，no
+transitions）；遇到错误匹配</p>
 <h2 id="regular-expressions-to-nfas">Regular Expressions to NFAS</h2>
-<p>Lexical Specification-&gt; Regular expressions-&gt; NFA-&gt; DFA-&gt; Table-driven Implementation of DFA</p>
+<p>Lexical Specification-&gt; Regular expressions-&gt; NFA-&gt; DFA-&gt;
+Table-driven Implementation of DFA</p>
 <p>对于NFA，每个notation的图表示与正则表达式相对应，比如正则表达式的epsilon就与开始状态，接收一个epsilon，到达的结束状态的图表示相对应。比如AB，就是状态A接收一个epsilon到达状态B。</p>
 <p>我觉得在这种情况下，AB中的A或者B用状态机来表示比较恰当。假如A是一个组合状态，就递归进去解析，直到得到最终的单元的notation。</p>
 <h2 id="nfa-to-dfa">NFA to DFA</h2>
 <p>假如在NFA中，由B分别经过epsilon可以到达B和C，那么可以说：</p>
-<p>epsilon-closure(B) = {B, C, D}，就是仅仅经过epsilon，迭代可以到达的状态</p>
-<p>对于NFA来说，在不同的时间NFA可能处于多个状态，a(X) = {y|x属于X and x-&gt;(a)y}表示a应用于X后到达Y</p>
+<p>epsilon-closure(B) = {B, C,
+D}，就是仅仅经过epsilon，迭代可以到达的状态</p>
+<p>对于NFA来说，在不同的时间NFA可能处于多个状态，a(X) = {y|x属于X and
+x-&gt;(a)y}表示a应用于X后到达Y</p>
 <ul>
 <li>定义DFA</li>
 </ul>
 <p>states: subset of S(all states in NFA)</p>
 <p>start: epsilon-closure(s)</p>
-<p>final: {X|x与NFA中final states的交集不等于空集的集合},也就是到达的状态中包含了NFA中的final states，就意味着这是DFA中的final states</p>
+<p>final: {X|x与NFA中final
+states的交集不等于空集的集合},也就是到达的状态中包含了NFA中的final
+states，就意味着这是DFA中的final states</p>
 <p>transitions: X-&gt;(a)Y, if y == epsilon-closure(a(X))</p>
 <h2 id="implementing-finite-automata">implementing finite automata</h2>
 <p>由DFA组织一个表，有多少种状态就多少行，有多少种输入就多少列，表示出每种状态在不同输入的情况下到达的状态。</p>
@@ -614,7 +623,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#implementation-of-lexical-analysis"><span class="nav-number">1.</span> <span class="nav-text">Implementation of Lexical Analysis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#regular-languages"><span class="nav-number">1.1.</span> <span class="nav-text">Regular languages</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#formal-languages"><span class="nav-number">1.2.</span> <span class="nav-text">Formal languages</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lexical-specification"><span class="nav-number">1.3.</span> <span class="nav-text">lexical specification</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#finite-automa"><span class="nav-number">1.4.</span> <span class="nav-text">Finite Automa</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#regular-expressions-to-nfas"><span class="nav-number">1.5.</span> <span class="nav-text">Regular Expressions to NFAS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nfa-to-dfa"><span class="nav-number">1.6.</span> <span class="nav-text">NFA to DFA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#implementing-finite-automata"><span class="nav-number">1.7.</span> <span class="nav-text">implementing finite automata</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E9%86%92"><span class="nav-number">2.</span> <span class="nav-text">提醒</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#implementation-of-lexical-analysis"><span class="nav-number">1.</span> <span class="nav-text">Implementation of Lexical
+Analysis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#regular-languages"><span class="nav-number">1.1.</span> <span class="nav-text">Regular languages</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#formal-languages"><span class="nav-number">1.2.</span> <span class="nav-text">Formal languages</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lexical-specification"><span class="nav-number">1.3.</span> <span class="nav-text">lexical specification</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#finite-automa"><span class="nav-number">1.4.</span> <span class="nav-text">Finite Automa</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#regular-expressions-to-nfas"><span class="nav-number">1.5.</span> <span class="nav-text">Regular Expressions to NFAS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nfa-to-dfa"><span class="nav-number">1.6.</span> <span class="nav-text">NFA to DFA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#implementing-finite-automata"><span class="nav-number">1.7.</span> <span class="nav-text">implementing finite automata</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E9%86%92"><span class="nav-number">2.</span> <span class="nav-text">提醒</span></a></li></ol></div>
             
 
           </div>
@@ -656,8 +666,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,11 +332,14 @@
       
 
       
-        <h1 id="sharing-data-race-conditions">Sharing Data &amp; Race Conditions</h1>
+        <h1 id="sharing-data-race-conditions">Sharing Data &amp; Race
+Conditions</h1>
 <p>多线程编程的一个经典问题就是<strong>Race Condition</strong>。</p>
 <h2 id="what-is-a-race-condition">What is a Race Condition?</h2>
-<p>race condition是多线程编程的一个经典bug，它指的是当多个线程并行执行某些操作时，它们访问公共的内存区域。此时有若干个线程回去修改这篇内存区域的的数据。</p>
-<h2 id="a-practical-example-of-race-condition">A Practical example of Race Condition</h2>
+<p>race
+condition是多线程编程的一个经典bug，它指的是当多个线程并行执行某些操作时，它们访问公共的内存区域。此时有若干个线程回去修改这篇内存区域的的数据。</p>
+<h2 id="a-practical-example-of-race-condition">A Practical example of
+Race Condition</h2>
 <p>假设有这样的一个钱包类，我们提供一个成员函数addMoney()：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Wallet</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> mMoney;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Wallet</span>() :<span class="built_in">mMoney</span>(<span class="number">0</span>)&#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">getMoney</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> mMoney; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">addMoney</span><span class="params">(<span class="type">int</span> money)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; money; ++i)</span><br><span class="line">       &#123;</span><br><span class="line">          mMoney++;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>接着我们创建5个线程，共享这个钱包类的对象，并行地添加1000到哪步的money变量，预期结果钱包类的结果应该是5000。</p>
@@ -525,7 +526,9 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#sharing-data-race-conditions"><span class="nav-number">1.</span> <span class="nav-text">Sharing Data &amp; Race Conditions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-a-race-condition"><span class="nav-number">1.1.</span> <span class="nav-text">What is a Race Condition?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#a-practical-example-of-race-condition"><span class="nav-number">1.2.</span> <span class="nav-text">A Practical example of Race Condition</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#sharing-data-race-conditions"><span class="nav-number">1.</span> <span class="nav-text">Sharing Data &amp; Race
+Conditions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-a-race-condition"><span class="nav-number">1.1.</span> <span class="nav-text">What is a Race Condition?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#a-practical-example-of-race-condition"><span class="nav-number">1.2.</span> <span class="nav-text">A Practical example of
+Race Condition</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -567,8 +570,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

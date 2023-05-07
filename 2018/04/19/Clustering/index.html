@@ -103,7 +103,6 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="聚类 聚类任务 在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。 假设有样本集D &#x3D; {x1,x2...xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l&#x3D;1,2,...,k}。 作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。 性能度量 性能的度量主要是为了">
 <meta property="og:locale">
-<meta property="og:image" content="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png">
 <meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png">
 <meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png">
 <meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png">
@@ -113,14 +112,13 @@
 <meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png">
 <meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png">
 <meta property="og:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png">
-<meta property="og:image" content="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png">
 <meta property="og:image" content="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png">
 <meta property="article:published_time" content="2018-04-19T13:23:25.000Z">
 <meta property="article:modified_time" content="2018-04-19T13:24:08.304Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="Machine Learning">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png">
+<meta name="twitter:image" content="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png">
 
 
 
@@ -171,9 +169,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -350,7 +346,8 @@
         <h1 id="聚类">聚类</h1>
 <h2 id="聚类任务">聚类任务</h2>
 <p>在无监督学习中，由于训练样本是未标记的，因此如果希望对无标记的训练样本进行深入挖掘，可以采用聚类（clustering）的方法。</p>
-<p>假设有样本集D = {x1,x2...xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l=1,2,...,k}。</p>
+<p>假设有样本集D =
+{x1,x2...xm}，则聚类算法就是将样本集D划分为k个不相交的簇{Cl|l=1,2,...,k}。</p>
 <p>作为一种无监督学习的算法，它既可以用于寻找数据内在的分布结构，也可以作为其它学习任务的前驱过程。</p>
 <h2 id="性能度量">性能度量</h2>
 <p>性能的度量主要是为了评估聚类结果的好坏，一般来说我们使用两种方法：</p>
@@ -359,10 +356,15 @@
 </ol>
 <p>假设λ与λ<em>分别表示C和C</em>对应的簇标记向量，我们将样本两两配对考虑。</p>
 <figure>
-<img src="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://images2015.cnblogs.com/blog/646262/201707/646262-20170707150202128-48296302.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <blockquote>
-<p>其中集合SS包含了在C中属于相同簇，且在C<em>也属于相同簇的样本对； 集合SD则是包含了在C中属于相同簇，但在C</em>中不属于相同簇的样本对； 如此类推。。。。</p>
+<p>其中集合SS包含了在C中属于相同簇，且在C<em>也属于相同簇的样本对；
+集合SD则是包含了在C中属于相同簇，但在C</em>中不属于相同簇的样本对；
+如此类推。。。。</p>
 </blockquote>
 <p>由于每个样本对(xi,xj)只能出现在一个集合中，因此有<strong>a+b+c+d=C(m,2)=m(m-1)/2</strong>。</p>
 <p>最后导出以下的外部度量指标：</p>
@@ -376,16 +378,20 @@
 <li>直接考虑聚类结果，不参考任何的模型</li>
 </ol>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-6.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-7.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-8.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-9.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-9.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <blockquote>
 <p>其中dist(.,.)用来计算两个样本之间的距离；diam(C)表示簇C内样本间的最远距离；dmin(Ci,Cj)对应于簇Ci与Cj最近样本的距离；dcen(Ci,Cj)表示簇Ci与簇Cj中心点间的距离</p>
@@ -395,13 +401,15 @@
 <li>DB指数：</li>
 </ul>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-10.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-10.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>Dunn指数：</li>
 </ul>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-11.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-11.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>显然，DBI越小越好，表示簇内距离小，簇间距离大；而DI则相反，越大越好，表示簇间距离大，簇内距离小</p>
 <h2 id="距离计算">距离计算</h2>
@@ -414,32 +422,41 @@
 </ul>
 <p>在讨论距离计算时，属性是否有序很关键，例如定义域为{1,2,3}的属性，能直接在属性值上计算距离，这种就称为有序属性；而对于定义域为{飞机，火车，轮船}这些，称为无序属性</p>
 <h3 id="有序属性">有序属性</h3>
-<p>给定样本xi=(xi1,xi2,...,xin)与xj=(xj1,xj2,...,xjn)，最常用的就是<strong>Minkowski distance</strong></p>
+<p>给定样本xi=(xi1,xi2,...,xin)与xj=(xj1,xj2,...,xjn)，最常用的就是<strong>Minkowski
+distance</strong></p>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-12.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>当p=2，也叫欧式距离</p>
 <h3 id="无序属性">无序属性</h3>
 <p>首先来看几个假设：m(u,a)表示在属性u取值为a的样本数，m(u,a,i)则是表示第i个样本簇在属性u取值为a的样本数。于是得到以下的公式(VDN)来计算距离。</p>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-15.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>另外，还可以结合Minkowski distance和VDM，保证处理混合属性</p>
 <figure>
-<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://o73nd1ra4.bkt.clouddn.com/ML10-16.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>但对于无序属性，有可能会出现直递性失效，以“人”，“马”，“人马”为例，“人”和“马”都与“人马”很接近，但“人”与“马”差距很大，这种就叫做<strong>非度量距离</strong>。</p>
 <h2 id="原型聚类">原型聚类</h2>
-<p>prototype-based clustering，此类算法假设聚类结构能够基于一组原型刻画</p>
+<p>prototype-based
+clustering，此类算法假设聚类结构能够基于一组原型刻画</p>
 <h3 id="k-means-算法">k-means 算法</h3>
 <p>对于一个样本集和目标簇数，我们希望最小化以下的误差，其中ui就是簇Ci的均值向量。</p>
 <figure>
-<img src="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="http://images.cnblogs.com/cnblogs_com/jerrylead/201104/20110406160154496.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>算法思想比较简单：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 随机选择k个样本作为初始的均值向量</span><br><span class="line"><span class="number">2.</span> 进入循环</span><br><span class="line"><span class="number">3.</span> 计算每个样本与各个均值向量的距离，将样本划分到距离最小的均值向量所代表的簇中</span><br><span class="line"><span class="number">4.</span> 根据划分的聚类，计算新的均值中心</span><br><span class="line"><span class="number">5.</span> 如果均值向量没有变化，则退出循环</span><br></pre></td></tr></table></figure>
 <h3 id="学习向量量化">学习向量量化</h3>
-<p><strong>Learning Vector Quantization</strong>是针对带有标记的数据样本的。对于这种情况，我们可以根据簇数选择一组n维向量（维度与样本一致）</p>
+<p><strong>Learning Vector
+Quantization</strong>是针对带有标记的数据样本的。对于这种情况，我们可以根据簇数选择一组n维向量（维度与样本一致）</p>
 <p>具体算法为：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 首先初始化一组原型向量</span><br><span class="line"><span class="number">2.</span> 从样本集中随机抽取样本(xi,yi)</span><br><span class="line"><span class="number">3.</span> 找出与样本距离最近的一个原型向量</span><br><span class="line"><span class="number">4.</span> 比较两者类别是否一致</span><br><span class="line"><span class="number">5.</span> 一致则通过公式逼近，否则则使其离得更远</span><br><span class="line"><span class="number">6.</span> 直到迭代次数最大或者原型向量不怎么更新为止</span><br><span class="line">==========================================</span><br><span class="line"><span class="number">7.</span> 得到原型向量之后，再对样本进行相应的分类</span><br></pre></td></tr></table></figure>
 <p>这里的关键是如何更新原型向量：</p>
@@ -455,7 +472,9 @@
 <h3 id="高斯混合聚类">高斯混合聚类</h3>
 <p>高斯混合聚类采用的是概率模型来表达聚类原型，我们定义高斯混合分布公式为：</p>
 <figure>
-<img src="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://img.my.csdn.net/uploads/201206/14/1339666259_7270.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>该分布为k个高斯分布的叠加，其中ai为相应的混合系数,且权重和为1。</p>
 <p>算法步骤为：</p>
@@ -695,8 +714,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,7 +332,8 @@
       
 
       
-        <h1 id="c11-c14-delete-keyword-and-deleted-functions">C++11 / C++14 : ‘delete’ keyword and deleted functions</h1>
+        <h1 id="c11-c14-delete-keyword-and-deleted-functions">C++11 / C++14 :
+‘delete’ keyword and deleted functions</h1>
 <p>本文将介绍C++11的一个新特性——delete，通过将delete应用到函数来限制其调用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>= <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
 <p>它通常用在以下的地方：</p>
@@ -344,34 +343,43 @@
 <li>delete类的new运算符，以限制堆的对象创建；</li>
 <li>delete特定的模版特化；</li>
 </ul>
-<h2 id="deleting-copy-constructor-and-assignment-operator">Deleting Copy Constructor and Assignment Operator</h2>
+<h2 id="deleting-copy-constructor-and-assignment-operator">Deleting Copy
+Constructor and Assignment Operator</h2>
 <p>假设存在这样的一个类，拷贝构造函数和赋值运算符都被delete了：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span></span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line">	<span class="type">int</span> id;</span><br><span class="line">	std::string name;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)</span><br><span class="line">	&#123;&#125;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Copy Constructor is deleted</span></span><br><span class="line">	<span class="built_in">User</span>(<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line">	<span class="comment">// Assignment operator is deleted</span></span><br><span class="line">	User &amp; <span class="keyword">operator</span> = (<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;id &lt;&lt; <span class="string">&quot; ::: &quot;</span>&lt;&lt;name&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>如果调用这赋值运算符：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">User obj = userObj;</span><br></pre></td></tr></table></figure>
 <p>编译时报错：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:30:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User obj = userObj;</span><br><span class="line">         ^     ~~~~~~~</span><br><span class="line">delete.cpp:15:2: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">        User(const User &amp; obj) = delete;</span><br><span class="line">        ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
-<h2 id="deleting-member-functions-to-prevent-data-loss-conversions">Deleting member functions to prevent data loss conversions</h2>
+<h2
+id="deleting-member-functions-to-prevent-data-loss-conversions">Deleting
+member functions to prevent data loss conversions</h2>
 <p>由于类型的隐式转换，有可能会在调用函数时传递了错误的参数，例如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 这样调用会被cast</span></span><br><span class="line"><span class="function">User <span class="title">obj4</span><span class="params">(<span class="number">5.5</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br><span class="line"> </span><br><span class="line"><span class="function">User <span class="title">obj5</span><span class="params">(<span class="string">&#x27;a&#x27;</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>通过利用delete来避免类型转换：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent narrowing conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">double</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent invalid type conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">char</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
 <p>报错如下：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">elete.cpp:32:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj1(5.5, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:14:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(double userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">delete.cpp:33:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj2(&#x27;a&#x27;, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:15:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(char userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">2 errors generated.</span><br></pre></td></tr></table></figure>
-<h2 id="restrict-object-creation-on-heap-by-deleting-new-operator-for-class">Restrict Object creation on Heap by deleting new operator for class</h2>
+<h2
+id="restrict-object-creation-on-heap-by-deleting-new-operator-for-class">Restrict
+Object creation on Heap by deleting new operator for class</h2>
 <p>我们也可以限制new运算符的使用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> * <span class="keyword">operator</span> <span class="title">new</span> <span class="params">(<span class="type">size_t</span>)</span> </span>= <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line">User * ptr = <span class="keyword">new</span> <span class="built_in">User</span>(<span class="number">1</span>, <span class="string">&quot;Riti&quot;</span>);</span><br></pre></td></tr></table></figure>
 <p>报错如下：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:34:17: error: call to deleted function &#x27;operator new&#x27;</span><br><span class="line">    User *ptr = new User(1, &quot;Rziti&quot;);</span><br><span class="line">                ^</span><br><span class="line">delete.cpp:17:12: note: candidate function has been explicitly deleted</span><br><span class="line">    void * operator new (size_t) = delete;</span><br><span class="line">           ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
-<h2 id="delete-specific-template-specialisation">Delete specific template specialisation</h2>
+<h2 id="delete-specific-template-specialisation">Delete specific
+template specialisation</h2>
 <p>使用delete关键字，我们可以限制模板类或函数的某些模板特化。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ComplexNumber</span></span><br><span class="line">&#123;</span><br><span class="line">	T x;</span><br><span class="line">	T y;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">ComplexNumber</span>(T a, T b) : <span class="built_in">x</span>(a) , <span class="built_in">y</span>(b)</span><br><span class="line">	&#123;&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;x &lt;&lt; <span class="string">&quot; + i&quot;</span>&lt;&lt;y&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line">        <span class="comment">// Deleted template specialisation </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">char</span> a, <span class="type">char</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="comment">// Deleted template specialisation  </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">double</span> a, <span class="type">double</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>原来该模版类可以接收char参数和double参数，通过delete，我们可以限制其特化。</p>
-<h2 id="different-between-deleted-function-and-private-functions">Different between deleted function and private functions</h2>
+<h2
+id="different-between-deleted-function-and-private-functions">Different
+between deleted function and private functions</h2>
 <p>相比private成员函数，delete有两个优点：</p>
 <ul>
 <li>避免被其它成员函数调用；</li>
-<li>delete函数在name lookup中，如果函数delete了，那么它就不会根据该类型去查找其它匹配函数；</li>
+<li>delete函数在name
+lookup中，如果函数delete了，那么它就不会根据该类型去查找其它匹配函数；</li>
 </ul>
 
       
@@ -547,7 +555,13 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-c14-delete-keyword-and-deleted-functions"><span class="nav-number">1.</span> <span class="nav-text">C++11 &#x2F; C++14 : ‘delete’ keyword and deleted functions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#deleting-copy-constructor-and-assignment-operator"><span class="nav-number">1.1.</span> <span class="nav-text">Deleting Copy Constructor and Assignment Operator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#deleting-member-functions-to-prevent-data-loss-conversions"><span class="nav-number">1.2.</span> <span class="nav-text">Deleting member functions to prevent data loss conversions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#restrict-object-creation-on-heap-by-deleting-new-operator-for-class"><span class="nav-number">1.3.</span> <span class="nav-text">Restrict Object creation on Heap by deleting new operator for class</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#delete-specific-template-specialisation"><span class="nav-number">1.4.</span> <span class="nav-text">Delete specific template specialisation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#different-between-deleted-function-and-private-functions"><span class="nav-number">1.5.</span> <span class="nav-text">Different between deleted function and private functions</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-c14-delete-keyword-and-deleted-functions"><span class="nav-number">1.</span> <span class="nav-text">C++11 &#x2F; C++14 :
+‘delete’ keyword and deleted functions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#deleting-copy-constructor-and-assignment-operator"><span class="nav-number">1.1.</span> <span class="nav-text">Deleting Copy
+Constructor and Assignment Operator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#deleting-member-functions-to-prevent-data-loss-conversions"><span class="nav-number">1.2.</span> <span class="nav-text">Deleting
+member functions to prevent data loss conversions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#restrict-object-creation-on-heap-by-deleting-new-operator-for-class"><span class="nav-number">1.3.</span> <span class="nav-text">Restrict
+Object creation on Heap by deleting new operator for class</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#delete-specific-template-specialisation"><span class="nav-number">1.4.</span> <span class="nav-text">Delete specific
+template specialisation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#different-between-deleted-function-and-private-functions"><span class="nav-number">1.5.</span> <span class="nav-text">Different
+between deleted function and private functions</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -589,8 +603,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

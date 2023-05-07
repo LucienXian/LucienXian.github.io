@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,12 +339,14 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> fun_sum = [](<span class="type">int</span> a , <span class="type">int</span> b)&#123;</span><br><span class="line">					<span class="keyword">return</span> a+b;</span><br><span class="line">				&#125;;</span><br><span class="line"> </span><br><span class="line">std::cout&lt;&lt;<span class="built_in">fun_sum</span>(<span class="number">4</span>,<span class="number">5</span>)&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
 <p>auto的最大优点就是，我们不需要书写很长的变量类型：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">std::map&lt;std::string, std::string&gt; mapOfStrs;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Insert data in Map</span></span><br><span class="line">mapOfStrs.<span class="built_in">insert</span>(std::<span class="built_in">pair</span>&lt;std::string, std::string&gt;(<span class="string">&quot;first&quot;</span>, <span class="string">&quot;1&quot;</span>) );</span><br><span class="line">mapOfStrs.<span class="built_in">insert</span>(std::<span class="built_in">pair</span>&lt;std::string, std::string&gt;(<span class="string">&quot;sec&quot;</span>, <span class="string">&quot;2&quot;</span>) );</span><br><span class="line">mapOfStrs.<span class="built_in">insert</span>(std::<span class="built_in">pair</span>&lt;std::string, std::string&gt;(<span class="string">&quot;thirs&quot;</span>, <span class="string">&quot;3&quot;</span>) );</span><br><span class="line"></span><br><span class="line"><span class="comment">//std::map&lt;std::string, std::string&gt;::iterator it = mapOfStrs.begin();</span></span><br><span class="line"><span class="keyword">auto</span> it = mapOfStrs.<span class="built_in">begin</span>();</span><br><span class="line"><span class="keyword">while</span>(it != mapOfStrs.<span class="built_in">end</span>())</span><br><span class="line">&#123;</span><br><span class="line">	std::cout&lt;&lt;it-&gt;first&lt;&lt;<span class="string">&quot;::&quot;</span>&lt;&lt;it-&gt;second&lt;&lt;std::endl;</span><br><span class="line">	it++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="important-points-about-auto-variable-in-c11">Important points about auto variable in C++11</h2>
+<h2 id="important-points-about-auto-variable-in-c11">Important points
+about auto variable in C++11</h2>
 <ol type="1">
 <li>初始化auto变量后，您可以更改值，但不能更改类型</li>
 <li>不能只声明而不进行初始化</li>
 </ol>
-<h2 id="returning-an-auto-from-a-function">Returning an auto from a function</h2>
+<h2 id="returning-an-auto-from-a-function">Returning an auto from a
+function</h2>
 <p>要从函数返回auto变量，我们可以以特殊方式声明它</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">sum</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> -&gt; <span class="type">int</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> x + y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> value = <span class="built_in">sum</span>(<span class="number">3</span>, <span class="number">5</span>);</span><br></pre></td></tr></table></figure>
 
@@ -523,7 +523,9 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#auto-specifier"><span class="nav-number">1.</span> <span class="nav-text">auto specifier</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#important-points-about-auto-variable-in-c11"><span class="nav-number">1.1.</span> <span class="nav-text">Important points about auto variable in C++11</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#returning-an-auto-from-a-function"><span class="nav-number">1.2.</span> <span class="nav-text">Returning an auto from a function</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#auto-specifier"><span class="nav-number">1.</span> <span class="nav-text">auto specifier</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#important-points-about-auto-variable-in-c11"><span class="nav-number">1.1.</span> <span class="nav-text">Important points
+about auto variable in C++11</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#returning-an-auto-from-a-function"><span class="nav-number">1.2.</span> <span class="nav-text">Returning an auto from a
+function</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -565,8 +567,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

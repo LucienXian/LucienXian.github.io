@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -351,7 +349,8 @@
 <li>纯右值，则会返回T；</li>
 </ul></li>
 </ul>
-<p>需要注意的是，如果对象的名字带有括号，则它被当做通常的左值表达式，从而 decltype(x) 和 decltype((x)) 通常是不同的类型。</p>
+<p>需要注意的是，如果对象的名字带有括号，则它被当做通常的左值表达式，从而
+decltype(x) 和 decltype((x)) 通常是不同的类型。</p>
 <p>举个简单的例子：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> &#123; <span class="type">double</span> x; &#125;;</span><br><span class="line"><span class="type">const</span> A* a;</span><br><span class="line"><span class="type">int</span> i=<span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(a-&gt;x) y;       <span class="comment">// y 的类型是 double（其声明类型）</span></span><br><span class="line"><span class="keyword">decltype</span>((a-&gt;x)) z = y; <span class="comment">// z 的类型是 const double&amp;（被当作左值表达式）</span></span><br><span class="line"><span class="keyword">decltype</span>((i))b = i;   	<span class="comment">// b 的类型是 int&amp;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者用在无名函数的类型推导上</span></span><br><span class="line"><span class="keyword">auto</span> f = [](<span class="type">int</span> a, <span class="type">int</span> b) -&gt; <span class="type">int</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> a * b;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(f) g = f; </span><br><span class="line">i = <span class="built_in">f</span>(<span class="number">2</span>, <span class="number">2</span>);</span><br><span class="line">j = <span class="built_in">g</span>(<span class="number">3</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
 <p>在日常编程中，用到decltype的情况还是比较少的，我们一般用在模版中，结合auto和尾返回类型，我们可以写出语言级别支持的简洁代码：</p>
@@ -477,10 +476,13 @@
       
         
           
-            <h1 id="scaling-distributed-machine-learning-with-the-parameter-server">Scaling Distributed Machine Learning with the Parameter Server</h1>
+            <h1
+id="scaling-distributed-machine-learning-with-the-parameter-server">Scaling
+Distributed Machine Learning with the Parameter Server</h1>
 <blockquote>
 <p>这篇论文提出了一种用于解决分布式机器学习问题的参数服务器框架。通过将数据和工作负载均匀地分布在所有工作节点上，服务器节点则用来维护全局共享的参数（即一些向量和矩阵）。这个框架能够很好地管理节点之间的异步数据通信，并保持了灵活的一致性、弹性可伸缩性和容错能力。</p>
-<p>这是它的开源实现：<a target="_blank" rel="noopener" href="https://github.com/dmlc/parameter_server" class="uri">https://github.com/dmlc/parameter_server</a></p>
+<p>这是它的开源实现：<a target="_blank" rel="noopener" href="https://github.com/dmlc/parameter_server"
+class="uri">https://github.com/dmlc/parameter_server</a></p>
 </blockquote>
 <h2 id="introduction">Introduction</h2>
 <p>分布式的优化和推理正成为解决大规模机器学习问题的先决条件，因为数据的增长和模型复杂，很难通过单机去快速解决这些问题。因此，如此大量的计算工作和数据都需要仔细的系统设计，</p>
@@ -491,7 +493,8 @@
 <li>大规模的容错能力；因为机器学习任务通常在云环境中执行，而云环境不够稳定可靠；</li>
 </ul>
 <h3 id="contributions">Contributions</h3>
-<p>参数服务器（Parameter Server）在学术界和工业界已经有了一定的影响力。本文主要描述其第三代开源实现。其注重于分布式推理的实现，提供了5个关键功能：</p>
+<p>参数服务器（Parameter
+Server）在学术界和工业界已经有了一定的影响力。本文主要描述其第三代开源实现。其注重于分布式推理的实现，提供了5个关键功能：</p>
 <ol type="1">
 <li>高效的通信：使用了不会阻塞计算的异步通信模型；</li>
 <li>灵活的一致性模型：较为宽松的一致性降低了同步成本和延迟；</li>
@@ -502,34 +505,50 @@
 <h2 id="machine-learning">Machine Learning</h2>
 <p>该论文因为要在非常大型的训练数据中证明参数服务器的有效性，因此介绍了两种广泛使用的机器学习技术。</p>
 <h3 id="risk-minimization">Risk Minimization</h3>
-<p>risk minimization是机器学习中最直观的一个问题，大概意思就是对预测误差的衡量，即通过risk minimization的模型来预测自变量x的值y。训练数据量与模型大小的有着重要的联系，详细的模型可能提高了准确性，却导致过拟合，反之则可能是欠拟合。为了解决这个问题，则通过正则化来实现在模型复杂度和训练误差之间取得平衡，即最小化训练数据预测误差损失和惩罚模型复杂度的正则器。</p>
-<p>虽然这两个对于机器学习算法的性能有着很重要的影响，但不是评估参数服务器的关键，因此这里采用了比较简单的算法，一种叫次梯度的分布式下降算法（ <em>distributed subgradient descent</em>）</p>
+<p>risk
+minimization是机器学习中最直观的一个问题，大概意思就是对预测误差的衡量，即通过risk
+minimization的模型来预测自变量x的值y。训练数据量与模型大小的有着重要的联系，详细的模型可能提高了准确性，却导致过拟合，反之则可能是欠拟合。为了解决这个问题，则通过正则化来实现在模型复杂度和训练误差之间取得平衡，即最小化训练数据预测误差损失和惩罚模型复杂度的正则器。</p>
+<p>虽然这两个对于机器学习算法的性能有着很重要的影响，但不是评估参数服务器的关键，因此这里采用了比较简单的算法，一种叫次梯度的分布式下降算法（
+<em>distributed subgradient descent</em>）</p>
 <p>在参数服务器中，训练数据分配到所有的worker，共同学习参数向量w。算法在每次迭代的时候，每个worker会独立地使用自己的训练数据来计算Δwi，这就是subgradient，参数向量w的移动方向，然后使用所有的subgradient来表示最终w的梯度。为了快速收敛，需要设计有效的学习率。算法如下所示</p>
 <figure>
-<img src="https://puui.qpic.cn/fans_admin/0/3_500685383_1571329244934/0" alt="img" /><figcaption>img</figcaption>
+<img src="https://puui.qpic.cn/fans_admin/0/3_500685383_1571329244934/0"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1389210464_1571329354280/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_1389210464_1571329354280/0" /></p>
 <p>由于计算梯度的成本比较高，如果w的维度很高的话，计算将无法执行，因此每个worker都需要知道其训练数据所依赖的w的坐标范围，从而减少计算量。</p>
 <p>论文的实验结果是，随着worker的增长，单机所需内存也在下降。如下图，对于100个worker，每个worker只需要使用参数的7.8％。拥有10,000名工人，这一比例降低到0.15％。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_775863512_1571329775763/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_775863512_1571329775763/0" /></p>
 <h3 id="generative-models">Generative Models</h3>
 <p>另一类主要的机器学习算法就是使用非监督算法来捕获数据的基础结构，具体不表，也是通过学习部分参数，然后进行聚合，但可能有点不同的是，有些算法不是使用的梯度下降，而是其它的比较方法。</p>
 <h2 id="architecture">Architecture</h2>
-<p>参数服务器可以同时运行多种算法，其将节点分为server group和好几个worker group。如下图所示，server group中的server节点负责维护全局共享的部分参数，而这些节点则通过相互通信完成参数迁移和复制，同时通过维护诸如节点状态和参数分配等原数据的一致性视图。</p>
-<p>每个worker都运行一个应用程序，存储着部分的训练数据，worker之间是不能通讯的，只能与server节点交流，从而更新和检索参数。每个worker都有一个叫task scheduler的节点，负责为worker节点分配任务和监视进度。当有workers新增或移除节点·时，task scheduler负责重新分配未完成的任务。</p>
-<p>参数服务器支持独立的参数名称空间，也允许多个worker group共享同一个名称空间。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_775863512_1571331119626/0" /></p>
+<p>参数服务器可以同时运行多种算法，其将节点分为server
+group和好几个worker group。如下图所示，server
+group中的server节点负责维护全局共享的部分参数，而这些节点则通过相互通信完成参数迁移和复制，同时通过维护诸如节点状态和参数分配等原数据的一致性视图。</p>
+<p>每个worker都运行一个应用程序，存储着部分的训练数据，worker之间是不能通讯的，只能与server节点交流，从而更新和检索参数。每个worker都有一个叫task
+scheduler的节点，负责为worker节点分配任务和监视进度。当有workers新增或移除节点·时，task
+scheduler负责重新分配未完成的任务。</p>
+<p>参数服务器支持独立的参数名称空间，也允许多个worker
+group共享同一个名称空间。</p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_775863512_1571331119626/0" /></p>
 <h3 id="keyvalue-vectors">(Key,Value) Vectors</h3>
 <p>节点之间的共享模型可以表示为一组键值对，并且假设所有的key都是有序的，例如损失函数最小化问题中，键值对是特征ID及其权重，对于LDA，则是单词ID和主题ID以及计数的组合。</p>
 <h3 id="range-push-and-pull">Range Push and Pull</h3>
 <p>参数服务器中，worker与server的节点之间发送数据是通过推拉操作完成的，并且支持基于范围的推拉。worker将计算好的梯度push到server，然后worker从server读取新的参数。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">w.push(R, dest) <span class="comment">// 将key范围中w的所有现存项全部发往目的，这里的目的可以是特定节点，也可以是节点组</span></span><br><span class="line">w.pull(R, dest) <span class="comment">// 从目的位置读取key范围中w的所有现存项</span></span><br></pre></td></tr></table></figure>
-<h3 id="user-defined-functions-on-the-server">User-Defined Functions on the Server</h3>
+<h3 id="user-defined-functions-on-the-server">User-Defined Functions on
+the Server</h3>
 <p>除了从worker聚合数据之外，server节点还可以执行用户自定义的功能，这里的好处是因为server节点往往具有共享参数更加完整更加新的的信息。</p>
-<h3 id="asynchronous-tasks-and-dependency">Asynchronous Tasks and Dependency</h3>
+<h3 id="asynchronous-tasks-and-dependency">Asynchronous Tasks and
+Dependency</h3>
 <p>task是通过远程调用发出的，worker向server发出的消息是pull或者push其中一种，也可以是由调度程序发给任何节点的用户自定义功能。另外task可能包含任意数量的子task。</p>
 <p>task是异步执行的，发出task之后，caller可以马上执行进一步的计算，caller仅在收到callee答复才能标记任务完成。默认情况下，callee并行执行任务，如果要实现序列化，则可以在task之间执行一个依赖关系。如下图就指示了三个迭代例子，其中10和11是独立的，但12依赖于11，因此callee在10中完成计算局部梯度之后可以立即开始11，但12则需要等到11的计算完成，返回数据之后才能开始。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1218999906_1571418637302/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_1218999906_1571418637302/0" /></p>
 <h3 id="flexible-consistency">Flexible Consistency</h3>
 <p>独立的任务虽然可以通过并行化CPU的使用，磁盘和网络带宽的方式提高系统效率，但也可能带来节点间数据不一致的问题，从而降低算法收敛速度，因此需要在系统效率和算法收敛速度之间进行取舍，但这里的权衡取舍又会依赖于以下几种因素：</p>
 <ul>
@@ -539,11 +558,14 @@
 </ul>
 <p>参数服务器为算法设计人员提供了定义一致性模型的灵活性，下图就是通过任务依赖关系实现的三种不同模型：</p>
 <figure>
-<img src="https://pic.superbed.cn/item/5da9f4df451253d1784d57cd.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://pic.superbed.cn/item/5da9f4df451253d1784d57cd.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p><strong>Sequential</strong>：顺序执行所有任务，当前一个任务执行完成，才能启动下一个任务；</p>
 <p><strong>Eventual</strong>：所有任务同时执行，这只有在对延时敏感度很robust的算法中才会被使用；</p>
-<p><strong>Bounded Delay</strong>：就是前两种模型的折衷，即使用一个最大延时t，在t时刻之前完成前一个任务才能启动下一个任务。t=0就是Eventual，t=∞即Sequential；</p>
+<p><strong>Bounded
+Delay</strong>：就是前两种模型的折衷，即使用一个最大延时t，在t时刻之前完成前一个任务才能启动下一个任务。t=0就是Eventual，t=∞即Sequential；</p>
 <p>另外，tasks之间的依赖关系可能是动态的，即可以根据系统情况来改变最大延时以平衡系统效率和优化算法的收敛性。</p>
 <h3 id="user-defined-filters">User-defined Filters</h3>
 <p>作为调度程序控制流的一个拓展，参数服务器支持用户自定义filter，以选择性地在节点之间同步各个键值对，从而更加细粒度地控制数据。这里的关键是，要明确优化算法本身拥有的跟参数有关的信息是什么。例如有些filter只会push自上次同步依赖变化超过阈值的item，有些则利用filterpush仅仅可能影响server权重的梯度。</p>
@@ -552,12 +574,16 @@
 <h3 id="vector-clock">Vector Clock</h3>
 <p>参数服务器会将每个键值对与矢量时钟关联起来，该时钟会记录每个节点在该键值对上的时间，矢量时钟的一个好处就是可以用来跟踪聚合状态或者是拒绝重复发送数据。但矢量时钟的最初版需要O(mn)的空间来处理n个节点和m个参数，这样的成本太高了。</p>
 <p>但由于参数服务器可以进行基于范围的通信模式，这样就会使得许多参数具有相同的时间戳，这样就可以将矢量时钟进行压缩。</p>
-<p>一开始，所有的节点都共享一个range vector clock，覆盖了整个参数键空间，其最初的时间戳为0。每个range key都可以抽取子range，并最多创建3个新的矢量时钟，参考下面的算法，这样就可以大大降低参数数量：</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571498105511/0" /></p>
+<p>一开始，所有的节点都共享一个range vector
+clock，覆盖了整个参数键空间，其最初的时间戳为0。每个range
+key都可以抽取子range，并最多创建3个新的矢量时钟，参考下面的算法，这样就可以大大降低参数数量：</p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571498105511/0" /></p>
 <h3 id="messages">Messages</h3>
 <p>节点可以将消息发送给耽搁节点或者是节点组，一条消息由key范围R中的键值对列表和相关范围的矢量时钟组成，这是参数服务器的基本通信格式，不仅用于共享参数，也会应用于任务。而对于任务，键值对则可能表示为（taskID，参数/返回值）。</p>
 <blockquote>
-<p>参数服务器基本通信格式：[vc(R), (k1,v1), ..., (kp,vp)] kj ∈ R and j ∈ {1,...p}</p>
+<p>参数服务器基本通信格式：[vc(R), (k1,v1), ..., (kp,vp)] kj ∈ R and j ∈
+{1,...p}</p>
 </blockquote>
 <p>由于机器学习问题往往需要高带宽，因此需要进行消息压缩：</p>
 <ol type="1">
@@ -566,19 +592,31 @@
 </ol>
 <h3 id="consistent-hashing">Consistent Hashing</h3>
 <p>参数服务器将key的分区方式是通过将key和服务器节点ID插入到哈希环中，如下：</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571499394673/0" /></p>
-<p>每个服务器节点管理一定的key范围，每个服务器节点都管理者它按逆时针方向到下一个节点之间的key range，这就是该key range的主节点。同样，每个节点都复制了按逆时针方向的k个节点的key range。另外为了改善平衡和提高恢复效率，物理服务器通过多个"虚拟服务器"在环中表示。例如k=2时，S1就会复制S2和S3管理的key range，这时S1就是这两个key range的slave</p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571499394673/0" /></p>
+<p>每个服务器节点管理一定的key范围，每个服务器节点都管理者它按逆时针方向到下一个节点之间的key
+range，这就是该key
+range的主节点。同样，每个节点都复制了按逆时针方向的k个节点的key
+range。另外为了改善平衡和提高恢复效率，物理服务器通过多个"虚拟服务器"在环中表示。例如k=2时，S1就会复制S2和S3管理的key
+range，这时S1就是这两个key range的slave</p>
 <h3 id="replication-and-consistency">Replication and Consistency</h3>
-<p>Worker仅与该key range的master进行通信，在主server节点的修改和时间戳都需要复制到slave服务器。下面的左图就是这样的一个情况，</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571501296060/0" /></p>
-<p>Worker1会push x到server1，server1执行完用户自定义函数后同步到slave server2，同步完成后，任务才算结束。</p>
+<p>Worker仅与该key
+range的master进行通信，在主server节点的修改和时间戳都需要复制到slave服务器。下面的左图就是这样的一个情况，</p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_1221609656_1571501296060/0" /></p>
+<p>Worker1会push x到server1，server1执行完用户自定义函数后同步到slave
+server2，同步完成后，任务才算结束。</p>
 <p>但简单的同步复制可能会使网络流量增加k倍，这对很多依赖于高网络带宽的机器学习应用是很致命的。因此参数服务器框架做了一个重要的优化：聚合后的复制，即servers先聚合从workers接收到的数据后再复制到slaves。如上右图所示，对于n个workers来说，复制带宽将会降低n倍。</p>
 <h3 id="server-management">Server Management</h3>
-<p>为了实现容错和动态扩展，参数服务器还必须支持添加和删除节点，为了方便起见，将会引入虚拟服务器。server 节点加入后，将会发生：</p>
+<p>为了实现容错和动态扩展，参数服务器还必须支持添加和删除节点，为了方便起见，将会引入虚拟服务器。server
+节点加入后，将会发生：</p>
 <ol type="1">
-<li>server管理器为新节点分配一个key range以用作master节点。这可能会导致另一个key range分裂或者从某个终止节点中删除；</li>
+<li>server管理器为新节点分配一个key
+range以用作master节点。这可能会导致另一个key
+range分裂或者从某个终止节点中删除；</li>
 <li>新加入的节点会获取k个key range，自身成为这些key range的slave；</li>
-<li>server管理器广播节点更改，接收方server将移除不属于自己管理的key range的数据，并将未完成的任务重新提交给新节点；</li>
+<li>server管理器广播节点更改，接收方server将移除不属于自己管理的key
+range的数据，并将未完成的任务重新提交给新节点；</li>
 </ol>
 <h3 id="worker-management">Worker Management</h3>
 <p>添加新的worker节点与添加server节点类似，但更简单：</p>
@@ -712,14 +750,18 @@
       
         
           
-            <h1 id="resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1>
+            <h1
+id="resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing">Resilient
+Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster
+Computing</h1>
 <h2 id="abstract">Abstract</h2>
 <p>本文介绍了弹性的分布式数据集，这是一种分布式的内存抽象形式，它可以让程序员以一种容错的方式在大型集群中进行内存计算。</p>
 <h2 id="introduction">Introduction</h2>
 <p>尽管想MapReduce之类的框架已经提供了关于访问集群的计算资源的抽象，但仍然缺乏对于分布式内存的抽象，这使得它们在处理需要重用多个计算中中间结果的应用程序上不够高效。像一些机器学习算法、图算法，交互式数据挖掘都需要对数据子集做临时的查询，但那些框架的做法往往是将其写入到外部的存储系统里，这里IO、序列化之类的开销非常大。</p>
 <p>本文提出了一种弹性的分布式数据集的新抽象。其可以将中间结果明确地保存在内存中，控制其分区进行优化放置，并使用一组丰富的运算符进行操作。</p>
 <p>Apache Spark应运而生。</p>
-<h2 id="resilient-distributed-datasets-rdds">Resilient Distributed Datasets (RDDs)</h2>
+<h2 id="resilient-distributed-datasets-rdds">Resilient Distributed
+Datasets (RDDs)</h2>
 <h3 id="rdd-abstraction">RDD Abstraction</h3>
 <p>所谓的弹性的分布式数据集，这里的弹性指的是在任何时候都可以进行重算，让用户不会感知到某部分内容曾经丢失过，这是Spark的核心抽象，是一种只读的、分区的数据记录集合。RDD的产生，要么通过从确定存储中获取，要么就是通过其它的RDD进行转换获取，这里的转换包括map、filter和join。</p>
 <p>RDD应该有足够的信息，去记录自身是如何从其它数据集派生而来的。用户可以控制RDD的持久化和分区，比如指示重用的RDD和存储策略，也可以命令RDD的元素进行分区。分区依照特定规则将具有相同属性的数据记录放在一起，每个分区相当于一个数据集片段。</p>
@@ -729,20 +771,24 @@
 <h3 id="advantages-of-the-rdd-model">Advantages of the RDD Model</h3>
 <p>RDD与分布式共享内存最大的区别就是，RDD只能通过粗粒度的转换得来，而DSM则可以读取/写入到每一个内存位置。这样RDD在处理容错时，就不会产生额外的有关checkpoint的开销，如果有分区丢失，RDD可以在不同的节点并行地重建，而不需要回滚整个系统。</p>
 <p>由于RDD的不可变特性，系统可以通过运行较慢的备份副本来缓解慢速节点，而DSM在这种情况会因为多副本访问相同内存位置，而产生干扰更新。</p>
-<h3 id="applications-not-suitable-for-rdds">Applications Not Suitable for RDDs</h3>
+<h3 id="applications-not-suitable-for-rdds">Applications Not Suitable
+for RDDs</h3>
 <p>RDD更适用于在批处理应用程序中对全集数据执行相同的操作，在这种情况下，RDD能够很好地记录每一步的转换，并且能够在分区丢失时快速恢复。</p>
 <p>而对于那些需要对共享状态进行异步更新的应用，RDD则不适合。</p>
 <h2 id="spark-programming-interface-1">Spark Programming Interface</h2>
 <p>为了使用Spark，开发人员编写了一个驱动程序，用以连接到一组worker，并通过一个或多个RDD来调用action，同时该驱动程序上的Spark代码还可以跟踪RDD的lineage（血统？）。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0" /></p>
 <p>这些worker是一个长期活跃的进程，在内存中存着RDD分区。</p>
 <h3 id="rdd-operations-in-spark">RDD Operations in Spark</h3>
 <p>下表列出了Spark中可用的RDD转换和可用操作：</p>
-<p><img src="https://pic1.superbed.cn/item/5de5470ef1f6f81c50404c93.png" /></p>
+<p><img
+src="https://pic1.superbed.cn/item/5de5470ef1f6f81c50404c93.png" /></p>
 <h2 id="representing-rdds">Representing RDDs</h2>
 <p>论文中提到使用了大约14000行Scala代码实现了Spark，这个系统在Mesos集群上运行。每个Spark程序都作为一个单独的Mesos应用程序，具有独立的驱动程序和worker程序，并且这些应用程序之间的资源共享由Mesos处理。</p>
 <p>论文中提到RDD的表示是一种基于图的表示。因此对于RDD的表示，则是通过暴露5个接口方法来实现的。</p>
-<p><img src="https://pic.superbed.cn/item/5de7e86ff1f6f81c50a2a07f.png" /></p>
+<p><img
+src="https://pic.superbed.cn/item/5de7e86ff1f6f81c50a2a07f.png" /></p>
 <ul>
 <li>Partions：数据集的原子结构；</li>
 <li>preferredLocations：能更快访问分区的系列节点；</li>
@@ -750,16 +796,19 @@
 <li>iterator：用于从父RDD计算子RDD；</li>
 <li>patitioner：数据分区的元信息；</li>
 </ul>
-<p>至于如何表示RDD的关系，由于RDD在物理上是分区的，散列在集群不同机器的内存上的，文中将其定义为窄依赖（Narrow Dependency）和宽依赖（Wide Dependency）两种。</p>
+<p>至于如何表示RDD的关系，由于RDD在物理上是分区的，散列在集群不同机器的内存上的，文中将其定义为窄依赖（Narrow
+Dependency）和宽依赖（Wide Dependency）两种。</p>
 <ul>
 <li>宽依赖：父RDD中的分区可能被子RDD中的多个分区所依赖；</li>
 <li>窄依赖：父RDD的每个分区至多被子RDD中的一个分区所依赖；像map/filter这些操作都属于窄依赖；</li>
 </ul>
-<p><img src="https://pic2.superbed.cn/item/5de7ea33f1f6f81c50a2e1cc.png" /></p>
+<p><img
+src="https://pic2.superbed.cn/item/5de7ea33f1f6f81c50a2e1cc.png" /></p>
 <p>这两种依赖的差别在于：窄依赖可以pipeline执行，在失败时只需要重新执行对应的父RDD即可；而宽依赖则需要shuffle，并且如果出现故障恢复则需要重算所有父RDD；</p>
 <h3 id="job-scheduling">Job Scheduling</h3>
 <p>每当用户在RDD执行action的时候，调度器就会检查RDD的谱系图，以构建要执行的DAG（有向无环图）。如下图所示：</p>
-<p><img src="https://pic.superbed.cn/item/5de7edaaf1f6f81c50a37d20.png" /></p>
+<p><img
+src="https://pic.superbed.cn/item/5de7edaaf1f6f81c50a37d20.png" /></p>
 <p>每个stage内部都包含尽可能多的具有窄依赖的操作。这些stage的边界是宽依赖所必需执行的shuffle操作，另外任何已经计算出的分区都可以使父RDD的计算短路。调度程序会集群上启动任务以计算每个阶段中缺少的分区，直到它计算出目标RDD。</p>
 <p>调度器会根据数据局部性的原则来执行delay scheduling算法：</p>
 <ul>
@@ -776,7 +825,8 @@
 <li>类传递：为了让工作节点能够获取在每一行上创建的类的字节码，解释器会通过HTTP为这些类提供服务；</li>
 <li>修改代码的生成：因为每行代码的单例对象都是通过对应的静态方法访问，这意味着无法引用上一行定义的变量。因此需要修改代码的生成，以便直接引用每行对象的实例，如下图：</li>
 </ol>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0" /></p>
 <h3 id="memory-management">Memory Management</h3>
 <p>Spark提供了三种对持久化RDD的存储策略：</p>
 <ul>
@@ -1069,7 +1119,10 @@
       
         
           
-            <h1 id="no-compromises-distributed-transactions-with-consistency-availability-and-performance">No compromises: distributed transactions with consistency, availability, and performance</h1>
+            <h1
+id="no-compromises-distributed-transactions-with-consistency-availability-and-performance">No
+compromises: distributed transactions with consistency, availability,
+and performance</h1>
 <h2 id="abtract">Abtract</h2>
 <p>本文展示了一个名为FaRM的主存分布式计算平台，可以提供强串行化、高性能、高可用和耐用性等特质，为此设计了新的事务，复制和恢复协议。</p>
 <h2 id="introduction">Introduction</h2>
@@ -1080,27 +1133,35 @@
 <p>前面讲过，FaRM的提出利用了两种硬件趋势——非易失性DRAM和具有RDMA的快速网络。</p>
 <h3 id="rdma-networking">RDMA networking</h3>
 <p>FaRM尽可能使用单向的RDMA操作，这是一种远程直接数据存取，是为了解决网络传输中服务器端数据处理的延迟而产生的。文中的实验发现，RDMA读取比可靠性的RPC执行性能高2倍，而RDMA的性能瓶颈是网卡的消息速率。另外，RDMA和RPC都会受到CPU的限制，因此降低CPU开销才是挖掘硬件潜力的好方法。</p>
-<h2 id="programming-model-and-architecture">Programming model and architecture</h2>
+<h2 id="programming-model-and-architecture">Programming model and
+architecture</h2>
 <p>FaRM为应用程序提供了跨集群机器的全局地址空间的抽象，每个机器都运行独立的应用程序进程并存储对象在地址空间里。FaRM的API提供了对本地或者远程对象的透明访问，应用程序线程可以随时启动事务，在事务执行期间可以执行任意逻辑，随后可以调用FaRM来提交这些逻辑操作。</p>
 <p>FaRM事务使用乐观并发控制，所有更新都被本地缓存，并且仅在成功提交后才对其他事务可见。如果并发事务冲突，事务的提交就会失败。</p>
-<p>FaRM API还提供了无锁读取（优化的单对象只读事务）和位置提示，这样应用程序就可以将相关对象共存于同一组机器上，从而改善性能。</p>
+<p>FaRM
+API还提供了无锁读取（优化的单对象只读事务）和位置提示，这样应用程序就可以将相关对象共存于同一组机器上，从而改善性能。</p>
 <p>如下图所示，每台机器在用户进程中固定在每个硬件线程中的内核线程上运行FaRM，，每个内核线程运行一个事件循环，该循环执行应用程序代码并轮询RDMA完成队列。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_131288061_1569132674961/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_131288061_1569132674961/0" /></p>
 <p>随着计算机故障或添加新计算机，FaRM实例会随着时间推移逐步进行一系列的配置。配置是元组⟨i，S，F，CM⟩，其中i是唯一的，单调递增的64位配置标识符，S是配置中的一组计算机，F是从计算机到故障域的映射，CM则是配置管理器，FaRM使用Zookeeper来协调服务，确保机器就当前配置达成一致并进行存储。每个配置更改都会由CM调用一次Zookeeper，以更新配置。</p>
 <p>FaRM中的全局地址空间由2GB的Region组成，每个Region都会备份到一个主备份和f个副备份中。每台机器在非易失性DRAM中存储多个Region，其他Region可以使用RDMA读取这些Region。读取对象必须要从包含该Region的主备份中完成，如果该Region位于本机，则使用局部地址空间读取。如果是远程，则使用单面RDMA读取。每个对象都有一个用于并行控制和复制的64位版本。Region标识符，即从主备份和副备份的映射由CM管理，并由线程与将单面RDMA读取发布到主备份所需的RDMA引用一起缓存。</p>
 <p>所有机器都与CM沟通以分配新Region，从单调递增的计数器分配Region标识符，并选择该区域的副本。副本选择需要平衡存储在每台机器上的Region数量，同时受到以下限制：容量足够大，每个副本位于不同的故障域中，并且当应用程序指定位置限制时，该Region与目标Region位于同一位置。CM将准备消息发送给具有Region标识符的所选副本。如果所有副本都报告分配区域成功，则CM向所有副本发送一条提交消息。这是一个两阶段协议。</p>
 <p>每台机器还存储实现FIFO队列的环形缓冲区。它们用作事务日志或消息队列。发送者会使用对尾部进行的单面RDMA写入，将记录追加到日志中。NIC会确认这些写入，但是不会涉及接收方的CPU。接收者定期轮询日志的开头以处理记录。</p>
-<h2 id="distributed-transactions-and-replication">Distributed transactions and replication</h2>
+<h2 id="distributed-transactions-and-replication">Distributed
+transactions and replication</h2>
 <p>FaRM集成了事务和备份的协议可以很好地提高性能，传统协议相比，它使用的消息更少，并且利用单面RDMA读取和写入来提高CPU效率和降低延迟。FaRM使用非易失性DRAM中的主备份复制来存储数据和事务日志，并使用单个事务协调器直接与primary和backup进行通信。</p>
 <p>下图是FaRM事务的timeline。虚线和实线分别表示RDMA的读写，点线表示硬件的响应，矩形是对象数据。</p>
-<p><a target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0"><img src="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0" /></a></p>
+<p><a
+target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0"><img
+src="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0" /></a></p>
 <p>在执行阶段，事务使用单向RDMA读取对象，并且它们在本地缓存写操作。协调器还记录所有访问对象的地址和版本，如果primary和backup与协调器位于同一个机器，对象访问会使用本地内存而不是RDMA来读取和写入日志。</p>
 <p>提交事务：</p>
 <ol type="1">
 <li>Lock：协调器将LOCK记录写入每台机器上的日志，这些机器是写入对象的主要机器。Primary的机器通过锁定特定版本对象的方式来处理这些记录。如果获取到所有的lock，那么将发送一条报告消息，否则会终止事务；</li>
 <li>Validate：协调器对primary机器执行读取验证，主要是读取所有对象的版本号，看是否一致。验证默认是通过单边的RDMA读取完成的；</li>
-<li>Commit backups：协调器在每次备份时将COMMITBACKBACK记录写入非易失性日志，然后等待NIC硬件的确认，而不是中断backup机器的CPU；</li>
-<li>Commit primaries：在COMMITBACKBACK写入backup机器之后，协调器开始对每台机器提交COMMIT-PRIMARY。Primary会更新对象的版本号；</li>
+<li>Commit
+backups：协调器在每次备份时将COMMITBACKBACK记录写入非易失性日志，然后等待NIC硬件的确认，而不是中断backup机器的CPU；</li>
+<li>Commit
+primaries：在COMMITBACKBACK写入backup机器之后，协调器开始对每台机器提交COMMIT-PRIMARY。Primary会更新对象的版本号；</li>
 <li>Truncate：在协调器收到所有主节点的响应之后，就会通过在其他日志记录中附带截断事务的标识符来实现记录的截断；</li>
 </ol>
 <h3 id="正确性">正确性</h3>
@@ -1108,7 +1169,9 @@
 <p>为了确保跨故障的可序列化性，必须在写入COMMIT-PRIMARY之前等待所有备份硬件的确认。否则一旦主节点在不接收COMMIT-BACKUP记录的情况下挂掉了，那么就可能丢失掉某个region的修改。</p>
 <p>由于读集仅存储在协调器中，因此如果协调器失败并且没有提交记录可以生存以证明验证是成功的，则事务将中止。协调器必须要在其中一个主数据库上等待成功提交，然后再向应用程序报告成功提交。否则，如果协调器和所有相关backup节点都挂掉了，那么事务就会被终止了。因为没有可以用来做验证的记录。</p>
 <h3 id="performance">Performance</h3>
-<p>对于FaRM来说，其协议比传统的分布式提交协议具有更多的优势，以带有备份的两阶段提交协议——Spanner的协议为例，Spanner使用Paxos复制事务协调器及其参与者，它们是存储由事务读取数据或写入数据的机器。每个Paxos状态机在传统的两阶段提交协议中都扮演着单独的机器的角色。因此这需要2f +1个副本才能容忍f个故障，每个状态机操作至少需要2f +1个往返消息，则需要4P（2f +1）个消息（其中P是事务参与者的数量）。</p>
+<p>对于FaRM来说，其协议比传统的分布式提交协议具有更多的优势，以带有备份的两阶段提交协议——Spanner的协议为例，Spanner使用Paxos复制事务协调器及其参与者，它们是存储由事务读取数据或写入数据的机器。每个Paxos状态机在传统的两阶段提交协议中都扮演着单独的机器的角色。因此这需要2f
++1个副本才能容忍f个故障，每个状态机操作至少需要2f
++1个往返消息，则需要4P（2f +1）个消息（其中P是事务参与者的数量）。</p>
 <p>FaRM使用primary-backup复制而不是Paxos状态机复制。这将数据副本的数量减少到f+1，减少了在事务处理期间传输的消息的数量。并且由于协调器直接与主备节点交流，进一步减少了延迟和消息数。此外，通过RDMA进行的读取验证可确保只读参与者主节点不占用CPU，并且对COMMIT-PRIMARY和COMMIT-BACKUP记录使用单向RDMA写操作可减少对远程CPU的等待，另外CPU也可以批处理和懒惰处理。</p>
 <h2 id="failure-recovery">Failure recovery</h2>
 <p>FaRM中的故障恢复有以下五个阶段：故障检测，重新配置，事务状态恢复，批量数据恢复和分配器状态恢复。</p>
@@ -1118,11 +1181,14 @@
 <p>租约的续期是在CPU上实现的，FaRM使用了专门的租约管理器线程，该线程以最高的用户空间优先级运行。</p>
 <h3 id="reconfiguration">Reconfiguration</h3>
 <p>重新配置协议将FaRM实例从一种配置移到另一种。以下是重新配置的时间图：</p>
-<p><a target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0"><img src="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0" /></a></p>
+<p><a
+target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0"><img
+src="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0" /></a></p>
 <ol type="1">
 <li>怀疑。当某个机器的租约在CM到期时，它将怀疑该机器发生了故障。然后屏蔽所有外部客户端请求。</li>
 <li>探测。新的CM向配置中的所有机器发出RDMA读取，但被怀疑的机器除外。同时也怀疑任何读取失败的机器，新CM仅在获得大多数探测的响应后才继续进行重新配置，避免CM处于小分区。</li>
-<li>更新配置。在收到对探针的答复后，新的CM尝试将存储在Zookeeper中的配置数据更新为⟨c+ 1，S，F和CMid⟩，其中c是当前配置标识符，S是已回复的探测器，F是计算机到故障域的映射，而CMid是其自身的标识符。</li>
+<li>更新配置。在收到对探针的答复后，新的CM尝试将存储在Zookeeper中的配置数据更新为⟨c+
+1，S，F和CMid⟩，其中c是当前配置标识符，S是已回复的探测器，F是计算机到故障域的映射，而CMid是其自身的标识符。</li>
 <li>重新映射区域。新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f+1。</li>
 <li>发送新配置。重新映射区域后，CM将NEW-CONFIG消息发送到配置中的所有计算机，其中包含配置标识符，其自身的标识符，配置中其他计算机的标识符以及区域到计算机的所有新映射。</li>
 <li>应用新配置。当机器收到配置标识符大于其自身配置的NEW-CONFIG时，它将更新其当前配置标识符及其区域映射的缓存副本，并分配空间以容纳分配给它的所有新区域副本。</li>
@@ -1130,7 +1196,9 @@
 </ol>
 <h3 id="transaction-state-recovery">Transaction state recovery</h3>
 <p>在配置更改之后，FaRM使用分布在因事务而修改对象副本所产生的日志来恢复事务状态。下图展示了事务恢复状态的timeline，FaRM通过在集群中的线程和机器之间分配工作来实现快速恢复。</p>
-<p><a target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0"><img src="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0" /></a></p>
+<p><a
+target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0"><img
+src="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0" /></a></p>
 <ol type="1">
 <li><em>Block access to recovering regions.</em></li>
 </ol>
@@ -1160,12 +1228,14 @@
 <ol start="7" type="1">
 <li><em>Decide.</em></li>
 </ol>
-<p>如果协调器收到来自任何region的commit-primary投票，则决定进行事务。否则，它将等待所有区域投票，如果至少一个区域对 commit-backup投票，而其他所有区域被事务投票锁定、提交备份或截断，则它将等待提交。</p>
+<p>如果协调器收到来自任何region的commit-primary投票，则决定进行事务。否则，它将等待所有区域投票，如果至少一个区域对
+commit-backup投票，而其他所有区域被事务投票锁定、提交备份或截断，则它将等待提交。</p>
 <h2 id="recovering-data">Recovering data</h2>
 <p>FaRM必须在某个region的新备份中恢复（重新复制）数据，以确保将来可以容忍复制失败。一个区域的新备份最初具有新分配的零区域副本。它将区域划分为多个工作线程，以并行方式恢复该工作线程。</p>
 <p>在复制到备份之前，必须检查每个恢复的对象。如果对象的版本大于本地版本，则备份将通过比较和交换锁定本地版本，更新对象状态，然后将其解锁。</p>
 <h2 id="recovering-allocator-state">Recovering allocator state</h2>
-<p>FaRM分配器将区域划分为块（1 MB），用作分配小对象的slabs。它保留了两个元数据：块标头（包含对象的大小）和slab的空闲列表。</p>
+<p>FaRM分配器将区域划分为块（1
+MB），用作分配小对象的slabs。它保留了两个元数据：块标头（包含对象的大小）和slab的空闲列表。</p>
 <p>分配新块时，块头将复制到备份中。这样可确保它们在发生故障后在新的主数据库上可用。slab空闲列表仅保留在primary上，以减少对象分配的开销。</p>
 
           
@@ -1294,7 +1364,8 @@
 <p>在redis/src/rdb.c中存在实际创建RDB文件的函数rdbSave()，SAVE命令和BGSAVE命令都会以不同方式调用这个函数。</p>
 <p>SAVE命令：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">saveCommand</span><span class="params">(client *c)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (server.rdb_child_pid != <span class="number">-1</span>) &#123; <span class="comment">// 正在执行BGSAVE</span></span><br><span class="line">        addReplyError(c,<span class="string">&quot;Background save already in progress&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rdbSaveInfo rsi, *rsiptr;</span><br><span class="line">    rsiptr = rdbPopulateSaveInfo(&amp;rsi);</span><br><span class="line">  	<span class="comment">// 调用rdbSave保存文件</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSave(server.rdb_filename,rsiptr) == C_OK) &#123;</span><br><span class="line">        addReply(c,shared.ok);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addReply(c,shared.err);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><em>redis</em> 的事件循环中会去检测redisServer的saveparams字段，判断是否执行BGSAVE，在执行完之后，子进程调用_exit()退出，避免因为父进程正在对文件进行操作而子进程直接回写文件缓冲区。</p>
+<p><em>redis</em>
+的事件循环中会去检测redisServer的saveparams字段，判断是否执行BGSAVE，在执行完之后，子进程调用_exit()退出，避免因为父进程正在对文件进行操作而子进程直接回写文件缓冲区。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">rdbSaveBackground</span><span class="params">(<span class="type">char</span> *filename, rdbSaveInfo *rsi)</span> &#123;</span><br><span class="line">    <span class="type">pid_t</span> childpid;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> start;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.aof_child_pid != <span class="number">-1</span> || server.rdb_child_pid != <span class="number">-1</span>) <span class="keyword">return</span> C_ERR;</span><br><span class="line"></span><br><span class="line">    server.dirty_before_bgsave = server.dirty;</span><br><span class="line">    server.lastbgsave_try = time(<span class="literal">NULL</span>);</span><br><span class="line">    openChildInfoPipe();</span><br><span class="line"></span><br><span class="line">    start = ustime();</span><br><span class="line">    <span class="keyword">if</span> ((childpid = fork()) == <span class="number">0</span>) &#123; <span class="comment">// Fork一个子进程</span></span><br><span class="line">        <span class="type">int</span> retval;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Child */</span></span><br><span class="line">        closeListeningSockets(<span class="number">0</span>); <span class="comment">// 关闭子进程的监听</span></span><br><span class="line">        redisSetProcTitle(<span class="string">&quot;redis-rdb-bgsave&quot;</span>);</span><br><span class="line">        retval = rdbSave(filename,rsi); <span class="comment">// 调用rdbSave</span></span><br><span class="line">        <span class="keyword">if</span> (retval == C_OK) &#123;</span><br><span class="line">            <span class="type">size_t</span> private_dirty = zmalloc_get_private_dirty(<span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (private_dirty) &#123;</span><br><span class="line">                serverLog(LL_NOTICE,</span><br><span class="line">                    <span class="string">&quot;RDB: %zu MB of memory used by copy-on-write&quot;</span>,</span><br><span class="line">                    private_dirty/(<span class="number">1024</span>*<span class="number">1024</span>));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            server.child_info_data.cow_size = private_dirty;</span><br><span class="line">            sendChildInfo(CHILD_INFO_TYPE_RDB);</span><br><span class="line">        &#125;</span><br><span class="line">        exitFromChild((retval == C_OK) ? <span class="number">0</span> : <span class="number">1</span>); <span class="comment">// 调用_exit(retcode);</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Parent */</span></span><br><span class="line">        <span class="comment">// 父进程会记录一些BGSAVE状态</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> C_OK; <span class="comment">/* unreached */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>无论是SAVE还是BGSAVE，最终都需要调用rdbSave完成工作。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">rdbSave</span><span class="params">(<span class="type">char</span> *filename, rdbSaveInfo *rsi)</span> &#123;</span><br><span class="line">    <span class="type">char</span> tmpfile[<span class="number">256</span>];</span><br><span class="line">    <span class="type">char</span> cwd[MAXPATHLEN]; <span class="comment">/* Current working dir path for error messages. */</span></span><br><span class="line">    FILE *fp;</span><br><span class="line">    rio rdb;</span><br><span class="line">    <span class="type">int</span> error = <span class="number">0</span>;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 创建一个临时的rdb文件 </span></span><br><span class="line">    <span class="built_in">snprintf</span>(tmpfile,<span class="number">256</span>,<span class="string">&quot;temp-%d.rdb&quot;</span>, (<span class="type">int</span>) getpid());</span><br><span class="line">    fp = fopen(tmpfile,<span class="string">&quot;w&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (!fp) &#123;</span><br><span class="line">        <span class="type">char</span> *cwdp = getcwd(cwd,MAXPATHLEN);</span><br><span class="line">        serverLog(LL_WARNING,</span><br><span class="line">            <span class="string">&quot;Failed opening the RDB file %s (in server root dir %s) &quot;</span></span><br><span class="line">            <span class="string">&quot;for saving: %s&quot;</span>,</span><br><span class="line">            filename,</span><br><span class="line">            cwdp ? cwdp : <span class="string">&quot;unknown&quot;</span>,</span><br><span class="line">            strerror(errno));</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    &#125;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 初始化 static const rio rioFileIO</span></span><br><span class="line">    rioInitWithFile(&amp;rdb,fp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (server.rdb_save_incremental_fsync)</span><br><span class="line">        rioSetAutoSync(&amp;rdb,REDIS_AUTOSYNC_BYTES);</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 保存rdb文件</span></span><br><span class="line">    <span class="keyword">if</span> (rdbSaveRio(&amp;rdb,&amp;error,RDB_SAVE_NONE,rsi) == C_ERR) &#123;</span><br><span class="line">        errno = error;</span><br><span class="line">        <span class="keyword">goto</span> werr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make sure data will not remain on the OS&#x27;s output buffers */</span></span><br><span class="line">    <span class="keyword">if</span> (fflush(fp) == EOF) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (fsync(fileno(fp)) == <span class="number">-1</span>) <span class="keyword">goto</span> werr;</span><br><span class="line">    <span class="keyword">if</span> (fclose(fp) == EOF) <span class="keyword">goto</span> werr;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 使用原子性的重命名操作 */</span></span><br><span class="line">    <span class="keyword">if</span> (rename(tmpfile,filename) == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="type">char</span> *cwdp = getcwd(cwd,MAXPATHLEN);</span><br><span class="line">        serverLog(LL_WARNING,</span><br><span class="line">            <span class="string">&quot;Error moving temp DB file %s on the final &quot;</span></span><br><span class="line">            <span class="string">&quot;destination %s (in server root dir %s): %s&quot;</span>,</span><br><span class="line">            tmpfile,</span><br><span class="line">            filename,</span><br><span class="line">            cwdp ? cwdp : <span class="string">&quot;unknown&quot;</span>,</span><br><span class="line">            strerror(errno));</span><br><span class="line">        unlink(tmpfile);</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    serverLog(LL_NOTICE,<span class="string">&quot;DB saved on disk&quot;</span>);</span><br><span class="line">    server.dirty = <span class="number">0</span>; <span class="comment">// 重设dirty属性</span></span><br><span class="line">    server.lastsave = time(<span class="literal">NULL</span>);</span><br><span class="line">    server.lastbgsave_status = C_OK;</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line"></span><br><span class="line">werr:</span><br><span class="line">    serverLog(LL_WARNING,<span class="string">&quot;Write error saving DB on disk: %s&quot;</span>, strerror(errno));</span><br><span class="line">    fclose(fp);</span><br><span class="line">    unlink(tmpfile);</span><br><span class="line">    <span class="keyword">return</span> C_ERR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1478,7 +1549,9 @@
 <p>由于每个Redis客户端都有自己的目标数据库，客户端通过SELECT命令来切换目标数据库。而server.h的结构体client中就有一个指向redisDb的指针。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 同样client会含有指向db的指针</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">client</span> &#123;</span></span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  redisDb *db; <span class="comment">/*指向当前被选中的db */</span></span><br><span class="line">&#125; client;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过select命令切换数据库</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">selectDb</span><span class="params">(client *c, <span class="type">int</span> id)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (id &lt; <span class="number">0</span> || id &gt;= server.dbnum)</span><br><span class="line">        <span class="keyword">return</span> C_ERR;</span><br><span class="line">    c-&gt;db = &amp;server.db[id];</span><br><span class="line">    <span class="keyword">return</span> C_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>目前没有命令可以获取当前db的index，但可以通过设置唯一名字并获取clientInfo的方法动态获取index：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/50534492/redis-how-to-get-current-database-name" class="uri">https://stackoverflow.com/questions/50534492/redis-how-to-get-current-database-name</a></p>
+<p>目前没有命令可以获取当前db的index，但可以通过设置唯一名字并获取clientInfo的方法动态获取index：<a
+target="_blank" rel="noopener" href="https://stackoverflow.com/questions/50534492/redis-how-to-get-current-database-name"
+class="uri">https://stackoverflow.com/questions/50534492/redis-how-to-get-current-database-name</a></p>
 </blockquote>
 <h2 id="数据库键空间">数据库键空间</h2>
 <p>Redis是一个键值对数据库服务器，由上面可知每个数据库都由一个redisDb结构表示，其中redisDb的dict字段保存了数据库中的所有键值对。</p>
@@ -1492,11 +1565,14 @@
 <p>其他的删改查操作，都是在dict字段上面封装了一层。</p>
 <h2 id="设置键的生存时间或过期时间">设置键的生存时间或过期时间</h2>
 <h3 id="设置过期时间">设置过期时间</h3>
-<p>通过EXPIRE或PEXPIRE命令可以为key设置秒级或毫秒级的生存时间（Time To Live，TTL）。也可以用EXPRIEAT或者PEXPIREAT设置一个过期时间戳。事实上，这三个命令的底层实现都是通过时间戳的设置方式来完成过期时间设置的。</p>
-<p>参考源码，这个函数是EXPIRE, PEXPIRE, EXPIREAT和PEXPIREAT四个命令的底层实现：</p>
+<p>通过EXPIRE或PEXPIRE命令可以为key设置秒级或毫秒级的生存时间（Time To
+Live，TTL）。也可以用EXPRIEAT或者PEXPIREAT设置一个过期时间戳。事实上，这三个命令的底层实现都是通过时间戳的设置方式来完成过期时间设置的。</p>
+<p>参考源码，这个函数是EXPIRE, PEXPIRE,
+EXPIREAT和PEXPIREAT四个命令的底层实现：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">expireGenericCommand</span><span class="params">(client *c, <span class="type">long</span> <span class="type">long</span> basetime, <span class="type">int</span> unit)</span> &#123;</span><br><span class="line">    robj *key = c-&gt;argv[<span class="number">1</span>], *param = c-&gt;argv[<span class="number">2</span>];</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> when; <span class="comment">/* 毫秒级别的unix时间戳 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (getLongLongFromObjectOrReply(c, param, &amp;when, <span class="literal">NULL</span>) != C_OK)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (unit == UNIT_SECONDS) when *= <span class="number">1000</span>;</span><br><span class="line">    when += basetime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* No key, return zero. */</span></span><br><span class="line">    <span class="keyword">if</span> (lookupKeyWrite(c-&gt;db,key) == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        addReply(c,shared.czero);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="保存过期时间">保存过期时间</h3>
-<p>redisDb结构的expires字段保存了数据库中所有key的过期时间，这是一个字典，其key是一个指向某个键对象的指针，而value则是一个long long类型的整数，一个毫秒级别的unix时间戳。</p>
+<p>redisDb结构的expires字段保存了数据库中所有key的过期时间，这是一个字典，其key是一个指向某个键对象的指针，而value则是一个long
+long类型的整数，一个毫秒级别的unix时间戳。</p>
 <h3 id="移除过期时间">移除过期时间</h3>
 <p>使用PERSIST命令可以移除一个键的过期时间，实际上就是删除expires字段中该键与过期时间的项。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">persistCommand</span><span class="params">(client *c)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (lookupKeyWrite(c-&gt;db,c-&gt;argv[<span class="number">1</span>])) &#123;</span><br><span class="line">      	<span class="comment">// 调用 dictDelete(db-&gt;expires,key-&gt;ptr)  删除</span></span><br><span class="line">        <span class="keyword">if</span> (removeExpire(c-&gt;db,c-&gt;argv[<span class="number">1</span>])) &#123;</span><br><span class="line">            addReply(c,shared.cone);</span><br><span class="line">            server.dirty++;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            addReply(c,shared.czero);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        addReply(c,shared.czero);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1511,7 +1587,8 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 同步删除，通过调用dictDelte实现</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dbSyncDelete</span><span class="params">(redisDb *db, robj *key)</span> &#123;</span><br><span class="line">    <span class="comment">/* Deleting an entry from the expires dict will not free the sds of</span></span><br><span class="line"><span class="comment">     * the key, because it is shared with the main dictionary. */</span></span><br><span class="line">    <span class="keyword">if</span> (dictSize(db-&gt;expires) &gt; <span class="number">0</span>) dictDelete(db-&gt;expires,key-&gt;ptr);</span><br><span class="line">    <span class="keyword">if</span> (dictDelete(db-&gt;dict,key-&gt;ptr) == DICT_OK) &#123;</span><br><span class="line">        <span class="keyword">if</span> (server.cluster_enabled) slotToKeyDel(key);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在实现删除expire字段，但不删除共享key的实现上，主要利用了dict底层结构中的dictType字段，该字段定义了dict的各种操作。</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictType</span> &#123;</span>   <span class="comment">// 各种字典操作</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">int</span> <span class="params">(*hashFunction)</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *key)</span>;  <span class="comment">// 计算hash值的函数</span></span><br><span class="line">    <span class="type">void</span> *(*keyDup)(<span class="type">void</span> *privdata, <span class="type">const</span> <span class="type">void</span> *key);   <span class="comment">// 键复制</span></span><br><span class="line">    <span class="type">void</span> *(*valDup)(<span class="type">void</span> *privdata, <span class="type">const</span> <span class="type">void</span> *obj);   <span class="comment">// 值复制</span></span><br><span class="line">    <span class="type">int</span> (*keyCompare)(<span class="type">void</span> *privdata, <span class="type">const</span> <span class="type">void</span> *key1, <span class="type">const</span> <span class="type">void</span> *key2);  <span class="comment">// 键比较</span></span><br><span class="line">    <span class="type">void</span> (*keyDestructor)(<span class="type">void</span> *privdata, <span class="type">void</span> *key);   <span class="comment">// 键销毁</span></span><br><span class="line">    <span class="type">void</span> (*valDestructor)(<span class="type">void</span> *privdata, <span class="type">void</span> *obj);   <span class="comment">// 值销毁</span></span><br><span class="line">&#125; dictType;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 而在初始化expires时，则将keyDestructor和valDestructor设置为了NULL</span></span><br></pre></td></tr></table></figure>
 <h3 id="定期删除策略的实现">定期删除策略的实现</h3>
 <p>过期键的定期删除策略时由expire.c/activeExpireCycle()实现的，它会在规定的时间内，多次去遍历服务器中的各个数据库，从数据库的expires字段中随机抽查一部分键的过期时间。</p>
-<h2 id="aofrob和复制功能对过期键的处理">AOF、ROB和复制功能对过期键的处理</h2>
+<h2
+id="aofrob和复制功能对过期键的处理">AOF、ROB和复制功能对过期键的处理</h2>
 <ul>
 <li>产生的新RDB文件和重写的AOF文件都不会包含已过期的键；</li>
 <li>当主服务器删除一个键之后，会向所有从服务器发del命令；</li>
@@ -1714,11 +1791,13 @@
 <p>由上表可得，字符串的对象编码有三种：int, raw和embst。</p>
 <p>当字符串是可以用long类型保存的整数，则转为long。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">robj *<span class="title function_">tryObjectEncoding</span><span class="params">(robj *o)</span> &#123;</span><br><span class="line">    <span class="type">long</span> value;</span><br><span class="line">    sds s = o-&gt;ptr;</span><br><span class="line">    <span class="type">size_t</span> len;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 确保是一个字符串对象 */</span></span><br><span class="line">    serverAssertWithInfo(<span class="literal">NULL</span>,o,o-&gt;type == OBJ_STRING);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 使用某些特殊的编码方式编码raw和emstr */</span></span><br><span class="line">    <span class="keyword">if</span> (!sdsEncodedObject(o)) <span class="keyword">return</span> o;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 不对共享对象进行编码 */</span></span><br><span class="line">     <span class="keyword">if</span> (o-&gt;refcount &gt; <span class="number">1</span>) <span class="keyword">return</span> o;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 编码字符串长度小于或等于20，且能够转换成long */</span></span><br><span class="line">    len = sdslen(s);</span><br><span class="line">    <span class="keyword">if</span> (len &lt;= <span class="number">20</span> &amp;&amp; string2l(s,len,&amp;value)) &#123;</span><br><span class="line">        <span class="comment">/* 使用共享的整数数据，节省内存</span></span><br><span class="line"><span class="comment">         * shared是server的共享数据，保存一些常用数据，</span></span><br><span class="line"><span class="comment">         * 用户在使用这部分数据时不用新申请内存 */</span></span><br><span class="line">        <span class="keyword">if</span> ((server.maxmemory == <span class="number">0</span> ||</span><br><span class="line">            !(server.maxmemory_policy &amp; MAXMEMORY_FLAG_NO_SHARED_INTEGERS)) &amp;&amp;</span><br><span class="line">            value &gt;= <span class="number">0</span> &amp;&amp;</span><br><span class="line">            value &lt; OBJ_SHARED_INTEGERS)</span><br><span class="line">        &#123;</span><br><span class="line">            decrRefCount(o);</span><br><span class="line">            incrRefCount(shared.integers[value]);</span><br><span class="line">            <span class="keyword">return</span> shared.integers[value];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (o-&gt;encoding == OBJ_ENCODING_RAW) &#123;</span><br><span class="line">                sdsfree(o-&gt;ptr);</span><br><span class="line">                o-&gt;encoding = OBJ_ENCODING_INT; <span class="comment">// 用int编码</span></span><br><span class="line">                o-&gt;ptr = (<span class="type">void</span>*) value;</span><br><span class="line">                <span class="keyword">return</span> o;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (o-&gt;encoding == OBJ_ENCODING_EMBSTR) &#123;</span><br><span class="line">                decrRefCount(o);</span><br><span class="line">                <span class="keyword">return</span> createStringObjectFromLongLongForValue(value);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 对于保存的字符串值长度小于44的进行embstr编码 */</span></span><br><span class="line">    <span class="keyword">if</span> (len &lt;= OBJ_ENCODING_EMBSTR_SIZE_LIMIT) &#123;</span><br><span class="line">        robj *emb;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (o-&gt;encoding == OBJ_ENCODING_EMBSTR) <span class="keyword">return</span> o;</span><br><span class="line">        emb = createEmbeddedStringObject(s,sdslen(s));</span><br><span class="line">        decrRefCount(o);</span><br><span class="line">        <span class="keyword">return</span> emb;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* We can&#x27;t encode the object...</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Do the last try, and at least optimize the SDS string inside</span></span><br><span class="line"><span class="comment">     * the string object to require little space, in case there</span></span><br><span class="line"><span class="comment">     * is more than 10% of free space at the end of the SDS string.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * We do that only for relatively large strings as this branch</span></span><br><span class="line"><span class="comment">     * is only entered if the length of the string is greater than</span></span><br><span class="line"><span class="comment">     * OBJ_ENCODING_EMBSTR_SIZE_LIMIT. */</span></span><br><span class="line">    trimStringObjectIfNeeded(o);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Return the original object. */</span></span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果字符串对象保存的字符串值小于或等于44，则用embstr编码的方式，否则用raw编码的方式。之所以选择44个字节，是因为使用了jemalloc，需要将embstr类型的字符串限定在64字节。而redis object占用了16个字节，当字符串长度小于44时sds会采用占用3字节的sdshdr8保存字符串，因此16+3+44=63，再加上字符串末尾的'\0'，刚好是64。</p>
+<p>如果字符串对象保存的字符串值小于或等于44，则用embstr编码的方式，否则用raw编码的方式。之所以选择44个字节，是因为使用了jemalloc，需要将embstr类型的字符串限定在64字节。而redis
+object占用了16个字节，当字符串长度小于44时sds会采用占用3字节的sdshdr8保存字符串，因此16+3+44=63，再加上字符串末尾的'\0'，刚好是64。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> OBJ_ENCODING_EMBSTR_SIZE_LIMIT 44</span></span><br><span class="line">robj *<span class="title function_">createStringObject</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *ptr, <span class="type">size_t</span> len)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (len &lt;= OBJ_ENCODING_EMBSTR_SIZE_LIMIT)</span><br><span class="line">        <span class="keyword">return</span> createEmbeddedStringObject(ptr,len);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> createRawStringObject(ptr,len);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">robj *<span class="title function_">createRawStringObject</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *ptr, <span class="type">size_t</span> len)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> createObject(OBJ_STRING, sdsnewlen(ptr,len));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>其中embstr编码是用来保存短字符串的一种优化的编码方式，虽然其跟raw一样都是采用redisobject结构和sdshdr结构来保存字符串对象，但embstr是调用一次内存分配函数来分配一块连续的空间（raw是调用两次，空间不连续）。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">robj *<span class="title function_">createEmbeddedStringObject</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *ptr, <span class="type">size_t</span> len)</span> &#123;</span><br><span class="line">    robj *o = zmalloc(<span class="keyword">sizeof</span>(robj)+<span class="keyword">sizeof</span>(<span class="keyword">struct</span> sdshdr8)+len+<span class="number">1</span>);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sdshdr8</span> *<span class="title">sh</span> =</span> (<span class="type">void</span>*)(o+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    o-&gt;type = OBJ_STRING;</span><br><span class="line">    o-&gt;encoding = OBJ_ENCODING_EMBSTR;</span><br><span class="line">    o-&gt;ptr = sh+<span class="number">1</span>;</span><br><span class="line">    o-&gt;refcount = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (server.maxmemory_policy &amp; MAXMEMORY_FLAG_LFU) &#123;</span><br><span class="line">        o-&gt;lru = (LFUGetTimeInMinutes()&lt;&lt;<span class="number">8</span>) | LFU_INIT_VAL;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        o-&gt;lru = LRU_CLOCK();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    sh-&gt;len = len;</span><br><span class="line">    sh-&gt;alloc = len;</span><br><span class="line">    sh-&gt;flags = SDS_TYPE_8;</span><br><span class="line">    <span class="keyword">if</span> (ptr == SDS_NOINIT)</span><br><span class="line">        sh-&gt;buf[len] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ptr) &#123;</span><br><span class="line">        <span class="built_in">memcpy</span>(sh-&gt;buf,ptr,len);</span><br><span class="line">        sh-&gt;buf[len] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">memset</span>(sh-&gt;buf,<span class="number">0</span>,len+<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>通过将相对于raw两次的内存分配和释放次数降低到一次，并且保存了一块连续的内存空间，也很好地利用了缓存的优势。另外，该编码方式是创建一种unmodifiable string，redis不提供直接修改其的方法。要修改该字符串对象，只能先转为raw。</p>
+<p>通过将相对于raw两次的内存分配和释放次数降低到一次，并且保存了一块连续的内存空间，也很好地利用了缓存的优势。另外，该编码方式是创建一种unmodifiable
+string，redis不提供直接修改其的方法。要修改该字符串对象，只能先转为raw。</p>
 <h2 id="列表对象">列表对象</h2>
 <p>在redis3.2.9之后，quicklist取代了ziplist和linkedlist，成为了列表对象的底层实现。创建一个新的列表对象：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">robj *<span class="title function_">createQuicklistObject</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    quicklist *l = quicklistCreate();</span><br><span class="line">    robj *o = createObject(OBJ_LIST,l);</span><br><span class="line">    o-&gt;encoding = OBJ_ENCODING_QUICKLIST;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1739,7 +1818,8 @@
 <li>哈希对象保存的所有key/value的字符串长度都小于64个字节；</li>
 <li>哈希对象保存的键值对个数小于512个；</li>
 </ul>
-<p>以上代码都在<a target="_blank" rel="noopener" href="https://github.com/antirez/redis/blob/190b63f9933b5bbc6659cb651c2c78a76732eced/src/t_hash.c">t_hash.c</a>中。</p>
+<p>以上代码都在<a
+target="_blank" rel="noopener" href="https://github.com/antirez/redis/blob/190b63f9933b5bbc6659cb651c2c78a76732eced/src/t_hash.c">t_hash.c</a>中。</p>
 <h2 id="集合对象">集合对象</h2>
 <p>集合对象有两种编码方式：intset或者hashtable</p>
 <p>以sadd命令对集合对象的编码方式做解释：</p>
@@ -1907,14 +1987,17 @@
 <blockquote>
 <p>A doubly linked list of ziplists</p>
 </blockquote>
-<p>根据quicklist.c的注释，这种数据结构是一个以ziplist为节点的双向链表。在redis3.2之后，quicklist取代了压缩列表和linkedlist，成为了列表对象的唯一编码形式。commit <a target="_blank" rel="noopener" href="https://github.com/antirez/redis/commit/5e362b84ab8b769bf2738daea97b45a375d223f1">记录</a></p>
+<p>根据quicklist.c的注释，这种数据结构是一个以ziplist为节点的双向链表。在redis3.2之后，quicklist取代了压缩列表和linkedlist，成为了列表对象的唯一编码形式。commit
+<a
+target="_blank" rel="noopener" href="https://github.com/antirez/redis/commit/5e362b84ab8b769bf2738daea97b45a375d223f1">记录</a></p>
 <p>之所以这样设计，是因为原先的linkedlist由于各个节点都是单独的内存，很容易造成内存碎片；而对于压缩列表，由于其每次修改都会引发内存的重新分配，导致大量的内存拷贝。经过对时间和空间的折中，选择了quicklist这种方法。</p>
 <h2 id="数据结构">数据结构</h2>
 <p>首先来看节点，</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">quicklistNode</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">quicklistNode</span> *<span class="title">prev</span>;</span> <span class="comment">// 前一个节点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">quicklistNode</span> *<span class="title">next</span>;</span> <span class="comment">// 后一个节点</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> *zl; <span class="comment">// ziplist结构，压缩的ziplist会指向一个quicklistLZF结构</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> sz;             <span class="comment">/* ziplist的大小 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> count : <span class="number">16</span>;     <span class="comment">/* ziplist的item个数*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> encoding : <span class="number">2</span>;   <span class="comment">/* ziplist是否压缩，1没有压缩，2压缩*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> container : <span class="number">2</span>;  <span class="comment">/* 目前固定为2，表示使用ziplist作为数据容器 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> recompress : <span class="number">1</span>; <span class="comment">/* 是否压缩，1表示压缩。有些命令需要做解压，因此用该标记以便后续压缩*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> attempted_compress : <span class="number">1</span>; <span class="comment">/* 暂时不用管，自动测试用的 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> extra : <span class="number">10</span>; <span class="comment">/* 扩展字段，目前还没被使用，刚好凑成32bit */</span></span><br><span class="line">&#125; quicklistNode;</span><br></pre></td></tr></table></figure>
 <p>然后quicklist这个结构体将上面节点表示连起来：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">quicklist</span> &#123;</span></span><br><span class="line">    quicklistNode *head; <span class="comment">// 头部节点</span></span><br><span class="line">    quicklistNode *tail; <span class="comment">// 尾部节点</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> count;        <span class="comment">/* ziplist的item个数总和 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> len;          <span class="comment">/* 节点个数 */</span></span><br><span class="line">    <span class="type">int</span> fill : <span class="number">16</span>;              <span class="comment">/* 单个ziplist的大小设置 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> compress : <span class="number">16</span>; <span class="comment">/* 节点的压缩设置 */</span></span><br><span class="line">&#125; quicklist;</span><br></pre></td></tr></table></figure>
-<p>fill的设置与单个quicklistNode的大小有关，当该值为正数时，表示节点指向的ziplist的数据项个数，因此16bit可以最多表示32k的个数；当该值为负数时，表示单个节点最多存储大小。（-1:4kb, -2:8kb, -3:16kb, -4:32kb, -5:64kb）。默认是-2，8kb。</p>
+<p>fill的设置与单个quicklistNode的大小有关，当该值为正数时，表示节点指向的ziplist的数据项个数，因此16bit可以最多表示32k的个数；当该值为负数时，表示单个节点最多存储大小。（-1:4kb,
+-2:8kb, -3:16kb, -4:32kb, -5:64kb）。默认是-2，8kb。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> FILL_MAX (1 &lt;&lt; 15)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">quicklistSetFill</span><span class="params">(quicklist *quicklist, <span class="type">int</span> fill)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (fill &gt; FILL_MAX) &#123;</span><br><span class="line">        fill = FILL_MAX;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fill &lt; <span class="number">-5</span>) &#123;</span><br><span class="line">        fill = <span class="number">-5</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    quicklist-&gt;fill = fill;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="创建">创建</h2>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">quicklist *<span class="title function_">quicklistCreate</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">quicklist</span> *<span class="title">quicklist</span>;</span></span><br><span class="line"></span><br><span class="line">    quicklist = zmalloc(<span class="keyword">sizeof</span>(*quicklist));</span><br><span class="line">    quicklist-&gt;head = quicklist-&gt;tail = <span class="literal">NULL</span>; <span class="comment">// 不包含多余的头部节点</span></span><br><span class="line">    quicklist-&gt;len = <span class="number">0</span>;</span><br><span class="line">    quicklist-&gt;count = <span class="number">0</span>;</span><br><span class="line">    quicklist-&gt;compress = <span class="number">0</span>;</span><br><span class="line">    quicklist-&gt;fill = <span class="number">-2</span>; <span class="comment">// 默认的fill是-2，8kb</span></span><br><span class="line">    <span class="keyword">return</span> quicklist;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1930,7 +2013,8 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">quicklistLZF</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> sz; <span class="comment">/* LZF size in bytes, compressed的长度*/</span></span><br><span class="line">    <span class="type">char</span> compressed[]</span><br><span class="line">&#125; quicklistLZF;</span><br></pre></td></tr></table></figure>
 <p>具体的压缩操作函数如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Compress the ziplist in &#x27;node&#x27; and update encoding details.</span></span><br><span class="line"><span class="comment"> * Returns 1 if ziplist compressed successfully.</span></span><br><span class="line"><span class="comment"> * Returns 0 if compression failed or if ziplist too small to compress. */</span></span><br><span class="line">REDIS_STATIC <span class="type">int</span> __quicklistCompressNode(quicklistNode *node) &#123;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> REDIS_TEST</span></span><br><span class="line">    node-&gt;attempted_compress = <span class="number">1</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 小于 #define MIN_COMPRESS_BYTES 48 不进行压缩 */</span></span><br><span class="line">    <span class="keyword">if</span> (node-&gt;sz &lt; MIN_COMPRESS_BYTES)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    quicklistLZF *lzf = zmalloc(<span class="keyword">sizeof</span>(*lzf) + node-&gt;sz); <span class="comment">// 分配内存</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 如果压缩失败，或者压缩尺寸不够，节省的空间不足8字节则取消 */</span></span><br><span class="line">  	<span class="comment">// #define MIN_COMPRESS_IMPROVE 8</span></span><br><span class="line">    <span class="keyword">if</span> (((lzf-&gt;sz = lzf_compress(node-&gt;zl, node-&gt;sz, lzf-&gt;compressed,</span><br><span class="line">                                 node-&gt;sz)) == <span class="number">0</span>) ||</span><br><span class="line">        lzf-&gt;sz + MIN_COMPRESS_IMPROVE &gt;= node-&gt;sz) &#123;</span><br><span class="line">        <span class="comment">/* lzf_compress aborts/rejects compression if value not compressable. */</span></span><br><span class="line">        zfree(lzf);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    lzf = zrealloc(lzf, <span class="keyword">sizeof</span>(*lzf) + lzf-&gt;sz); <span class="comment">// 重新分配内存</span></span><br><span class="line">    zfree(node-&gt;zl); <span class="comment">// 释放原来的节点</span></span><br><span class="line">    node-&gt;zl = (<span class="type">unsigned</span> <span class="type">char</span> *)lzf;</span><br><span class="line">    node-&gt;encoding = QUICKLIST_NODE_ENCODING_LZF;</span><br><span class="line">    node-&gt;recompress = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>具体lzf压缩算法，可以参考<a target="_blank" rel="noopener" href="https://github.com/antirez/redis/blob/fc0c9c8097a5b2bc8728bec9cfee26817a702f09/src/lzf_c.c">lzf_compress函数</a></p>
+<p>具体lzf压缩算法，可以参考<a
+target="_blank" rel="noopener" href="https://github.com/antirez/redis/blob/fc0c9c8097a5b2bc8728bec9cfee26817a702f09/src/lzf_c.c">lzf_compress函数</a></p>
 
           
         
@@ -2050,34 +2134,55 @@
       
         
           
-            <h1 id="atomicity-all-or-nothing-and-before-or-aftermit6.824">Atomicity: All-or-Nothing and Before-or-After——MIT6.824</h1>
+            <h1 id="atomicity-all-or-nothing-and-before-or-aftermit6.824">Atomicity:
+All-or-Nothing and Before-or-After——MIT6.824</h1>
 <blockquote>
 <p>《Principles Computer System Design Introduction》</p>
 </blockquote>
-<h2 id="before-or-after-atomicity-coordinating-concurrent-threads">Before-or-After Atomicity: Coordinating Concurrent Threads</h2>
-<p>并发操作中经常会出现data race condition，从程序员的角度看，有两种不同的并发协调做法：序列协调和原子性（<em>sequence coordina­tion</em> and <em>before-or-after atomicity</em>）。序列协调指的是约束"动作W必须在动作X之前发生"，而原子性则是一种更普遍的约束，即同时对同一个数据进行操作的若干动作不会相互干扰。我们对Before-or-after atomicity的定义是：</p>
+<h2
+id="before-or-after-atomicity-coordinating-concurrent-threads">Before-or-After
+Atomicity: Coordinating Concurrent Threads</h2>
+<p>并发操作中经常会出现data race
+condition，从程序员的角度看，有两种不同的并发协调做法：序列协调和原子性（<em>sequence
+coordina­tion</em> and <em>before-or-after
+atomicity</em>）。序列协调指的是约束"动作W必须在动作X之前发生"，而原子性则是一种更普遍的约束，即同时对同一个数据进行操作的若干动作不会相互干扰。我们对Before-or-after
+atomicity的定义是：</p>
 <blockquote>
-<p>Concurrent actions have the <em>before-or-afte</em>r property if their effect from the point of view of their invokers is the same as if the actions occurred either <em>completely before</em> or <em>completely after</em> one another.</p>
+<p>Concurrent actions have the <em>before-or-afte</em>r property if
+their effect from the point of view of their invokers is the same as if
+the actions occurred either <em>completely before</em> or <em>completely
+after</em> one another.</p>
 </blockquote>
 <p>与序列协调不同，before-or-after原子性对于程序员来说无法知道共享变量的所有其他动作的ID。程序员需要的是一种自动的隐式机制，可确保正确处理每个共享变量。举个例子，在操作系统中，几个并发线程可能决定在某个时间使用共享打印机。而且，哪个线程首先使用打印机并不重要，重要的是是打印机的一次使用在下一次开始之前必须要完成。</p>
 <p>否则，多个线程交叉发生很可能引起最终的结果不一致，如图，如果两个线程对这个操作交叉执行，就会产生不一致的行为，原子性要保证的就是两个线程对B的操作必须是原子操作。</p>
 <figure>
-<img src="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<h2 id="correctness-and-serialization">Correctness and Serialization</h2>
+<h2 id="correctness-and-serialization">Correctness and
+Serialization</h2>
 <p>我们的目标是对before-or-after原子性进行正确性的验证，而不会涉及使用该机制的应用程序是否正确的问题。此正确性标准意味着如果并发操作的结果是通过某些纯串行应用的相同操作获得的结果，则算正确协调并发操作。</p>
 <p>因此我们对before-or-after原子性的定义就是每个before-or-after的行为都表现得是执行之前或者完全执行之后的效果。</p>
 <h2 id="simple-locking">Simple Locking</h2>
-<p>simple locking有两个规则，首先是每个事务必须在执行任何实际读取和写入之前为其操作的所有共享对象获取锁；其次是必须事务完成上次更新并提交或者重新加载数据并终止后才会释放锁。</p>
-<p>simple locking能有效地协调并发事务，在该规则下一个事务必须在前一个事务完成之后进行、在后一个事务开始之前进行，并且进行中的事务不会拥有共同的数据。并发事务产生的结果就像是按照序列化顺序进行的一样。</p>
-<p>但是simple locking也会因为性能问题影响其并发过程，因为它要求事务获取它将要读取或写入的每个共享对象的锁，如果其需要读取的锁数量大于当前的数量，那么就会在一定程度上影响其并发性能。</p>
+<p>simple
+locking有两个规则，首先是每个事务必须在执行任何实际读取和写入之前为其操作的所有共享对象获取锁；其次是必须事务完成上次更新并提交或者重新加载数据并终止后才会释放锁。</p>
+<p>simple
+locking能有效地协调并发事务，在该规则下一个事务必须在前一个事务完成之后进行、在后一个事务开始之前进行，并且进行中的事务不会拥有共同的数据。并发事务产生的结果就像是按照序列化顺序进行的一样。</p>
+<p>但是simple
+locking也会因为性能问题影响其并发过程，因为它要求事务获取它将要读取或写入的每个共享对象的锁，如果其需要读取的锁数量大于当前的数量，那么就会在一定程度上影响其并发性能。</p>
 <h2 id="two-phase-locking">Two-Phase Locking</h2>
 <p>两阶段锁协议整个过程分为两个阶段：一是加锁，二是释放锁。加锁过程中事务只能加锁或者操作数据，在其通过某个锁定点之前都不能释放锁。而释放锁的过程中事务只能解锁或者操作数据，而不能再重新上锁了。</p>
-<p>虽然两阶段锁协议比简单的锁定具有更好的并发性能，例如假设事务T1读取X，接着写Y，而事务T2只执行写入Y。在两阶段锁协议下，T2只能在T1两个动作之前或者之后发生。但事实上T2在T1两个动作中间进行与T2完全在T1之前进行的效果是一样的。允许所有可能的并发性同时确保的before-or-after atomicity规则很难设计。</p>
+<p>虽然两阶段锁协议比简单的锁定具有更好的并发性能，例如假设事务T1读取X，接着写Y，而事务T2只执行写入Y。在两阶段锁协议下，T2只能在T1两个动作之前或者之后发生。但事实上T2在T1两个动作中间进行与T2完全在T1之前进行的效果是一样的。允许所有可能的并发性同时确保的before-or-after
+atomicity规则很难设计。</p>
 <p>锁与日志之间的关系有两点是需要考虑的：单个的中止事务和系统恢复。对于前者，协议要求中止事务在释放任何锁之前将其更改的数据对象恢复为原始值，因此不需要对中止的事务采取特殊的计算。至于后者，锁不是在非易失性存储中，因此在系统的恢复过程中必须将锁捕获以释放锁。然而我们还需要考虑的是，基于日志的恢复算法是否构建了正确的系统状态，因为系统崩溃可能是由于在崩溃之前提交的那些事务的串行排序引起的。</p>
 <p>假设锁是在易失性存储器中，在系统崩溃的瞬间所有锁的记录都丢失。某些事务（记录BEGIN记录但尚未记录END记录的事务）可能尚未完成。但由于在那一瞬间所有事物的锁集合都是不重叠的，因此在恢复过程中可以不加锁地通过执行恢复算法重建系统状态，当然这一恢复过程中不能有新的事务产生。</p>
-<h2 id="multiple-site-atomicity-distributed-two-phase-commit">Multiple-Site Atomicity: Distributed Two-Phase Commit</h2>
-<p>如果事务需要在分布式的环境下执行，则需要使用结合了persis­tent senders, duplicate suppression和single-site transactions的两阶段提交协议。</p>
+<h2
+id="multiple-site-atomicity-distributed-two-phase-commit">Multiple-Site
+Atomicity: Distributed Two-Phase Commit</h2>
+<p>如果事务需要在分布式的环境下执行，则需要使用结合了persis­tent senders,
+duplicate suppression和single-site transactions的两阶段提交协议。</p>
 <p>这是因为分布式架构中，不同的节点之间只能知道自己的操作是否成功，而无法知道其他节点的操作的成功或失败。为了保证事务的特性，需要引入一个作为<strong>协调者</strong>的组件来统一掌控所有节点（<strong>参与者</strong>）的操作结果并最终指示这些节点的最终提交。</p>
 <p>第一阶段：提交请求的投票阶段</p>
 <ol type="1">
@@ -2094,7 +2199,9 @@
 </ol>
 <p>通信流程参考：</p>
 <figure>
-<img src="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0" alt="img" /><figcaption>img</figcaption>
+<img src="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>2PC也存在一些缺点，其中一个就是执行过程中，节点处于阻塞状态；另一个就是出现节点崩溃时，只能依赖协调者去进行回滚；并且协调者还存在单点故障的问题。</p>
 
@@ -2263,8 +2370,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

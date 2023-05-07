@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,7 +338,8 @@
 <li>通过观察接下来的tokens；</li>
 <li>没有回溯；</li>
 </ul>
-<p>predictIve parsers接收LL(k)语法（left to right，leftmost derivation），k代码向前看k个tokens</p>
+<p>predictIve parsers接收LL(k)语法（left to right，leftmost
+derivation），k代码向前看k个tokens</p>
 <p>LL(1):每一个step，只能选择一个production</p>
 <p>但这里有一个问题就是，对于这样的grammar：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">E-&gt;T+E|T</span><br><span class="line"></span><br><span class="line">T-&gt;<span class="type">int</span> | <span class="type">int</span> * T | (E)</span><br></pre></td></tr></table></figure>
@@ -361,14 +360,16 @@
 <li>if X-&gt;A1A2...Ana and ε属于First(Aj)for 1&lt;=j&lt;=n</li>
 </ul>
 <ol start="3" type="1">
-<li>First(a)属于Frist(X) if X-&gt;A1..An a and ε属于First(Aj) for 1&lt;=j&lt;=n</li>
+<li>First(a)属于Frist(X) if X-&gt;A1..An a and ε属于First(Aj) for
+1&lt;=j&lt;=n</li>
 </ol>
 <h1 id="follow-sets">Follow Sets</h1>
 <p>定义：</p>
 <p>Follow(X)={t|S-&gt;*βXtε}</p>
 <p>follow sets没有ε</p>
 <p>Intution:</p>
-<p>if X-&gt;AB, then First(B)属于Follow(A) and Follow(X)属于Follow(B) * if B-&gt;*ε then Follow(X)属于Follow(B)</p>
+<p>if X-&gt;AB, then First(B)属于Follow(A) and Follow(X)属于Follow(B) *
+if B-&gt;*ε then Follow(X)属于Follow(B)</p>
 <p>if S 是开始symbol，$属于Follow(S)</p>
 <p>algorithm sketch</p>
 <ol type="1">
@@ -623,8 +624,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

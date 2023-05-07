@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,18 +336,22 @@
 <h2 id="基本介绍">基本介绍</h2>
 <p>泛型是一种表示类或者方法行为对于未知类型的类型约束的方法，通配符在类型系统中有重要的作用，它们为一个泛型类所指定的类型集合提供了一个有用的类型范围。</p>
 <h2 id="协变">协变</h2>
-<p>数组是协变的，因为Integer是Number的子类型，数组类型Integer[]是Number[]的子类型，因此在任何需要 Number[]值的地方都可以提供一个Integer[]值。泛型不是协变的，List&lt;Integer&gt;不是List&lt;Number&gt;的子类型。</p>
+<p>数组是协变的，因为Integer是Number的子类型，数组类型Integer[]是Number[]的子类型，因此在任何需要
+Number[]值的地方都可以提供一个Integer[]值。泛型不是协变的，List&lt;Integer&gt;不是List&lt;Number&gt;的子类型。</p>
 <p>因此这种代码无法通过编译：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;Fruit&gt; flist = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Apple&gt;();</span><br></pre></td></tr></table></figure>
 <h2 id="使用通配符">使用通配符</h2>
 <p>我们知道上面那种语句是无法通过编译，通过它们之间存在父子类型的关系，如果我们需要建立这种向上转型的关系，就需要使用通配符了。</p>
 <h3 id="上边界限定通配符">上边界限定通配符</h3>
-<p>利用 <code>&lt;? extends Fruit&gt;</code> 形式的通配符，可以实现泛型的向上转型：</p>
+<p>利用 <code>&lt;? extends Fruit&gt;</code>
+形式的通配符，可以实现泛型的向上转型：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GenericsAndCovariance</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="comment">// Wildcards allow covariance:</span></span><br><span class="line">        List&lt;? <span class="keyword">extends</span> <span class="title class_">Fruit</span>&gt; flist = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Apple&gt;();</span><br><span class="line">        <span class="comment">// Compile Error: can’t add any type of object:</span></span><br><span class="line">        <span class="comment">// flist.add(new Apple());</span></span><br><span class="line">        <span class="comment">// flist.add(new Fruit());</span></span><br><span class="line">        <span class="comment">// flist.add(new Object());</span></span><br><span class="line">        flist.add(<span class="literal">null</span>); <span class="comment">// Legal but uninteresting</span></span><br><span class="line">        <span class="comment">// We know that it returns at least Fruit:</span></span><br><span class="line">        <span class="type">Fruit</span> <span class="variable">f</span> <span class="operator">=</span> flist.get(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在这种情况下，我们不知道这个 List 到底持有什么类型，因此也不可能安全的添加一个对象，唯一可以添加的是null。编译器会为这个问号类型起一个临时的代号，比如<strong>CAP#1</strong>。但是调用某个返回Fruit的方法就是安全的，因此不管实际类型是什么，肯定能够转型为Fruit。</p>
+<p>在这种情况下，我们不知道这个 List
+到底持有什么类型，因此也不可能安全的添加一个对象，唯一可以添加的是null。编译器会为这个问号类型起一个临时的代号，比如<strong>CAP#1</strong>。但是调用某个返回Fruit的方法就是安全的，因此不管实际类型是什么，肯定能够转型为Fruit。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CompilerIntelligence</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;? <span class="keyword">extends</span> <span class="title class_">Fruit</span>&gt; flist =</span><br><span class="line">        Arrays.asList(<span class="keyword">new</span> <span class="title class_">Apple</span>());</span><br><span class="line">        <span class="type">Apple</span> <span class="variable">a</span> <span class="operator">=</span> (Apple)flist.get(<span class="number">0</span>); <span class="comment">// No warning</span></span><br><span class="line">        flist.contains(<span class="keyword">new</span> <span class="title class_">Apple</span>()); <span class="comment">// Argument is ‘Object’</span></span><br><span class="line">        flist.indexOf(<span class="keyword">new</span> <span class="title class_">Apple</span>()); <span class="comment">// Argument is ‘Object’</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">//flist.add(new Apple());   无法编译</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="下边界限定通配符">下边界限定通配符</h3>
-<p>这是通配符的另一个方向，超类型的通配符：? super T，T是类型参数的下界。在这种情况下，写入是有效的，因为对象都可以被向上转型成合法的类型：</p>
+<p>这是通配符的另一个方向，超类型的通配符：? super
+T，T是类型参数的下界。在这种情况下，写入是有效的，因为对象都可以被向上转型成合法的类型：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SuperTypeWildcards</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">writeTo</span><span class="params">(List&lt;? <span class="built_in">super</span> Apple&gt; apples)</span> &#123;</span><br><span class="line">        apples.add(<span class="keyword">new</span> <span class="title class_">Apple</span>());</span><br><span class="line">        apples.add(<span class="keyword">new</span> <span class="title class_">Jonathan</span>());</span><br><span class="line">        <span class="comment">// apples.add(new Fruit()); // Error</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="无边界通配符">无边界通配符</h3>
 <p>还有一种通配符是无边界通配符，它的使用形式是一个单独的问号：List&lt;?&gt;，也就是没有任何限定。因为不知道是具体哪种类型，我们也无法向其中添加对象。</p>
@@ -578,8 +580,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

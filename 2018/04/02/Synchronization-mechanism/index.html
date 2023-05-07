@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -351,7 +349,8 @@
 <p>而对于线程来讲，主要的同步机制有以下几种：互斥锁，信号量，临界区，条件变量。</p>
 <h2 id="同步原理">同步原理</h2>
 <h3 id="互斥锁">互斥锁</h3>
-<p>互斥锁是一种时间和空间代价都比较低廉的，实现对资源互斥访问的手段。主要有两种状态：<strong>lock &amp; unlock</strong>。</p>
+<p>互斥锁是一种时间和空间代价都比较低廉的，实现对资源互斥访问的手段。主要有两种状态：<strong>lock
+&amp; unlock</strong>。</p>
 <p>当一个线程想要进入临界区操作数据的时候会尝试给它加锁，如果锁已经处于unlock状态，该线程就会被阻塞，直到锁被释放。</p>
 <h3 id="条件变量">条件变量</h3>
 <p>与互斥锁不同的是，条件变量是自动阻塞进程进入等待状态而不是用来上锁，它会等待某个信号的接收。</p>
@@ -580,8 +579,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,7 +336,8 @@
 <h2 id="动机">动机</h2>
 <ul>
 <li>局部的拷贝，编译器是允许的。假如你自定义了一个拷贝构造函数或者拷贝复制函数，但函数内部只复制了部分的成员变量，那么编译器并不会报错。</li>
-<li>另一个问题是在继承时，由于子类无法访问基类的私有变量，那么拷贝构造函数可能会没有拷贝所有成员变量，而是由基类的default constructor初始化成员变量；</li>
+<li>另一个问题是在继承时，由于子类无法访问基类的私有变量，那么拷贝构造函数可能会没有拷贝所有成员变量，而是由基类的default
+constructor初始化成员变量；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Customer</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	...</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  std::string name;</span><br><span class="line">  Date last;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PriorityCustomer</span>: <span class="keyword">public</span> Customer&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">PriorityCustomer</span>(<span class="type">const</span> PriorityCustomer&amp; rhs):<span class="built_in">priority</span>(rhs.prioruty)&#123;&#125;</span><br><span class="line">  <span class="comment">//在这种情况，基类成员的初始化是在default constructor中完成的</span></span><br><span class="line">  PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="type">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">    priority = rhs.priority;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="type">int</span> priority;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h2 id="解决方法">解决方法</h2>
@@ -349,8 +348,10 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PriorityCustomer</span>(<span class="type">const</span> PriorityCustomer&amp; rhs):<span class="built_in">Customer</span>(rhs) ,<span class="built_in">priority</span>(rhs.prioruty)&#123;&#125;</span><br><span class="line"><span class="comment">//分别调用基类的copy函数</span></span><br><span class="line">PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="type">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">	Customer::<span class="keyword">operator</span>=(rhs);</span><br><span class="line">  priority = rhs.priority;</span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="注意问题">注意问题</h2>
 <ul>
-<li>不应该在copy assignment操作符函数中调用copy构造函数，因为这相当于初始化一个已经存在存在的对象，这没意义，并且增加复杂度；</li>
-<li>也不应该在copy构造函数中调用copy assignment操作符，这相当于在一个尚未初始化的对象身上做“对已经初始化的对象的操作”；</li>
+<li>不应该在copy
+assignment操作符函数中调用copy构造函数，因为这相当于初始化一个已经存在存在的对象，这没意义，并且增加复杂度；</li>
+<li>也不应该在copy构造函数中调用copy
+assignment操作符，这相当于在一个尚未初始化的对象身上做“对已经初始化的对象的操作”；</li>
 <li>往往以上两种操作都很有可能造成循环调用；</li>
 </ul>
 
@@ -569,8 +570,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

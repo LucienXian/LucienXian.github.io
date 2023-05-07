@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -353,7 +351,8 @@
 <p>a_ops域指向地址空间对象中的操作函数表，由adress_space_operations结构体表示：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span> &#123;</span></span><br><span class="line">        <span class="type">int</span> (*writepage)(<span class="keyword">struct</span> page *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*readpage) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*sync_page) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*writepages) (<span class="keyword">struct</span> address_space *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*set_page_dirty) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*readpages) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> address_space *,<span class="keyword">struct</span> list_head *, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*prepare_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*commit_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">sector_t</span> (*bmap)(<span class="keyword">struct</span> address_space *, <span class="type">sector_t</span>);</span><br><span class="line">        <span class="type">int</span> (*invalidatepage) (<span class="keyword">struct</span> page *, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">        <span class="type">int</span> (*releasepage) (<span class="keyword">struct</span> page *, <span class="type">int</span>);</span><br><span class="line">        <span class="type">int</span> (*direct_IO) (<span class="type">int</span>, <span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *,<span class="type">loff_t</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>这里面最重要的是读写——readpage()和writepage()。</p>
-<p>对于readpage，Linux内核试图在页高速缓存中使用<strong>find_get_page(mapping, index)</strong>找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
+<p>对于readpage，Linux内核试图在页高速缓存中使用<strong>find_get_page(mapping,
+index)</strong>找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
 <p>对于writepage，首先在cache中搜索需要的页，如果需要的页不在，则新分配一个空闲项；下一步，内核会创建一个写请求，接着数据被从用户空间拷贝到内核缓冲，最后写入磁盘。</p>
 <h3 id="基树">基树</h3>
 <p>每个address_page对象都有唯一的基树，保存在page_tree结构体中。只要指定了文件偏移量，就可以在基树中迅速检索到希望的页面。</p>
@@ -581,8 +580,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -337,22 +335,29 @@
       
         
           
-            <h1 id="c11-lambda-how-to-capture-local-variables-inside-lambda">C++11 Lambda : How to capture local variables inside Lambda ?</h1>
+            <h1 id="c11-lambda-how-to-capture-local-variables-inside-lambda">C++11
+Lambda : How to capture local variables inside Lambda ?</h1>
 <p>本文将介绍如何在lambda中从外部域捕获变量，同样的，我们可以以值传递或引用传递的方式捕获变量，以下是语法：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Captured variables](paameters) &#123; function code &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="capturing-local-variables-by-value-inside-lambda-function">Capturing Local Variables by value inside Lambda Function</h2>
+<h2
+id="capturing-local-variables-by-value-inside-lambda-function">Capturing
+Local Variables by value inside Lambda Function</h2>
 <p>以下是以值传递捕获变量的方式：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables</span></span><br><span class="line">std::string msg = <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line"><span class="type">int</span> counter = <span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Defining Lambda function and</span></span><br><span class="line"><span class="comment">// Capturing Local variables by Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [msg, counter] () &#123;</span><br><span class="line">                          <span class="comment">//...</span></span><br><span class="line">                          &#125;;</span><br></pre></td></tr></table></figure>
 <p>msg和counter都是const变量，只读不改。要想修改，可以加入关键字mutable：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> func = [msg, counter] () <span class="keyword">mutable</span> &#123; &#125;;</span><br></pre></td></tr></table></figure>
-<h2 id="capturing-local-variables-by-reference-inside-lambda">Capturing Local Variables by Reference inside Lambda</h2>
+<h2 id="capturing-local-variables-by-reference-inside-lambda">Capturing
+Local Variables by Reference inside Lambda</h2>
 <p>要实现引用传递，只需要加上前缀<strong>&amp;</strong>即可。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables</span></span><br><span class="line">std::string msg = <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line"><span class="type">int</span> counter = <span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Defining Lambda function and</span></span><br><span class="line"><span class="comment">// Capturing Local variables by Reference</span></span><br><span class="line"><span class="keyword">auto</span> func = [&amp;msg, &amp;counter] () &#123;</span><br><span class="line">                       <span class="comment">//...</span></span><br><span class="line">                       &#125;;</span><br></pre></td></tr></table></figure>
 <p>这样在lambda中就可以通过修改该引用从而修改外部值。</p>
-<h2 id="capture-all-local-variables-from-outer-scope-by-value">Capture All Local Variables from outer scope by Value</h2>
+<h2 id="capture-all-local-variables-from-outer-scope-by-value">Capture
+All Local Variables from outer scope by Value</h2>
 <p>正如前面的文章提到过的，我们也可以把外部变量全部捕获，或值传递或引用传递，甚至可以混合使用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Capturing all Local variables by Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [=] () &#123;</span><br><span class="line">                   <span class="comment">//...</span></span><br><span class="line">                   &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Capturing all Local variables by Reference</span></span><br><span class="line"><span class="keyword">auto</span> func = [&amp;] () &#123;</span><br><span class="line">                   <span class="comment">//...</span></span><br><span class="line">                   &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Capturing all Local variables by Reference and Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [=, &amp;counter] () <span class="keyword">mutable</span> &#123;&#125;;</span><br></pre></td></tr></table></figure>
-<h3 id="be-aware-of-capturing-local-variables-by-reference-in-lambda">Be-aware of capturing local variables by Reference in Lambda</h3>
+<h3
+id="be-aware-of-capturing-local-variables-by-reference-in-lambda">Be-aware
+of capturing local variables by Reference in Lambda</h3>
 <p>如果在lambda中我们通过引用捕获局部变量，那么我们需要确保在访问或调用lambda函数时，所有引用捕获的局部变量仍然在作用域内。</p>
 <p>如果该变量已经被回收或者从stack中移除，会导致undefined behavior。</p>
 
@@ -490,7 +495,8 @@
 </ul>
 <p>利用lambda函数改写：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    std::for_each(arr, arr + <span class="built_in">sizeof</span>(arr) / <span class="built_in">sizeof</span>(<span class="type">int</span>), [](<span class="type">int</span> x) &#123;</span><br><span class="line">            std::cout&lt;&lt;x&lt;&lt;<span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="how-to-pass-outer-scope-elements-inside-lambda-functions">How to pass outer scope elements inside lambda functions</h2>
+<h2 id="how-to-pass-outer-scope-elements-inside-lambda-functions">How to
+pass outer scope elements inside lambda functions</h2>
 <h3 id="case-1-使用">case 1: 使用[=]</h3>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[=](<span class="type">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by value</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="case-1-使用-1">case 1: 使用[&amp;]</h3>
@@ -614,17 +620,23 @@
       
         
           
-            <h1 id="c11-variadic-template-function">C++11 – Variadic Template Function</h1>
+            <h1 id="c11-variadic-template-function">C++11 – Variadic Template
+Function</h1>
 <p>Variadic模版允许函数采用任意类型的可变数量参数，考虑这样的一个例子，假设我们创建一个函数log()，它接受任意类型的可变数量参数，并在控制台上打印。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">log</span>(<span class="number">1</span>,<span class="number">4.3</span>, <span class="string">&quot;Hello&quot;</span>);</span><br><span class="line"> </span><br><span class="line"><span class="built_in">log</span>(<span class="string">&#x27;a&#x27;</span>, <span class="string">&quot;test&quot;</span>, <span class="number">78L</span>, <span class="number">5</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span>;</span><br><span class="line">Student obj;</span><br><span class="line"> </span><br><span class="line"><span class="built_in">log</span>(<span class="number">3</span>, obj);</span><br></pre></td></tr></table></figure>
 <p>对于可变类型的参数，我们一般考虑的是创建模版函数，如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T obj)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout&lt;&lt;obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>但以上做法只能接受一个参数。</p>
-<h2 id="vardiac-template-function-creating-function-that-accepts-variable-number-of-arguments-of-ant-type">Vardiac Template Function: Creating function that accepts variable number of arguments of ant type</h2>
-<p>使用vardiac template，我们可以定义这样的一个函数，接收不定数量的参数：</p>
+<h2
+id="vardiac-template-function-creating-function-that-accepts-variable-number-of-arguments-of-ant-type">Vardiac
+Template Function: Creating function that accepts variable number of
+arguments of ant type</h2>
+<p>使用vardiac
+template，我们可以定义这样的一个函数，接收不定数量的参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> ... Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T first, Args ... args)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>上述函数可以接收多个参数，**Args…代表了模版参数的可变数目。</p>
-<p>声明一个vardiac template函数是容易的，但其内部具体定义会有点tricky。由于我们无法直接访问到被传递进去的可变数目的参数。我们需要使用c++的类型推导机制和递归来实现。</p>
+<p>声明一个vardiac
+template函数是容易的，但其内部具体定义会有点tricky。由于我们无法直接访问到被传递进去的可变数目的参数。我们需要使用c++的类型推导机制和递归来实现。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> ... Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T first, Args ... args)</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Print the First Element</span></span><br><span class="line">	std::cout&lt;&lt;first&lt;&lt;<span class="string">&quot; , &quot;</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Forward the remaining arguments</span></span><br><span class="line">	<span class="built_in">log</span>(args ...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>现在假设我们通过这种方式调用log函数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">log</span>(<span class="number">2</span>, <span class="number">3.4</span>, <span class="string">&quot;aaa&quot;</span>);</span><br></pre></td></tr></table></figure>
@@ -758,12 +770,14 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> fun_sum = [](<span class="type">int</span> a , <span class="type">int</span> b)&#123;</span><br><span class="line">					<span class="keyword">return</span> a+b;</span><br><span class="line">				&#125;;</span><br><span class="line"> </span><br><span class="line">std::cout&lt;&lt;<span class="built_in">fun_sum</span>(<span class="number">4</span>,<span class="number">5</span>)&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
 <p>auto的最大优点就是，我们不需要书写很长的变量类型：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">std::map&lt;std::string, std::string&gt; mapOfStrs;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Insert data in Map</span></span><br><span class="line">mapOfStrs.<span class="built_in">insert</span>(std::<span class="built_in">pair</span>&lt;std::string, std::string&gt;(<span class="string">&quot;first&quot;</span>, <span class="string">&quot;1&quot;</span>) );</span><br><span class="line">mapOfStrs.<span class="built_in">insert</span>(std::<span class="built_in">pair</span>&lt;std::string, std::string&gt;(<span class="string">&quot;sec&quot;</span>, <span class="string">&quot;2&quot;</span>) );</span><br><span class="line">mapOfStrs.<span class="built_in">insert</span>(std::<span class="built_in">pair</span>&lt;std::string, std::string&gt;(<span class="string">&quot;thirs&quot;</span>, <span class="string">&quot;3&quot;</span>) );</span><br><span class="line"></span><br><span class="line"><span class="comment">//std::map&lt;std::string, std::string&gt;::iterator it = mapOfStrs.begin();</span></span><br><span class="line"><span class="keyword">auto</span> it = mapOfStrs.<span class="built_in">begin</span>();</span><br><span class="line"><span class="keyword">while</span>(it != mapOfStrs.<span class="built_in">end</span>())</span><br><span class="line">&#123;</span><br><span class="line">	std::cout&lt;&lt;it-&gt;first&lt;&lt;<span class="string">&quot;::&quot;</span>&lt;&lt;it-&gt;second&lt;&lt;std::endl;</span><br><span class="line">	it++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="important-points-about-auto-variable-in-c11">Important points about auto variable in C++11</h2>
+<h2 id="important-points-about-auto-variable-in-c11">Important points
+about auto variable in C++11</h2>
 <ol type="1">
 <li>初始化auto变量后，您可以更改值，但不能更改类型</li>
 <li>不能只声明而不进行初始化</li>
 </ol>
-<h2 id="returning-an-auto-from-a-function">Returning an auto from a function</h2>
+<h2 id="returning-an-auto-from-a-function">Returning an auto from a
+function</h2>
 <p>要从函数返回auto变量，我们可以以特殊方式声明它</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">sum</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> -&gt; <span class="type">int</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> x + y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> value = <span class="built_in">sum</span>(<span class="number">3</span>, <span class="number">5</span>);</span><br></pre></td></tr></table></figure>
 
@@ -896,14 +910,20 @@
 <p>它将在内部调用add()函数，并在_1的位置传递第一个参数，在_2的位置传递第二个参数。</p>
 <p>现在假设我们想在一个特殊场景中使用这个add函数，我们应该将第一个参数始终固定为12，并让第二个参数由用户传递，即：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> new_add_func = std::<span class="built_in">bind</span>(&amp;add, <span class="number">12</span>, _1);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> x = <span class="built_in">new_add_func</span>(<span class="number">5</span>);</span><br><span class="line"><span class="comment">// Will return 17</span></span><br></pre></td></tr></table></figure>
-<p>我们也可以使用std :: bind()重新排列参数，即_1和_2等决定要传递的参数的位：</p>
+<p>我们也可以使用std ::
+bind()重新排列参数，即_1和_2等决定要传递的参数的位：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> mod_add_func = std::<span class="built_in">bind</span>(&amp;add, _2, _1);</span><br><span class="line"></span><br><span class="line"><span class="comment">// mod_add_func(12,15) === add(15, 12).</span></span><br></pre></td></tr></table></figure>
-<h2 id="use-of-stdbind-in-stl-algorithms">Use of std::bind in STL algorithms</h2>
-<p>由于std :: bind充当功能适配器并提供新的函数对象，因此它对于许多STL算法非常有用。</p>
-<p>例如， 我们有一个数字列表，我们想要计算5的倍数。要实现这一点，我们有一个现有的函数，即:</p>
+<h2 id="use-of-stdbind-in-stl-algorithms">Use of std::bind in STL
+algorithms</h2>
+<p>由于std ::
+bind充当功能适配器并提供新的函数对象，因此它对于许多STL算法非常有用。</p>
+<p>例如，
+我们有一个数字列表，我们想要计算5的倍数。要实现这一点，我们有一个现有的函数，即:</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">divisible</span><span class="params">(<span class="type">int</span> num , <span class="type">int</span> den)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(num % den == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>一般的算法是遍历判断，但我们可以使用std :: count_if这一个STL算法，即：</p>
-<p><strong><em>count_if (InputIterator firstValue, InputIterator lastValue, UnaryPredicate predFunctionObject);</em></strong></p>
+<p>一般的算法是遍历判断，但我们可以使用std ::
+count_if这一个STL算法，即：</p>
+<p><strong><em>count_if (InputIterator firstValue, InputIterator
+lastValue, UnaryPredicate predFunctionObject);</em></strong></p>
 <p>通过bind函数，我们就可以将divisible转换为一元参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">approach_2</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> arr[<span class="number">10</span>] = &#123;<span class="number">1</span>,<span class="number">20</span>,<span class="number">13</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">10</span>,<span class="number">28</span>,<span class="number">19</span>,<span class="number">15</span>&#125;;</span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">count_if</span>(arr, arr + <span class="built_in">sizeof</span>(arr)/<span class="built_in">sizeof</span>(<span class="type">int</span>) , std::<span class="built_in">bind</span>(&amp;divisible, _1, <span class="number">5</span>));</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="what-stdbind-returns">What std::bind returns ?</h2>
@@ -1028,7 +1048,8 @@
       
         
           
-            <h1 id="c11-c14-delete-keyword-and-deleted-functions">C++11 / C++14 : ‘delete’ keyword and deleted functions</h1>
+            <h1 id="c11-c14-delete-keyword-and-deleted-functions">C++11 / C++14 :
+‘delete’ keyword and deleted functions</h1>
 <p>本文将介绍C++11的一个新特性——delete，通过将delete应用到函数来限制其调用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>= <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
 <p>它通常用在以下的地方：</p>
@@ -1038,34 +1059,43 @@
 <li>delete类的new运算符，以限制堆的对象创建；</li>
 <li>delete特定的模版特化；</li>
 </ul>
-<h2 id="deleting-copy-constructor-and-assignment-operator">Deleting Copy Constructor and Assignment Operator</h2>
+<h2 id="deleting-copy-constructor-and-assignment-operator">Deleting Copy
+Constructor and Assignment Operator</h2>
 <p>假设存在这样的一个类，拷贝构造函数和赋值运算符都被delete了：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span></span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line">	<span class="type">int</span> id;</span><br><span class="line">	std::string name;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)</span><br><span class="line">	&#123;&#125;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Copy Constructor is deleted</span></span><br><span class="line">	<span class="built_in">User</span>(<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line">	<span class="comment">// Assignment operator is deleted</span></span><br><span class="line">	User &amp; <span class="keyword">operator</span> = (<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;id &lt;&lt; <span class="string">&quot; ::: &quot;</span>&lt;&lt;name&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>如果调用这赋值运算符：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">User obj = userObj;</span><br></pre></td></tr></table></figure>
 <p>编译时报错：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:30:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User obj = userObj;</span><br><span class="line">         ^     ~~~~~~~</span><br><span class="line">delete.cpp:15:2: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">        User(const User &amp; obj) = delete;</span><br><span class="line">        ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
-<h2 id="deleting-member-functions-to-prevent-data-loss-conversions">Deleting member functions to prevent data loss conversions</h2>
+<h2
+id="deleting-member-functions-to-prevent-data-loss-conversions">Deleting
+member functions to prevent data loss conversions</h2>
 <p>由于类型的隐式转换，有可能会在调用函数时传递了错误的参数，例如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 这样调用会被cast</span></span><br><span class="line"><span class="function">User <span class="title">obj4</span><span class="params">(<span class="number">5.5</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br><span class="line"> </span><br><span class="line"><span class="function">User <span class="title">obj5</span><span class="params">(<span class="string">&#x27;a&#x27;</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>通过利用delete来避免类型转换：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent narrowing conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">double</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent invalid type conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">char</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
 <p>报错如下：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">elete.cpp:32:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj1(5.5, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:14:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(double userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">delete.cpp:33:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj2(&#x27;a&#x27;, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:15:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(char userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">2 errors generated.</span><br></pre></td></tr></table></figure>
-<h2 id="restrict-object-creation-on-heap-by-deleting-new-operator-for-class">Restrict Object creation on Heap by deleting new operator for class</h2>
+<h2
+id="restrict-object-creation-on-heap-by-deleting-new-operator-for-class">Restrict
+Object creation on Heap by deleting new operator for class</h2>
 <p>我们也可以限制new运算符的使用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> * <span class="keyword">operator</span> <span class="title">new</span> <span class="params">(<span class="type">size_t</span>)</span> </span>= <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line">User * ptr = <span class="keyword">new</span> <span class="built_in">User</span>(<span class="number">1</span>, <span class="string">&quot;Riti&quot;</span>);</span><br></pre></td></tr></table></figure>
 <p>报错如下：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:34:17: error: call to deleted function &#x27;operator new&#x27;</span><br><span class="line">    User *ptr = new User(1, &quot;Rziti&quot;);</span><br><span class="line">                ^</span><br><span class="line">delete.cpp:17:12: note: candidate function has been explicitly deleted</span><br><span class="line">    void * operator new (size_t) = delete;</span><br><span class="line">           ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
-<h2 id="delete-specific-template-specialisation">Delete specific template specialisation</h2>
+<h2 id="delete-specific-template-specialisation">Delete specific
+template specialisation</h2>
 <p>使用delete关键字，我们可以限制模板类或函数的某些模板特化。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ComplexNumber</span></span><br><span class="line">&#123;</span><br><span class="line">	T x;</span><br><span class="line">	T y;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">ComplexNumber</span>(T a, T b) : <span class="built_in">x</span>(a) , <span class="built_in">y</span>(b)</span><br><span class="line">	&#123;&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;x &lt;&lt; <span class="string">&quot; + i&quot;</span>&lt;&lt;y&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line">        <span class="comment">// Deleted template specialisation </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">char</span> a, <span class="type">char</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="comment">// Deleted template specialisation  </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">double</span> a, <span class="type">double</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>原来该模版类可以接收char参数和double参数，通过delete，我们可以限制其特化。</p>
-<h2 id="different-between-deleted-function-and-private-functions">Different between deleted function and private functions</h2>
+<h2
+id="different-between-deleted-function-and-private-functions">Different
+between deleted function and private functions</h2>
 <p>相比private成员函数，delete有两个优点：</p>
 <ul>
 <li>避免被其它成员函数调用；</li>
-<li>delete函数在name lookup中，如果函数delete了，那么它就不会根据该类型去查找其它匹配函数；</li>
+<li>delete函数在name
+lookup中，如果函数delete了，那么它就不会根据该类型去查找其它匹配函数；</li>
 </ul>
 
           
@@ -1186,13 +1216,20 @@
       
         
           
-            <h1 id="in-search-of-an-understandable-consensus-algorithm">In Search of an Understandable Consensus Algorithm<二></h1>
+            <h1 id="in-search-of-an-understandable-consensus-algorithm">In Search of
+an Understandable Consensus Algorithm<二></h1>
 <h2 id="cluster-membership-changes">Cluster membership changes</h2>
-<p>上一篇<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2019/03/27/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%B8%80-%E2%80%94%E2%80%94MIT6-824/">博文</a>中，我们都假设集群配置是固定的。但在实践中往往需要更改配置，可能需要更换服务器或者更改备份配置。为了使配置变更机制更加安全，在过渡期间不存在任意一个时间点会存在两个leader，但任何从旧配置切换到新配置的方法都是不够安全的，在切换期间可能会存在分裂成两个集群，如图：</p>
+<p>上一篇<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2019/03/27/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%B8%80-%E2%80%94%E2%80%94MIT6-824/">博文</a>中，我们都假设集群配置是固定的。但在实践中往往需要更改配置，可能需要更换服务器或者更改备份配置。为了使配置变更机制更加安全，在过渡期间不存在任意一个时间点会存在两个leader，但任何从旧配置切换到新配置的方法都是不够安全的，在切换期间可能会存在分裂成两个集群，如图：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_two_disjoint_majorities.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_two_disjoint_majorities.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>为了确保安全，配置更改可以使用两阶段的方法。在raft中，集群首先切换到过渡配置，即为<strong>joint consensus</strong>。一旦commit了joint consensus，系统就会切换到新配置。</p>
+<p>为了确保安全，配置更改可以使用两阶段的方法。在raft中，集群首先切换到过渡配置，即为<strong>joint
+consensus</strong>。一旦commit了joint
+consensus，系统就会切换到新配置。</p>
 <ul>
 <li>日志会被复制到两种配置中的所有服务器；</li>
 <li>两种配置中的任何服务器就可以成为leader；</li>
@@ -1200,25 +1237,42 @@
 </ul>
 <p>我们使用复制的日志中特殊条目来存储和传送集群配置，下图就是配置更改过程：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_Timeline_Conf_change.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_Timeline_Conf_change.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>当leader收到请求，从Cold配置更改为Cnew时，它会将联合共识即<span class="math inline">\(C_{old, new}\)</span>存储为日志。如果leader crash了，新的leader会在<span class="math inline">\(C_{old}\)</span>和<span class="math inline">\(C_{old, new}\)</span>中选择。</p>
+<p>当leader收到请求，从Cold配置更改为Cnew时，它会将联合共识即<span
+class="math inline">\(C_{old, new}\)</span>存储为日志。如果leader
+crash了，新的leader会在<span
+class="math inline">\(C_{old}\)</span>和<span
+class="math inline">\(C_{old, new}\)</span>中选择。</p>
 <p>更改配置后还有三个问题需要解决；</p>
 <ul>
 <li>新服务器可能一开始不会存储任何日志；raft的解决方法是在更改配置之前引入一个额外的阶段，在该阶段新的服务器以非投票成员的身份加入集群，leader会将日志复制到它们，但不参与投票；</li>
-<li>集群leader可能并不属于新配置；在这种情况下，leader在提交了日志<span class="math inline">\(C_{new}\)</span>之后就会返回到follower阶段；</li>
-<li>删除的服务器可能会破坏集群；这些服务器不再接受心跳，因此会超时用新的term发送RequestVote RPC请求选举，并且重复这个过程。为了避免这个问题，服务器会在当前leader存在时，忽略掉RequestVote RPC，不会更新term或者授予票数；</li>
+<li>集群leader可能并不属于新配置；在这种情况下，leader在提交了日志<span
+class="math inline">\(C_{new}\)</span>之后就会返回到follower阶段；</li>
+<li>删除的服务器可能会破坏集群；这些服务器不再接受心跳，因此会超时用新的term发送RequestVote
+RPC请求选举，并且重复这个过程。为了避免这个问题，服务器会在当前leader存在时，忽略掉RequestVote
+RPC，不会更新term或者授予票数；</li>
 </ul>
 <h2 id="log-compaction">Log compaction</h2>
 <p>日志会在服务器运行期间无限增长，如果我们不及时丢弃过期的日志，那么对着日志的增长，它会占据更多的内存空间并需要更多时间来重新执行日志。</p>
 <p>snapshot是最简单的压缩方法，下图就是raft的快照方式：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_snapshot.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_snapshot.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>每个服务器独立获取快照，快照内容仅仅覆盖了已提交的条目。快照除了包括状态集信息之外，还包含了少量的元数据信息，如上图就包含了最近索引和term。包含了这些信息，可以帮助支持快照后第一个日志条目的AppendEntries一致性检查。</p>
-<p>虽然服务器独立生成快照，但一般情况下，如果有一个落后非常多的follower或者新的服务器加入集群，leader会通过InstallSnapshot RPC往其它服务器发送快照。</p>
+<p>虽然服务器独立生成快照，但一般情况下，如果有一个落后非常多的follower或者新的服务器加入集群，leader会通过InstallSnapshot
+RPC往其它服务器发送快照。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_InstallSnapshot_RPC.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_InstallSnapshot_RPC.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>如果snapshot中包含了follower未包含的日志新内容，该follower会丢弃整个日志，并用snapshot替代。如果接收者收到的snapshot是当前日志的前缀部分，则该快照后面的条目保留，其余删除。</p>
 <p>如果是由leader生成snapshot再转发到各个follower，这种做法会浪费网络带宽并降低生成快照的速度。另外还有两个问题会影响性能：</p>
@@ -1356,45 +1410,81 @@
           
             <h1 id="特征选择与稀疏学习">特征选择与稀疏学习</h1>
 <h2 id="子集搜索与评价">子集搜索与评价</h2>
-<p>对一个学习任务来说，有些属性很关键，而从给定的特征集合中选择出相关特征子集的过程，就叫"特征选择"(feature selection)。</p>
+<p>对一个学习任务来说，有些属性很关键，而从给定的特征集合中选择出相关特征子集的过程，就叫"特征选择"(feature
+selection)。</p>
 <p>除了无用特征，还有一类冗余特征，它的信息是从其它特征推断出来的。大部分时候这些特征是不起作用，但有时也会起到中间特征的作用，使得学习更加方便。</p>
 <p>提取特征的一个可行做法是先产生一个候选子集，评估好坏，再根据评估结果去产生下一个候选子集，依次迭代。</p>
 <ol type="1">
 <li>子集搜索</li>
 </ol>
-<p>这第一个环节就是"子集搜索"，给定特征集合<span class="math inline">\({a_1, a_2, …, a_d}\)</span>。对于前向搜索，对这个d个特征子集进行评价，假设<span class="math inline">\(\{a_2\}\)</span>最优，接着从剩下的d-1个特征选一个特征，假设此时两特征集合<span class="math inline">\(\{a_2, a_4\}\)</span>最优，并且由于<span class="math inline">\(\{a_2\}\)</span>效果更好，则选择<span class="math inline">\(\{a_2, a_4\}\)</span>。依次进行，直到最优的候选子集不如上一轮选定集合，则停止生成候选子集。而对于后向搜索，则是每次减去一个无关特征。</p>
-<p>这种贪心的策略可能会遇到这样一种情况，第三轮选了<span class="math inline">\(\{a_2,a_4,a_5\}\)</span>，而第四轮却可能是<span class="math inline">\(\{a_2,a_4,a_6,a_8\}\)</span>更好。这是不可避免的。</p>
+<p>这第一个环节就是"子集搜索"，给定特征集合<span
+class="math inline">\({a_1, a_2, …,
+a_d}\)</span>。对于前向搜索，对这个d个特征子集进行评价，假设<span
+class="math inline">\(\{a_2\}\)</span>最优，接着从剩下的d-1个特征选一个特征，假设此时两特征集合<span
+class="math inline">\(\{a_2, a_4\}\)</span>最优，并且由于<span
+class="math inline">\(\{a_2\}\)</span>效果更好，则选择<span
+class="math inline">\(\{a_2,
+a_4\}\)</span>。依次进行，直到最优的候选子集不如上一轮选定集合，则停止生成候选子集。而对于后向搜索，则是每次减去一个无关特征。</p>
+<p>这种贪心的策略可能会遇到这样一种情况，第三轮选了<span
+class="math inline">\(\{a_2,a_4,a_5\}\)</span>，而第四轮却可能是<span
+class="math inline">\(\{a_2,a_4,a_6,a_8\}\)</span>更好。这是不可避免的。</p>
 <ol start="2" type="1">
 <li>子集评价</li>
 </ol>
-<p>给定数据集D，假设D中第i类样本所占的比例为<span class="math inline">\(p_i(i=1,2,..,|y|)\)</span>，另外对于属性子集A，假定根据其取值将D划分为V个子集:<span class="math inline">\(\{D^1, D^2, ,,., D^V\}\)</span>，每个子集中的样本在属性A上取值相同，则计算属性子集A的信息增益： <span class="math display">\[
+<p>给定数据集D，假设D中第i类样本所占的比例为<span
+class="math inline">\(p_i(i=1,2,..,|y|)\)</span>，另外对于属性子集A，假定根据其取值将D划分为V个子集:<span
+class="math inline">\(\{D^1, D^2, ,,.,
+D^V\}\)</span>，每个子集中的样本在属性A上取值相同，则计算属性子集A的信息增益：
+<span class="math display">\[
 Gain(A) = Ent(D) - \sum_{v=1}^V \frac{|D^v|}{|D|}Ent(D^v) \\
 Ent(D) = - \sum_{k=1}^{|y|} p_k log_2p_k
-\]</span> Gain(A)越大，意味着特征子集A对数据集D的划分与样本标记信息对于D的真实划分，差异越小，则越有助于分类。</p>
+\]</span>
+Gain(A)越大，意味着特征子集A对数据集D的划分与样本标记信息对于D的真实划分，差异越小，则越有助于分类。</p>
 <p>常见的特征选择方法有：过滤式、包裹式、嵌入式</p>
 <h2 id="过滤式选择">过滤式选择</h2>
 <p>过滤式方法先对数据集进行特征选择——"过滤"，然后再训练学习器。Relief是一种过滤式特征选择方法，其设计了一个"相关统计量"来度量特征的重要性，该统计量是一个向量，每个分量对应一个初始特征，特征子集的重要性由子集中每个特征所对应的相关统计量分量之和所决定。</p>
-<p>Relief的关键是如何确定相关统计量。假设样本为<span class="math inline">\(\{(x_1,y_1), (x_2, y_2),…, (x_m,y_m)\}\)</span>。对于每个样本<span class="math inline">\(x_i\)</span>，该算法先在<span class="math inline">\(x_i\)</span>的同类样本中寻找最近邻<span class="math inline">\(x_{i,nh}\)</span>，再从异样样本中寻找其最近邻<span class="math inline">\(x_{i,nm}\)</span>。相关统计量对应属性j的分量为： <span class="math display">\[
-\delta^j = \sum_i -diff(x_i^j, x_{i,nh}^j)^2 + \sum_{l\neq k}(x_i^j, x_{i,nm}^j)^2
-\]</span> 如果属性j为离散型，则<span class="math inline">\(diff(x_a^j, x_b^j)^2\)</span>的值域为[0, 1]。若是连续型，则是<span class="math inline">\(|x_a^j-x_b^j|\)</span>。</p>
-<p>由上式可以看出，若<span class="math inline">\(x_i\)</span>与同类样本更近，则属性j对于区分同类与异类的样本是有益的。</p>
-<p>上述Relief算法是为二分类问题准备的，其扩展变形Relief-F则能够处理多分类问题： <span class="math display">\[
-\delta^j = \sum_i -diff(x_i^j, x_{i,nh}^j)^2 + \sum_{l\neq k}(p_l \times (x_i^j, x_{i,nm}^j)^2)
-\]</span> 其中<span class="math inline">\(p_l\)</span>为第l类样本在数据集D中所占的比例。</p>
+<p>Relief的关键是如何确定相关统计量。假设样本为<span
+class="math inline">\(\{(x_1,y_1), (x_2, y_2),…,
+(x_m,y_m)\}\)</span>。对于每个样本<span
+class="math inline">\(x_i\)</span>，该算法先在<span
+class="math inline">\(x_i\)</span>的同类样本中寻找最近邻<span
+class="math inline">\(x_{i,nh}\)</span>，再从异样样本中寻找其最近邻<span
+class="math inline">\(x_{i,nm}\)</span>。相关统计量对应属性j的分量为：
+<span class="math display">\[
+\delta^j = \sum_i -diff(x_i^j, x_{i,nh}^j)^2 + \sum_{l\neq k}(x_i^j,
+x_{i,nm}^j)^2
+\]</span> 如果属性j为离散型，则<span class="math inline">\(diff(x_a^j,
+x_b^j)^2\)</span>的值域为[0, 1]。若是连续型，则是<span
+class="math inline">\(|x_a^j-x_b^j|\)</span>。</p>
+<p>由上式可以看出，若<span
+class="math inline">\(x_i\)</span>与同类样本更近，则属性j对于区分同类与异类的样本是有益的。</p>
+<p>上述Relief算法是为二分类问题准备的，其扩展变形Relief-F则能够处理多分类问题：
+<span class="math display">\[
+\delta^j = \sum_i -diff(x_i^j, x_{i,nh}^j)^2 + \sum_{l\neq k}(p_l \times
+(x_i^j, x_{i,nm}^j)^2)
+\]</span> 其中<span
+class="math inline">\(p_l\)</span>为第l类样本在数据集D中所占的比例。</p>
 <h2 id="包裹式选择">包裹式选择</h2>
 <p>包裹式特征选择直接把最终将要使用的学习器性能最为特征子集的最终评价标准，因为是为了目的学习器选择特征子集，因此往往比过滤式选择性能更好。</p>
 <p>LVW是其中的代表，算法描述为：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">输入： 数据集D</span><br><span class="line">			特征集A</span><br><span class="line">			学习算法O</span><br><span class="line">			停止条件控制参数T</span><br><span class="line">过程：</span><br><span class="line">1. E = inf</span><br><span class="line">2. d = |A|</span><br><span class="line">3. A* = A</span><br><span class="line">4. t = O</span><br><span class="line">5. while t &lt; T do</span><br><span class="line">		随机生成特征子集A&#x27;</span><br><span class="line">		d&#x27; = |A&#x27;|</span><br><span class="line">		E&#x27; = CrossValidation(O(D^A&#x27;))</span><br><span class="line">		if (E&#x27;&lt;E) or ((E&#x27;=E)and(d&#x27;&lt;d)) then</span><br><span class="line">			t = 0</span><br><span class="line">			E = E&#x27;</span><br><span class="line">			d = d&#x27;</span><br><span class="line">			A* = A&#x27;</span><br><span class="line">		else</span><br><span class="line">			t = t+1</span><br><span class="line">		endif</span><br><span class="line">	endwhile</span><br><span class="line">输出A&#x27;</span><br></pre></td></tr></table></figure>
 <p>由于特征搜索时使用了随机策略，因此每次特征子集评价都需要训练学习器，因此开销很大，我们设置停止条件控制参数。</p>
 <h2 id="嵌入式选择与l1正则化">嵌入式选择与L1正则化</h2>
-<p>嵌入式特征选择是将特征选择与学习器训练过程融合为一体，给定数据集<span class="math inline">\(D = \{(x_1,y_1),(x_2, y_2),…,(x_m,y_m)\}\)</span>，考虑简单的线性回归模型，以平方差为损失函数： <span class="math display">\[
+<p>嵌入式特征选择是将特征选择与学习器训练过程融合为一体，给定数据集<span
+class="math inline">\(D = \{(x_1,y_1),(x_2,
+y_2),…,(x_m,y_m)\}\)</span>，考虑简单的线性回归模型，以平方差为损失函数：
+<span class="math display">\[
 min_w \sum_{i=1}^m(y_i-w^Tx_i)^2
 \]</span> 为了避免过拟合，加入范数正则化： <span class="math display">\[
 min_w \sum_{i=1}^m(y_i-w^Tx_i)^2 + \lambda||w||^2_2----L_2范数 \\
 min_w \sum_{i=1}^m(y_i-w^Tx_i)^2 + \lambda||w||_1----L_1范数
-\]</span> L1范数相对于L2范数更容易带来稀疏解，即它求得的w具有更少的非零分量。假设x只有两个属性，同理解w也只有两个分量，因此我们画出等值线：</p>
+\]</span>
+L1范数相对于L2范数更容易带来稀疏解，即它求得的w具有更少的非零分量。假设x只有两个属性，同理解w也只有两个分量，因此我们画出等值线：</p>
 <figure>
-<img src="https://upload.wikimedia.org/wikipedia/en/f/fd/L1_and_L2_balls.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload.wikimedia.org/wikipedia/en/f/fd/L1_and_L2_balls.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>可以看到的是，由于上面w的解必须要在误差项与正则化项之间折中，因此即有图中的误差项等值线与正则化项等值线相交，采用L1范数时，相交点一般在坐标轴上，则w1或者w2为0。这意味着采用L1范数正则化的结果是得到了对应w的非零分量的特征。</p>
 <p>其特征选择过程与学习器训练融为一体，同时完成。</p>
@@ -1402,23 +1492,41 @@ min_w \sum_{i=1}^m(y_i-w^Tx_i)^2 + \lambda||w||_1----L_1范数
 <p>假设数据集D是一个矩阵，行对应每个样本，列则对应特征，特征选择考虑的是如何使得矩阵变得稀疏，即某些特征与学习任务无关，我们可以去掉这些咧从而提高学习速度。</p>
 <p>但考虑另一种稀疏性，即D对应的矩阵中存在很多零元素。但样本具有这样的稀疏表达形式时，学习任务会得到许多好处，例如线性支持向量机能使大多数问题变得线性可分，同时也不会带来存储上的负担。</p>
 <p>若提供的数据集是稠密的，我们需要学习出一个"字典"，从而使得稠密数据转化为"恰当稀疏"的数据。</p>
-<p>给定数据集<span class="math inline">\({x_1,x_2,…,x_m}\)</span>，字典学习的最简单形式为： <span class="math display">\[
-min_{B,\alpha_i} || x_i-B\alpha_i ||^2_2 + \lambda \sum_{i=1}^m || \alpha_i ||_1
-\]</span> 其中B为字典矩阵，<span class="math inline">\(\alpha_i\)</span>则是样本<span class="math inline">\(x_i\)</span>的稀疏表示。该式的第一项是希望<span class="math inline">\(\alpha_i\)</span>能够尽可能重构样本，而第二项则是希望<span class="math inline">\(\alpha_i\)</span>尽可能稀疏。</p>
+<p>给定数据集<span
+class="math inline">\({x_1,x_2,…,x_m}\)</span>，字典学习的最简单形式为：
+<span class="math display">\[
+min_{B,\alpha_i} || x_i-B\alpha_i ||^2_2 + \lambda \sum_{i=1}^m ||
+\alpha_i ||_1
+\]</span> 其中B为字典矩阵，<span
+class="math inline">\(\alpha_i\)</span>则是样本<span
+class="math inline">\(x_i\)</span>的稀疏表示。该式的第一项是希望<span
+class="math inline">\(\alpha_i\)</span>能够尽可能重构样本，而第二项则是希望<span
+class="math inline">\(\alpha_i\)</span>尽可能稀疏。</p>
 <h2 id="压缩感知">压缩感知</h2>
-<p>在现实任务中，我们常希望能够通过部分信息来恢复全部信息，假定有长度为m的离散信号x，采样后得到长度为n的信号y，其中n&lt;&lt;m： <span class="math display">\[
+<p>在现实任务中，我们常希望能够通过部分信息来恢复全部信息，假定有长度为m的离散信号x，采样后得到长度为n的信号y，其中n&lt;&lt;m：
+<span class="math display">\[
 y = \phi x
-\]</span> 其中<span class="math inline">\(\phi \in R^{n \times m}\)</span>表示对信号x的测量矩阵，而由于n&lt;&lt;m，因此上式是一个欠定方程。</p>
-<p>现在假设存在某个线性变换<span class="math inline">\(\psi \in R^{n \times m}\)</span>，使得y表示为： <span class="math display">\[
+\]</span> 其中<span class="math inline">\(\phi \in R^{n \times
+m}\)</span>表示对信号x的测量矩阵，而由于n&lt;&lt;m，因此上式是一个欠定方程。</p>
+<p>现在假设存在某个线性变换<span class="math inline">\(\psi \in R^{n
+\times m}\)</span>，使得y表示为： <span class="math display">\[
 y = \phi \psi s = As
-\]</span> 若能恢复出s，我们也可以最后恢复出x。虽然这个问题仍然是欠定的，但如果s具有稀疏性，我们就可以解决这个问题了。这里A的作用则类似于字典，能够将信号转换为稀疏表示。</p>
+\]</span>
+若能恢复出s，我们也可以最后恢复出x。虽然这个问题仍然是欠定的，但如果s具有稀疏性，我们就可以解决这个问题了。这里A的作用则类似于字典，能够将信号转换为稀疏表示。</p>
 <p>压缩感知分为"感知测量"和"重构恢复"两个阶段，前者关注如何对原始信号进行处理以获得稀疏样本表示，后者则是基于稀疏性从少量观察中恢复原信号。</p>
-<p>对于大小为nXm的矩阵A，若存在常数<span class="math inline">\(\delta_k \in (0, 1)\)</span>使得对任意常量s和A的所有子矩阵<span class="math inline">\(A_k \in R^{n\times k}\)</span>有： <span class="math display">\[
+<p>对于大小为nXm的矩阵A，若存在常数<span class="math inline">\(\delta_k
+\in (0, 1)\)</span>使得对任意常量s和A的所有子矩阵<span
+class="math inline">\(A_k \in R^{n\times k}\)</span>有： <span
+class="math display">\[
 (1-\delta_k)||s||_2^2 \leq || A_ks ||_2^2 \leq (1+\delta_k)||s||_2^2
-\]</span> 则称A满足k限定等距性，此时可通过下面的优化问题从y中恢复出稀疏信号s： <span class="math display">\[
+\]</span>
+则称A满足k限定等距性，此时可通过下面的优化问题从y中恢复出稀疏信号s：
+<span class="math display">\[
 min_s || s ||_0 \\
 s.t. \ \ y = As
-\]</span> 但该式涉及到L0范数最小化，这是一个NP难的问题，但由于L1范数最小化在一定条件下与L0范数最小化问题同解，因此有： <span class="math display">\[
+\]</span>
+但该式涉及到L0范数最小化，这是一个NP难的问题，但由于L1范数最小化在一定条件下与L0范数最小化问题同解，因此有：
+<span class="math display">\[
 min_s || s ||_1 \\
 s.t. \ \ y = As
 \]</span></p>
@@ -1544,103 +1652,177 @@ s.t. \ \ y = As
             <h1 id="降纬与度量学习">降纬与度量学习</h1>
 <h2 id="k近邻学习">k近邻学习</h2>
 <p>k近邻学习是一种常见的监督学习方法，给定测试样本，然后基于某种距离度量找出训练样本中与测试样本距离最近的k个样本。在预测结果时，既可以通过投票法选择k个样本中出现最多的类标记，也可以在回归任务中使用平均法计算输出标记的平均值，还可以基于距离远近进行加权平均或者加权投票。</p>
-<p>给定测试样本x，若其最近邻样本为z，则该分类器的出错概率就是x与z类标记不同的概率： <span class="math display">\[
+<p>给定测试样本x，若其最近邻样本为z，则该分类器的出错概率就是x与z类标记不同的概率：
+<span class="math display">\[
 P(err) = 1 - \sum_{c \in y} P(c|x)P(c|z)
 \]</span></p>
 <h2 id="低维嵌入">低维嵌入</h2>
-<p>假设测试样本x附近任意小的<span class="math inline">\(\sigma\)</span>距离范围内总能找到一个训练样本，即需要实现足够大的密度采样。然而这种情况在现实生活中却不容易实现，以<span class="math inline">\(\sigma=0.001\)</span>为例，单个属性就需要1000个样本点平均分布在归一化后的属性取值范围内。但假如属性维度数目达到了20，样本就指数增长到(10<sup>3)</sup>20，这就是出现了所谓的维数灾难(curse of dimensionality)。</p>
-<p>缓解这个问题的一个重要途径是实现降维，之所能降维，是因为往往与学习任务相关的属性仅仅是某个低维分布。若要求原始空间样本中样本之间的距离在低维空间得以保持，则要实现"多维缩放"(MDS——Multiple Dimensional Scaling)。</p>
-<p>假设m个样本在原始空间的距离矩阵为<span class="math inline">\(D\in R^{m X m}\)</span>，其第i行h列的元素<span class="math inline">\(dist_{ij}\)</span>为样本<span class="math inline">\(x_i\)</span>到<span class="math inline">\(x_j\)</span>的距离。而我们的目标是获得样本在<span class="math inline">\(d&#39;\)</span>维空间的表示<span class="math inline">\(Z\in R^{d&#39;Xm}\)</span>，d'比d小，且任意两个样本在d'维空间中的欧式距离应该与原始空间相等或者近似于。</p>
-<p>令<span class="math inline">\(B=Z^TZ \in R^{mXm}\)</span>，且<span class="math inline">\(b_{ij}=z_i^Tz_j\)</span>，则有： <span class="math display">\[
+<p>假设测试样本x附近任意小的<span
+class="math inline">\(\sigma\)</span>距离范围内总能找到一个训练样本，即需要实现足够大的密度采样。然而这种情况在现实生活中却不容易实现，以<span
+class="math inline">\(\sigma=0.001\)</span>为例，单个属性就需要1000个样本点平均分布在归一化后的属性取值范围内。但假如属性维度数目达到了20，样本就指数增长到(10<sup>3)</sup>20，这就是出现了所谓的维数灾难(curse
+of dimensionality)。</p>
+<p>缓解这个问题的一个重要途径是实现降维，之所能降维，是因为往往与学习任务相关的属性仅仅是某个低维分布。若要求原始空间样本中样本之间的距离在低维空间得以保持，则要实现"多维缩放"(MDS——Multiple
+Dimensional Scaling)。</p>
+<p>假设m个样本在原始空间的距离矩阵为<span class="math inline">\(D\in
+R^{m X m}\)</span>，其第i行h列的元素<span
+class="math inline">\(dist_{ij}\)</span>为样本<span
+class="math inline">\(x_i\)</span>到<span
+class="math inline">\(x_j\)</span>的距离。而我们的目标是获得样本在<span
+class="math inline">\(d&#39;\)</span>维空间的表示<span
+class="math inline">\(Z\in
+R^{d&#39;Xm}\)</span>，d'比d小，且任意两个样本在d'维空间中的欧式距离应该与原始空间相等或者近似于。</p>
+<p>令<span class="math inline">\(B=Z^TZ \in R^{mXm}\)</span>，且<span
+class="math inline">\(b_{ij}=z_i^Tz_j\)</span>，则有： <span
+class="math display">\[
 dist_{ij}^2 = b_{ii} + b_{jj} - 2b_{ij}
-\]</span> 令降维后的样本Z被中心化，即<span class="math inline">\(\sum_{i=1}^mz_i=0\)</span>，矩阵B的行与列之和为0，则有： <span class="math display">\[
+\]</span> 令降维后的样本Z被中心化，即<span
+class="math inline">\(\sum_{i=1}^mz_i=0\)</span>，矩阵B的行与列之和为0，则有：
+<span class="math display">\[
 \sum_{i=1}^m dist_{ij}^2 = tr(B) + mb_{jj} \\
 \sum_{j=1}^m dist_{ij}^2 = tr(B) + mb_{ii} \\
-\sum_{i=1}^m\sum_{j=1}^m dist_{ij}^2 = 2m \ tr(B) 
-\]</span> 其中，tr为矩阵的trace，<span class="math inline">\(tr(B) = \sum_{i=1}^m || z_i ||^2\)</span>： <span class="math display">\[
-dist_{i.}^2 = \frac{1}{m}\sum_{j=1}^m dist_{ij}^2 \\ 
+\sum_{i=1}^m\sum_{j=1}^m dist_{ij}^2 = 2m \ tr(B)
+\]</span> 其中，tr为矩阵的trace，<span class="math inline">\(tr(B) =
+\sum_{i=1}^m || z_i ||^2\)</span>： <span class="math display">\[
+dist_{i.}^2 = \frac{1}{m}\sum_{j=1}^m dist_{ij}^2 \\
 dist_{.j}^2 = \frac{1}{m}\sum_{i=1}^m dist_{ij}^2 \\
 dist_{..}^2 = \frac{1}{m^2}\sum_{i=1}^m\sum_{j=1}^m dist_{ij}^2
 \]</span> 根据上式，可得： <span class="math display">\[
 b_{ij} = -\frac{1}{2}(dist_{ij}^2-dist_{i.}^2-dist_{.j}^2+dist_{..}^2)
-\]</span> 由此可见，我们可以通过降维前后保持不变的距离矩阵D求取内积矩阵B。对矩阵B做特征值分解，取A为d‘个最大特征值所构成的对角矩阵，V为相应的特征向量矩阵。 <span class="math display">\[
+\]</span>
+由此可见，我们可以通过降维前后保持不变的距离矩阵D求取内积矩阵B。对矩阵B做特征值分解，取A为d‘个最大特征值所构成的对角矩阵，V为相应的特征向量矩阵。
+<span class="math display">\[
 Z = A^{1/2}V^T \in R^{d&#39;Xm}
-\]</span> 一般来说，想要获得低维子空间，最简单是对原始高维空间进行线性变换，这就是线性降维方法。</p>
+\]</span>
+一般来说，想要获得低维子空间，最简单是对原始高维空间进行线性变换，这就是线性降维方法。</p>
 <h2 id="主成分分析">主成分分析</h2>
-<p>主成分分析(Principal Component Analysis，简称PCA)是最常用的一种降维方法。简单来说，就是用一个超平面来对所有样本进行适当的表达，这个超平面应该具有的性质：</p>
+<p>主成分分析(Principal Component
+Analysis，简称PCA)是最常用的一种降维方法。简单来说，就是用一个超平面来对所有样本进行适当的表达，这个超平面应该具有的性质：</p>
 <ul>
 <li>样本点到这个超平面的距离都足够近；</li>
 <li>样本点在这个超平面的投影尽可能分开；</li>
 </ul>
-<p>假设样本进行了中心化，即<span class="math inline">\(\sum_ix_i=0​\)</span>，再假定投影变换后的新坐标系为<span class="math inline">\({w_1,w_2,…,w_d}​\)</span>，其中<span class="math inline">\(w_i​\)</span>是标准正交基。假设降维之后样本点<span class="math inline">\(x_i​\)</span>在低维空间下的投影是<span class="math inline">\(z_i = {z_{i1},z_{i2},…,z_{id&#39;}}​\)</span>。其中，<span class="math inline">\(z_{ij}=w_j^Tx_i​\)</span>，重构回来的投影带点为<span class="math inline">\(x_i=\sum_{j=1}^{d&#39;}z_{ij}w_j​\)</span>。</p>
-<p>考虑整个数据集，原样本点与重构后的投影点之间的距离： <span class="math display">\[
-\sum_{i=1}^m||\sum_{j=1}^{d&#39;}z_{ij}w_j - x_i||^2_2 = \sum_{i=1}^mz_i^Tz_i-2\sum_{i=1}^mz_i^TW^Tx_i+const \varpropto - tr(W^T(\sum_{i=1}^mx_ix_i^T)W)
-\]</span> 根据上面的属性要求，我们需要最小化上式： <span class="math display">\[
+<p>假设样本进行了中心化，即<span
+class="math inline">\(\sum_ix_i=0​\)</span>，再假定投影变换后的新坐标系为<span
+class="math inline">\({w_1,w_2,…,w_d}​\)</span>，其中<span
+class="math inline">\(w_i​\)</span>是标准正交基。假设降维之后样本点<span
+class="math inline">\(x_i​\)</span>在低维空间下的投影是<span
+class="math inline">\(z_i =
+{z_{i1},z_{i2},…,z_{id&#39;}}​\)</span>。其中，<span
+class="math inline">\(z_{ij}=w_j^Tx_i​\)</span>，重构回来的投影带点为<span
+class="math inline">\(x_i=\sum_{j=1}^{d&#39;}z_{ij}w_j​\)</span>。</p>
+<p>考虑整个数据集，原样本点与重构后的投影点之间的距离： <span
+class="math display">\[
+\sum_{i=1}^m||\sum_{j=1}^{d&#39;}z_{ij}w_j - x_i||^2_2 =
+\sum_{i=1}^mz_i^Tz_i-2\sum_{i=1}^mz_i^TW^Tx_i+const \varpropto -
+tr(W^T(\sum_{i=1}^mx_ix_i^T)W)
+\]</span> 根据上面的属性要求，我们需要最小化上式： <span
+class="math display">\[
 min \  -tr(W^TXX^TW)
-\]</span> 而为了使得所有样本点的投影尽可能分散，则最大化投影后样本点的方差 <span class="math inline">\(\sum_i W^Tx_ix_iW\)</span>： <span class="math display">\[
+\]</span>
+而为了使得所有样本点的投影尽可能分散，则最大化投影后样本点的方差 <span
+class="math inline">\(\sum_i W^Tx_ix_iW\)</span>： <span
+class="math display">\[
 max \ tr(W^TXX^TW)
-\]</span> 可见，两个优化目标等价，对其使用拉格朗日乘子法，得： <span class="math display">\[
+\]</span> 可见，两个优化目标等价，对其使用拉格朗日乘子法，得： <span
+class="math display">\[
 XX^Tw_i = \lambda_iw_i
-\]</span> 然后对协方差矩阵<span class="math inline">\(XX^T\)</span>进行特征值分解，将求得的特征值进行排序，再取前n个特征值对应的特征向量构成<span class="math inline">\(W^*=(w_1,w_2,…,w_n)\)</span>。</p>
+\]</span> 然后对协方差矩阵<span
+class="math inline">\(XX^T\)</span>进行特征值分解，将求得的特征值进行排序，再取前n个特征值对应的特征向量构成<span
+class="math inline">\(W^*=(w_1,w_2,…,w_n)\)</span>。</p>
 <h2 id="核化线性降维">核化线性降维</h2>
 <p>在现实任务中，需要实现非线性映射才能找到恰当的低维嵌入。非线性将维的一种常用方法是基于核技巧对线性将维方法进行"核化"。</p>
-<p>假设我们将在高维特征空间中把数据投影到<span class="math inline">\(W=(w_1,w_2,..,w_d)\)</span>确定的超平面上，根据上面的式子有： <span class="math display">\[
+<p>假设我们将在高维特征空间中把数据投影到<span
+class="math inline">\(W=(w_1,w_2,..,w_d)\)</span>确定的超平面上，根据上面的式子有：
+<span class="math display">\[
 (\sum_{i=1}^mz_iz_i^T)w_j = \lambda_jw_j
-\]</span> 其中<span class="math inline">\(z_i\)</span>是样本点<span class="math inline">\(x_i\)</span>在高维特征空间中的像，因此有: <span class="math display">\[
-w_j = \frac{1}{\lambda_j}(\sum_{i=1}^mz_iz_i^T)w_j = \sum_{i=1}^m z_i \frac{z_i^Tw_j}{\lambda_j} = \sum_{i=1}^m z_i \alpha_i^j
-\]</span> 假定<span class="math inline">\(z_i = \phi(x_i)\)</span>，即原始属性空间中的样本点通过映射<span class="math inline">\(\phi\)</span>产生。</p>
+\]</span> 其中<span class="math inline">\(z_i\)</span>是样本点<span
+class="math inline">\(x_i\)</span>在高维特征空间中的像，因此有: <span
+class="math display">\[
+w_j = \frac{1}{\lambda_j}(\sum_{i=1}^mz_iz_i^T)w_j = \sum_{i=1}^m z_i
+\frac{z_i^Tw_j}{\lambda_j} = \sum_{i=1}^m z_i \alpha_i^j
+\]</span> 假定<span class="math inline">\(z_i =
+\phi(x_i)\)</span>，即原始属性空间中的样本点通过映射<span
+class="math inline">\(\phi\)</span>产生。</p>
 <p>因此前面的式子可以变换为 <span class="math display">\[
 (\sum_{i=1}^m \phi(x_i)\phi(x_i)^T) w_j= \lambda_jw_j \\
 w_j = \sum_{i=1}^m \phi(x_i) \alpha_i^j
-\]</span> 由于我们不知道<span class="math inline">\(\phi\)</span>的具体形式，因此引入核函数： <span class="math display">\[
+\]</span> 由于我们不知道<span
+class="math inline">\(\phi\)</span>的具体形式，因此引入核函数： <span
+class="math display">\[
 k(x_i, x_j) = \phi(x_i)\phi(x_i)^T
 \]</span> 将上面的式子化简后，得到： <span class="math display">\[
 K \alpha^j = \lambda_j\alpha^j
-\]</span> 这里又变成了特征值分解的问题，取K最大的d'个特征值对应的特征向量即可。</p>
+\]</span>
+这里又变成了特征值分解的问题，取K最大的d'个特征值对应的特征向量即可。</p>
 <h2 id="流形学习">流形学习</h2>
 <p>"流形"是在局部与欧氏空间同胚的空间，它在局部具有欧氏空间的性质，能用欧式距离来进行距离计算。若低维流形嵌入到高维空间中，其局部仍然具有欧氏空间的性质，因此可以在局部建立降维映射关系，并设法将局部关系推广到全局。</p>
 <h3 id="等度量映射">等度量映射</h3>
 <p>等度量映射(Isomap)的一个出发点：低维流形嵌入到高维空间之后，直接在高维空间中计算直线距离具有误导性，可能会丢失某些信息。以下图为例：</p>
 <figure>
-<img src="http://blog.pluskid.org/wp-content/uploads/2010/05/isomap-graph.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="http://blog.pluskid.org/wp-content/uploads/2010/05/isomap-graph.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>如果使用传统的欧氏距离来作为距离尺度，显然会抛弃“数据的内部特征”，即假设一只虫子从一点到另一点，如果它不能脱离图中的曲面行走，那么红色曲线才是距离最短的路径。</p>
 <p>如上图，低维嵌入流形上两点间的距离是"测地线"距离，要求得这个距离，可以对每个点基于欧氏距离找出其近邻点，然后就能建立一个近邻连接图。这样计算两点之间的测地线距离的问题，就变成了临接图上两点之间的最短路径问题。</p>
-<p>构建近邻图也有两种做法：一种是指定近邻点个书，例如欧氏距离最近的k个点为近邻点；另一种则是指定距离阈值<span class="math inline">\(\epsilon\)</span>，小于这个距离的点则认为是近邻点。</p>
+<p>构建近邻图也有两种做法：一种是指定近邻点个书，例如欧氏距离最近的k个点为近邻点；另一种则是指定距离阈值<span
+class="math inline">\(\epsilon\)</span>，小于这个距离的点则认为是近邻点。</p>
 <h3 id="局部线性嵌入">局部线性嵌入</h3>
 <p>与Isomap不同的是，局部线性嵌入LLE试图保持领域内样本之间的线性关系，如图：</p>
 <figure>
-<img src="http://science.sciencemag.org/content/sci/290/5500/2323/F2.large.jpg?width=800&amp;height=600&amp;carousel=1" alt="img" /><figcaption>img</figcaption>
+<img
+src="http://science.sciencemag.org/content/sci/290/5500/2323/F2.large.jpg?width=800&amp;height=600&amp;carousel=1"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>假设样本点可以通过它的领域样本线性重构： <span class="math display">\[
+<p>假设样本点可以通过它的领域样本线性重构： <span
+class="math display">\[
 x_i = w_{ij}x_j+w_{ik}x_k+w_{il}x_;
 \]</span> LLE希望上式的关系在低维空间中得以保持。</p>
 <p>算法步骤；</p>
 <ol type="1">
-<li>LLE首先为每个样本找到其近邻下标集合<span class="math inline">\(Q_i\)</span>，然后计算出样本点对<span class="math inline">\(x_i\)</span>进行线性重构的系数<span class="math inline">\(w_i\)</span>：</li>
+<li>LLE首先为每个样本找到其近邻下标集合<span
+class="math inline">\(Q_i\)</span>，然后计算出样本点对<span
+class="math inline">\(x_i\)</span>进行线性重构的系数<span
+class="math inline">\(w_i\)</span>：</li>
 </ol>
 <p><span class="math display">\[
 min \sum_{i=1}^m || x_i - \sum_{j \in Q_i} w_{ij}x_j||^2_2 \\
 \sum_{j \in Q_i} w_{ij} = 1
 \]</span></p>
-<p>令<span class="math inline">\(C_{jk} = (x_i-x_j)^T(x_i-x_j)\)</span>，<span class="math inline">\(w_{ij}\)</span>有闭式解： <span class="math display">\[
-w_{ij} = \frac{\sum_{k\in Q_i} C_{jk}^{-1}}{\sum_{l,s \in Q_i} C_{ls}^{-1}}
-\]</span> LLE在低维空间中保持<span class="math inline">\(w_i\)</span>不变，因此低维空间坐标<span class="math inline">\(z_i\)</span>可通过以下求解： <span class="math display">\[
+<p>令<span class="math inline">\(C_{jk} =
+(x_i-x_j)^T(x_i-x_j)\)</span>，<span
+class="math inline">\(w_{ij}\)</span>有闭式解： <span
+class="math display">\[
+w_{ij} = \frac{\sum_{k\in Q_i} C_{jk}^{-1}}{\sum_{l,s \in Q_i}
+C_{ls}^{-1}}
+\]</span> LLE在低维空间中保持<span
+class="math inline">\(w_i\)</span>不变，因此低维空间坐标<span
+class="math inline">\(z_i\)</span>可通过以下求解： <span
+class="math display">\[
 min \sum_{i=1}^m || z_i - \sum_{j \in Q_i} w_{ij}z_j||^2_2 \\
 M = (1-W)^T(1-W)
 \]</span> 则上式可以重写为： <span class="math display">\[
-min \ tr(ZMZ^T) \\ 
+min \ tr(ZMZ^T) \\
 ZZ^T = 1
-\]</span> 然后对改式通过特征值分解，M最小的k个特征值组成的矩阵即为<span class="math inline">\(Z^T\)</span>.</p>
+\]</span> 然后对改式通过特征值分解，M最小的k个特征值组成的矩阵即为<span
+class="math inline">\(Z^T\)</span>.</p>
 <h2 id="度量学习">度量学习</h2>
 <p>在机器学习中，对高维数据进行降维的目的是找到一个合适的低维空间，而由于每个空间对应了在样本属性定义的一个距离度量。因此寻找合适的空间就是寻找一个合适的距离度量。</p>
-<p>对两个d维的样本<span class="math inline">\(x_i, x_j\)</span>，引入属性权重后的平方欧氏距离为： <span class="math display">\[
-dist_{wed}^2(x_i,x_j) = ||x_i-x_j||^2_2 = w_1\cdot dist_{ij,1}^2 + w_2\cdot dist_{ij,2}^2+...+w_d\cdot dist_{ij,d}^2 \\
+<p>对两个d维的样本<span class="math inline">\(x_i,
+x_j\)</span>，引入属性权重后的平方欧氏距离为： <span
+class="math display">\[
+dist_{wed}^2(x_i,x_j) = ||x_i-x_j||^2_2 = w_1\cdot dist_{ij,1}^2 +
+w_2\cdot dist_{ij,2}^2+...+w_d\cdot dist_{ij,d}^2 \\
 =(x_i-x_j)^TW(x_i-x_j)
 \]</span> 其中W=diag(w)是一个对角矩阵。</p>
-<p>由于W的非对角矩阵为0，因此坐标轴是正交的，即属性之间无关，但现实生活中属性往往是相关的，因此可以将W替换为一个普通的半正定对称矩阵M。由此可得到马氏距离： <span class="math display">\[
+<p>由于W的非对角矩阵为0，因此坐标轴是正交的，即属性之间无关，但现实生活中属性往往是相关的，因此可以将W替换为一个普通的半正定对称矩阵M。由此可得到马氏距离：
+<span class="math display">\[
 dist_{mat}^2(x_i,x_j) =(x_i-x_j)^TM(x_i-x_j)= ||x_i-x_j||^2_M
-\]</span> 度量学习必须对M进行学习，而因为M是半正定对称矩阵，因此一定存在正交基P使得<span class="math inline">\(M=PP^T\)</span>。</p>
+\]</span>
+度量学习必须对M进行学习，而因为M是半正定对称矩阵，因此一定存在正交基P使得<span
+class="math inline">\(M=PP^T\)</span>。</p>
 <p>对M学习需要设置合适优化目标，不同度量学习方法针对不同的目标获得合适半正定对称距离度量矩阵M。</p>
 
           
@@ -1761,7 +1943,8 @@ dist_{mat}^2(x_i,x_j) =(x_i-x_j)^TM(x_i-x_j)= ||x_i-x_j||^2_M
       
         
           
-            <h1 id="in-search-of-an-understandable-consensus-algorithm">In Search of an Understandable Consensus Algorithm<一></h1>
+            <h1 id="in-search-of-an-understandable-consensus-algorithm">In Search of
+an Understandable Consensus Algorithm<一></h1>
 <h2 id="简介">简介</h2>
 <p>Raft是用于管理复制日志的一致性算法，但由于与paxos结构不同，raft更加容易被理解。</p>
 <h2 id="introduction">Introduction</h2>
@@ -1770,12 +1953,16 @@ dist_{mat}^2(x_i,x_j) =(x_i-x_j)^TM(x_i-x_j)= ||x_i-x_j||^2_M
 <ul>
 <li>Strong leader：例如所有日志都只能从该leader流向其它服务器；</li>
 <li>Leader election：Raft使用随机的定时器来选举leader；</li>
-<li>Membership changes：raft更改集群中服务器集的机制，使用了一种新的共识算法，两种不同配置的机器允许在转换期间重叠；</li>
+<li>Membership
+changes：raft更改集群中服务器集的机制，使用了一种新的共识算法，两种不同配置的机器允许在转换期间重叠；</li>
 </ul>
 <h2 id="replicated-state-machines">Replicated state machines</h2>
 <p>共识算法通常出现在复制状态机的上下文中，通过复制日志实现，如下图，每个服务器都存储着一些列命令的日志，状态机按顺序执行，由于状态机时确定性的，因此每个都计算出相同的状态和输出序列。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/Replicated_state_machine_arch.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/Replicated_state_machine_arch.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>保障复制日志的一致性是一致性算法的工作。服务器的共识模块从客户端接受命令并将其添加到日志中。正确复制命令后，每个服务器的状态机按日志顺序处理它们，并将输出返回给客户端。</p>
 <p>生产系统的共识算法具备以下特点：</p>
@@ -1788,38 +1975,59 @@ dist_{mat}^2(x_i,x_j) =(x_i-x_j)^TM(x_i-x_j)= ||x_i-x_j||^2_M
 <h2 id="the-raft-consensus-algorithm">The Raft consensus algorithm</h2>
 <p>下图简洁地总结了raft算法：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_sum.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_sum.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>raft通过选举一个leader来实现共识，然后让该leader负责管理复制的日志。leader可能会与服务器断开连接，这时需要选出新的leader。</p>
 <h3 id="raft-basic">raft basic</h3>
 <p>raft集群中包含多个服务器，在任意时间内，每个服务器都处于以下三种状态之一：leader、follower、candidate。一般情况下，只有一个leader，其它都是follower。follower不会自发请求，而是响应leader和candidate的请求，leader处理所有来自client的请求（即便client私自联系了follower，也会被重定向到leader）。以下是状态转换图：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_server_states.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_server_states.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>raft将时间划分为任意长度，如下图：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_terms.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_terms.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>term是一个逻辑时钟，采用连续的整数编号。每个term都以选举开始，如果有candidate成为了leader，那么它将成为在剩下的term时间内成为leader。raft保障在一个term内最多只有一个leader。</p>
-<p>不同的服务器可以在不同的时间观察term之间的转换，每个服务器都有一个当前的term编号，并且随着时间单调递增。服务器间通信时交换当前term。如果一个服务器的当前term小于另一个服务器的当前term，则它将其当前term更新为更大的值。 如果候选人或领导者发现其term已过期，则会立即变成到follower的状态。 如果服务器收到带有过期term的请求，它将拒绝该请求。</p>
-<p>Raft服务器使用远程过程调用（RPC）进行通信。RequestVote RPCs由candidate在选举期间启动，Append-Entries RPCs由leader发起，用来复制日志条目并提供心跳形式。</p>
+<p>不同的服务器可以在不同的时间观察term之间的转换，每个服务器都有一个当前的term编号，并且随着时间单调递增。服务器间通信时交换当前term。如果一个服务器的当前term小于另一个服务器的当前term，则它将其当前term更新为更大的值。
+如果候选人或领导者发现其term已过期，则会立即变成到follower的状态。
+如果服务器收到带有过期term的请求，它将拒绝该请求。</p>
+<p>Raft服务器使用远程过程调用（RPC）进行通信。RequestVote
+RPCs由candidate在选举期间启动，Append-Entries
+RPCs由leader发起，用来复制日志条目并提供心跳形式。</p>
 <h3 id="leader-election">Leader election</h3>
-<p>raft使用心跳机制出发leader选举，leader向所有follower定期发送heartbeat(log entry为空的appendEntries RPC)。如果follower在选举超时的一定时间内没有收到任何联系，则会假定没有leader并开始重新选举。</p>
-<p>在开始选举时，follower会增加当前的term，并切换到candidate状态，然后它会给自己投上一票，并向所有其它server发送RequestVote RPC。candidate接下来会遇到以下三种情况：</p>
+<p>raft使用心跳机制出发leader选举，leader向所有follower定期发送heartbeat(log
+entry为空的appendEntries
+RPC)。如果follower在选举超时的一定时间内没有收到任何联系，则会假定没有leader并开始重新选举。</p>
+<p>在开始选举时，follower会增加当前的term，并切换到candidate状态，然后它会给自己投上一票，并向所有其它server发送RequestVote
+RPC。candidate接下来会遇到以下三种情况：</p>
 <ul>
 <li>它赢得了选举；</li>
 <li>有其他服务器成为了leader；</li>
 <li>一段时间内没有选出leader；</li>
 </ul>
 <p>如果candidate在相同的期限内收到来自完整集群中大多数服务器的投票，则candidate将赢得选举。每个服务器将按照first-come-first-served的规则对给定期限内的一个候选人进行投票。一旦赢得选举，它会向所有其它服务器发送heartbeat，以确定自己的身份并阻止后续选举。</p>
-<p>在等待投票时，candidate可能会从另外的服务器上收到声称自己的是leader的AppendEntries RPC，这时会比较term，如果当前term小于RPC的term，则会视为合法，并返回follower状态。否则会拒绝RPC并保持candidate状态。</p>
+<p>在等待投票时，candidate可能会从另外的服务器上收到声称自己的是leader的AppendEntries
+RPC，这时会比较term，如果当前term小于RPC的term，则会视为合法，并返回follower状态。否则会拒绝RPC并保持candidate状态。</p>
 <p>第三种情况是由于出现了许多的candidate，使得投票分割，以便没有candidate获得多数票。这样每个candidate会超时并开始一个新的选举，增加其term。但是，如果不采取额外措施，分割票数可能会无限期重复。</p>
 <p>raft使用随机选举超时的机制来避免分割投票，从固定的范围内随机选择时间(150-300ms)选择一个时间作为选举超时，使得在大多数情况下只有一台服务器会超时，它会赢得选举并在其他服务器超时之前发送heartbeat。同理，这样可以解决分割投票的问题，每个candidate在重新选举时重启并选择随机选举超时，这减少了新选举时另一次分割投票的可能性。</p>
 <h3 id="log-replication">Log replication</h3>
-<p>在leader选举完毕之后，就开始为client请求提供服务，client把这些命令提供给状态机，leader则把命令作为新的条目添加到日志中，并通过<strong>AppendEntries RPC</strong>并行地发送到每个其它的服务器以复制条目。如果发送失败/包丢失/follower崩溃，leader会无限重试。</p>
+<p>在leader选举完毕之后，就开始为client请求提供服务，client把这些命令提供给状态机，leader则把命令作为新的条目添加到日志中，并通过<strong>AppendEntries
+RPC</strong>并行地发送到每个其它的服务器以复制条目。如果发送失败/包丢失/follower崩溃，leader会无限重试。</p>
 <p>日志的组织结构如下，每个条目都有一个term编号：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_logs_entries.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_logs_entries.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>Raft保证提交的条目是持久的，并最终由所有可用的状态机执行。一旦创建条目的领导者将其复制到大多数服务器上（例如，上图中的条目7），就会提交日志条目。并且还会提交leader日志中的所有前面的日志。</p>
 <p>Log Matching属性：</p>
@@ -1827,47 +2035,74 @@ dist_{mat}^2(x_i,x_j) =(x_i-x_j)^TM(x_i-x_j)= ||x_i-x_j||^2_M
 <li>如果不同日志中的两个条目具有相同的index和term，则它们存储相同的命令。</li>
 <li>如果不同日志中的两个条目具有相同的index和term，则所有前面的条目中的日志相同。</li>
 </ul>
-<p>第一个属性是基于leader在给定的term中最多创建一个具有给定日志索引的条目，并永远不会更改其在日志中的位置；第二个属性由AppendEntries执行的简单一致性检查保证。发送AppendEntries RPC时，leader在其日志中加入紧接在新条目之前的条目的索引和term。如果follower找不到相同索引和term的条目，则拒绝新日志条目。</p>
+<p>第一个属性是基于leader在给定的term中最多创建一个具有给定日志索引的条目，并永远不会更改其在日志中的位置；第二个属性由AppendEntries执行的简单一致性检查保证。发送AppendEntries
+RPC时，leader在其日志中加入紧接在新条目之前的条目的索引和term。如果follower找不到相同索引和term的条目，则拒绝新日志条目。</p>
 <p>正常情况下，leader和follower保持着一致的日志，但也有可能出现日志不一致的情况，比如旧leader可能不提交日志，如下：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_log_eorr_scenarios.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_log_eorr_scenarios.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>为了解决这种情况。raft会让leader通过强制follower的日志复制自己的日志来覆盖处理。</p>
-<p>要使得follower的日志与leader保持一致，leader必须找到共同的最新日志条目，在该店之后删除follower日志中的所有条目，然后往follower发送这之后的所有在leader上存在的日志。所有这些操作都是在响应AppendEntries RPC执行的一致性检查时发生的。leader为每个follower维护一个nextIndex，这是leader将发送给follower的下一个日志条目的索引。leader选举出来后，所有的nextIndex会被初始化到其日志中最后一个之后的索引（上图中的11）。如果不一致，RPC将会失败，拒绝后，leader会减少nextIndex，知道RPC成功。</p>
+<p>要使得follower的日志与leader保持一致，leader必须找到共同的最新日志条目，在该店之后删除follower日志中的所有条目，然后往follower发送这之后的所有在leader上存在的日志。所有这些操作都是在响应AppendEntries
+RPC执行的一致性检查时发生的。leader为每个follower维护一个nextIndex，这是leader将发送给follower的下一个日志条目的索引。leader选举出来后，所有的nextIndex会被初始化到其日志中最后一个之后的索引（上图中的11）。如果不一致，RPC将会失败，拒绝后，leader会减少nextIndex，知道RPC成功。</p>
 <blockquote>
-<p>当然也可以做优化，减少AppendEntries RPC，则follower可以发送冲突条目的term和它为该term存储的第一个索引。这样就是一个term一次RPC。</p>
+<p>当然也可以做优化，减少AppendEntries
+RPC，则follower可以发送冲突条目的term和它为该term存储的第一个索引。这样就是一个term一次RPC。</p>
 </blockquote>
-<p>该机制使得leader在选举出来后，无需采取额外的操作恢复日志，而是正常运行，并且由于RPC自动收敛日志。Leader Append-Only，leader永远不会覆盖或者删除自己的日志。</p>
+<p>该机制使得leader在选举出来后，无需采取额外的操作恢复日志，而是正常运行，并且由于RPC自动收敛日志。Leader
+Append-Only，leader永远不会覆盖或者删除自己的日志。</p>
 <h3 id="safety">Safety</h3>
 <p>当leader提交多个日志时，follower可能崩溃了，这时新的leader会用新的日志条目覆盖原来的那些日志，导致不同的状态机可能执行不同的命令序列。</p>
 <h4 id="election-restriction">Election restriction</h4>
 <p>在基于leader的一致性算法中，leader最终会存储所有提交的日志条目，raft通过保证先前term的所有已提交的日志条目从其选举时出现在每个新leader身上，这意味着日志只会从了leader流向follower，leader之间不会覆盖日志。</p>
-<p>如果candidate的日志中没有与大多机器的日志保持着最新，raft会使用投票来阻止candidate赢得选举。RequestVote RPC实现了这一限制：RPC包含有关候选人日志的信息，如果其自己的日志比候选者的日志更新，则选民拒绝其投票。</p>
+<p>如果candidate的日志中没有与大多机器的日志保持着最新，raft会使用投票来阻止candidate赢得选举。RequestVote
+RPC实现了这一限制：RPC包含有关候选人日志的信息，如果其自己的日志比候选者的日志更新，则选民拒绝其投票。</p>
 <p>通过比较日志中最后一个条目的索引和术语，Raft确定两个日志中哪一个更新。如果日志包含具有不同term的最后一个条目，则具有较晚term的日志为新的。如果日志以相同的term结束，则索引更大的日志是新的。</p>
-<h4 id="committing-entries-from-previous-terms">Committing entries from previous terms</h4>
-<p>一个leader不能立马对之前term的log entry是否复制到大多数server来判断其是否已被提交。下图就是这样一个例子：</p>
+<h4 id="committing-entries-from-previous-terms">Committing entries from
+previous terms</h4>
+<p>一个leader不能立马对之前term的log
+entry是否复制到大多数server来判断其是否已被提交。下图就是这样一个例子：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_log_time_seq.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_log_time_seq.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>在c中，term2的日志已经在大多数server中了，但如果此时leader S1 crash的话，在d这种情况下，term2的日志会被新leader S5给重写。</p>
-<p>为了消除这种情况，raft不会通过副本数来commit之前的log entries。只有当前term的log entries才会通过计算副本数被commit。</p>
+<p>在c中，term2的日志已经在大多数server中了，但如果此时leader S1
+crash的话，在d这种情况下，term2的日志会被新leader S5给重写。</p>
+<p>为了消除这种情况，raft不会通过副本数来commit之前的log
+entries。只有当前term的log entries才会通过计算副本数被commit。</p>
 <h4 id="safety-argument">Safety argument</h4>
 <p>现在来证明Leader Completeness Property。</p>
-<p>假设leader在term T 提交了一个当前term的log entry，但是这个log entry在随后的term没有被leader保存。term U是大于term T的最小的term，并且term U的leader没有包含这个log entry。</p>
+<p>假设leader在term T 提交了一个当前term的log entry，但是这个log
+entry在随后的term没有被leader保存。term U是大于term
+T的最小的term，并且term U的leader没有包含这个log entry。</p>
 <ol type="1">
-<li>在选举时leader U的日志中一定没有提交该条目（leader永远不会删除或覆盖条目）</li>
+<li>在选举时leader
+U的日志中一定没有提交该条目（leader永远不会删除或覆盖条目）</li>
 <li>leaderT复制了大多数机器的条目，leaderU从集群的大多数群体中获得了投票。因此，至少一个服务器（“voter”）接受了来自leaderT的条目并投票给了leaderU；这个voter就是矛盾的关键；</li>
-<li>voter必须在给leader U投票之前收到了被leader T提交的entry。否则它会拒绝来自leader T的AppendEntries请求，因为它当前的term比T的高；</li>
-<li>当voter投票给leader U的时候，它仍然保存着这个entry，这中间的所有leader都会包含了这个条目；</li>
-<li>voter将票投给了leader U，所以leader U的log必须和voter至少是一样新的。这就导致了两个矛盾；</li>
+<li>voter必须在给leader U投票之前收到了被leader
+T提交的entry。否则它会拒绝来自leader
+T的AppendEntries请求，因为它当前的term比T的高；</li>
+<li>当voter投票给leader
+U的时候，它仍然保存着这个entry，这中间的所有leader都会包含了这个条目；</li>
+<li>voter将票投给了leader U，所以leader
+U的log必须和voter至少是一样新的。这就导致了两个矛盾；</li>
 </ol>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_leader_completeness.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_leader_completeness.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<h3 id="follower-and-candidate-crashes">Follower and candidate crashes</h3>
+<h3 id="follower-and-candidate-crashes">Follower and candidate
+crashes</h3>
 <p>相对leader失败，follower和candidate的crash更容易被处理，而且都是通过重试来完成，这是因为raft的RPC都是幂等的。</p>
 <h3 id="timing-and-availability">Timing and availability</h3>
-<p>我们对raft的一个要求是安全性不能取决于时间安排，而可用性(系统及时对客户端作出响应的能力)则必然取决于时间。选举leader就体现了时间的重要性，只要系统满足以下的时间要求，就能保持稳定的leader： <span class="math display">\[
+<p>我们对raft的一个要求是安全性不能取决于时间安排，而可用性(系统及时对客户端作出响应的能力)则必然取决于时间。选举leader就体现了时间的重要性，只要系统满足以下的时间要求，就能保持稳定的leader：
+<span class="math display">\[
 broadcastTime &lt;&lt; electionTimeout &lt;&lt; MTBF
 \]</span></p>
 <ul>
@@ -2042,8 +2277,7 @@ broadcastTime &lt;&lt; electionTimeout &lt;&lt; MTBF
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

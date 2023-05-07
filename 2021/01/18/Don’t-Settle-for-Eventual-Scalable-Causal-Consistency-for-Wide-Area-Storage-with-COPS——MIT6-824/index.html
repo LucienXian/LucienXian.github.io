@@ -103,15 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS ABSTRACT COPS的KV存储系统，并引出了一种新的一致性模型——具有收敛性冲突处理的因果一致性。 INTRODUCTION 对于分布式存储系统，论文从CAP转移到关注ALPS——即可用性、低延迟、分区容忍性和扩展性。论">
 <meta property="og:locale">
-<meta property="og:image" content="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png">
-<meta property="og:image" content="https://img.imgdb.cn/item/6002872f3ffa7d37b3d238d1.png">
-<meta property="og:image" content="https://img.imgdb.cn/item/6002908b3ffa7d37b3d70194.png">
 <meta property="article:published_time" content="2021-01-17T16:09:57.000Z">
 <meta property="article:modified_time" content="2021-01-17T16:10:30.621Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="分布式">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png">
 
 
 
@@ -162,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,11 +332,15 @@
       
 
       
-        <h1 id="dont-settle-for-eventual-scalable-causal-consistency-for-wide-area-storage-with-cops">Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS</h1>
+        <h1
+id="dont-settle-for-eventual-scalable-causal-consistency-for-wide-area-storage-with-cops">Don’t
+Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage
+with COPS</h1>
 <h2 id="abstract">ABSTRACT</h2>
 <p>COPS的KV存储系统，并引出了一种新的一致性模型——具有收敛性冲突处理的因果一致性。</p>
 <h2 id="introduction">INTRODUCTION</h2>
-<p>对于分布式存储系统，论文从CAP转移到关注ALPS——即可用性、低延迟、分区容忍性和扩展性。论文介绍了一个叫COPS的KV存储系统，并实现了一种新的一致性模型causal+ consistency，收敛冲突处理的因果一致性。除此之外还有一个扩展版本——COPS-GT，提供了get事务来保证提供对于多个key的一致性视图，并且是无锁和非阻塞的。</p>
+<p>对于分布式存储系统，论文从CAP转移到关注ALPS——即可用性、低延迟、分区容忍性和扩展性。论文介绍了一个叫COPS的KV存储系统，并实现了一种新的一致性模型causal+
+consistency，收敛冲突处理的因果一致性。除此之外还有一个扩展版本——COPS-GT，提供了get事务来保证提供对于多个key的一致性视图，并且是无锁和非阻塞的。</p>
 <ul>
 <li>因果一致性：确保数据存储遵循操作之间的因果依赖关系；</li>
 <li>收敛冲突处理：确保副本永远不会发散，并且在所有节点上对相同key的冲突进行相同的处理；</li>
@@ -359,21 +357,28 @@
 </ul>
 <p>由于CAP的缘故，具备可用性和分区容忍性的分布式系统无法实现强一致性。为了在ALPS系统的要求和易编程之间取得平衡，论文定义了一个中间一致性模型。</p>
 <h2 id="causal-consistency">CAUSAL+ CONSISTENCY</h2>
-<p>对于具有收敛冲突处理的因果一致性来说，其抽象模型只有两种操作：put(key,val)和 get(key)=val，即读写。在COPS系统里，单个逻辑副本就是完整的本地集群的所有节点。</p>
+<p>对于具有收敛冲突处理的因果一致性来说，其抽象模型只有两种操作：put(key,val)和
+get(key)=val，即读写。在COPS系统里，单个逻辑副本就是完整的本地集群的所有节点。</p>
 <p>该模型定义了三条规则：</p>
 <ul>
-<li>Execution Thread：如果a和b是单线程内的两个操作，a-&gt;b表示a发生在b之前；</li>
-<li>Gets From：如果a是一个put操作，b是一个获取a写入值的get操作，则是a-&gt;b；</li>
+<li>Execution
+Thread：如果a和b是单线程内的两个操作，a-&gt;b表示a发生在b之前；</li>
+<li>Gets
+From：如果a是一个put操作，b是一个获取a写入值的get操作，则是a-&gt;b；</li>
 <li>Transitivity：对于操作a、b、c来说，如果存在a-&gt;b和b-&gt;c，则一定有a-&gt;c；</li>
 </ul>
 <p>下图就是这三条规则的一个样例：</p>
-<p><img src="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png" /></p>
 <h3 id="definition">Definition</h3>
 <p>论文将因果一致性定义为两个属性的组合：因果一致性和收敛性冲突处理。</p>
-<p>所谓的因果一致性就是上图提到的一个操作顺序结果，如果client 2读取x的时候，先读取到4，再读取到1就会违反因果一致性。但如果两个操作a和b没有任何顺序关系，那么因果一致性就会认为这是一个并发操作，不会做任何的约束，提高系统性能。如果a和b都在同一个key上做put操作，就意味着发生冲突。冲突会带来两个问题：冲突的值可能不确定，即不同副本的值可能不一致；冲突可能产生需要特殊处理的特殊情况；</p>
-<p>因此就需要收敛的冲突处理，冲突处理函数必须能在所有副本上以相同的方式进行处理，并且满足交换律和结合律的，即<span class="math inline">\(h(a,h(b,c))=h(c,h(b,a))\)</span>，不同的副本以接收到顺序处理冲突，收敛处理的结果。</p>
+<p>所谓的因果一致性就是上图提到的一个操作顺序结果，如果client
+2读取x的时候，先读取到4，再读取到1就会违反因果一致性。但如果两个操作a和b没有任何顺序关系，那么因果一致性就会认为这是一个并发操作，不会做任何的约束，提高系统性能。如果a和b都在同一个key上做put操作，就意味着发生冲突。冲突会带来两个问题：冲突的值可能不确定，即不同副本的值可能不一致；冲突可能产生需要特殊处理的特殊情况；</p>
+<p>因此就需要收敛的冲突处理，冲突处理函数必须能在所有副本上以相同的方式进行处理，并且满足交换律和结合律的，即<span
+class="math inline">\(h(a,h(b,c))=h(c,h(b,a))\)</span>，不同的副本以接收到顺序处理冲突，收敛处理的结果。</p>
 <p>COPS可以自定义冲突收敛函数，默认使用last writer wins。</p>
-<h3 id="causal-vs.-other-consistency-models">Causal+ vs. Other Consistency Models</h3>
+<h3 id="causal-vs.-other-consistency-models">Causal+ vs. Other
+Consistency Models</h3>
 <p>这一章主要介绍各种一致性模型的对比，从约束能力来看：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Linearizability &gt; Sequential &gt; Causal+ &gt; Causal &gt; FIFO</span><br><span class="line">																			 &gt; Per-Key Sequential &gt; Eventua</span><br></pre></td></tr></table></figure>
 <p>Causal+提供了比较适中的一致性模型，且能满足ALPS的系统要求。</p>
@@ -382,19 +387,25 @@
 <h3 id="scalable-causality">Scalable Causality</h3>
 <p>有些类似的因果一致性系统使用的是日志交换的序列化，在扩展性方便表现不好。而COPS则是采用了划分key空间和编码依赖关系到key元数据的方式来提高扩展性。</p>
 <h2 id="system-design-of-cops">SYSTEM DESIGN OF COPS</h2>
-<p>COPS是一个实现了causal+一致性的、能满足ALPS的分布式存储系统，论文提及了两个版本：一个是简单版的，支持causal+ 的一致性，另一个则是升级版的，支持get事务，能确保client请求keys的时候，存储系统能提供一个一致的相关values的快照，成为 COPS-GT。</p>
+<p>COPS是一个实现了causal+一致性的、能满足ALPS的分布式存储系统，论文提及了两个版本：一个是简单版的，支持causal+
+的一致性，另一个则是升级版的，支持get事务，能确保client请求keys的时候，存储系统能提供一个一致的相关values的快照，成为
+COPS-GT。</p>
 <h3 id="overview-of-cops">Overview of COPS</h3>
 <p>如下图，COPS就是一个在若干个数据中心运行着的kv存储系统。每个数据中心都有一个本地的COPS集群，保存着完整的一份数据。Client只与本地的数据中心进行联系，并通过COPS的client库进行调用。</p>
-<p><img src="https://img.imgdb.cn/item/6002872f3ffa7d37b3d238d1.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/6002872f3ffa7d37b3d238d1.png" /></p>
 <p>COPS系统主要由两个组件组成的：</p>
 <ul>
 <li>Key-value store：提供了对keys的线性化操作
 <ul>
-<li>每个key- value对都有对应的元数据。对于COPS，这个元数据是版本号；对于COPS-GT，则是有版本号和一系列的依赖‘</li>
-<li>kv存储提供了三种额外的操作：get by version, put after和dep check这三种操作确保了client库和异步复制进程能够提供Casula+一致性和get事务；</li>
+<li>每个key-
+value对都有对应的元数据。对于COPS，这个元数据是版本号；对于COPS-GT，则是有版本号和一系列的依赖‘</li>
+<li>kv存储提供了三种额外的操作：get by version, put after和dep
+check这三种操作确保了client库和异步复制进程能够提供Casula+一致性和get事务；</li>
 <li>对于 COPS-GT，系统保存了kv对的一些老版本数据，提供get事务；</li>
 </ul></li>
-<li>client库：主要提供读写操作，COPS的get， COPS-GT的get_trans，还有put。</li>
+<li>client库：主要提供读写操作，COPS的get，
+COPS-GT的get_trans，还有put。</li>
 </ul>
 <p>另外，COPS为了在确保casual+一致性的时候，能降低资源和性能开销：</p>
 <ul>
@@ -403,8 +414,10 @@
 <li>最多进行两次的get事务，降低延迟；</li>
 </ul>
 <h3 id="the-cops-key-value-store">The COPS Key-Value Store</h3>
-<p>对于COPS，存储元组是&lt;key: {value, version}&gt;，存储的是最新版本的数据；</p>
-<p>对于COPS-GT，存储元组是&lt;key: {value, version, deps}&gt;，deps就是一个链表，链表元素是&lt;key, version&gt;；</p>
+<p>对于COPS，存储元组是&lt;key: {value,
+version}&gt;，存储的是最新版本的数据；</p>
+<p>对于COPS-GT，存储元组是&lt;key: {value, version,
+deps}&gt;，deps就是一个链表，链表元素是&lt;key, version&gt;；</p>
 <p>每个COPS集群都持有完整的一份kv存储数据，每个集群节点根据一致性哈希获得一个独立的keys空间。至于容灾，则是通过链式复制来提供的。在每个集群中，每个key都有一个主节点，主节点会复制到集群内的从节点；至于其他集群也有一个对应的主节点；</p>
 <p>集群内的操作是线性化的，本地commit后，跨集群复制时会将数据放到一个队列上异步复制到其他集群的主节点。待其他集群检查完依赖关系后，就会提交该key；</p>
 <h3 id="client-library-and-interface">Client Library and Interface</h3>
@@ -414,9 +427,11 @@
 <ul>
 <li>COPS-GT Client Library</li>
 </ul>
-<p>COPS-GT的client库中context存了一组&lt;key, version, deps&gt;，读取时，client会将该key和其依赖关系添加到当前的context里；写入时，client先取出最新版本key的依赖关系，重新计算新依赖D，待写入成功后，则将写入该项&lt;key，返回的version，D&gt;到context；</p>
+<p>COPS-GT的client库中context存了一组&lt;key, version,
+deps&gt;，读取时，client会将该key和其依赖关系添加到当前的context里；写入时，client先取出最新版本key的依赖关系，重新计算新依赖D，待写入成功后，则将写入该项&lt;key，返回的version，D&gt;到context；</p>
 <p>下图就是运行过程中的依赖关系变化图：</p>
-<p><img src="https://img.imgdb.cn/item/6002908b3ffa7d37b3d70194.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/6002908b3ffa7d37b3d70194.png" /></p>
 <p>这种依赖关系的设计会嗲来两个问题：空间占用大和检查依赖关系的成本高。</p>
 <p>论文的解决方法是：COPS-GT会在依赖关系被提交后进行垃圾回收，另外就是由于依赖关系具备传递性，一旦依赖项被提交，那么可以确定该依赖项的依赖项也被提交了，所以只需要检查最近依赖；</p>
 <blockquote>
@@ -426,12 +441,15 @@
 <li>COPS Client Library</li>
 </ul>
 <p>COPS的client库需要更好的状态，因此读取时只需要将拿到的key和版本号添加到context就好，至于写入，则是先使用context作为最近的依赖项，返回数据后，则用返回的数据去副高context。</p>
-<h3 id="writing-values-in-cops-and-cops-gt">Writing Values in COPS and COPS-GT</h3>
+<h3 id="writing-values-in-cops-and-cops-gt">Writing Values in COPS and
+COPS-GT</h3>
 <p>所有对COPS的写入都分为两步：同步写入本地集群，异步复制到其他集群，并且都通过下面的API去完成：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bool,vers&gt; ← put_after (key, val, [deps], nearest, vers=∅)</span><br></pre></td></tr></table></figure>
 <h4 id="写入本地集群">写入本地集群</h4>
 <p>当client调用put接口时，首先需要计算最近的依赖关系，然后client库会去调用put_after接口，这里COPS不需要传入deps参数。然后该key对应的本地主节点会赋予该key一个版本号。put_after接口可以确保本地集群的commit是强一致性的，至于其他集群的提交在后面叙述。</p>
-<p>主节点使用Lamport时间戳来为每次更新计算一个版本号，其中高位是版本号，低位是节点号，通过比较Lamport时间戳，并应用 last-writer-wins 来检查和解决冲突。Lamport时间戳提供了所有分布式事件的偏序关系，与COPS的因果一致性兼容。</p>
+<p>主节点使用Lamport时间戳来为每次更新计算一个版本号，其中高位是版本号，低位是节点号，通过比较Lamport时间戳，并应用
+last-writer-wins
+来检查和解决冲突。Lamport时间戳提供了所有分布式事件的偏序关系，与COPS的因果一致性兼容。</p>
 <h4 id="复制到其他集群">复制到其他集群</h4>
 <p>本地写入提交后，主节点会调用put_after（此时vers参数需要设置为新得到的值）异步复制到其他集群的主节点，主节点进行依赖检查dep_check，一直阻塞直到依赖中的值都写入提交了，参会写入并提交该key值。依赖检查只需要nearest就好。</p>
 <h3 id="reading-values-in-cops">Reading Values in COPS</h3>
@@ -448,7 +466,8 @@
 <li>然后根据前面的计算，得到需要进行第二轮get_by_version的调用，此时获取指定版本的值；（同样是并行调用）；</li>
 <li>此时拿到的acl值就是最新的了；</li>
 </ul>
-<h2 id="garbage-faults-and-conflicts">GARBAGE, FAULTS, AND CONFLICTS</h2>
+<h2 id="garbage-faults-and-conflicts">GARBAGE, FAULTS, AND
+CONFLICTS</h2>
 <h3 id="garbage-collection-subsystem">Garbage Collection Subsystem</h3>
 <p>随着key的更新和插入，系统的空间占用将会无限制增长。COPS的垃圾回收子系统能够删除无用的状态，将系统的空间维持在一个合适的大小。</p>
 <ul>
@@ -468,8 +487,16 @@
 <p>存储：client存在context里的元数据，包括依赖关系和其他数据。</p>
 <p>COPS清理的方式有两种：</p>
 <ol type="1">
-<li>put_after作用于所有集群后，会对key标记为never- depend，并返回给client，client就可以在context中进行删除；</li>
-<li>COPS节点会从put_after中移除不需要的依赖，这里使用了一个global checkpoint time的概念，版本号比这个小的都移除；global checkpoint time的计算方式：首先是从pending中的put_after里找到最早的Lamport timestamp；然后联系其他集群的等价节点，一对一交换拿到最早的Lamport timestamp，所有数据中心都能知道key范围内最早的Lamport timestamp是什么了；最后数据中心会gossip自己负责的key range的最小时间戳，以找到任何一个节点观测到的最早Lamport timestamp。论文的实现是，每秒执行10次，并且对性能没有明显影响。</li>
+<li>put_after作用于所有集群后，会对key标记为never-
+depend，并返回给client，client就可以在context中进行删除；</li>
+<li>COPS节点会从put_after中移除不需要的依赖，这里使用了一个global
+checkpoint time的概念，版本号比这个小的都移除；global checkpoint
+time的计算方式：首先是从pending中的put_after里找到最早的Lamport
+timestamp；然后联系其他集群的等价节点，一对一交换拿到最早的Lamport
+timestamp，所有数据中心都能知道key范围内最早的Lamport
+timestamp是什么了；最后数据中心会gossip自己负责的key
+range的最小时间戳，以找到任何一个节点观测到的最早Lamport
+timestamp。论文的实现是，每秒执行10次，并且对性能没有明显影响。</li>
 </ol>
 <h3 id="fault-tolerance">Fault Tolerance</h3>
 <h4 id="client-failures">Client Failures</h4>
@@ -491,7 +518,8 @@
 <p>数据中心出故障时，COPS-GT无法进行依赖回收，要等到重新配置去掉有问题的数据中心。</p>
 <h3 id="conflict-detection">Conflict Detection</h3>
 <p>多线程并发写同一个key会导致冲突。</p>
-<p>COPS使用的是前文提到过的last- write-win策略来解决冲突，last则是最新的写入版本号。</p>
+<p>COPS使用的是前文提到过的last-
+write-win策略来解决冲突，last则是最新的写入版本号。</p>
 <p>COPS也可以自定义冲突检查和解决策略，但需要考虑三个部分的内容：</p>
 <ul>
 <li>所有的写入都需要带上前面的版本元数据，即本地集群看到的最近版本；</li>
@@ -500,7 +528,8 @@
 </ul>
 <p>冲突检查：如果写入的key——new，带有了一个版本号prev，而此时可见的当前版本是curr，如果prev!=curr，则意味着发生冲突。</p>
 <h2 id="conclusion">CONCLUSION</h2>
-<p>本文介绍了一种可扩展的分布式存储系统COPS，可以在不牺牲ALPS属性的情况下提供因果关系+一致性。COPS通过在每个集群的写入之前跟踪并显式检查是否满足因果关系来实现因果一致性。COPS-GT通过在COPS的基础上引入get事务，使client能够获得多个key的一致性视图； COPS-GT进行了优化，减少状态，最小化多轮协议并减少复制开销。</p>
+<p>本文介绍了一种可扩展的分布式存储系统COPS，可以在不牺牲ALPS属性的情况下提供因果关系+一致性。COPS通过在每个集群的写入之前跟踪并显式检查是否满足因果关系来实现因果一致性。COPS-GT通过在COPS的基础上引入get事务，使client能够获得多个key的一致性视图；
+COPS-GT进行了优化，减少状态，最小化多轮协议并减少复制开销。</p>
 
       
     </div>
@@ -675,7 +704,12 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#dont-settle-for-eventual-scalable-causal-consistency-for-wide-area-storage-with-cops"><span class="nav-number">1.</span> <span class="nav-text">Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract"><span class="nav-number">1.1.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.2.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#alps-systems-and-trade-offs"><span class="nav-number">1.3.</span> <span class="nav-text">ALPS SYSTEMS AND TRADE-OFFS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#causal-consistency"><span class="nav-number">1.4.</span> <span class="nav-text">CAUSAL+ CONSISTENCY</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#definition"><span class="nav-number">1.4.1.</span> <span class="nav-text">Definition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#causal-vs.-other-consistency-models"><span class="nav-number">1.4.2.</span> <span class="nav-text">Causal+ vs. Other Consistency Models</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#causal-in-cops"><span class="nav-number">1.4.3.</span> <span class="nav-text">Causal+ in COPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scalable-causality"><span class="nav-number">1.4.4.</span> <span class="nav-text">Scalable Causality</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#system-design-of-cops"><span class="nav-number">1.5.</span> <span class="nav-text">SYSTEM DESIGN OF COPS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#overview-of-cops"><span class="nav-number">1.5.1.</span> <span class="nav-text">Overview of COPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#the-cops-key-value-store"><span class="nav-number">1.5.2.</span> <span class="nav-text">The COPS Key-Value Store</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#client-library-and-interface"><span class="nav-number">1.5.3.</span> <span class="nav-text">Client Library and Interface</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#writing-values-in-cops-and-cops-gt"><span class="nav-number">1.5.4.</span> <span class="nav-text">Writing Values in COPS and COPS-GT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E6%9C%AC%E5%9C%B0%E9%9B%86%E7%BE%A4"><span class="nav-number">1.5.4.1.</span> <span class="nav-text">写入本地集群</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%8D%E5%88%B6%E5%88%B0%E5%85%B6%E4%BB%96%E9%9B%86%E7%BE%A4"><span class="nav-number">1.5.4.2.</span> <span class="nav-text">复制到其他集群</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reading-values-in-cops"><span class="nav-number">1.5.5.</span> <span class="nav-text">Reading Values in COPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#get-transactions-in-cops-gt"><span class="nav-number">1.5.6.</span> <span class="nav-text">Get Transactions in COPS-GT</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#garbage-faults-and-conflicts"><span class="nav-number">1.6.</span> <span class="nav-text">GARBAGE, FAULTS, AND CONFLICTS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#garbage-collection-subsystem"><span class="nav-number">1.6.1.</span> <span class="nav-text">Garbage Collection Subsystem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fault-tolerance"><span class="nav-number">1.6.2.</span> <span class="nav-text">Fault Tolerance</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#client-failures"><span class="nav-number">1.6.2.1.</span> <span class="nav-text">Client Failures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#key-value-node-failures"><span class="nav-number">1.6.2.2.</span> <span class="nav-text">Key-Value Node Failures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#datacenter-failures"><span class="nav-number">1.6.2.3.</span> <span class="nav-text">Datacenter Failures</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#conflict-detection"><span class="nav-number">1.6.3.</span> <span class="nav-text">Conflict Detection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion"><span class="nav-number">1.7.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#dont-settle-for-eventual-scalable-causal-consistency-for-wide-area-storage-with-cops"><span class="nav-number">1.</span> <span class="nav-text">Don’t
+Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage
+with COPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract"><span class="nav-number">1.1.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.2.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#alps-systems-and-trade-offs"><span class="nav-number">1.3.</span> <span class="nav-text">ALPS SYSTEMS AND TRADE-OFFS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#causal-consistency"><span class="nav-number">1.4.</span> <span class="nav-text">CAUSAL+ CONSISTENCY</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#definition"><span class="nav-number">1.4.1.</span> <span class="nav-text">Definition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#causal-vs.-other-consistency-models"><span class="nav-number">1.4.2.</span> <span class="nav-text">Causal+ vs. Other
+Consistency Models</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#causal-in-cops"><span class="nav-number">1.4.3.</span> <span class="nav-text">Causal+ in COPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scalable-causality"><span class="nav-number">1.4.4.</span> <span class="nav-text">Scalable Causality</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#system-design-of-cops"><span class="nav-number">1.5.</span> <span class="nav-text">SYSTEM DESIGN OF COPS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#overview-of-cops"><span class="nav-number">1.5.1.</span> <span class="nav-text">Overview of COPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#the-cops-key-value-store"><span class="nav-number">1.5.2.</span> <span class="nav-text">The COPS Key-Value Store</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#client-library-and-interface"><span class="nav-number">1.5.3.</span> <span class="nav-text">Client Library and Interface</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#writing-values-in-cops-and-cops-gt"><span class="nav-number">1.5.4.</span> <span class="nav-text">Writing Values in COPS and
+COPS-GT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E6%9C%AC%E5%9C%B0%E9%9B%86%E7%BE%A4"><span class="nav-number">1.5.4.1.</span> <span class="nav-text">写入本地集群</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%8D%E5%88%B6%E5%88%B0%E5%85%B6%E4%BB%96%E9%9B%86%E7%BE%A4"><span class="nav-number">1.5.4.2.</span> <span class="nav-text">复制到其他集群</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reading-values-in-cops"><span class="nav-number">1.5.5.</span> <span class="nav-text">Reading Values in COPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#get-transactions-in-cops-gt"><span class="nav-number">1.5.6.</span> <span class="nav-text">Get Transactions in COPS-GT</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#garbage-faults-and-conflicts"><span class="nav-number">1.6.</span> <span class="nav-text">GARBAGE, FAULTS, AND
+CONFLICTS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#garbage-collection-subsystem"><span class="nav-number">1.6.1.</span> <span class="nav-text">Garbage Collection Subsystem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fault-tolerance"><span class="nav-number">1.6.2.</span> <span class="nav-text">Fault Tolerance</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#client-failures"><span class="nav-number">1.6.2.1.</span> <span class="nav-text">Client Failures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#key-value-node-failures"><span class="nav-number">1.6.2.2.</span> <span class="nav-text">Key-Value Node Failures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#datacenter-failures"><span class="nav-number">1.6.2.3.</span> <span class="nav-text">Datacenter Failures</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#conflict-detection"><span class="nav-number">1.6.3.</span> <span class="nav-text">Conflict Detection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion"><span class="nav-number">1.7.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -717,8 +751,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

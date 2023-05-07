@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,11 +339,15 @@
 <ul>
 <li>假如有１TB的数据，内存只有32GB</li>
 </ul>
-<p>第一步是将１TB的数据分成40组，每组25GB； 然后分别读取40组数据，进行内部排序（可以用快排或者归并），然后写回磁盘； 接着从这40组数据中分别读取25GB/40=0.625GB，放在40个缓冲区里； 最后进行多路归并，可以每次将归并结果写满4GB就写回磁盘；并且一旦有缓冲区已经读完了，就从该缓冲区对应的组里读入新的0.625GB；</p>
+<p>第一步是将１TB的数据分成40组，每组25GB；
+然后分别读取40组数据，进行内部排序（可以用快排或者归并），然后写回磁盘；
+接着从这40组数据中分别读取25GB/40=0.625GB，放在40个缓冲区里；
+最后进行多路归并，可以每次将归并结果写满4GB就写回磁盘；并且一旦有缓冲区已经读完了，就从该缓冲区对应的组里读入新的0.625GB；</p>
 <ol start="2" type="1">
 <li>海量数据中选出最大的前k个数</li>
 </ol>
-<p>一种方法：通过哈希将海量数据分成n个小文件（如果不够小，继续细分，直到文件大小小于内存）。然后为每个小文件建立一个小顶堆，这样就能选出n个topK，进行归并，选出最后的topK； 另外的方法：是直接建立一个k大小的大顶堆，然后依次读入数据，与堆顶元素比较，调整堆。当所有数据读完之后，得到最终的堆就是topK个数；</p>
+<p>一种方法：通过哈希将海量数据分成n个小文件（如果不够小，继续细分，直到文件大小小于内存）。然后为每个小文件建立一个小顶堆，这样就能选出n个topK，进行归并，选出最后的topK；
+另外的方法：是直接建立一个k大小的大顶堆，然后依次读入数据，与堆顶元素比较，调整堆。当所有数据读完之后，得到最终的堆就是topK个数；</p>
 <ol start="3" type="1">
 <li>海量数据中选出频率最高的几个元素</li>
 </ol>
@@ -361,9 +363,11 @@
 <ol start="6" type="1">
 <li>判断一个数是否在海量数据中</li>
 </ol>
-<p>一种方法是采用位图法，1个bit代表一个数，扫描一遍海量数据，得到扫描结果。之后进行判断； 另外的方法则是，把海量数据按照每个bit为0或者1分成两类，然后又按照次高位分成2类。。一次下去。这样，每次判断数是否存在于海量数据中花费时间为logN</p>
+<p>一种方法是采用位图法，1个bit代表一个数，扫描一遍海量数据，得到扫描结果。之后进行判断；
+另外的方法则是，把海量数据按照每个bit为0或者1分成两类，然后又按照次高位分成2类。。一次下去。这样，每次判断数是否存在于海量数据中花费时间为logN</p>
 <h1 id="参考">参考</h1>
-<p>http://blog.csdn.net/FX677588/article/details/72471357 https://kb.cnblogs.com/page/95701/</p>
+<p>http://blog.csdn.net/FX677588/article/details/72471357
+https://kb.cnblogs.com/page/95701/</p>
 
       
     </div>
@@ -580,8 +584,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

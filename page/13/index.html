@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -901,7 +899,8 @@
       
         
           
-            <p>最近在学习Java，学习到了一个新的Java特性——代理(Proxy)。代理可以为其它对象实现一种新的控制访问方式，这是Java SE1.3新加的特性。</p>
+            <p>最近在学习Java，学习到了一个新的Java特性——代理(Proxy)。代理可以为其它对象实现一种新的控制访问方式，这是Java
+SE1.3新加的特性。</p>
 <h2 id="目的">目的</h2>
 <p>假如我们希望在运行时创建一个实现了一组给定接口的新类，我们就可以使用代理实现。</p>
 <h2 id="模式">模式</h2>
@@ -1048,25 +1047,35 @@
 <h2 id="目的">目的</h2>
 <p>相比较于CNN，RNN能够更好地序列的信息。比如理解一句话的意思，根据视频输出行为，判断文本的情感等等。前后的输入是有关联的。</p>
 <h2 id="结构">结构</h2>
-<p>RNN的结构中有一个内部状态值<span class="math inline">\(h_t\)</span>，这个值取决于输入的x和上一次的内部状态值<span class="math inline">\(h_{t-1}\)</span>。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值<span class="math inline">\(Y_t\)</span></p>
+<p>RNN的结构中有一个内部状态值<span
+class="math inline">\(h_t\)</span>，这个值取决于输入的x和上一次的内部状态值<span
+class="math inline">\(h_{t-1}\)</span>。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值<span
+class="math inline">\(Y_t\)</span></p>
 <p>结构图如下：</p>
 <figure>
-<img src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>RNN的公式如下： <span class="math display">\[
 Y_t = g(V h_t) \\
 h_t = f(UX_t+Wh_{t-1})
 \]</span></p>
 <h2 id="truncated-backprop">truncated backprop</h2>
-<p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final states作为后一个序列的initial states。</p>
+<p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final
+states作为后一个序列的initial states。</p>
 <figure>
-<img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="vanilla-rnn">vanilla RNN</h2>
 <p>只有一层隐藏层的RNN</p>
 <h1 id="lstm">LSTM</h1>
 <p>用来缓解梯度消失和梯度爆炸。</p>
-<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell state，即c，让它保存长期的状态。</p>
+<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell
+state，即c，让它保存长期的状态。</p>
 <p>LSTM将隐藏状态和输入拼接在一起，然后乘以一个巨大的矩阵，得到四个门向量。</p>
 <ul>
 <li>i：input gate，whether to write to cell；</li>
@@ -1092,7 +1101,8 @@ o_t = \sigma (W_o [h_{t-1}, x_t] + b_o)
 <p><span class="math display">\[
 g_t = tanh(W_g [h_{t-1}, x_t] + b_g)
 \]</span></p>
-<p>cell state的计算公式为：(注意是按元素相乘) <span class="math display">\[
+<p>cell state的计算公式为：(注意是按元素相乘) <span
+class="math display">\[
 c_t = f_t \circ c_{t-1} + i_t \circ g_t
 \]</span> 至于隐藏状态： <span class="math display">\[
 h_t = o_t \circ tanh(c_t)
@@ -1391,7 +1401,8 @@ h_t = o_t \circ tanh(c_t)
         
           
             <h1 id="简单动态字符串">简单动态字符串</h1>
-<p>redis的字符串表示不是使用的像C语言那种以空字符结尾的字符数组，而是自己构建了一种简单动态字符串（simple dynamic string）——<strong>SDS</strong>。</p>
+<p>redis的字符串表示不是使用的像C语言那种以空字符结尾的字符数组，而是自己构建了一种简单动态字符串（simple
+dynamic string）——<strong>SDS</strong>。</p>
 <p>而一般来说，redis只会在字符串字面量被用在一些无需对字符串进行更改的地方使用C风格的字符串，比如打印日志。</p>
 <h2 id="sds的定义">SDS的定义</h2>
 <p>sds定义在sds.h的sdshdr的结构体中：</p>
@@ -1406,7 +1417,8 @@ h_t = o_t \circ tanh(c_t)
 <h3 id="杜绝缓冲区溢出">杜绝缓冲区溢出</h3>
 <p>这个也比较好理解。对于一些字符串拼接的操作，如果没有记录字符串长度，无法得知字符串剩余的内存，这样在拼接的时候就可能发生缓冲区溢出。</p>
 <p>而SDS的API在使用sdscat函数进行字符串拼接的时候，会先检查SDS的空间是否足够，不足的话，会使用某种分配策略扩展空间。</p>
-<h3 id="减少修改字符串带来内存重分配次数">减少修改字符串带来内存重分配次数</h3>
+<h3
+id="减少修改字符串带来内存重分配次数">减少修改字符串带来内存重分配次数</h3>
 <p>对于C字符串来说，每次增长或者缩短一个字符串，程序都需要对保存该字符串的数组进行一次重新分配内存的工作，一旦没有重新分配，就可能造成内存泄露或者产生缓冲区溢出。而且因为内存重分配涉及到了复杂的算法，并且有可能会执行系统调用，所以通常是比较耗时的操作。</p>
 <p>为了避免C字符串的这种缺陷，redis的SDS实现了空间预分配和惰性空间释放两种优化策略。</p>
 <ol type="1">
@@ -1549,13 +1561,16 @@ h_t = o_t \circ tanh(c_t)
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gofmt -w program.go</span><br></pre></td></tr></table></figure>
 <p>该命令会将源代码格式化后再去覆盖原来的内容。</p>
 <blockquote>
-<p>All GO code in the standard packages has been formatted with gofmt</p>
+<p>All GO code in the standard packages has been formatted with
+gofmt</p>
 </blockquote>
 <h2 id="注释">注释</h2>
-<p>Go语言支持块注释**/* */<strong>和行注释</strong>/ /**。在golang中，因为godoc的提供，我们可以通过两种方式来查看文档。godoc既是一个程序，也是一个web服务器。</p>
+<p>Go语言支持块注释**/* */<strong>和行注释</strong>/
+/**。在golang中，因为godoc的提供，我们可以通过两种方式来查看文档。godoc既是一个程序，也是一个web服务器。</p>
 <p>考虑这样一段代码：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">提供常用库，输出一个vim-go</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//只是一个main函数</span></span><br><span class="line"><span class="comment">//不知道说什么了</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;vim-go&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>go doc的使用可以接收包名作为参数，也可以不输入任何参数，那么显示觉得就是当前目录下的文档。</p>
+<p>go
+doc的使用可以接收包名作为参数，也可以不输入任何参数，那么显示觉得就是当前目录下的文档。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">&gt; </span><span class="language-bash">go doc</span></span><br><span class="line"><span class="meta prompt_">&gt; </span><span class="language-bash">提供常用库，输出一个vim-go</span></span><br></pre></td></tr></table></figure>
 <p>当然也可以打开web服务器去访问：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">godoc -http=:6060</span><br></pre></td></tr></table></figure>
@@ -1625,7 +1640,9 @@ h_t = o_t \circ tanh(c_t)
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewFile</span><span class="params">(fd <span class="type">int</span>, name <span class="type">string</span>)</span></span> *File &#123;</span><br><span class="line">    <span class="keyword">if</span> fd &lt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//return &amp;File&#123;fd, name, nil, 0&#125;</span></span><br><span class="line">    <span class="keyword">return</span> &amp;File&#123;fd: fd, name: name&#125; <span class="comment">//此时其它字段默认为零值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>与C不同的是，golang返回一个局部变量地址是有效的，因此可以直接合并上面的语句。当然也可以以key：value的方式标出长远，如上。</p>
 <h3 id="make分配">make分配</h3>
-<p>内建函数make(T, args) 的目的不同于 new(T)。它只用于创建切片、映射和信道，并返回类型为 T（而非 <code>*T</code>）的一个已初始化 （而非置零）的值。例如：</p>
+<p>内建函数make(T, args) 的目的不同于
+new(T)。它只用于创建切片、映射和信道，并返回类型为
+T（而非 <code>*T</code>）的一个已初始化 （而非置零）的值。例如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">make</span>([]<span class="type">int</span>, <span class="number">10</span>, <span class="number">100</span>) <span class="comment">//分配一个100个int的数组空间，接着创建一个长度为10，容量为100并且指向该数组前10个元素的切片结构</span></span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>若要返回指针，请用new分配内存</p>
@@ -1636,7 +1653,8 @@ h_t = o_t \circ tanh(c_t)
 <p>若要从更大的缓冲区 b 中读取前 32 个字节，只需对其进行切片即可。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">n, err := f.Read(buf[<span class="number">0</span>:<span class="number">32</span>])</span><br></pre></td></tr></table></figure>
 <h3 id="map">map</h3>
-<p>map的key可以是任何相等性操作符支持的类型， 如整数、浮点数、复数、字符串、指针、接口，结构以及数组，但不能是切片。</p>
+<p>map的key可以是任何相等性操作符支持的类型，
+如整数、浮点数、复数、字符串、指针、接口，结构以及数组，但不能是切片。</p>
 <p>若试图通过map中不存在的键来取值，就会返回与该映射中项的类型对应的零值。</p>
 <p>但这种设计我们不知道到底是不是因为不存在该项而得到零值，因此可以使用这种做法来检查：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> seconds <span class="type">int</span></span><br><span class="line"><span class="keyword">var</span> ok <span class="type">bool</span></span><br><span class="line">seconds, ok = timeZone[tz]</span><br></pre></td></tr></table></figure>
@@ -1652,11 +1670,16 @@ h_t = o_t \circ tanh(c_t)
 <li>进行一次计算；</li>
 </ul>
 <h2 id="接口">接口</h2>
-<p>golang的接口为指定对象的行为提供了一种途径，如果某个类型可以完成这个，那么它就可以被用在这里。通过实现 String 方法，我们可以自定义打印函数，而通过 Write 方法，Fprintf 则能对任何对象产生输出。</p>
-<p>例如一个实现了 sort.Interface 接口的集合就可通过 sort 包中的例程进行排序。该接口包括 Len()、Less(i, j int) bool 以及 Swap(i, j int)。</p>
+<p>golang的接口为指定对象的行为提供了一种途径，如果某个类型可以完成这个，那么它就可以被用在这里。通过实现
+String 方法，我们可以自定义打印函数，而通过 Write 方法，Fprintf
+则能对任何对象产生输出。</p>
+<p>例如一个实现了 sort.Interface 接口的集合就可通过 sort
+包中的例程进行排序。该接口包括 Len()、Less(i, j int) bool 以及 Swap(i, j
+int)。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Sequence []<span class="type">int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Methods required by sort.Interface.</span></span><br><span class="line"><span class="comment">// sort.Interface 所需的方法。</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span></span> Len() <span class="type">int</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(s)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span></span> Less(i, j <span class="type">int</span>) <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> s[i] &lt; s[j]</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s Sequence)</span></span> Swap(i, j <span class="type">int</span>) &#123;</span><br><span class="line">    s[i], s[j] = s[j], s[i]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="接口转换和类型断言">接口转换和类型断言</h3>
-<p>类型选择是类型转换的一种形式：它接受一个接口，通过switch判断选择读经的case，并在某种意义上将其转换为该种类型。以下代码为 fmt.Printf 通过类型选择将值转换为字符串的简化版。</p>
+<p>类型选择是类型转换的一种形式：它接受一个接口，通过switch判断选择读经的case，并在某种意义上将其转换为该种类型。以下代码为
+fmt.Printf 通过类型选择将值转换为字符串的简化版。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Stringer <span class="keyword">interface</span> &#123;</span><br><span class="line">    String() <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> value <span class="keyword">interface</span>&#123;&#125; <span class="comment">// Value provided by caller.</span></span><br><span class="line"><span class="keyword">switch</span> str := value.(<span class="keyword">type</span>) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="type">string</span>:</span><br><span class="line">    <span class="keyword">return</span> str</span><br><span class="line"><span class="keyword">case</span> Stringer:</span><br><span class="line">    <span class="keyword">return</span> str.String()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>一个接口类型的变量可能包含任何类型的值，因此我们需要用类型断言来检查其动态类型，即运行时在变量中存储的值的实际类型。例如我们可以测试某个时刻接口varI是否包含类型T的值：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> v, ok := varI.(T); ok &#123;  <span class="comment">// checked type assertion</span></span><br><span class="line">    Process(v)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// varI is not of type T</span></span><br></pre></td></tr></table></figure>
@@ -1667,16 +1690,22 @@ h_t = o_t \circ tanh(c_t)
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;io&quot;</span></span><br><span class="line">    <span class="string">&quot;log&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fd, err := os.Open(<span class="string">&quot;test.go&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> use fd.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>通过引入空白标识符，则可以顺利通过编译：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;io&quot;</span></span><br><span class="line">    <span class="string">&quot;log&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _ = fmt.Printf <span class="comment">// For debugging; delete when done. // 用于调试，结束时删除。</span></span><br><span class="line"><span class="keyword">var</span> _ io.Reader    <span class="comment">// For debugging; delete when done. // 用于调试，结束时删除。</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fd, err := os.Open(<span class="string">&quot;test.go&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> use fd.</span></span><br><span class="line">    _ = fd</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>还有一种用法，是为了使用其副作用而引入包，比如在 net/http/pprof 包的 init 函数中记录了 HTTP 处理程序的调试信息。它有个可导出的 API， 但大部分客户端只需要该处理程序的记录和通过 Web 页面访问数据。那么可以这样使用：</p>
+<p>还有一种用法，是为了使用其副作用而引入包，比如在 net/http/pprof 包的
+init 函数中记录了 HTTP 处理程序的调试信息。它有个可导出的 API，
+但大部分客户端只需要该处理程序的记录和通过 Web
+页面访问数据。那么可以这样使用：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="string">&quot;net/http/pprof&quot;</span></span><br></pre></td></tr></table></figure>
 <h2 id="错误">错误</h2>
-<p>由于golang的多值返回，我们可以很轻易地返回各种类型的错误提示，按照约定，错误的类型通常为 error，这是一个内建的简单接口。</p>
+<p>由于golang的多值返回，我们可以很轻易地返回各种类型的错误提示，按照约定，错误的类型通常为
+error，这是一个内建的简单接口。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="type">error</span> <span class="keyword">interface</span> &#123;</span><br><span class="line">    Error() <span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="panic">Panic</h3>
 <p>内建的panic函数，会产生一个运行时错误并终止程序，还会在程序终止时打印。比如这样：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CubeRoot</span><span class="params">(x <span class="type">float64</span>)</span></span> <span class="type">float64</span> &#123;</span><br><span class="line">    z := x/<span class="number">3</span>   <span class="comment">// Arbitrary initial value</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">1e6</span>; i++ &#123;</span><br><span class="line">        prevz := z</span><br><span class="line">        z -= (z*z*z-x) / (<span class="number">3</span>*z*z)</span><br><span class="line">        <span class="keyword">if</span> veryClose(z, prevz) &#123;</span><br><span class="line">            <span class="keyword">return</span> z</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// A million iterations has not converged; something is wrong.</span></span><br><span class="line">    <span class="built_in">panic</span>(fmt.Sprintf(<span class="string">&quot;CubeRoot(%g) did not converge&quot;</span>, x))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>由于panic被调用后，程序会终止当前函数的执行，并开始回溯goroutine的栈，当到达栈顶时，程序就会终止。不过我们可以用内建的 recover 函数来重新取回 goroutine 的控制权限并使其恢复正常执行。</p>
-<p>由于在回溯时只有被推迟函数中的代码在运行，因此 recover 只能在被推迟的函数中才有效。</p>
+<p>由于panic被调用后，程序会终止当前函数的执行，并开始回溯goroutine的栈，当到达栈顶时，程序就会终止。不过我们可以用内建的
+recover 函数来重新取回 goroutine 的控制权限并使其恢复正常执行。</p>
+<p>由于在回溯时只有被推迟函数中的代码在运行，因此 recover
+只能在被推迟的函数中才有效。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">server</span><span class="params">(workChan &lt;-<span class="keyword">chan</span> *Work)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> work := <span class="keyword">range</span> workChan &#123;</span><br><span class="line">        <span class="keyword">go</span> safelyDo(work)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">safelyDo</span><span class="params">(work *Work)</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> err := <span class="built_in">recover</span>(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            log.Println(<span class="string">&quot;work failed:&quot;</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">    do(work)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
           
@@ -1812,7 +1841,8 @@ h_t = o_t \circ tanh(c_t)
 <li>字符串值编码为有效的UTF-8的JSON字符串，并且会用Unicode替换无效字节</li>
 </ul>
 <blockquote>
-为了防止某些浏览器会将JSON输出解析为HTML，尖括号<和>被转义为**
+<p>为了防止某些浏览器会将JSON输出解析为HTML，尖括号<和>被转义为<strong>03c</strong>和<strong>03e</strong>。基于相同的原因，符号<strong>&amp;</strong>会被转义为<strong>026</strong></p>
+<p>可以使用调用了SetEscapeHTML(false)的编码器禁止此转义</p>
 </blockquote>
 <ul>
 <li>数组和切片值编码为JSON数组，但了[]字节会被编码为base64编码的字符串，而nil切片编码为空JSON值</li>
@@ -1822,7 +1852,9 @@ h_t = o_t \circ tanh(c_t)
 <p>在golang的结构体中，每个成员变量都可以附带一个Tag说明，因此每个struct字段的编码可以通过存储在以Json为key的tag进行定制化。比如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    UserId   <span class="type">int</span>    <span class="string">`json:&quot;user_id,omitempty&quot; bson:&quot;user_id&quot;`</span></span><br><span class="line">    UserName <span class="type">string</span> <span class="string">`json:&quot;user_name&quot; bson:&quot;user_name&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这些格式化字符串给出了字符的名称，还可以通过逗号在后面加上一系列的选项。tag中如果带有”omitempty”选项，那么如果该字段值为空，就不会输出到JSON串中。</p>
-<p>还有一种特别的情况，如果字段标记为“ - ”，则始终省略该字段。请注意，比较特别的是仍然可以使用标记“ - ，”生成名称为“ - ”的字段。比如：</p>
+<p>还有一种特别的情况，如果字段标记为“ -
+”，则始终省略该字段。请注意，比较特别的是仍然可以使用标记“ -
+，”生成名称为“ - ”的字段。比如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Field is ignored by this package.</span></span><br><span class="line">Field <span class="type">int</span> <span class="string">`json:&quot;-&quot;`</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Field appears in JSON as key &quot;-&quot;.</span></span><br><span class="line">Field <span class="type">int</span> <span class="string">`json:&quot;-,&quot;`</span></span><br></pre></td></tr></table></figure>
 <p>“string”选项表示字段在JSON编码的字符串中存储为JSON。它仅适用于字符串，浮点，整数或布尔类型的字段。在与JavaScript程序通信时，有时会使用这种额外的编码级别。</p>
 <h2 id="其它">其它</h2>
@@ -1837,7 +1869,9 @@ h_t = o_t \circ tanh(c_t)
 <p>接口会被编码为接口中包含的值，nil接口值则被编码为null JSON值</p>
 <p>另外：</p>
 <blockquote>
-<p>Channel, complex, and function values cannot be encoded in JSON. Attempting to encode such a value causes Marshal to return an UnsupportedTypeError.</p>
+<p>Channel, complex, and function values cannot be encoded in JSON.
+Attempting to encode such a value causes Marshal to return an
+UnsupportedTypeError.</p>
 </blockquote>
 <h2 id="例子">例子</h2>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">type</span> ColorGroup <span class="keyword">struct</span> &#123;</span><br><span class="line">		ID     <span class="type">int</span></span><br><span class="line">		Name   <span class="type">string</span></span><br><span class="line">		Colors []<span class="type">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	group := ColorGroup&#123;</span><br><span class="line">		ID:     <span class="number">1</span>,</span><br><span class="line">		Name:   <span class="string">&quot;Reds&quot;</span>,</span><br><span class="line">		Colors: []<span class="type">string</span>&#123;<span class="string">&quot;Crimson&quot;</span>, <span class="string">&quot;Red&quot;</span>, <span class="string">&quot;Ruby&quot;</span>, <span class="string">&quot;Maroon&quot;</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	b, err := json.Marshal(group)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">&quot;error:&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	os.Stdout.Write(b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -2007,8 +2041,7 @@ h_t = o_t \circ tanh(c_t)
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

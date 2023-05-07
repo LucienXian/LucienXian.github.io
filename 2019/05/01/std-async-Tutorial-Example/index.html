@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,13 +332,15 @@
       
 
       
-        <h1 id="stdasync-tutorial-example">std::async Tutorial &amp; Example</h1>
+        <h1 id="stdasync-tutorial-example">std::async Tutorial &amp;
+Example</h1>
 <p>本文将介绍在C++11中如何执行异步任务。</p>
 <h2 id="what-is-stdasync">what is std::async()</h2>
 <p>std::async()是一个函数模版，可以接收一个回调作为参数，并异步执行该函数。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Fn</span>, <span class="keyword">class</span>... Args&gt;</span><br><span class="line">future&lt;<span class="keyword">typename</span> result_of&lt;<span class="built_in">Fn</span>(Args...)&gt;::type&gt; <span class="built_in">async</span> (launch policy, Fn&amp;&amp; fn, Args&amp;&amp;... args);</span><br></pre></td></tr></table></figure>
 <p>返回值是一个future对象，该对象存着异步执行的函数的返回值。</p>
-<p>第一个参数launch policy是一个启动策略，它控制着异步执行的行为，我们可以创建三种异步启动的策略：</p>
+<p>第一个参数launch
+policy是一个启动策略，它控制着异步执行的行为，我们可以创建三种异步启动的策略：</p>
 <ul>
 <li>std::launch::async：传递进来的函数在独立的线程中执行；</li>
 <li>std::launch::deferred：只有某个线程对future对象调用get()的时候才会调用函数；</li>
@@ -534,7 +534,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdasync-tutorial-example"><span class="nav-number">1.</span> <span class="nav-text">std::async Tutorial &amp; Example</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-stdasync"><span class="nav-number">1.1.</span> <span class="nav-text">what is std::async()</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdasync-tutorial-example"><span class="nav-number">1.</span> <span class="nav-text">std::async Tutorial &amp;
+Example</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-stdasync"><span class="nav-number">1.1.</span> <span class="nav-text">what is std::async()</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -576,8 +577,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

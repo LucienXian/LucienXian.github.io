@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -335,7 +333,8 @@
 
       
         <h1 id="use-const-whenever-possible">use const whenever possible</h1>
-<p>关于const的使用，之前的文章里也做过相似的介绍，但《effective C++》里还是做了一些规则推荐，那就来学习一下。</p>
+<p>关于const的使用，之前的文章里也做过相似的介绍，但《effective
+C++》里还是做了一些规则推荐，那就来学习一下。</p>
 <h2 id="函数声明">函数声明</h2>
 <p>讲道理，之前对这种用法并不熟悉，但书上做了很详细的介绍。令函数返回一个常量值在某些情况下是非常有用的。举个例子，考虑有理数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span> &#123;&#125;;</span><br><span class="line"><span class="type">const</span> Rational <span class="keyword">operator</span>* (<span class="type">const</span> Rational&amp; lhs, <span class="type">const</span> Rational&amp; rhs);</span><br></pre></td></tr></table></figure>
@@ -349,7 +348,8 @@
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TextBlock</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="type">const</span> <span class="type">char</span>&amp; <span class="keyword">operator</span>[](std::<span class="type">size_t</span> position) <span class="type">const</span>&#123;... <span class="keyword">return</span> text[position];&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="type">char</span>&amp; <span class="keyword">operator</span>[](std::<span class="type">size_t</span> position)&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">const_char</span>&lt;<span class="type">char</span>&amp;&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">const</span> TextBlock&gt;(*<span class="keyword">this</span>)[position]);</span><br><span class="line">  	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>通过在non-const operator[]经过两次转换，即可以减少代码量，也可以返回non-const值；
+<li>通过在non-const
+operator[]经过两次转换，即可以减少代码量，也可以返回non-const值；
 <ul>
 <li>non-const转换成const是安全转换；</li>
 </ul></li>
@@ -575,8 +575,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,7 +336,9 @@
 <h2 id="为什么使用volatile">为什么使用volatile</h2>
 <p>根据CPP之父的说法：</p>
 <blockquote>
-<p>A volatile specifier is a hint to a compiler that an object may change its value in ways not specified by the language so that aggressive optimizations must be avoided.</p>
+<p>A volatile specifier is a hint to a compiler that an object may
+change its value in ways not specified by the language so that
+aggressive optimizations must be avoided.</p>
 </blockquote>
 <p>直接处理硬件的程序往往会包含这样的数据元素，这些元素可能会被程序之外的过程控制，因此对象的值很有可能会被程序之外修改，这时应该把对象声明为<strong>volatile</strong>。</p>
 <p>声明为volatile的变量在编译器访问它时，编译器就不再对它做任何优化，从而提供稳定的地址访问。例如，系统总是会重新从内存中读取该数据，即便在它前面的指令中已经都读取过数据并存储在寄存器中。</p>
@@ -575,8 +575,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

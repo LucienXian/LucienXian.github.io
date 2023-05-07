@@ -103,13 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="std::future, std::promise and Returning values from Thread std::future对象常与异步一起使用。本文将主要关注使用std::future与std::promise。 一般情况下，我们希望一个线程能够返回一个结果。假设这样的一个场景，我们的应用创建一个线程去压缩文件夹，然后我们希望得到返回的zip包名和大小。  老的方法：在多个线程之">
 <meta property="og:locale">
-<meta property="og:image" content="https://thispointer.com//wp-content/uploads/2015/06/promise.png">
 <meta property="article:published_time" content="2019-04-30T03:14:42.000Z">
 <meta property="article:modified_time" content="2019-04-30T03:15:05.203Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://thispointer.com//wp-content/uploads/2015/06/promise.png">
 
 
 
@@ -160,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -336,7 +332,9 @@
       
 
       
-        <h1 id="stdfuture-stdpromise-and-returning-values-from-thread">std::future, std::promise and Returning values from Thread</h1>
+        <h1
+id="stdfuture-stdpromise-and-returning-values-from-thread">std::future,
+std::promise and Returning values from Thread</h1>
 <p>std::future对象常与异步一起使用。本文将主要关注使用std::future与std::promise。</p>
 <p>一般情况下，我们希望一个线程能够返回一个结果。假设这样的一个场景，我们的应用创建一个线程去压缩文件夹，然后我们希望得到返回的zip包名和大小。</p>
 <ol type="1">
@@ -347,7 +345,8 @@
 <ol start="2" type="1">
 <li>c++11的方法：使用std::future和std::promise</li>
 </ol>
-<p>std::future是一个类模版，对象存储的是future value——一个在内部存储中将在未来分配的值，提供了get()访问，但在这个未来值不可用时，调用get()将会阻塞。</p>
+<p>std::future是一个类模版，对象存储的是future
+value——一个在内部存储中将在未来分配的值，提供了get()访问，但在这个未来值不可用时，调用get()将会阻塞。</p>
 <p>std::promise也是一个类模版，它的对象承诺将来会设置值，每个对象都有一个关联的std::future对象。一个std::promise对象与关联的std::future对象共享数据。</p>
 <h2 id="使用方法">使用方法</h2>
 <ol type="1">
@@ -368,7 +367,10 @@
 </ol>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">promiseObj.<span class="built_in">set_value</span>(<span class="number">45</span>);</span><br></pre></td></tr></table></figure>
 <figure>
-<img src="https://thispointer.com//wp-content/uploads/2015/06/promise.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://thispointer.com//wp-content/uploads/2015/06/promise.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="注意">注意</h2>
 <p>如果在设置值之前销毁了std::promise对象，则关联的std::future对象调用get将会抛出异常。</p>
@@ -547,7 +549,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdfuture-stdpromise-and-returning-values-from-thread"><span class="nav-number">1.</span> <span class="nav-text">std::future, std::promise and Returning values from Thread</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">1.2.</span> <span class="nav-text">注意</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdfuture-stdpromise-and-returning-values-from-thread"><span class="nav-number">1.</span> <span class="nav-text">std::future,
+std::promise and Returning values from Thread</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">1.2.</span> <span class="nav-text">注意</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -589,8 +592,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

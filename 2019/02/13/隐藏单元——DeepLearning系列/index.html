@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -337,30 +335,49 @@
         <h1 id="隐藏单元">隐藏单元</h1>
 <h2 id="概述">概述</h2>
 <p>这是前馈神经网络的一个特有研究问题：如何选择隐藏单元的类型。</p>
-<p>一般来说，整流线性单元是隐藏单元很好的一个默认选择。另外有一些隐藏单元并不是在所有的输入点上都是可微的，流入：<span class="math inline">\(g(z)=max\{0, z\}\)</span>在z=0处是不可微的，这使得g对于基于梯度的学习算法无效。但由于神经网络使用的函数通常对左导数和右导数都有定义，在这种情况下，在z=0的左导数是0，右导数是1。神经网络训练的软件实现通常返回左导数或者右导数的其中一个。</p>
-<p>除非有特别说明，大多数隐藏单元都可以描述为接收输入向量x，计算仿射变换<span class="math inline">\(z = W^Tx+b\)</span>，然后使用一个逐元素的非线性函数<span class="math inline">\(g(z)\)</span>。</p>
+<p>一般来说，整流线性单元是隐藏单元很好的一个默认选择。另外有一些隐藏单元并不是在所有的输入点上都是可微的，流入：<span
+class="math inline">\(g(z)=max\{0,
+z\}\)</span>在z=0处是不可微的，这使得g对于基于梯度的学习算法无效。但由于神经网络使用的函数通常对左导数和右导数都有定义，在这种情况下，在z=0的左导数是0，右导数是1。神经网络训练的软件实现通常返回左导数或者右导数的其中一个。</p>
+<p>除非有特别说明，大多数隐藏单元都可以描述为接收输入向量x，计算仿射变换<span
+class="math inline">\(z =
+W^Tx+b\)</span>，然后使用一个逐元素的非线性函数<span
+class="math inline">\(g(z)\)</span>。</p>
 <h2 id="整流线性单元及其扩展">整流线性单元及其扩展</h2>
-<p>整流线性单元使用激活函数<span class="math inline">\(g(z)=max\{0, z\}\)</span>。</p>
+<p>整流线性单元使用激活函数<span class="math inline">\(g(z)=max\{0,
+z\}\)</span>。</p>
 <p>在这种情况下，整流线性单元在其一半的定义域上输出为0，并且只要整流线性单元处于激活状态，它的导数都能保持比较大并一致。</p>
 <p>整流线性单元通常作用于仿射变换之上： <span class="math display">\[
 h = g(W^Tx+b)
-\]</span> 初始化的时候可以把b的所有元素设置为一个较小的正值，使得整流线性单元在初始时就能对大多数输入呈现激活状态。</p>
-<p>至于扩展，都是基于当z&lt;0时使用了一个非零的斜率：<span class="math inline">\(g(z, \alpha)_i=max(0, z_i) + \alpha_imin(0, z_i)\)</span>。</p>
+\]</span>
+初始化的时候可以把b的所有元素设置为一个较小的正值，使得整流线性单元在初始时就能对大多数输入呈现激活状态。</p>
+<p>至于扩展，都是基于当z&lt;0时使用了一个非零的斜率：<span
+class="math inline">\(g(z, \alpha)_i=max(0, z_i) + \alpha_imin(0,
+z_i)\)</span>。</p>
 <ul>
-<li>绝对值整流（absolute value rectification）固定<span class="math inline">\(\alpha_i=-1\)</span>，它用于图像中的对象识别，寻找在输入照明极性反转下不变的特征是有意义的；</li>
-<li>渗透整流线性单元（Leakly ReLU）将固定<span class="math inline">\(\alpha_i=0.01\)</span>之类的小值；</li>
+<li>绝对值整流（absolute value rectification）固定<span
+class="math inline">\(\alpha_i=-1\)</span>，它用于图像中的对象识别，寻找在输入照明极性反转下不变的特征是有意义的；</li>
+<li>渗透整流线性单元（Leakly ReLU）将固定<span
+class="math inline">\(\alpha_i=0.01\)</span>之类的小值；</li>
 <li>参数化整流线性单元（parametric ReLU）则是将其作为学习的参数；</li>
 </ul>
-<p>maxout单元进一步做了扩展，它将z划分为每组具有k个值的组，买个maxout单元则输出每组中的最大元素： <span class="math display">\[
+<p>maxout单元进一步做了扩展，它将z划分为每组具有k个值的组，买个maxout单元则输出每组中的最大元素：
+<span class="math display">\[
 g(z)_i = max z_j
-\]</span> maxout 单元可以学习具有多达 k 段的分段线性的凸函数，在k足够大的情况下，maxout 单元可以以任意的精确度来近似任何凸函数。</p>
-<h2 id="logistic-sigmoid与双曲正切函数">logistic sigmoid与双曲正切函数</h2>
-<p>在引入整流线性单元之前,大多数神经网络使用 logistic sigmoid 激活函数： <span class="math display">\[
+\]</span> maxout 单元可以学习具有多达 k
+段的分段线性的凸函数，在k足够大的情况下，maxout
+单元可以以任意的精确度来近似任何凸函数。</p>
+<h2 id="logistic-sigmoid与双曲正切函数">logistic
+sigmoid与双曲正切函数</h2>
+<p>在引入整流线性单元之前,大多数神经网络使用 logistic sigmoid 激活函数：
+<span class="math display">\[
 g(z) = \sigma(z)
 \]</span> 或者双曲正切激活函数： <span class="math display">\[
 g(z) = tanh(z)
-\]</span> 其中,<span class="math inline">\(tanh(z)=2\sigma(2z)-1\)</span>。</p>
-<p>sigmoid 单元的广泛饱和性会使得基于梯度的学习变得非常困难。因为这个原因,现在不鼓励将它们用作前馈网络中的隐藏单元。而双曲正切激活函数通常要比 logistic sigmoid 函数表现更好。</p>
+\]</span> 其中,<span
+class="math inline">\(tanh(z)=2\sigma(2z)-1\)</span>。</p>
+<p>sigmoid
+单元的广泛饱和性会使得基于梯度的学习变得非常困难。因为这个原因,现在不鼓励将它们用作前馈网络中的隐藏单元。而双曲正切激活函数通常要比
+logistic sigmoid 函数表现更好。</p>
 <p>而在一些不能使用分段激活函数的场景下，sigmoid的使用会更常见。</p>
 
       
@@ -536,7 +553,8 @@ g(z) = tanh(z)
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%90%E8%97%8F%E5%8D%95%E5%85%83"><span class="nav-number">1.</span> <span class="nav-text">隐藏单元</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E6%B5%81%E7%BA%BF%E6%80%A7%E5%8D%95%E5%85%83%E5%8F%8A%E5%85%B6%E6%89%A9%E5%B1%95"><span class="nav-number">1.2.</span> <span class="nav-text">整流线性单元及其扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logistic-sigmoid%E4%B8%8E%E5%8F%8C%E6%9B%B2%E6%AD%A3%E5%88%87%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">logistic sigmoid与双曲正切函数</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%90%E8%97%8F%E5%8D%95%E5%85%83"><span class="nav-number">1.</span> <span class="nav-text">隐藏单元</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E6%B5%81%E7%BA%BF%E6%80%A7%E5%8D%95%E5%85%83%E5%8F%8A%E5%85%B6%E6%89%A9%E5%B1%95"><span class="nav-number">1.2.</span> <span class="nav-text">整流线性单元及其扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logistic-sigmoid%E4%B8%8E%E5%8F%8C%E6%9B%B2%E6%AD%A3%E5%88%87%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">logistic
+sigmoid与双曲正切函数</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -578,8 +596,7 @@ g(z) = tanh(z)
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,11 +332,13 @@
       
 
       
-        <h1 id="c11-lambda-capturing-member-variables">C++11 Lambda : Capturing Member Variables</h1>
+        <h1 id="c11-lambda-capturing-member-variables">C++11 Lambda : Capturing
+Member Variables</h1>
 <p>本文将介绍如下从外部域捕获成员变量，假设有一个OddCounter类，在其成员函数中使用lambda函数，并需要捕获成员变量：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">OddCounter</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// tracks the count of odd numbers encountered</span></span><br><span class="line">	<span class="type">int</span> mCounter = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="type">int</span> <span class="title">getCount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> mCounter;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">(std::vector&lt;<span class="type">int</span>&gt; &amp; vec)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="comment">// Capturing member variable by value will not work</span></span><br><span class="line">                <span class="comment">// Will result in Compile Error</span></span><br><span class="line">		std::for_each(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>(), [mCounter](<span class="type">int</span> element)&#123;</span><br><span class="line">			<span class="keyword">if</span>(element % <span class="number">2</span>)</span><br><span class="line">				mCounter++; <span class="comment">// Accessing member variable from outer scope</span></span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>这种做法无论是将成员变量传值还是传引用都会出现编译错误。</p>
-<h2 id="capturing-member-variables-inside-lambda-function">Capturing Member variables inside Lambda Function</h2>
+<h2 id="capturing-member-variables-inside-lambda-function">Capturing
+Member variables inside Lambda Function</h2>
 <p>理想的做法是传递this指针的值，这样就可以访问外部成员变量了。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::for_each(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>(), [<span class="keyword">this</span>](<span class="type">int</span> element)&#123;</span><br><span class="line"><span class="comment">//....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -515,7 +515,9 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-lambda-capturing-member-variables"><span class="nav-number">1.</span> <span class="nav-text">C++11 Lambda : Capturing Member Variables</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#capturing-member-variables-inside-lambda-function"><span class="nav-number">1.1.</span> <span class="nav-text">Capturing Member variables inside Lambda Function</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-lambda-capturing-member-variables"><span class="nav-number">1.</span> <span class="nav-text">C++11 Lambda : Capturing
+Member Variables</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#capturing-member-variables-inside-lambda-function"><span class="nav-number">1.1.</span> <span class="nav-text">Capturing
+Member variables inside Lambda Function</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -557,8 +559,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

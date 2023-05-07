@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -354,7 +352,8 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1.<span class="built_in">use_count</span>();</span><br></pre></td></tr></table></figure>
 <p>另外，要将一个指针赋值给shared_ptr，我们不能采用隐式的方式，因为其构造器是采用explicit的方式，所以隐式赋值会报错，但我们可以使用<strong>std::make_shared</strong></p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = <span class="keyword">new</span> <span class="built_in">int</span>(); <span class="comment">// Compile error</span></span><br><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;();</span><br></pre></td></tr></table></figure>
-<h3 id="detaching-the-associated-raw-pointer">Detaching the associated Raw Pointer</h3>
+<h3 id="detaching-the-associated-raw-pointer">Detaching the associated
+Raw Pointer</h3>
 <p>要使shared_ptr对象取消附加其附加指针，可以调用reset()方法。</p>
 <ul>
 <li>无参调用reset：</li>
@@ -369,7 +368,8 @@
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1 = <span class="literal">nullptr</span>;</span><br></pre></td></tr></table></figure>
 <p>shared_ptr可以看作是普通指针，即我们可以对shared_ptr对象使用*和-&gt;与，也可以像其他shared_ptr对象一样进行比较。</p>
-<h2 id="shared_ptr-and-custom-deletor">shared_ptr and Custom Deletor</h2>
+<h2 id="shared_ptr-and-custom-deletor">shared_ptr and Custom
+Deletor</h2>
 <p>在上文说过，shared_ptr对象超出作用域的时候，会递减引用计数，当计数为0时，默认情况下会调用<strong>delete</strong>函数删除指针。但如果我们的shared_ptr指向的是一个数组，就应该使用delete[]了。</p>
 <p>因此，为了避免默认调用的错误，我们可以自定义删除器。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">deleter</span><span class="params">(Sample * x)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	std::cout &lt;&lt; <span class="string">&quot;DELETER FUNCTION CALLED\n&quot;</span>;</span><br><span class="line">	<span class="keyword">delete</span>[] x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">std::shared_ptr&lt;Sample&gt; <span class="title">p3</span><span class="params">(<span class="keyword">new</span> Sample[<span class="number">12</span>], deleter)</span></span>;</span><br></pre></td></tr></table></figure>
@@ -385,7 +385,8 @@
 </ul>
 <p>当我们创建shared_ptr对象而不分配任何值时，它就是空的。而对于原生的指针来说，它会包含一个垃圾值。因此对于shared_ptr对象，我们可以这样检查：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;Sample&gt; ptr3;</span><br><span class="line"><span class="keyword">if</span>(!ptr3)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;Yes, ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">if</span>(ptr3 == <span class="literal">NULL</span>)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">if</span>(ptr3 == <span class="literal">nullptr</span>)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
-<h2 id="create-shared_ptr-objects-carefully">Create shared_ptr objects carefully</h2>
+<h2 id="create-shared_ptr-objects-carefully">Create shared_ptr objects
+carefully</h2>
 <p>在创建shared_ptr对象时，有些情况需要注意的：</p>
 <ol type="1">
 <li>不要使用相同的原始指针来创建多个shared_ptr对象，因为不同的shared_ptr对象并不知道它们正在与其它shared_ptr对象共享指针；</li>
@@ -533,7 +534,8 @@
 <p>那么我们的API就可以这样调用了：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::string msg = <span class="built_in">buildCompleteMessage</span>(<span class="string">&quot;SampleString&quot;</span>, &amp;encryptDataByLetterInc);</span><br><span class="line">    std::cout&lt;&lt;msg&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
 <h2 id="function-objects-functors">Function Objects &amp; Functors</h2>
-<p>首先来看看什么是函数对象，实际上就是一个带状态的回调。一个重载了operator()的类对应的对象就是 Function Object or Functor，比如：</p>
+<p>首先来看看什么是函数对象，实际上就是一个带状态的回调。一个重载了operator()的类对应的对象就是
+Function Object or Functor，比如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyFunctor</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">int</span> a , <span class="type">int</span> b)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a+b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//调用时</span></span><br><span class="line">MyFunctor funObj;</span><br><span class="line">std::cout&lt;&lt;<span class="built_in">funObj</span>(<span class="number">2</span>,<span class="number">3</span>)&lt;&lt;std::endl;</span><br><span class="line">funObj.<span class="built_in">operator</span>()(<span class="number">2</span>,<span class="number">3</span>);</span><br></pre></td></tr></table></figure>
 <p>还是以上面的API为例子，假设我们系统API以三种不同的加密方式调用，加密方式分别是对每个字母加一、加二或者减一。如果是用函数指针的方式，我们需要定义三个不同函数，但实际上函数体是类似的。</p>
 <p>但如果使用函数对象，那就可以在类里面绑定状态变量。</p>
@@ -662,15 +664,19 @@
         
           
             <h1 id="unordered-map">Unordered Map</h1>
-<h2 id="basic-usage-detail-and-example">Basic Usage Detail and Example</h2>
-<p>Unordered map是C++11新出的特性，它提供了一种map的实现机制，可以存储键值对。Unordered map内部实现了哈希函数，当我们插入一个新的元素时：</p>
+<h2 id="basic-usage-detail-and-example">Basic Usage Detail and
+Example</h2>
+<p>Unordered
+map是C++11新出的特性，它提供了一种map的实现机制，可以存储键值对。Unordered
+map内部实现了哈希函数，当我们插入一个新的元素时：</p>
 <ul>
 <li>首先对key做哈希函数处理，然后选择一个合适的bucket；</li>
 <li>比较该bucket下的key是否重复；</li>
 <li>在不重复的情况下，添加该元素到bucket中；</li>
 </ul>
 <p>因此Unordered map时无序的，并且其搜索元素的时间复杂度为O(1)。</p>
-<h2 id="different-ways-to-initialize-an-unordered_map">Different Ways to initialize an unordered_map</h2>
+<h2 id="different-ways-to-initialize-an-unordered_map">Different Ways to
+initialize an unordered_map</h2>
 <p>unordered map提供了三种不同的重载构造器：</p>
 <ul>
 <li>通过initializer_list初始化</li>
@@ -687,7 +693,8 @@
 <h2 id="searching-in-unordered_map">Searching in unordered_map</h2>
 <p>unordered_map提供了一个成员函数find()，改函数接受一个key作为参数，在找到元素的时候就会返回一个相对应的迭代器，否则会返回map的尾部迭代器。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">find</span> <span class="params">( <span class="type">const</span> key_type&amp; k )</span></span>;</span><br></pre></td></tr></table></figure>
-<h2 id="different-ways-to-insert-elements-in-an-unordered_map">Different ways to insert elements in an unordered_map</h2>
+<h2 id="different-ways-to-insert-elements-in-an-unordered_map">Different
+ways to insert elements in an unordered_map</h2>
 <p>unordered_map提供了多种insert()成员函数的重载版本，我们来一一讨论：</p>
 <ul>
 <li>通过initializer_list插入多个元素；</li>
@@ -695,7 +702,8 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">insert</span> <span class="params">( initializer_list&lt;value_type&gt; il )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Example</span></span><br><span class="line">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; wordMap;</span><br><span class="line"><span class="comment">// Inserting elements through an initializer_list</span></span><br><span class="line">wordMap.<span class="built_in">insert</span>(&#123; &#123;<span class="string">&quot;First&quot;</span>, <span class="number">1</span>&#125;, &#123;<span class="string">&quot;Second&quot;</span>, <span class="number">2</span>&#125;, &#123;<span class="string">&quot;Third&quot;</span>, <span class="number">3</span>&#125; &#125; );</span><br></pre></td></tr></table></figure>
 <p>这种插入方式有一个缺点，因为insert()返回的是void类型，因此在添加重复key的元素时，用户无法确定插入是否成功。</p>
 <ul>
-<li>unordered_map提供了一个重载版本，它接受std::pair of key – value 作为参数，并返回一对迭代器和bool变量，通过该bool变量我们就可以判断插入是否成功；</li>
+<li>unordered_map提供了一个重载版本，它接受std::pair of key – value
+作为参数，并返回一对迭代器和bool变量，通过该bool变量我们就可以判断插入是否成功；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">pair&lt;iterator,<span class="type">bool</span>&gt; <span class="title">insert</span> <span class="params">( <span class="type">const</span> value_type&amp; val )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> std::unordered_map&lt;std::string, <span class="type">int</span>&gt;::iterator UOMIterator;</span><br><span class="line"><span class="comment">// Pair of Map Iterator and bool value</span></span><br><span class="line">std::pair&lt; UOMIterator , <span class="type">bool</span>&gt; result;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Inserting an element through pair</span></span><br><span class="line">result = wordMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>&lt;std::string, <span class="type">int</span>&gt;(<span class="string">&quot;Second&quot;</span>, <span class="number">6</span>));</span><br><span class="line"><span class="keyword">if</span>(result.second == <span class="literal">false</span>)</span><br><span class="line">      std::cout&lt;&lt;<span class="string">&quot;Element &#x27;Second&#x27; not inserted again&quot;</span>&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
 <h2 id="erasing-an-element">Erasing an element</h2>
@@ -715,7 +723,8 @@
 <ul>
 <li>内部实现：与std::unordered_map不同，std::map是通过二叉搜索树存储元素的，因此它能通过key进行排序；</li>
 <li>内存使用：std::unordered_map需要更多的内存来存储哈希表；</li>
-<li>搜索的时间复杂度：由于std::map是树的结构，因此其时间复杂度为O(log n)，而std::unordered_map最好的时间复杂度是O(1)，最坏的情况是O(n)，即所有元素在同一个bucket；</li>
+<li>搜索的时间复杂度：由于std::map是树的结构，因此其时间复杂度为O(log
+n)，而std::unordered_map最好的时间复杂度是O(1)，最坏的情况是O(n)，即所有元素在同一个bucket；</li>
 <li>自定义key的使用方法：使用自定义key时，对于std::map来说，需要重载&lt;操作符或者传入外部的comparator比较器，对于std::unordered_map则需要提供std::hash&lt;K&gt;，同时我们还需要重载==操作符；</li>
 </ul>
 
@@ -838,27 +847,35 @@
         
           
             <h1 id="c11-stdtuples">C++11: std::tuples</h1>
-<h2 id="stdtuple-tutorial-examples">std::tuple Tutorial &amp; Examples</h2>
-<h3 id="what-is-stdtuple-and-why-do-we-need-it">what is std::tuple and why do we need it</h3>
+<h2 id="stdtuple-tutorial-examples">std::tuple Tutorial &amp;
+Examples</h2>
+<h3 id="what-is-stdtuple-and-why-do-we-need-it">what is std::tuple and
+why do we need it</h3>
 <p>std::tuple是一种可以将固定大小的异构值绑定在一起的类型。在创建元组对象时，我们需要将元素的类型指定为模版参数。</p>
 <h3 id="creating-a-stdtuple-object">Creating a std::tuple object</h3>
 <p>首先是要include进头文件：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br></pre></td></tr></table></figure>
-<p>我们可以声明一个包含了int, double和string类型的tuple，实际上这种做法可以帮助我们从一个函数中返回多种值，避免创建不必要structure。</p>
+<p>我们可以声明一个包含了int,
+double和string类型的tuple，实际上这种做法可以帮助我们从一个函数中返回多种值，避免创建不必要structure。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::tuple&lt;<span class="type">int</span>, <span class="type">double</span>, std::string&gt; <span class="title">result</span><span class="params">(<span class="number">7</span>, <span class="number">9.8</span>, <span class="string">&quot;text&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<h3 id="getting-elements-from-a-stdtuple">Getting elements from a std::tuple</h3>
+<h3 id="getting-elements-from-a-stdtuple">Getting elements from a
+std::tuple</h3>
 <p>我们可以使用std::get函数获得隐藏在tuple对象中的元素，方法是将索引值指定为模版参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> iVal = std::<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;(result);</span><br></pre></td></tr></table></figure>
-<h3 id="getting-out-of-range-value-from-tuple">Getting Out Of Range value from tuple</h3>
+<h3 id="getting-out-of-range-value-from-tuple">Getting Out Of Range
+value from tuple</h3>
 <p>从tuple中获取索引大于元素数量的tuple元素会引起编译错误：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> iVal2 = std::<span class="built_in">get</span>&lt;<span class="number">4</span>&gt;(result); <span class="comment">// Compile error</span></span><br></pre></td></tr></table></figure>
-<h3 id="wrong-type-cast-while-getting-value-from-tuple">Wrong type cast while getting value from tuple</h3>
+<h3 id="wrong-type-cast-while-getting-value-from-tuple">Wrong type cast
+while getting value from tuple</h3>
 <p>接收类型与tuple里面元素不符合也会导致编译错误：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string strVal2 = std::<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;(result); <span class="comment">// Compile error</span></span><br></pre></td></tr></table></figure>
-<h3 id="getting-value-from-tuple-by-dynamic-index">Getting value from tuple by dynamic index</h3>
+<h3 id="getting-value-from-tuple-by-dynamic-index">Getting value from
+tuple by dynamic index</h3>
 <p>提供给std::get的模版参数必须是编译期常量，否则会引起编译错误：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="type">double</span> dVal2 = std::<span class="built_in">get</span>&lt;x&gt;(result); <span class="comment">// Compile error</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="comment">// Get second double value from tuple</span></span><br><span class="line"><span class="type">double</span> dVal3 = std::<span class="built_in">get</span>&lt;i&gt;(result);</span><br></pre></td></tr></table></figure>
-<h2 id="make_tuple-tutorial-example">make_tuple Tutorial &amp; Example</h2>
+<h2 id="make_tuple-tutorial-example">make_tuple Tutorial &amp;
+Example</h2>
 <h3 id="initializing-a-stdtuple">Initializing a std::tuple</h3>
 <p>我们可以通过传递参数到构造器的方式来初始化std::tuple：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::tuple&lt;<span class="type">int</span>, <span class="type">double</span>, std::string&gt; result1 &#123; <span class="number">22</span>, <span class="number">19.28</span>, <span class="string">&quot;text&quot;</span> &#125;;</span><br></pre></td></tr></table></figure>
@@ -987,27 +1004,40 @@
       
         
           
-            <h1 id="using-paxos-to-build-a-scalable-consistent-and-highly-available-datastore">Using Paxos to Build a Scalable, Consistent, and Highly Available Datastore</h1>
+            <h1
+id="using-paxos-to-build-a-scalable-consistent-and-highly-available-datastore">Using
+Paxos to Build a Scalable, Consistent, and Highly Available
+Datastore</h1>
 <h2 id="abstract">ABSTRACT</h2>
 <p>Spinnaker是一个实验性数据存储区，旨在在单个数据中心的大型商用服务器集群上运行。这篇文章介绍了Spinnaker基于Paxos的复制协议。Paxos的使用确保Spinnaker中的数据分区可用于读取和写入，只要其复制品的大部分存活。与最中一致的数据存储区相比，Spinnaker在读取时可以更快，但写入速度只有5%-10%。</p>
 <h2 id="introduction">INTRODUCTION</h2>
 <p>对数据库功能进行扩展时，一个有效的方法是在服务器集群使用手动分片，集群的每个节点负责部分数据并独立运行实例。后来也出现了新的数据库体系结构，可以进行自动化分片和负载平衡。</p>
 <p>除了扩展要求外，还需要实现某种复制策略以实现高可用性和容错，一种可行方案是使用同步主从复制。但这不是一个理想的方法：</p>
-<h3 id="limitations-of-master-slave-replication-and-the-case-for-paxos">Limitations of Master-Slave Replication and the Case for Paxos</h3>
+<h3
+id="limitations-of-master-slave-replication-and-the-case-for-paxos">Limitations
+of Master-Slave Replication and the Case for Paxos</h3>
 <p>在传统的双向同步复制中，很可能存在这样的问题：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig1.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>随着时间序列a-b-c-d的进行，从节点在b崩溃，在d恢复，主节点在c接受完写入后崩溃。此时从节点无法获取最新状态。因为根据要求，所有的写入都必须要路由到master，再由master的日志发送到slave。</p>
-<p>因此，三向复制通常与商品服务器一起使用，可以避免其中一个节点数据丢失带来的问题或者便于在线升级。当有3个或多个副本时，Paxos协议被广泛认为是唯一经过验证的解决方案。Paxos解决了在2F + 1副本状态达成共识的一般问题，同时可以解决F故障。但paxos过于复杂和缓慢。</p>
-<h3 id="strong-vs.-eventual-consistency">Strong vs. Eventual Consistency</h3>
+<p>因此，三向复制通常与商品服务器一起使用，可以避免其中一个节点数据丢失带来的问题或者便于在线升级。当有3个或多个副本时，Paxos协议被广泛认为是唯一经过验证的解决方案。Paxos解决了在2F
++
+1副本状态达成共识的一般问题，同时可以解决F故障。但paxos过于复杂和缓慢。</p>
+<h3 id="strong-vs.-eventual-consistency">Strong vs. Eventual
+Consistency</h3>
 <p>在分布式系统中，一致性模型描述了不同副本如何保持同步。强一致性保证所有副本看起来与应用程序完全相同，这是构建应用程序的理想属性。CAP定理中提出，一致性，可用性和分区容差，最多只能保证两个。</p>
 <h3 id="spinnaker">Spinnaker</h3>
-<p>本文介绍了Spinnaker环境中一致性复制问题的解决方案，这是一个实验性数据存储，旨在在单个数据中心的大型商用服务器集群上运行。Spinnaker具有基于密钥的范围分区，3向复制和事务性get-put API。</p>
+<p>本文介绍了Spinnaker环境中一致性复制问题的解决方案，这是一个实验性数据存储，旨在在单个数据中心的大型商用服务器集群上运行。Spinnaker具有基于密钥的范围分区，3向复制和事务性get-put
+API。</p>
 <p>对于复制，Spinnaker使用基于Paxos的协议，该协议将日志提交和恢复处理集成在一起。Spinnaker是CA系统的一个示例。</p>
 <h2 id="related-work">RELATED WORK</h2>
 <h3 id="two-phase-commit">Two-Phase Commit</h3>
-<p>2PC是维持副本一致性的方法之一，具体可以<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2018/12/22/Two-phase-Commit-protocol/">参考</a>。</p>
+<p>2PC是维持副本一致性的方法之一，具体可以<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2018/12/22/Two-phase-Commit-protocol/">参考</a>。</p>
 <p>由于其性能较差，所以一般不会使用。</p>
 <h3 id="database-replication">Database Replication</h3>
 <p>与spinnaker相比，数据库备份主要关注在单个未分区数据库的上下文。</p>
@@ -1018,29 +1048,39 @@
 <h2 id="data-model-and-api">DATA MODEL AND API</h2>
 <p>Spinnaker的数据模型和api与Bitable类似。数据以表格和行列的形式组成，每一行有一个唯一ID，并且包含了多个列（每一列又有其版本号和值）。至于API则是：</p>
 <ul>
-<li>get(key, colname, consistent): consistent是一个flag，true时选择强一致性，返回最新的值</li>
+<li>get(key, colname, consistent):
+consistent是一个flag，true时选择强一致性，返回最新的值</li>
 <li>put(key, colname, colvalue)</li>
 <li>delete(key, colname)</li>
-<li>conditionalPut(key, colname, value, v)：v代表版本号，插入时该列的版本需等于'v'</li>
+<li>conditionalPut(key, colname, value,
+v)：v代表版本号，插入时该列的版本需等于'v'</li>
 <li>conditionalDelete(key, colname, v)</li>
 </ul>
-<p>版本号是单调递增的整数，由Spinnaker管理并通过其get API暴露出去，因此我们可以这样使用api来更新某个计数器：</p>
+<p>版本号是单调递增的整数，由Spinnaker管理并通过其get
+API暴露出去，因此我们可以这样使用api来更新某个计数器：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c = <span class="built_in">get</span>(key, “c”, consistent=<span class="literal">true</span>);</span><br><span class="line">ret = <span class="built_in">conditionalPut</span>(key, “c”, c.value + <span class="number">1</span>, c.version);</span><br></pre></td></tr></table></figure>
 <p>每个API调用都作为单个操作事务执行。</p>
 <h2 id="architecture">ARCHITECTURE</h2>
 <p>本文主要介绍Spinnaker的架构。</p>
 <p>Spinnaker通过范围分区的方式将一个表的行分布到集群中。以下图为例，这个Spinnaker集群有5个节点，每个节点都有一个key范围，这个范围会被备份到后面的N-1个节点中（这里N为3）。这样节点A-B-C形成key范围[0,199]的群组，节点B-C-D形成key范围为[200,399]的群组。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig2.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig2.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="node-architecture">Node Architecture</h3>
 <p>Spinnaker每个节点都包含多个组件，每个组件都是线程安全的，这样就可以多线程地支持节点上三个key范围的其中一个使用。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/Spinnaker_fig3.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/Spinnaker_fig3.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>每个节点的群组都有自己独立的逻辑LSN，以便共享相同的日志。</p>
 <ul>
-<li>commit queue是用来追踪pending的写入，在接收到群组足够的答应之后此才会将写入提交</li>
+<li>commit
+queue是用来追踪pending的写入，在接收到群组足够的答应之后此才会将写入提交</li>
 <li>memtable则是用来放置提交的写入，定期排序并刷新到称为SSTable的不可变磁盘结构中</li>
 <li>SSTables按密钥和列名称编制索引，以便高效访问，并在后台中合并小的SSTables</li>
 </ul>
@@ -1052,50 +1092,77 @@
 <p>首先是每个群组都会有一个leader，而其它两个节点就是follower。这个协议有两个阶段：一是leader选举，后面则是称为quorum的阶段，leader会提出写入，follower会接受这个提议。</p>
 <p>下图就是稳定状态下的复制协议流程：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig4.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig4.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>首先是客户端提交写入W，被路由到相关key范围的leader节点。leader并行地启动日志刷到磁盘、将W添加到commit queue并发送一个消息到followers。</p>
-<p>follower在接收到消息后，将W日志记录到磁盘，附加W到commit queue，并对leader作出应答。</p>
+<p>首先是客户端提交写入W，被路由到相关key范围的leader节点。leader并行地启动日志刷到磁盘、将W添加到commit
+queue并发送一个消息到followers。</p>
+<p>follower在接收到消息后，将W日志记录到磁盘，附加W到commit
+queue，并对leader作出应答。</p>
 <p>leader收到至少一个应答后就会将W写入memtable。</p>
-<p>另外，leader会周期性地发送异步消息给followers，以让followers将到某个LSN范围内的pending写入应用到memtable。对于强一致性来说。所有的读取都路由到leader；而时间轴一致性则可以路由到任意节点。因此由上图可得，一共会有三次log force和四次消息传递。</p>
+<p>另外，leader会周期性地发送异步消息给followers，以让followers将到某个LSN范围内的pending写入应用到memtable。对于强一致性来说。所有的读取都路由到leader；而时间轴一致性则可以路由到任意节点。因此由上图可得，一共会有三次log
+force和四次消息传递。</p>
 <h3 id="conditional-put">Conditional Put</h3>
-<p>Conditional Put与常规put的唯一区别就是前者需要检查版本是否匹配，如果不符合，不会写入任何数据，并且会向客户端返回错误代码。Conditional Put在组群的每个节点上具有相同的结果。</p>
+<p>Conditional
+Put与常规put的唯一区别就是前者需要检查版本是否匹配，如果不符合，不会写入任何数据，并且会向客户端返回错误代码。Conditional
+Put在组群的每个节点上具有相同的结果。</p>
 <h2 id="recovery">RECOVERY</h2>
 <p>接下来会讨论一个群组在某个节点挂掉后如何恢复。一个属于三群组的节点是共享日志、并行恢复的，因此这里主要以一个群组为例。</p>
 <h3 id="follower-recovery">Follower Recovery</h3>
 <p>follower的恢复有两个阶段：local recovery和catch up。</p>
-<p>首先假设f.cmt和f.lst分别是follower最近提交的日志LSN和最后的LSN，在local recovery阶段，follower会重播f.cmt之前的日志记录，至于f.cmt之后的，在catch up阶段，follower会先通知leader它的f.cmt，leader会将f.cmt之后提交的写入作为应答，然后follower会阻塞其他的写入，重播这些日志。</p>
-<p>由于实际中，一个节点最旧的那部分日志很可能已经被SSTable捕获，如果catch up阶段需要，leader无法访问这部分日志。因此SSTable会记录其包含写入的日志LSN范围，在catch up无法满足要求时，SSTable会帮助获取这部分日志。</p>
-<h4 id="logical-truncation-of-the-followers-log"><em>Logical Truncation of the Follower’s Log</em></h4>
+<p>首先假设f.cmt和f.lst分别是follower最近提交的日志LSN和最后的LSN，在local
+recovery阶段，follower会重播f.cmt之前的日志记录，至于f.cmt之后的，在catch
+up阶段，follower会先通知leader它的f.cmt，leader会将f.cmt之后提交的写入作为应答，然后follower会阻塞其他的写入，重播这些日志。</p>
+<p>由于实际中，一个节点最旧的那部分日志很可能已经被SSTable捕获，如果catch
+up阶段需要，leader无法访问这部分日志。因此SSTable会记录其包含写入的日志LSN范围，在catch
+up无法满足要求时，SSTable会帮助获取这部分日志。</p>
+<h4 id="logical-truncation-of-the-followers-log"><em>Logical Truncation
+of the Follower’s Log</em></h4>
 <p>前面提到过，f.cmt之后的写入状态是无法确定的，因为leader可能尚未提交，也可能旧leader提交了，但其挂掉后，新leader丢弃了部分日志。</p>
-<p>为了解决这个问题，我们采用的是logical truncation的方法，则将f.cmt与f.lst之间日志的LSN记录到LSN的跳表中，如下：</p>
+<p>为了解决这个问题，我们采用的是logical
+truncation的方法，则将f.cmt与f.lst之间日志的LSN记录到LSN的跳表中，如下：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig5.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig5.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="leader-takeover">Leader Takeover</h3>
 <p>当leader挂掉时，一个集群的key范围将变得不可写入，新leader会被选出，并保证老的leader的所有commit日志都会被包括进来。</p>
 <p>如果老的leader挂掉了，有些可能在follower的处于pending状态下的，但已经在老leader里commit的日志。新leader的解决方法如下：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig6.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig6.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="leader-election">LEADER ELECTION</h2>
 <p>本文主要描述Spinnaker的leader选举协议，该协议是基于每个群组运行。当一个群组的leader挂掉或者系统重启后本地恢复时，leader的选举就会被触发。</p>
-<h3 id="zookeepers-data-model-and-api">Zookeeper’s Data Model and API</h3>
+<h3 id="zookeepers-data-model-and-api">Zookeeper’s Data Model and
+API</h3>
 <p>Zookeeper的数据模型与文件系统的目录树类似，树中的节点都由从根开始的路径标示，例如/a/b/c。这些znode包含了相关的二进制数据。</p>
 <p>znode既可以是持久化的也可以是临时的，另外znode还可以包含一个顺序属性，使Zookeeper在创建时为znode添加一个唯一的，单调递增的标识符。</p>
 <h3 id="the-leader-election-protocol">The Leader Election Protocol</h3>
 <p>每个Spinnaker节点都包含一个Zookeeper客户端。</p>
 <p>假设r是进行选举的群组的key范围，那么选举所需要的信息都存储在Zookeeper的/r下。leader选举之前会有一个节点清除上一轮leader选举的状态。紧接着，群组的节点会宣称自己是candidate，此时会添加一个临时的znode在目录/r/candidates下。一旦有大多数的节点成为了candidate，就选择最大lst的节点作为leader。具体过程如下：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig7.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/spinnaker_fig7.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="discussion">DISCUSSION</h2>
-<h3 id="availability-and-durability-guarantees">Availability and Durability Guarantees</h3>
+<h3 id="availability-and-durability-guarantees">Availability and
+Durability Guarantees</h3>
 <p>使用N=3的默认备份设置时，Spinnaker会在日志成为大多数时才会真正commit。只要大多数节点启动，群组就可以继续进行强一致的读写操作。</p>
-<p>在正常情况下，即使其中3个节点中的2个永久失败，群组也不会丢失已发送的数据。 但是，如果一个群组的领导者及其一个follower在快速连续中永久失败，那么一个小写的commit窗口可能会丢失。</p>
+<p>在正常情况下，即使其中3个节点中的2个永久失败，群组也不会丢失已发送的数据。
+但是，如果一个群组的领导者及其一个follower在快速连续中永久失败，那么一个小写的commit窗口可能会丢失。</p>
 <h3 id="multi-operation-transactions">Multi-Operation Transactions</h3>
 <p>目前，Spinnaker中的每个API调用都作为单个操作事务执行，但可以通过对其复制协议和恢复过程进行相当适度的扩展来支持多操作事务。</p>
-<p>基本思想是让事务创建多个日志记录，但仅在提交时为一批日志记录调用复制协议。 然后在恢复期间，首先使用Paxos将日志的副本置于一致状态，然后是本地（每个节点）redo和撤消恢复过程。</p>
+<p>基本思想是让事务创建多个日志记录，但仅在提交时为一批日志记录调用复制协议。
+然后在恢复期间，首先使用Paxos将日志的副本置于一致状态，然后是本地（每个节点）redo和撤消恢复过程。</p>
 
           
         
@@ -1224,13 +1291,17 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::initialzer_list&lt;<span class="type">int</span>&gt; data = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
 <p>当编译器看到这样的形式时<strong>{a,b,c}</strong>，它会自动创建一个这样的对象<strong>std::initialzer_list&lt;T&gt;</strong>，另外像vector或者list之类的容器，也实现了一个参数化的构造器：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;T&gt;::<span class="built_in">vector</span>&lt;T&gt;(initializer_list&lt;T&gt;  elements)</span><br><span class="line">&#123;</span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="using-stdinitializer_list-in-constructors-to-initialize-member-variables">Using std::initializer_list in constructors to initialize member variables</h2>
+<h2
+id="using-stdinitializer_list-in-constructors-to-initialize-member-variables">Using
+std::initializer_list in constructors to initialize member
+variables</h2>
 <p>我们也可以用<strong>std::initializer_list&lt;T&gt;</strong>去初始化成员变量，假设我们有一个这样的类：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span> &#123;</span><br><span class="line">    <span class="type">int</span> mX;</span><br><span class="line">    <span class="type">int</span> mY;</span><br><span class="line">    <span class="type">int</span> mZ;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Point</span>(<span class="type">int</span> a, <span class="type">int</span> b, <span class="type">int</span> c) :</span><br><span class="line">        <span class="built_in">mX</span>(a), <span class="built_in">mY</span>(b), <span class="built_in">mZ</span>(c) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      	std::cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; mX &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; mY &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; mZ &lt;&lt; <span class="string">&quot;)\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>我们可以直接传递一个<strong>initializer_list</strong>作为参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point <span class="title">pointobj</span><span class="params">(&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]&#125;)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>但如果我们有一个构造器，其参数恰好就是std::initializer_list&lt;<strong>T</strong>&gt;，那么它就会调用该构造起，而不是调用以上三参数形式的构造起。</p>
-<h2 id="how-to-initialize-a-map-in-one-line-using-initialzer_list">How to Initialize a map in one line using initialzer_list ?</h2>
+<h2 id="how-to-initialize-a-map-in-one-line-using-initialzer_list">How
+to Initialize a map in one line using initialzer_list ?</h2>
 <p>同样的，我们也可以用<strong>std::initialzer_list&lt;T&gt;</strong>初始化一个map：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">std::map&lt;std::string, <span class="type">int</span>&gt; mapOfMarks = &#123;</span><br><span class="line">		&#123;<span class="string">&quot;Riti&quot;</span>,<span class="number">2</span>&#125;,</span><br><span class="line">		&#123;<span class="string">&quot;Jack&quot;</span>,<span class="number">4</span>&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>相对应的，编译器会在内部创建这样的一个对象：</p>
@@ -1354,7 +1425,8 @@
       
         
           
-            <h1 id="move-contsructor-rvalue-references">Move Contsructor &amp; rvalue References</h1>
+            <h1 id="move-contsructor-rvalue-references">Move Contsructor &amp;
+rvalue References</h1>
 <h2 id="problem-of-temporary-objects">Problem of Temporary Objects</h2>
 <p>这篇文章的主要目的是研究如何使用move语义去降低内存中临时对象的负载。每次从函数中返回一个对象时，都会有一个临时对象被创建出来，然后进行拷贝。最终我们将会创建出两个对象，但实质上我们只需要一个。</p>
 <p>举个例子，我们有一个容器类：</p>
@@ -1370,7 +1442,10 @@
 <li>一个是在加入vector中使用Container类的拷贝构造函数创建出来的；</li>
 </ul>
 <p>这样每一个对象，都会带来两次在heap上创建数组。</p>
-<h2 id="solving-problem-of-temporary-objects-using-rvalue-references-move-constructor">Solving Problem of Temporary Objects using rvalue references &amp; Move Constructor</h2>
+<h2
+id="solving-problem-of-temporary-objects-using-rvalue-references-move-constructor">Solving
+Problem of Temporary Objects using rvalue references &amp; Move
+Constructor</h2>
 <p>getContainer()函数实际上是一个右值，所以可以被右值引用指向。因此为了实现这个目的，我们可以重载一个新的构造器，即move构造器：</p>
 <h2 id="move-constructor">Move Constructor</h2>
 <p>Move构造函数将右值引用作为参数，并重载该函数。在move构造函数中，我们只是将传递对象的成员变量move到新对象的成员变量中，而不是分配新内存。</p>
@@ -1509,13 +1584,16 @@
 <p>getData()是一个右值，在赋值之后这个临时值就失效了，里面的data是拷贝出来的，因此我们不能取其地址。</p>
 <h2 id="is-rvalue-immutable-in-c">Is rvalue immutable in C++</h2>
 <p>虽然我们不能获取右值的地址，但我们能根据右值的数据类型去修改其。</p>
-<h3 id="rvalues-of-builtin-data-type-is-immutable">rvalues of builtin data type is Immutable</h3>
+<h3 id="rvalues-of-builtin-data-type-is-immutable">rvalues of builtin
+data type is Immutable</h3>
 <p>我们无法修改内置的数据类型，例如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(x+<span class="number">7</span>) = <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">getData</span>() = <span class="number">9</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Both Compile Error</span></span><br></pre></td></tr></table></figure>
-<h3 id="rvalue-of-user-defined-data-type-is-not-immutable">rvalue of User Defined data type is not Immutable</h3>
+<h3 id="rvalue-of-user-defined-data-type-is-not-immutable">rvalue of
+User Defined data type is not Immutable</h3>
 <p>如果右值是用户定义的数据类型，我们可以在同一个表达式中使用成员函数去修改右值：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">		<span class="type">int</span> mAge;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Person</span>() &#123;</span><br><span class="line">      	mAge = <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">incrementAge</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      	mAge = mAge + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="function">Person <span class="title">getPerson</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">Person</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">getPerson</span>().<span class="built_in">incrementAge</span>(); <span class="comment">// persist in single expression</span></span><br></pre></td></tr></table></figure>
-<h2 id="what-is-rvalue-reference-in-c11">What is rvalue reference in C++11</h2>
+<h2 id="what-is-rvalue-reference-in-c11">What is rvalue reference in
+C++11</h2>
 <h3 id="lvalue-references">lvalue references</h3>
 <p>在C++11以前只有引用，即指向现存变量的别名。</p>
 <p>c++11将原来的引用变成了左值引用，只能引用左值：</p>
@@ -1642,7 +1720,8 @@
       
         
           
-            <h1 id="packaged_task-example-and-tutorial">packaged_task&lt;&gt; Example and Tutorial</h1>
+            <h1 id="packaged_task-example-and-tutorial">packaged_task&lt;&gt;
+Example and Tutorial</h1>
 <p>本文将主要讨论std::packagded_task的特性和使用</p>
 <h2 id="stdpackaged_task">std::packaged_task&lt;&gt;</h2>
 <p>std::packaged_task&lt;&gt;是一个代表异步任务的类模版，它包括两部分：</p>
@@ -1650,18 +1729,22 @@
 <li>一个可调用的实体。例如函数、lambda函数或者函数对象；</li>
 <li>一个存储着返回值的共享状态或者由相关回调抛出的异常；</li>
 </ul>
-<h2 id="need-of-stdpackaged_task">Need of std::packaged_task&lt;&gt;</h2>
+<h2 id="need-of-stdpackaged_task">Need of
+std::packaged_task&lt;&gt;</h2>
 <p>假设我们想利用以下的函数从DB中获取数据：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">getDataFromDB</span><span class="params">( std::string token)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// Do some stuff to fetch the data</span></span><br><span class="line">	std::string data = <span class="string">&quot;Data fetched from DB by Filter :: &quot;</span> + token;</span><br><span class="line">	<span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>一种方法是使用前面提及的，在函数中传递std::promise&lt;&gt;对象。</p>
 <p>另一种方法就是使用std::packaged_task&lt;&gt;</p>
-<h2 id="using-packaged_task-with-function-to-create-asynchronous-tasks">Using packaged_task&lt;&gt; with function to create Asynchronous tasks</h2>
+<h2
+id="using-packaged_task-with-function-to-create-asynchronous-tasks">Using
+packaged_task&lt;&gt; with function to create Asynchronous tasks</h2>
 <p>当std::packaged_task&lt;&gt;在独立的线程上调用时，它会调用相关的回调并把返回值存储到内部的共享状态里。这些值可以在其它线程或者main函数里通过future对象访问。</p>
 <p>以上面的函数为例，我们可以创建一个packaged_task对象。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::packaged_task&lt;<span class="title">std::string</span> <span class="params">(std::string)</span>&gt; <span class="title">task</span><span class="params">(getDataFromDB)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>然后在将std::packaged_task传递进线程之前，先从中获取future对象。由于std::packaged_task是不可以拷贝的，因此需要用move。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;std::string&gt; result = task.<span class="built_in">get_future</span>();</span><br><span class="line"><span class="function">std::thread <span class="title">th</span><span class="params">(std::move(task), <span class="string">&quot;Arg&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>当此函数返回值时，std :: packaged_task&lt;&gt;将其设置为关联的共享状态，getDataFromDB()返回的结果或异常最终会在相关的future对象中可用。</p>
+<p>当此函数返回值时，std ::
+packaged_task&lt;&gt;将其设置为关联的共享状态，getDataFromDB()返回的结果或异常最终会在相关的future对象中可用。</p>
 <p>main函数阻塞调用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string data =  result.<span class="built_in">get</span>();</span><br></pre></td></tr></table></figure>
 
@@ -1783,13 +1866,15 @@
       
         
           
-            <h1 id="stdasync-tutorial-example">std::async Tutorial &amp; Example</h1>
+            <h1 id="stdasync-tutorial-example">std::async Tutorial &amp;
+Example</h1>
 <p>本文将介绍在C++11中如何执行异步任务。</p>
 <h2 id="what-is-stdasync">what is std::async()</h2>
 <p>std::async()是一个函数模版，可以接收一个回调作为参数，并异步执行该函数。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Fn</span>, <span class="keyword">class</span>... Args&gt;</span><br><span class="line">future&lt;<span class="keyword">typename</span> result_of&lt;<span class="built_in">Fn</span>(Args...)&gt;::type&gt; <span class="built_in">async</span> (launch policy, Fn&amp;&amp; fn, Args&amp;&amp;... args);</span><br></pre></td></tr></table></figure>
 <p>返回值是一个future对象，该对象存着异步执行的函数的返回值。</p>
-<p>第一个参数launch policy是一个启动策略，它控制着异步执行的行为，我们可以创建三种异步启动的策略：</p>
+<p>第一个参数launch
+policy是一个启动策略，它控制着异步执行的行为，我们可以创建三种异步启动的策略：</p>
 <ul>
 <li>std::launch::async：传递进来的函数在独立的线程中执行；</li>
 <li>std::launch::deferred：只有某个线程对future对象调用get()的时候才会调用函数；</li>
@@ -1975,8 +2060,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,9 +332,11 @@
       
 
       
-        <h1 id="prefers-const-enums-and-inlines-to-defines">prefers const, enums, and inlines to #defines</h1>
+        <h1 id="prefers-const-enums-and-inlines-to-defines">prefers const,
+enums, and inlines to #defines</h1>
 <p>这条规则的本质是利用编译器去替换预处理器。</p>
-<p>比如在代码中，ASPECT_RATIO可能会被编译器忽略，因为编译器在处理源码之前预处理器以及把这个标记移走，而该记号无法被记载进symbol table。所以如果遇到编译错误时，我们可能只看到1.653而无法看到ASPECT_RATIO，特别是假如改行代码是别人写的，你就更加难以发现错误了。</p>
+<p>比如在代码中，ASPECT_RATIO可能会被编译器忽略，因为编译器在处理源码之前预处理器以及把这个标记移走，而该记号无法被记载进symbol
+table。所以如果遇到编译错误时，我们可能只看到1.653而无法看到ASPECT_RATIO，特别是假如改行代码是别人写的，你就更加难以发现错误了。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ASPECT_RATIO 1.653</span></span><br></pre></td></tr></table></figure>
 <h2 id="const">const</h2>
 <ul>
@@ -346,7 +346,8 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span>&#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="type">static</span> <span class="type">const</span> <span class="type">int</span> Num = <span class="number">5</span>;<span class="comment">//也可以只是声明const int Num; 在另一个文件内定义int MyClass:Num = 5;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="enum">enum</h2>
 <ul>
-<li>假如编译不允许在类内使用static整数型常量，此时可以用<strong>the enum hack</strong>的做法；</li>
+<li>假如编译不允许在类内使用static整数型常量，此时可以用<strong>the enum
+hack</strong>的做法；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span>&#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="keyword">enum</span> &#123;Num = <span class="number">5</span>&#125;;</span><br><span class="line">  	<span class="type">int</span> scores[Num];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
@@ -543,7 +544,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#prefers-const-enums-and-inlines-to-defines"><span class="nav-number">1.</span> <span class="nav-text">prefers const, enums, and inlines to #defines</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#const"><span class="nav-number">1.1.</span> <span class="nav-text">const</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#enum"><span class="nav-number">1.2.</span> <span class="nav-text">enum</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inline"><span class="nav-number">1.3.</span> <span class="nav-text">inline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#prefers-const-enums-and-inlines-to-defines"><span class="nav-number">1.</span> <span class="nav-text">prefers const,
+enums, and inlines to #defines</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#const"><span class="nav-number">1.1.</span> <span class="nav-text">const</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#enum"><span class="nav-number">1.2.</span> <span class="nav-text">enum</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inline"><span class="nav-number">1.3.</span> <span class="nav-text">inline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -585,8 +587,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

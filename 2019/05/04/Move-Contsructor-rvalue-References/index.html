@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,7 +332,8 @@
       
 
       
-        <h1 id="move-contsructor-rvalue-references">Move Contsructor &amp; rvalue References</h1>
+        <h1 id="move-contsructor-rvalue-references">Move Contsructor &amp;
+rvalue References</h1>
 <h2 id="problem-of-temporary-objects">Problem of Temporary Objects</h2>
 <p>这篇文章的主要目的是研究如何使用move语义去降低内存中临时对象的负载。每次从函数中返回一个对象时，都会有一个临时对象被创建出来，然后进行拷贝。最终我们将会创建出两个对象，但实质上我们只需要一个。</p>
 <p>举个例子，我们有一个容器类：</p>
@@ -350,7 +349,10 @@
 <li>一个是在加入vector中使用Container类的拷贝构造函数创建出来的；</li>
 </ul>
 <p>这样每一个对象，都会带来两次在heap上创建数组。</p>
-<h2 id="solving-problem-of-temporary-objects-using-rvalue-references-move-constructor">Solving Problem of Temporary Objects using rvalue references &amp; Move Constructor</h2>
+<h2
+id="solving-problem-of-temporary-objects-using-rvalue-references-move-constructor">Solving
+Problem of Temporary Objects using rvalue references &amp; Move
+Constructor</h2>
 <p>getContainer()函数实际上是一个右值，所以可以被右值引用指向。因此为了实现这个目的，我们可以重载一个新的构造器，即move构造器：</p>
 <h2 id="move-constructor">Move Constructor</h2>
 <p>Move构造函数将右值引用作为参数，并重载该函数。在move构造函数中，我们只是将传递对象的成员变量move到新对象的成员变量中，而不是分配新内存。</p>
@@ -531,7 +533,10 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#move-contsructor-rvalue-references"><span class="nav-number">1.</span> <span class="nav-text">Move Contsructor &amp; rvalue References</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#problem-of-temporary-objects"><span class="nav-number">1.1.</span> <span class="nav-text">Problem of Temporary Objects</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#solving-problem-of-temporary-objects-using-rvalue-references-move-constructor"><span class="nav-number">1.2.</span> <span class="nav-text">Solving Problem of Temporary Objects using rvalue references &amp; Move Constructor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#move-constructor"><span class="nav-number">1.3.</span> <span class="nav-text">Move Constructor</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#move-contsructor-rvalue-references"><span class="nav-number">1.</span> <span class="nav-text">Move Contsructor &amp;
+rvalue References</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#problem-of-temporary-objects"><span class="nav-number">1.1.</span> <span class="nav-text">Problem of Temporary Objects</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#solving-problem-of-temporary-objects-using-rvalue-references-move-constructor"><span class="nav-number">1.2.</span> <span class="nav-text">Solving
+Problem of Temporary Objects using rvalue references &amp; Move
+Constructor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#move-constructor"><span class="nav-number">1.3.</span> <span class="nav-text">Move Constructor</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -573,8 +578,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

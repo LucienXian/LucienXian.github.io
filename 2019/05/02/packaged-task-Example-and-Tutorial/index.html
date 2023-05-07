@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,7 +332,8 @@
       
 
       
-        <h1 id="packaged_task-example-and-tutorial">packaged_task&lt;&gt; Example and Tutorial</h1>
+        <h1 id="packaged_task-example-and-tutorial">packaged_task&lt;&gt;
+Example and Tutorial</h1>
 <p>本文将主要讨论std::packagded_task的特性和使用</p>
 <h2 id="stdpackaged_task">std::packaged_task&lt;&gt;</h2>
 <p>std::packaged_task&lt;&gt;是一个代表异步任务的类模版，它包括两部分：</p>
@@ -342,18 +341,22 @@
 <li>一个可调用的实体。例如函数、lambda函数或者函数对象；</li>
 <li>一个存储着返回值的共享状态或者由相关回调抛出的异常；</li>
 </ul>
-<h2 id="need-of-stdpackaged_task">Need of std::packaged_task&lt;&gt;</h2>
+<h2 id="need-of-stdpackaged_task">Need of
+std::packaged_task&lt;&gt;</h2>
 <p>假设我们想利用以下的函数从DB中获取数据：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">getDataFromDB</span><span class="params">( std::string token)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// Do some stuff to fetch the data</span></span><br><span class="line">	std::string data = <span class="string">&quot;Data fetched from DB by Filter :: &quot;</span> + token;</span><br><span class="line">	<span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>一种方法是使用前面提及的，在函数中传递std::promise&lt;&gt;对象。</p>
 <p>另一种方法就是使用std::packaged_task&lt;&gt;</p>
-<h2 id="using-packaged_task-with-function-to-create-asynchronous-tasks">Using packaged_task&lt;&gt; with function to create Asynchronous tasks</h2>
+<h2
+id="using-packaged_task-with-function-to-create-asynchronous-tasks">Using
+packaged_task&lt;&gt; with function to create Asynchronous tasks</h2>
 <p>当std::packaged_task&lt;&gt;在独立的线程上调用时，它会调用相关的回调并把返回值存储到内部的共享状态里。这些值可以在其它线程或者main函数里通过future对象访问。</p>
 <p>以上面的函数为例，我们可以创建一个packaged_task对象。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::packaged_task&lt;<span class="title">std::string</span> <span class="params">(std::string)</span>&gt; <span class="title">task</span><span class="params">(getDataFromDB)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>然后在将std::packaged_task传递进线程之前，先从中获取future对象。由于std::packaged_task是不可以拷贝的，因此需要用move。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;std::string&gt; result = task.<span class="built_in">get_future</span>();</span><br><span class="line"><span class="function">std::thread <span class="title">th</span><span class="params">(std::move(task), <span class="string">&quot;Arg&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>当此函数返回值时，std :: packaged_task&lt;&gt;将其设置为关联的共享状态，getDataFromDB()返回的结果或异常最终会在相关的future对象中可用。</p>
+<p>当此函数返回值时，std ::
+packaged_task&lt;&gt;将其设置为关联的共享状态，getDataFromDB()返回的结果或异常最终会在相关的future对象中可用。</p>
 <p>main函数阻塞调用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string data =  result.<span class="built_in">get</span>();</span><br></pre></td></tr></table></figure>
 
@@ -530,7 +533,10 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#packaged_task-example-and-tutorial"><span class="nav-number">1.</span> <span class="nav-text">packaged_task&lt;&gt; Example and Tutorial</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#stdpackaged_task"><span class="nav-number">1.1.</span> <span class="nav-text">std::packaged_task&lt;&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#need-of-stdpackaged_task"><span class="nav-number">1.2.</span> <span class="nav-text">Need of std::packaged_task&lt;&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#using-packaged_task-with-function-to-create-asynchronous-tasks"><span class="nav-number">1.3.</span> <span class="nav-text">Using packaged_task&lt;&gt; with function to create Asynchronous tasks</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#packaged_task-example-and-tutorial"><span class="nav-number">1.</span> <span class="nav-text">packaged_task&lt;&gt;
+Example and Tutorial</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#stdpackaged_task"><span class="nav-number">1.1.</span> <span class="nav-text">std::packaged_task&lt;&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#need-of-stdpackaged_task"><span class="nav-number">1.2.</span> <span class="nav-text">Need of
+std::packaged_task&lt;&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#using-packaged_task-with-function-to-create-asynchronous-tasks"><span class="nav-number">1.3.</span> <span class="nav-text">Using
+packaged_task&lt;&gt; with function to create Asynchronous tasks</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -572,8 +578,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

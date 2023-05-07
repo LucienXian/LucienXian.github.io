@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,17 +332,23 @@
       
 
       
-        <h1 id="c11-variadic-template-function">C++11 – Variadic Template Function</h1>
+        <h1 id="c11-variadic-template-function">C++11 – Variadic Template
+Function</h1>
 <p>Variadic模版允许函数采用任意类型的可变数量参数，考虑这样的一个例子，假设我们创建一个函数log()，它接受任意类型的可变数量参数，并在控制台上打印。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">log</span>(<span class="number">1</span>,<span class="number">4.3</span>, <span class="string">&quot;Hello&quot;</span>);</span><br><span class="line"> </span><br><span class="line"><span class="built_in">log</span>(<span class="string">&#x27;a&#x27;</span>, <span class="string">&quot;test&quot;</span>, <span class="number">78L</span>, <span class="number">5</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span>;</span><br><span class="line">Student obj;</span><br><span class="line"> </span><br><span class="line"><span class="built_in">log</span>(<span class="number">3</span>, obj);</span><br></pre></td></tr></table></figure>
 <p>对于可变类型的参数，我们一般考虑的是创建模版函数，如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T obj)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout&lt;&lt;obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>但以上做法只能接受一个参数。</p>
-<h2 id="vardiac-template-function-creating-function-that-accepts-variable-number-of-arguments-of-ant-type">Vardiac Template Function: Creating function that accepts variable number of arguments of ant type</h2>
-<p>使用vardiac template，我们可以定义这样的一个函数，接收不定数量的参数：</p>
+<h2
+id="vardiac-template-function-creating-function-that-accepts-variable-number-of-arguments-of-ant-type">Vardiac
+Template Function: Creating function that accepts variable number of
+arguments of ant type</h2>
+<p>使用vardiac
+template，我们可以定义这样的一个函数，接收不定数量的参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> ... Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T first, Args ... args)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>上述函数可以接收多个参数，**Args…代表了模版参数的可变数目。</p>
-<p>声明一个vardiac template函数是容易的，但其内部具体定义会有点tricky。由于我们无法直接访问到被传递进去的可变数目的参数。我们需要使用c++的类型推导机制和递归来实现。</p>
+<p>声明一个vardiac
+template函数是容易的，但其内部具体定义会有点tricky。由于我们无法直接访问到被传递进去的可变数目的参数。我们需要使用c++的类型推导机制和递归来实现。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> ... Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T first, Args ... args)</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Print the First Element</span></span><br><span class="line">	std::cout&lt;&lt;first&lt;&lt;<span class="string">&quot; , &quot;</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Forward the remaining arguments</span></span><br><span class="line">	<span class="built_in">log</span>(args ...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>现在假设我们通过这种方式调用log函数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">log</span>(<span class="number">2</span>, <span class="number">3.4</span>, <span class="string">&quot;aaa&quot;</span>);</span><br></pre></td></tr></table></figure>
@@ -526,7 +530,10 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-variadic-template-function"><span class="nav-number">1.</span> <span class="nav-text">C++11 – Variadic Template Function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vardiac-template-function-creating-function-that-accepts-variable-number-of-arguments-of-ant-type"><span class="nav-number">1.1.</span> <span class="nav-text">Vardiac Template Function: Creating function that accepts variable number of arguments of ant type</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-variadic-template-function"><span class="nav-number">1.</span> <span class="nav-text">C++11 – Variadic Template
+Function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vardiac-template-function-creating-function-that-accepts-variable-number-of-arguments-of-ant-type"><span class="nav-number">1.1.</span> <span class="nav-text">Vardiac
+Template Function: Creating function that accepts variable number of
+arguments of ant type</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -568,8 +575,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

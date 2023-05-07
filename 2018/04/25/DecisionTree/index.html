@@ -96,26 +96,18 @@
 
 
 
-<meta name="description" content="决策树 基本流程 决策树是一种常见的机器学习方法，采取的是分而治之的策略。其中每个非叶节点对应于一个属性测试，而叶子节点则对应于决策结果，也就是类别。  img  在生成决策树的过程中，遇到以下三种情况时停止递归：  当前节点所包含的样本完全属于同一个类别 当前属性集为空，或是所有样本在所有的属性上取值相同，对于这种情况我们会将当前节点标记为叶节点，并设定类别为该节点所包含样本最多的类别 当前节点">
+<meta name="description" content="决策树 基本流程 决策树是一种常见的机器学习方法，采取的是分而治之的策略。其中每个非叶节点对应于一个属性测试，而叶子节点则对应于决策结果，也就是类别。   img  在生成决策树的过程中，遇到以下三种情况时停止递归：  当前节点所包含的样本完全属于同一个类别 当前属性集为空，或是所有样本在所有的属性上取值相同，对于这种情况我们会将当前节点标记为叶节点，并设定类别为该节点所包含样本最多的类别 当前节">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DecisionTree">
 <meta property="og:url" content="http://yoursite.com/2018/04/25/DecisionTree/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="决策树 基本流程 决策树是一种常见的机器学习方法，采取的是分而治之的策略。其中每个非叶节点对应于一个属性测试，而叶子节点则对应于决策结果，也就是类别。  img  在生成决策树的过程中，遇到以下三种情况时停止递归：  当前节点所包含的样本完全属于同一个类别 当前属性集为空，或是所有样本在所有的属性上取值相同，对于这种情况我们会将当前节点标记为叶节点，并设定类别为该节点所包含样本最多的类别 当前节点">
+<meta property="og:description" content="决策树 基本流程 决策树是一种常见的机器学习方法，采取的是分而治之的策略。其中每个非叶节点对应于一个属性测试，而叶子节点则对应于决策结果，也就是类别。   img  在生成决策树的过程中，遇到以下三种情况时停止递归：  当前节点所包含的样本完全属于同一个类别 当前属性集为空，或是所有样本在所有的属性上取值相同，对于这种情况我们会将当前节点标记为叶节点，并设定类别为该节点所包含样本最多的类别 当前节">
 <meta property="og:locale">
-<meta property="og:image" content="https://pic3.zhimg.com/80/v2-39d109b46ea4f34d5efbf67edc11d57d_hd.jpg">
-<meta property="og:image" content="https://www.zhihu.com/equation?tex=H%28X%29%3D-%5Csum%5Climits_%7Bx%5Cin%5Cmathcal%7BX%7D%7Dp%28x%29%5Clog+p%28x%29">
-<meta property="og:image" content="https://www.zhihu.com/equation?tex=gain%28X%29%3Dinfo%28S%29-info_x+%28S%29">
-<meta property="og:image" content="https://www.zhihu.com/equation?tex=Info%3D-%5Csum_%7Bv%5Cin+value%28A%29%7D%7B%5Cfrac%7Bnum%28S_%7Bv%7D%29+%7D%7Bnum%28S%29%7Dlog_2%7B%5Cfrac%7Bnum%28S_%7Bv%7D+%29%7D%7Bnum%28S%29%7D+%7D%7D+">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/40658-fb638d3013c6cfa5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/522">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/40658-7837b7f1610b1c4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/311">
-<meta property="og:image" content="https://images2015.cnblogs.com/blog/528496/201607/528496-20160720113416326-954203055.png">
 <meta property="article:published_time" content="2018-04-25T15:14:03.000Z">
 <meta property="article:modified_time" content="2018-04-25T15:15:48.666Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="Machine Learning">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pic3.zhimg.com/80/v2-39d109b46ea4f34d5efbf67edc11d57d_hd.jpg">
 
 
 
@@ -166,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -346,7 +336,10 @@
 <h2 id="基本流程">基本流程</h2>
 <p>决策树是一种常见的机器学习方法，采取的是分而治之的策略。其中每个非叶节点对应于一个属性测试，而叶子节点则对应于决策结果，也就是类别。</p>
 <figure>
-<img src="https://pic3.zhimg.com/80/v2-39d109b46ea4f34d5efbf67edc11d57d_hd.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://pic3.zhimg.com/80/v2-39d109b46ea4f34d5efbf67edc11d57d_hd.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>在生成决策树的过程中，遇到以下三种情况时停止递归：</p>
 <ul>
@@ -359,13 +352,19 @@
 <h3 id="信息增益information-entropy">信息增益(information entropy)</h3>
 <p>信息熵是度量样本集合纯度的常用指标。假定当前样本集合D中第x类样本所占比例为p(x)，那么D的信息熵就是：</p>
 <figure>
-<img src="https://www.zhihu.com/equation?tex=H%28X%29%3D-%5Csum%5Climits_%7Bx%5Cin%5Cmathcal%7BX%7D%7Dp%28x%29%5Clog+p%28x%29" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.zhihu.com/equation?tex=H%28X%29%3D-%5Csum%5Climits_%7Bx%5Cin%5Cmathcal%7BX%7D%7Dp%28x%29%5Clog+p%28x%29"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>信息熵的取值范围为[0, log|y|]，y为类别数目</p>
 <p>那么如何去判断某个属性对于样本集信息熵的提升呢，这里就提到了信息增益：</p>
 <p>利用总的熵减去某个分类标准对应的熵，往往我们也可以给某个分支节点赋予权重|Dv|/|D|，Dv就是该分类标准下第v个节点对应的样本</p>
 <figure>
-<img src="https://www.zhihu.com/equation?tex=gain%28X%29%3Dinfo%28S%29-info_x+%28S%29" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.zhihu.com/equation?tex=gain%28X%29%3Dinfo%28S%29-info_x+%28S%29"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>怎么去理解呢？这里表述的是：原来的总熵为info(S)，在某个划分条件下熵变为了infos(S)，又由于熵是不确定的意思，那么差值越大，就意味着这个划分选择越好。</p>
 <h3 id="增益率">增益率</h3>
@@ -374,18 +373,27 @@
 <p><strong>Gain_ration(D, a)= Gain(D, a)/IV(a)</strong></p>
 <p>其中IV(a)为：</p>
 <figure>
-<img src="https://www.zhihu.com/equation?tex=Info%3D-%5Csum_%7Bv%5Cin+value%28A%29%7D%7B%5Cfrac%7Bnum%28S_%7Bv%7D%29+%7D%7Bnum%28S%29%7Dlog_2%7B%5Cfrac%7Bnum%28S_%7Bv%7D+%29%7D%7Bnum%28S%29%7D+%7D%7D+" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.zhihu.com/equation?tex=Info%3D-%5Csum_%7Bv%5Cin+value%28A%29%7D%7B%5Cfrac%7Bnum%28S_%7Bv%7D%29+%7D%7Bnum%28S%29%7Dlog_2%7B%5Cfrac%7Bnum%28S_%7Bv%7D+%29%7D%7Bnum%28S%29%7D+%7D%7D+"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>因为这是属性a的固有值，往往属性a的可取值树木越多，那么改值越大。由于该算法可能会倾向于选择可取值树木少的属性，所以它是这样操作的：先根据信息增益选择出高于平均水平的属性，再从其中选出增益率最高的。</p>
 <h3 id="基尼指数">基尼指数</h3>
 <p>先来看看基尼指数的公式：</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/40658-fb638d3013c6cfa5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/522" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/40658-fb638d3013c6cfa5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/522"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>从公式可以看出，基尼指数反映了随机从样本中抽取两个样本，两个样本一致的概率，该概率越小意味着样本集的纯度越高。</p>
 <p>则对于属性a的基尼指数则是：</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/40658-7837b7f1610b1c4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/311" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/40658-7837b7f1610b1c4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/311"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="剪枝处理">剪枝处理</h2>
 <p>剪枝处理的目的是提高决策树的泛化能力，以应对算法出现的过拟合。</p>
@@ -405,7 +413,10 @@
 <p>我们为每个样本取一个权重wx</p>
 <p>将信息增益的计算式更新为以下：</p>
 <figure>
-<img src="https://images2015.cnblogs.com/blog/528496/201607/528496-20160720113416326-954203055.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://images2015.cnblogs.com/blog/528496/201607/528496-20160720113416326-954203055.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>若样本在属性的取值已知，则将该样本划入与其取值对应的子节点，并保持权重wx；若属性取值未知，则同时划入所有子节点，并更新权重为~r_v*w_x</p>
 <h2 id="多变量决策树">多变量决策树</h2>
@@ -628,8 +639,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

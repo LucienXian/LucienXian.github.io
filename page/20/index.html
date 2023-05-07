@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -1061,7 +1059,8 @@
 <li><p>堆是自下往上，往高地址生长的；而栈则相反</p></li>
 <li><p>栈分配效率较高，只需要从寄存器中找到存放栈的地址；而堆比较麻烦，需要通过一定的算法找到内存大小合适的空间（链表），或者因为碎片太多，先进行压缩抖动等</p></li>
 </ul>
-<p>引用自： http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html</p>
+<p>引用自：
+http://www.cnblogs.com/daocaoren/archive/2011/06/29/2092957.html</p>
 
           
         
@@ -1305,22 +1304,28 @@
 <h1 id="简单对象模型">简单对象模型</h1>
 <p>第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h1 id="表格驱动对象模型">表格驱动对象模型</h1>
 <p>存储两个指针，分别指向data member table和function member table</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h1 id="c对象模型">C++对象模型</h1>
 <p>来看看重头戏——C++对象模型。有几个需要注意的：</p>
 <ul>
 <li><p>非静态数据成员放在类的对象中；</p></li>
 <li><p>静态数据成员和成员函数放在类对象之外；</p></li>
-<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info object；</p></li>
+<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info
+object；</p></li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 
           
@@ -1453,8 +1458,12 @@
 </ul>
 <h2 id="注意">注意</h2>
 <ul>
-<li><p>空类的大小为１：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/621616/c-what-is-the-size-of-an-object-of-an-empty-class">To ensure that the addresses of two different objects will be different.</a></p></li>
-<li><p>虚函数：由于类中有一个virtual table，所以需要一个指针指向该表，在上例中指针是８个字节。另外，还可能遇到向上对齐的情况，例如：</p></li>
+<li><p>空类的大小为１：<a
+target="_blank" rel="noopener" href="https://stackoverflow.com/questions/621616/c-what-is-the-size-of-an-object-of-an-empty-class">To
+ensure that the addresses of two different objects will be
+different.</a></p></li>
+<li><p>虚函数：由于类中有一个virtual
+table，所以需要一个指针指向该表，在上例中指针是８个字节。另外，还可能遇到向上对齐的情况，例如：</p></li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">        <span class="type">char</span> c[<span class="number">3</span>];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//结果为１６</span></span><br></pre></td></tr></table></figure>
 <ul>
@@ -1580,7 +1589,8 @@
       
         
           
-            <h1 id="avoiding-hiding-iherited-names">Avoiding hiding iherited names</h1>
+            <h1 id="avoiding-hiding-iherited-names">Avoiding hiding iherited
+names</h1>
 <p>这里的关键是区分清楚重载与重写</p>
 <p>继承一个基类时，如果其下的public函数不带virtual，而派生类又重写了一个同名的函数，那么派生类就会把基类版本的该函数给掩盖住了，也就是无法再通过派生类去调用基类版本的函数了</p>
 <h2 id="解决方法">解决方法</h2>
@@ -1588,13 +1598,16 @@
 <p>第一种是使用using声明式：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//保证Base class内名为mf1和mf3的所有东西在Derived域内可见</span></span><br><span class="line">    <span class="keyword">using</span> Base::mf1;</span><br><span class="line">    <span class="keyword">using</span> Base::mf3;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mf3</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mf4</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>通过这种手段，继承机制没有问题，在派生类找不到的函数（版本），会继续到基类作用域内寻找。</p>
-<p>第二个方法就是使用<strong>forwarding function</strong>，特别是你如果想要隐藏到基类不同参数的函数中某一个，用例子说话：</p>
+<p>第二个方法就是使用<strong>forwarding
+function</strong>，特别是你如果想要隐藏到基类不同参数的函数中某一个，用例子说话：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">(<span class="type">int</span>)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">private</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">mf1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Base::<span class="built_in">mf1</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>这样就隐藏掉带参数的mf1()了</p>
 <h2 id="建议">建议</h2>
 <ul>
-<li>Derived class内的名称会隐藏掉base class内的函数。在public继承体系下，我们不希望发生这样的事情；</li>
-<li>为了重新获取被掩盖的基类函数，可以使用using声明式或者forwarding functions</li>
+<li>Derived class内的名称会隐藏掉base
+class内的函数。在public继承体系下，我们不希望发生这样的事情；</li>
+<li>为了重新获取被掩盖的基类函数，可以使用using声明式或者forwarding
+functions</li>
 </ul>
 
           
@@ -1762,8 +1775,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

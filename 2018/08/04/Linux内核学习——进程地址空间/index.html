@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -374,7 +372,8 @@
 <li>指定内存区域被加入到一个地址空间时，open函数被调用</li>
 <li>指定内存区域被删除时，close函数被调用</li>
 </ul>
-<h3 id="内存区域的树型结构和内存区域的链表结构">内存区域的树型结构和内存区域的链表结构</h3>
+<h3
+id="内存区域的树型结构和内存区域的链表结构">内存区域的树型结构和内存区域的链表结构</h3>
 <p>mmap域使用单独链表连接所有的内存区域对象，每个vm_area_struct结构体通过自身vm_next域连入链表。</p>
 <p>而mm_rb则是用红黑树连接所有的内存区域。</p>
 <h2 id="操作内存区域">操作内存区域</h2>
@@ -390,7 +389,8 @@
 <p>内核使用do_mmap()创建一个新的线性地址区间，不过不同的是，如果新创建的地址区间与一个已经存在的地址区间相邻，并且它们具有相邻的访问权限时，两个区间就会合并为一个。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">do_mmap</span><span class="params">(<span class="keyword">struct</span> file *file, 			<span class="type">unsigned</span> <span class="type">long</span> addr,</span></span><br><span class="line"><span class="params">        <span class="type">unsigned</span> <span class="type">long</span> len, <span class="type">unsigned</span> <span class="type">long</span> prot,</span></span><br><span class="line"><span class="params">        	<span class="type">unsigned</span> <span class="type">long</span> flag, <span class="type">unsigned</span> <span class="type">long</span> offset)</span></span><br><span class="line">&#123;</span><br><span class="line">         <span class="type">unsigned</span> <span class="type">long</span> ret = -EINVAL;</span><br><span class="line">         <span class="keyword">if</span> ((offset + PAGE_ALIGN(len)) &lt; offset)</span><br><span class="line">                   <span class="keyword">goto</span> out;</span><br><span class="line">         <span class="keyword">if</span> (!(offset &amp; ~PAGE_MASK))</span><br><span class="line">                   ret = do_mmap_pgoff(file, addr, len, prot, flag, offset &gt;&gt; PAGE_SHIFT);</span><br><span class="line">out:</span><br><span class="line">         <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>该函数映射由file指定的文件。</p>
-<h2 id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址区间</h2>
+<h2
+id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址区间</h2>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">do_mummap</span><span class="params">(<span class="keyword">struct</span> mm_struct *mm, <span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">size_t</span> len)</span>;</span><br></pre></td></tr></table></figure>
 <p>该函数从特定的进程地址空间中删除从地址start开始，长度为len字节的空间。</p>
 <p>而mummap()则是对do)mummap()函数的一个简单封装。</p>
@@ -614,8 +614,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -335,27 +333,35 @@
 
       
         <h1 id="c11-stdtuples">C++11: std::tuples</h1>
-<h2 id="stdtuple-tutorial-examples">std::tuple Tutorial &amp; Examples</h2>
-<h3 id="what-is-stdtuple-and-why-do-we-need-it">what is std::tuple and why do we need it</h3>
+<h2 id="stdtuple-tutorial-examples">std::tuple Tutorial &amp;
+Examples</h2>
+<h3 id="what-is-stdtuple-and-why-do-we-need-it">what is std::tuple and
+why do we need it</h3>
 <p>std::tuple是一种可以将固定大小的异构值绑定在一起的类型。在创建元组对象时，我们需要将元素的类型指定为模版参数。</p>
 <h3 id="creating-a-stdtuple-object">Creating a std::tuple object</h3>
 <p>首先是要include进头文件：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br></pre></td></tr></table></figure>
-<p>我们可以声明一个包含了int, double和string类型的tuple，实际上这种做法可以帮助我们从一个函数中返回多种值，避免创建不必要structure。</p>
+<p>我们可以声明一个包含了int,
+double和string类型的tuple，实际上这种做法可以帮助我们从一个函数中返回多种值，避免创建不必要structure。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::tuple&lt;<span class="type">int</span>, <span class="type">double</span>, std::string&gt; <span class="title">result</span><span class="params">(<span class="number">7</span>, <span class="number">9.8</span>, <span class="string">&quot;text&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<h3 id="getting-elements-from-a-stdtuple">Getting elements from a std::tuple</h3>
+<h3 id="getting-elements-from-a-stdtuple">Getting elements from a
+std::tuple</h3>
 <p>我们可以使用std::get函数获得隐藏在tuple对象中的元素，方法是将索引值指定为模版参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> iVal = std::<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;(result);</span><br></pre></td></tr></table></figure>
-<h3 id="getting-out-of-range-value-from-tuple">Getting Out Of Range value from tuple</h3>
+<h3 id="getting-out-of-range-value-from-tuple">Getting Out Of Range
+value from tuple</h3>
 <p>从tuple中获取索引大于元素数量的tuple元素会引起编译错误：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> iVal2 = std::<span class="built_in">get</span>&lt;<span class="number">4</span>&gt;(result); <span class="comment">// Compile error</span></span><br></pre></td></tr></table></figure>
-<h3 id="wrong-type-cast-while-getting-value-from-tuple">Wrong type cast while getting value from tuple</h3>
+<h3 id="wrong-type-cast-while-getting-value-from-tuple">Wrong type cast
+while getting value from tuple</h3>
 <p>接收类型与tuple里面元素不符合也会导致编译错误：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string strVal2 = std::<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;(result); <span class="comment">// Compile error</span></span><br></pre></td></tr></table></figure>
-<h3 id="getting-value-from-tuple-by-dynamic-index">Getting value from tuple by dynamic index</h3>
+<h3 id="getting-value-from-tuple-by-dynamic-index">Getting value from
+tuple by dynamic index</h3>
 <p>提供给std::get的模版参数必须是编译期常量，否则会引起编译错误：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="type">double</span> dVal2 = std::<span class="built_in">get</span>&lt;x&gt;(result); <span class="comment">// Compile error</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="comment">// Get second double value from tuple</span></span><br><span class="line"><span class="type">double</span> dVal3 = std::<span class="built_in">get</span>&lt;i&gt;(result);</span><br></pre></td></tr></table></figure>
-<h2 id="make_tuple-tutorial-example">make_tuple Tutorial &amp; Example</h2>
+<h2 id="make_tuple-tutorial-example">make_tuple Tutorial &amp;
+Example</h2>
 <h3 id="initializing-a-stdtuple">Initializing a std::tuple</h3>
 <p>我们可以通过传递参数到构造器的方式来初始化std::tuple：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::tuple&lt;<span class="type">int</span>, <span class="type">double</span>, std::string&gt; result1 &#123; <span class="number">22</span>, <span class="number">19.28</span>, <span class="string">&quot;text&quot;</span> &#125;;</span><br></pre></td></tr></table></figure>
@@ -539,7 +545,14 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-stdtuples"><span class="nav-number">1.</span> <span class="nav-text">C++11: std::tuples</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#stdtuple-tutorial-examples"><span class="nav-number">1.1.</span> <span class="nav-text">std::tuple Tutorial &amp; Examples</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-stdtuple-and-why-do-we-need-it"><span class="nav-number">1.1.1.</span> <span class="nav-text">what is std::tuple and why do we need it</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#creating-a-stdtuple-object"><span class="nav-number">1.1.2.</span> <span class="nav-text">Creating a std::tuple object</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getting-elements-from-a-stdtuple"><span class="nav-number">1.1.3.</span> <span class="nav-text">Getting elements from a std::tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getting-out-of-range-value-from-tuple"><span class="nav-number">1.1.4.</span> <span class="nav-text">Getting Out Of Range value from tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wrong-type-cast-while-getting-value-from-tuple"><span class="nav-number">1.1.5.</span> <span class="nav-text">Wrong type cast while getting value from tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getting-value-from-tuple-by-dynamic-index"><span class="nav-number">1.1.6.</span> <span class="nav-text">Getting value from tuple by dynamic index</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#make_tuple-tutorial-example"><span class="nav-number">1.2.</span> <span class="nav-text">make_tuple Tutorial &amp; Example</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#initializing-a-stdtuple"><span class="nav-number">1.2.1.</span> <span class="nav-text">Initializing a std::tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stdmake_tuple"><span class="nav-number">1.2.2.</span> <span class="nav-text">std::make_tuple</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-stdtuples"><span class="nav-number">1.</span> <span class="nav-text">C++11: std::tuples</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#stdtuple-tutorial-examples"><span class="nav-number">1.1.</span> <span class="nav-text">std::tuple Tutorial &amp;
+Examples</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-stdtuple-and-why-do-we-need-it"><span class="nav-number">1.1.1.</span> <span class="nav-text">what is std::tuple and
+why do we need it</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#creating-a-stdtuple-object"><span class="nav-number">1.1.2.</span> <span class="nav-text">Creating a std::tuple object</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getting-elements-from-a-stdtuple"><span class="nav-number">1.1.3.</span> <span class="nav-text">Getting elements from a
+std::tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getting-out-of-range-value-from-tuple"><span class="nav-number">1.1.4.</span> <span class="nav-text">Getting Out Of Range
+value from tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wrong-type-cast-while-getting-value-from-tuple"><span class="nav-number">1.1.5.</span> <span class="nav-text">Wrong type cast
+while getting value from tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getting-value-from-tuple-by-dynamic-index"><span class="nav-number">1.1.6.</span> <span class="nav-text">Getting value from
+tuple by dynamic index</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#make_tuple-tutorial-example"><span class="nav-number">1.2.</span> <span class="nav-text">make_tuple Tutorial &amp;
+Example</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#initializing-a-stdtuple"><span class="nav-number">1.2.1.</span> <span class="nav-text">Initializing a std::tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stdmake_tuple"><span class="nav-number">1.2.2.</span> <span class="nav-text">std::make_tuple</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -581,8 +594,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

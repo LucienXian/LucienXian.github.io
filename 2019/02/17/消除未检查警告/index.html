@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -335,7 +333,9 @@
 
       
         <p>在编译过程中出现warning的时候，我们应该根据编译器的指示来进行修正，让警告消失。</p>
-<p>对于不能消除的警告，如果能够引起这个警告的代码是类型安全的话，那么就可以使用注解<strong><span class="citation" data-cites="SuppressWarnings">@SuppressWarnings</span>("unchecked")</strong>来禁止这个警告。该注解可以在任意声明上使用，从单独的局部变量到整个类都可以，但我们应该在尽可能小的作用域上使用该注解。永远不要在整个类上使用SuppressWarnings注解。</p>
+<p>对于不能消除的警告，如果能够引起这个警告的代码是类型安全的话，那么就可以使用注解<strong><span
+class="citation"
+data-cites="SuppressWarnings">@SuppressWarnings</span>("unchecked")</strong>来禁止这个警告。该注解可以在任意声明上使用，从单独的局部变量到整个类都可以，但我们应该在尽可能小的作用域上使用该注解。永远不要在整个类上使用SuppressWarnings注解。</p>
 <p>对于以下的方法，编译的时候会生成warning：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123; </span><br><span class="line">    <span class="keyword">if</span> (a.length &lt; size)</span><br><span class="line">        <span class="keyword">return</span> (T[]) Arrays.copyOf(elements, size, a.getClass()); </span><br><span class="line">    System.arraycopy(elements, <span class="number">0</span>, a, <span class="number">0</span>, size);</span><br><span class="line">    <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">        a[size] = <span class="literal">null</span>; </span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ArrayList.java:<span class="number">305</span>: warning: [unchecked] unchecked cast <span class="title function_">return</span> <span class="params">(T[])</span> Arrays.copyOf(elements, size, a.getClass());</span><br><span class="line">                                                                     ^ </span><br><span class="line">required: T[]</span><br><span class="line">found: Object[]</span><br></pre></td></tr></table></figure>
@@ -532,8 +532,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

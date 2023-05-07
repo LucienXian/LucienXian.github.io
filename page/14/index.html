@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -346,7 +344,9 @@
 <h2 id="invoking-pylint">Invoking pylint</h2>
 <p>pylint可以在命令行使用，具体用法为：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint [options] modules_or_packages</span><br></pre></td></tr></table></figure>
-<p>从上面的用法可以得知，我们应该提供pylint要检查的python包或者模块的名称。而Pylint不会导入这些包，而是利用Python internals去进行定位。因此我们需要关注<a target="_blank" rel="noopener" href="https://docs.python.org/2/using/cmdline.html#envvar-PYTHONPATH">PYTHONPATH</a>，防止它去检查已安装的模块版本，而不是开发版本。</p>
+<p>从上面的用法可以得知，我们应该提供pylint要检查的python包或者模块的名称。而Pylint不会导入这些包，而是利用Python
+internals去进行定位。因此我们需要关注<a
+target="_blank" rel="noopener" href="https://docs.python.org/2/using/cmdline.html#envvar-PYTHONPATH">PYTHONPATH</a>，防止它去检查已安装的模块版本，而不是开发版本。</p>
 <p>如果传给pylint一个单文件，例如这样：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint mymodules.py</span><br></pre></td></tr></table></figure>
 <p>就要保证当前的工作目录为一个package（即目录下有__init__.py）。</p>
@@ -369,14 +369,18 @@
 </tbody>
 </table>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(venv) ➜  py pylint --version</span><br><span class="line">No config file found, using default configuration</span><br><span class="line">pylint 1.9.3,</span><br><span class="line">astroid 1.6.5</span><br><span class="line">Python 2.7.10 (default, Jul 15 2017, 17:16:57)</span><br><span class="line">[GCC 4.2.1 Compatible Apple LLVM 9.0.0 (clang-900.0.31)]</span><br></pre></td></tr></table></figure>
-<p>接下来介绍一个message control的命令后选项：<strong>--disable</strong>和<strong>--enable</strong>，如果我们只是希望启动某些checker，可以先用--disable = all然后使用--enable = &lt;symbol&gt;，其中&lt;symbol&gt;是逗号分隔的检查器名称和消息符号列表。这样的使用方式对于仅仅希望启动少数的checkers非常有用。</p>
+<p>接下来介绍一个message
+control的命令后选项：<strong>--disable</strong>和<strong>--enable</strong>，如果我们只是希望启动某些checker，可以先用--disable
+= all然后使用--enable =
+&lt;symbol&gt;，其中&lt;symbol&gt;是逗号分隔的检查器名称和消息符号列表。这样的使用方式对于仅仅希望启动少数的checkers非常有用。</p>
 <p>举个例子，假如你只想启动相似性检查，可以增加选项：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">–-disable=all –-enable=similarities</span><br></pre></td></tr></table></figure>
 <p>pylint提供的symbol，可以参考：https://docs.pylint.org/en/1.6.0/features.html#messages-control-options</p>
 <h2 id="parallel-execution">Parallel execution</h2>
 <p>如果主机的CPU数量超过1个，可以使用<strong>-j</strong>选项加速pylint的运行，比如：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint -j 4 mymodule1.py mymodule2.py mymodule3.py mymodule4.py</span><br></pre></td></tr></table></figure>
-<p>这样就会产生4个子进程，其中每个提供的模块将被并行检查。checkers发现的问题不会立即显示。 完成检查模块后才会立即显示它们。当提供的参数为0时，将会使用主机上所有CPU的数量。</p>
+<p>这样就会产生4个子进程，其中每个提供的模块将被并行检查。checkers发现的问题不会立即显示。
+完成检查模块后才会立即显示它们。当提供的参数为0时，将会使用主机上所有CPU的数量。</p>
 
           
         
@@ -498,19 +502,26 @@
           
             <h1 id="支持向量机">支持向量机</h1>
 <h2 id="间隔与支持向量">间隔与支持向量</h2>
-<p>考虑这样的训练样本<span class="math inline">\(D = {(x_1, y_1), (x_2, y_2), ... , (x_m, y_m)}, y_i \in {-1, +1}\)</span>。分类学习最重要的基于训练集D找到一个划分超平面，使得不同类别的样本能够分考。虽然划分平面可能很多，但我们应该尽量找到<strong>"位于正中间"</strong>的平面，使得robust最好。</p>
+<p>考虑这样的训练样本<span class="math inline">\(D = {(x_1, y_1), (x_2,
+y_2), ... , (x_m, y_m)}, y_i \in {-1,
++1}\)</span>。分类学习最重要的基于训练集D找到一个划分超平面，使得不同类别的样本能够分考。虽然划分平面可能很多，但我们应该尽量找到<strong>"位于正中间"</strong>的平面，使得robust最好。</p>
 <p>在样本空间中，划分超平面可以这样描述： <span class="math display">\[
 w^Tx + b = 0
-\]</span> 其中<span class="math inline">\(w=(w_1;w_2;...;w_d)\)</span>为法向量，决定平面的方向，而b则是位移，决定的事平面与原点的距离。</p>
+\]</span> 其中<span
+class="math inline">\(w=(w_1;w_2;...;w_d)\)</span>为法向量，决定平面的方向，而b则是位移，决定的事平面与原点的距离。</p>
 <p>样本空间中任意点x到平面的距离记为： <span class="math display">\[
 r = \frac {|w^Tx+b|} {||w||}
 \]</span> 假设平面能够正确分类，那么对于 <span class="math display">\[
 w^T x_i + b \geq +1, y_i +1 \\
 w^T x_i + b \leq -1, y_i -1
-\]</span> 根据这个公式可以得知，距离平面最近的点使得上式成立，那么这几个样本就成为支持向量，两个异类支持向量到平面的距离之和为： <span class="math display">\[
+\]</span>
+根据这个公式可以得知，距离平面最近的点使得上式成立，那么这几个样本就成为支持向量，两个异类支持向量到平面的距离之和为：
+<span class="math display">\[
 \gamma = \frac {2} {||w||}
 \]</span> 这就是间隔(margin)。</p>
-<p>但如果我们希望找到具有最大间隔的平面，应该要最大化<span class="math inline">\(\gamma\)</span>，则使得<span class="math inline">\(\frac{1}{2}{||w||}^2\)</span>最大化。</p>
+<p>但如果我们希望找到具有最大间隔的平面，应该要最大化<span
+class="math inline">\(\gamma\)</span>，则使得<span
+class="math inline">\(\frac{1}{2}{||w||}^2\)</span>最大化。</p>
 <p>这就是<strong>support vector machine(SVM)</strong>的基本模型。</p>
 <h2 id="对偶问题">对偶问题</h2>
 <p>TODO</p>
@@ -518,43 +529,60 @@ w^T x_i + b \leq -1, y_i -1
 <p>在现实生活中，很可能无法找到使得原始样本空间可分的超平面，比如抑或问题就是这样。但我们可以将样本从原始空间映射到一个更高维空间，使得样本在这个特征空间内是线性可分。</p>
 <p>经过映射后，假设超平面模型为： <span class="math display">\[
 f(x) = w^T \Phi(x) + b
-\]</span> 在利用对偶问题求解时会涉及得到计算内积——<span class="math inline">\(\Phi(x)^T\Phi(x)\)</span>，由于映射后的特征空间可能维度很高，甚至是无穷维，要想直接计算通常是困难的。因此可以设计这样一个函数，即<span class="math inline">\(x_i\)</span>与<span class="math inline">\(x_j\)</span>在特征空间的内积等于它们在原始空间中通过函数k计算的结果。重写解为： <span class="math display">\[
+\]</span> 在利用对偶问题求解时会涉及得到计算内积——<span
+class="math inline">\(\Phi(x)^T\Phi(x)\)</span>，由于映射后的特征空间可能维度很高，甚至是无穷维，要想直接计算通常是困难的。因此可以设计这样一个函数，即<span
+class="math inline">\(x_i\)</span>与<span
+class="math inline">\(x_j\)</span>在特征空间的内积等于它们在原始空间中通过函数k计算的结果。重写解为：
+<span class="math display">\[
 f(x) = w^T\Phi(x) + b \\
 =\sum_{i=1}^{m}\alpha_iy_i\Phi(x_i)^T\Phi(x) + b \\
 =\sum_{i=1}^{m}\alpha_iy_ik(x, x_i) + b
-\]</span> 但这样还存在一个问题，在不知道$ (x) $形式时该怎么得到核函数呢？</p>
+\]</span> 但这样还存在一个问题，在不知道$ (x)
+$形式时该怎么得到核函数呢？</p>
 <blockquote>
 <p>有这么一个定理，如果有这么一个对称函数，它在输入空间中对应的核矩阵是半正定的，那么它就能作为核函数使用。（不懂？？）</p>
 </blockquote>
 <p>以下为一些常见和核函数：</p>
 <ul>
-<li>线性核：<span class="math inline">\(k(x_i, x_j) = x_i^Tx_i\)</span></li>
-<li>多项式核：<span class="math inline">\(k(x_i, x_j) = (x_i^Tx_j)^d\)</span></li>
-<li>高斯核：<span class="math inline">\(k(x_i, x_j) = exp(- \frac{ || x_i - x_j ||^2 }{2\sigma^2})\)</span></li>
-<li>拉普拉斯核：<span class="math inline">\(k(x_i, x_j) = exp(- \frac{ || x_i - x_j ||^2 }{\sigma})\)</span></li>
-<li>sigmoid核：<span class="math inline">\(k(x_i, x_j) = tanh(\beta x_i^T x_j + \theta)\)</span></li>
+<li>线性核：<span class="math inline">\(k(x_i, x_j) =
+x_i^Tx_i\)</span></li>
+<li>多项式核：<span class="math inline">\(k(x_i, x_j) =
+(x_i^Tx_j)^d\)</span></li>
+<li>高斯核：<span class="math inline">\(k(x_i, x_j) = exp(- \frac{ ||
+x_i - x_j ||^2 }{2\sigma^2})\)</span></li>
+<li>拉普拉斯核：<span class="math inline">\(k(x_i, x_j) = exp(- \frac{
+|| x_i - x_j ||^2 }{\sigma})\)</span></li>
+<li>sigmoid核：<span class="math inline">\(k(x_i, x_j) = tanh(\beta
+x_i^T x_j + \theta)\)</span></li>
 </ul>
 <h2 id="软间隔与正则化">软间隔与正则化</h2>
 <p>todo</p>
 <h2 id="支持向量回归">支持向量回归</h2>
-<p>这样的训练样本<span class="math inline">\(D = {(x_1, y_1), (x_2, y_2), ... , (x_m, y_m)}\)</span>，希望学得一个回归模型，使得f(x)与y尽可能接近，在传统的回归模型中，我们是基于模型输出f(x)与真实输出y之间的差别来计算损失，在这种情况中当且仅当f(x)与y完全相同时，损失才为零。</p>
-<p>但是对于SVR，假设我们能容忍f(x)与y之间最多有<span class="math inline">\(\epsilon\)</span>的偏差，这相当于以f(x)为中心，构建了一个宽度为<span class="math inline">\(2\epsilon\)</span>的间隔带，若训练样本落入间隔带，则认为是被预测正确的。</p>
+<p>这样的训练样本<span class="math inline">\(D = {(x_1, y_1), (x_2,
+y_2), ... , (x_m,
+y_m)}\)</span>，希望学得一个回归模型，使得f(x)与y尽可能接近，在传统的回归模型中，我们是基于模型输出f(x)与真实输出y之间的差别来计算损失，在这种情况中当且仅当f(x)与y完全相同时，损失才为零。</p>
+<p>但是对于SVR，假设我们能容忍f(x)与y之间最多有<span
+class="math inline">\(\epsilon\)</span>的偏差，这相当于以f(x)为中心，构建了一个宽度为<span
+class="math inline">\(2\epsilon\)</span>的间隔带，若训练样本落入间隔带，则认为是被预测正确的。</p>
 <p>于是，SVR问题可以转化为：</p>
 <p><span class="math display">\[
-min_{w, b} \frac{1}{2}||w||^2+C\sum_{i=1}^{m}\ell_{\epsilon}(f(x_i)-y_i) \\
+min_{w, b} \frac{1}{2}||w||^2+C\sum_{i=1}^{m}\ell_{\epsilon}(f(x_i)-y_i)
+\\
 \]</span></p>
 <p><span class="math display">\[
 f(x)=\left\{
-\begin{aligned} 
+\begin{aligned}
 0, if |z| \le \epsilon \\
 |z| - \epsilon,otherwise \\
 \end{aligned}
 \right.
 \]</span></p>
 <p>引入松弛变量： <span class="math display">\[
-min_{w, b, \xi_{i2}, \xi_{i1}} \frac{1}{2}||w||^2+C\sum_{i=1}^{m}(\xi_{i2}+\xi_{i1})
+min_{w, b, \xi_{i2}, \xi_{i1}}
+\frac{1}{2}||w||^2+C\sum_{i=1}^{m}(\xi_{i2}+\xi_{i1})
 \]</span></p>
-<p>通过引入拉格朗日乘子，并对目标参数求偏导，最后得到SVR表示为： <span class="math display">\[
+<p>通过引入拉格朗日乘子，并对目标参数求偏导，最后得到SVR表示为： <span
+class="math display">\[
 f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 \]</span></p>
 <h2 id="核方法">核方法</h2>
@@ -697,7 +725,8 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <p>a_ops域指向地址空间对象中的操作函数表，由adress_space_operations结构体表示：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span> &#123;</span></span><br><span class="line">        <span class="type">int</span> (*writepage)(<span class="keyword">struct</span> page *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*readpage) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*sync_page) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*writepages) (<span class="keyword">struct</span> address_space *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*set_page_dirty) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*readpages) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> address_space *,<span class="keyword">struct</span> list_head *, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*prepare_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*commit_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">sector_t</span> (*bmap)(<span class="keyword">struct</span> address_space *, <span class="type">sector_t</span>);</span><br><span class="line">        <span class="type">int</span> (*invalidatepage) (<span class="keyword">struct</span> page *, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">        <span class="type">int</span> (*releasepage) (<span class="keyword">struct</span> page *, <span class="type">int</span>);</span><br><span class="line">        <span class="type">int</span> (*direct_IO) (<span class="type">int</span>, <span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *,<span class="type">loff_t</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>这里面最重要的是读写——readpage()和writepage()。</p>
-<p>对于readpage，Linux内核试图在页高速缓存中使用<strong>find_get_page(mapping, index)</strong>找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
+<p>对于readpage，Linux内核试图在页高速缓存中使用<strong>find_get_page(mapping,
+index)</strong>找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
 <p>对于writepage，首先在cache中搜索需要的页，如果需要的页不在，则新分配一个空闲项；下一步，内核会创建一个写请求，接着数据被从用户空间拷贝到内核缓冲，最后写入磁盘。</p>
 <h3 id="基树">基树</h3>
 <p>每个address_page对象都有唯一的基树，保存在page_tree结构体中。只要指定了文件偏移量，就可以在基树中迅速检索到希望的页面。</p>
@@ -835,35 +864,49 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <p>golang1.2引进了一种新的测试覆盖工具，采用一种特别的方法来生成覆盖率统计数据。</p>
 <h2 id="覆盖率测试">覆盖率测试</h2>
 <p>代码覆盖率测试是指，通过运行一个测试来查看有多少代码被执行了。如果使用的测试样例导致80%的源代码语句运行，我们就认为代码覆盖率为80%。</p>
-<p>go语言引进了一个轻量级的测试框架<strong>testing</strong>和自带的<strong>go test</strong>命令来实现单元测试和性能测试。这套框架的原理很简单，就是在2变异之前重写package的源代码以添加检测、编译和运行修改后的源代码，并且将统计信息转移。</p>
+<p>go语言引进了一个轻量级的测试框架<strong>testing</strong>和自带的<strong>go
+test</strong>命令来实现单元测试和性能测试。这套框架的原理很简单，就是在2变异之前重写package的源代码以添加检测、编译和运行修改后的源代码，并且将统计信息转移。</p>
 <h2 id="golang的覆盖率测试">golang的覆盖率测试</h2>
 <p>假设有这样一个源代码：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;negative&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;zero&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;small&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;big&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;huge&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;enormous&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>和这样的一个测试样例：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;testing&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Test <span class="keyword">struct</span> &#123;</span><br><span class="line">    in  <span class="type">int</span></span><br><span class="line">    out <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> tests = []Test&#123;</span><br><span class="line">    &#123;<span class="number">-1</span>, <span class="string">&quot;negative&quot;</span>&#125;,</span><br><span class="line">    &#123;<span class="number">5</span>, <span class="string">&quot;small&quot;</span>&#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSize</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i, test := <span class="keyword">range</span> tests &#123;</span><br><span class="line">        size := Size(test.in)</span><br><span class="line">        <span class="keyword">if</span> size != test.out &#123;</span><br><span class="line">            t.Errorf(<span class="string">&quot;#%d: Size(%d)=%s; want %s&quot;</span>, i, test.in, size, test.out)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然后使用go test命令加上<strong>-cover</strong>选项来测试代码覆盖率，产生结果如下：</p>
+<p>然后使用go
+test命令加上<strong>-cover</strong>选项来测试代码覆盖率，产生结果如下：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok  	_/Users/lucien/Study/gosrc	0.006s</span><br></pre></td></tr></table></figure>
 <ul>
-<li>由于go test命令只能在一个相应的目录下执行所有文件，注意这两个文件需要在同一个目录下。</li>
-<li>另外测试文件必须要以_test.go结尾，这样在执行go test的时候才能执行到相应的代码。</li>
-<li>在测试文件中必须要import testing这个包，另外所有测试函数都以Test开头，并且参数是testing.T，用来记录错误或者测试状态；格式为：</li>
+<li>由于go
+test命令只能在一个相应的目录下执行所有文件，注意这两个文件需要在同一个目录下。</li>
+<li>另外测试文件必须要以_test.go结尾，这样在执行go
+test的时候才能执行到相应的代码。</li>
+<li>在测试文件中必须要import
+testing这个包，另外所有测试函数都以Test开头，并且参数是testing.T，用来记录错误或者测试状态；格式为：</li>
 </ul>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestXxx</span> <span class="params">(t *testing.T)</span></span> <span class="comment">//Xxx开头必须大写</span></span><br></pre></td></tr></table></figure>
-<p>上面的结果显示，我们代码的测试覆盖率为42.9%，这个数字怎么来的呢？当启用测试覆盖的时候，go test会用cover工具在编译之前重写源代码，在原始代码中寻找分支，然后在每个分支"种下"锚点。 等所有的case都跑完后，通过统计执行锚点的数量来计算覆盖率。比如变成这样：</p>
+<p>上面的结果显示，我们代码的测试覆盖率为42.9%，这个数字怎么来的呢？当启用测试覆盖的时候，go
+test会用cover工具在编译之前重写源代码，在原始代码中寻找分支，然后在每个分支"种下"锚点。
+等所有的case都跑完后，通过统计执行锚点的数量来计算覆盖率。比如变成这样：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    GoCover.Count[<span class="number">0</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">2</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;negative&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">3</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;zero&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        GoCover.Count[<span class="number">4</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;small&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        GoCover.Count[<span class="number">5</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;big&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        GoCover.Count[<span class="number">6</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;huge&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    GoCover.Count[<span class="number">1</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;enormous&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>虽然这样重写代码的方式开销看起来比较昂贵，但实际上它会被编译为单个的move指令，在实际测试时开销仅仅增加3%。</p>
 <blockquote>
-<p>Although that annotating assignment might look expensive, it compiles to a single "move" instruction. Its run-time overhead is therefore modest, adding only about 3% when running a typical (more realistic) test. That makes it reasonable to include test coverage as part of the standard development pipeline.</p>
+<p>Although that annotating assignment might look expensive, it compiles
+to a single "move" instruction. Its run-time overhead is therefore
+modest, adding only about 3% when running a typical (more realistic)
+test. That makes it reasonable to include test coverage as part of the
+standard development pipeline.</p>
 </blockquote>
 <h2 id="查看结果">查看结果</h2>
-<p>实际上，刚刚那种测试结果看起来比较简陋，我们需要了解更加详细的测试内容，因此我们可以使用go test来输出一个<strong>coverage profile</strong>，该文件保存着收集的统计信息的文件，使得我们研究它们更加方便。</p>
+<p>实际上，刚刚那种测试结果看起来比较简陋，我们需要了解更加详细的测试内容，因此我们可以使用go
+test来输出一个<strong>coverage
+profile</strong>，该文件保存着收集的统计信息的文件，使得我们研究它们更加方便。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">% </span><span class="language-bash">go <span class="built_in">test</span> -coverprofile=coverage.out</span> </span><br><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok      size    0.030s</span><br><span class="line"><span class="meta prompt_">%</span></span><br></pre></td></tr></table></figure>
 <p>输出结果为：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mode: set</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:3.25,4.12 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:16.5,16.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:5.16,6.26 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:7.17,8.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:9.17,10.23 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:11.18,12.21 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:13.19,14.22 1 0</span><br></pre></td></tr></table></figure>
 <p>有了这么一个文件，我们可以不进行测试，直接查看测试结果：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">% </span><span class="language-bash">go tool cover -func=coverage.out</span></span><br><span class="line">size.go:    Size          42.9%</span><br><span class="line">total:      (statements)  42.9%</span><br><span class="line"><span class="meta prompt_">%</span></span><br></pre></td></tr></table></figure>
 <h2 id="热图">热图</h2>
-<p>我们可以以多种方式来检测代码覆盖率，go test接受-covermode标志来将覆盖模式设置为以下三种：</p>
+<p>我们可以以多种方式来检测代码覆盖率，go
+test接受-covermode标志来将覆盖模式设置为以下三种：</p>
 <ul>
 <li>set：每个语句都运行了吗</li>
 <li>count：每个语句运行了多少次</li>
@@ -1030,7 +1073,8 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <li>指定内存区域被加入到一个地址空间时，open函数被调用</li>
 <li>指定内存区域被删除时，close函数被调用</li>
 </ul>
-<h3 id="内存区域的树型结构和内存区域的链表结构">内存区域的树型结构和内存区域的链表结构</h3>
+<h3
+id="内存区域的树型结构和内存区域的链表结构">内存区域的树型结构和内存区域的链表结构</h3>
 <p>mmap域使用单独链表连接所有的内存区域对象，每个vm_area_struct结构体通过自身vm_next域连入链表。</p>
 <p>而mm_rb则是用红黑树连接所有的内存区域。</p>
 <h2 id="操作内存区域">操作内存区域</h2>
@@ -1046,7 +1090,8 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <p>内核使用do_mmap()创建一个新的线性地址区间，不过不同的是，如果新创建的地址区间与一个已经存在的地址区间相邻，并且它们具有相邻的访问权限时，两个区间就会合并为一个。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">do_mmap</span><span class="params">(<span class="keyword">struct</span> file *file, 			<span class="type">unsigned</span> <span class="type">long</span> addr,</span></span><br><span class="line"><span class="params">        <span class="type">unsigned</span> <span class="type">long</span> len, <span class="type">unsigned</span> <span class="type">long</span> prot,</span></span><br><span class="line"><span class="params">        	<span class="type">unsigned</span> <span class="type">long</span> flag, <span class="type">unsigned</span> <span class="type">long</span> offset)</span></span><br><span class="line">&#123;</span><br><span class="line">         <span class="type">unsigned</span> <span class="type">long</span> ret = -EINVAL;</span><br><span class="line">         <span class="keyword">if</span> ((offset + PAGE_ALIGN(len)) &lt; offset)</span><br><span class="line">                   <span class="keyword">goto</span> out;</span><br><span class="line">         <span class="keyword">if</span> (!(offset &amp; ~PAGE_MASK))</span><br><span class="line">                   ret = do_mmap_pgoff(file, addr, len, prot, flag, offset &gt;&gt; PAGE_SHIFT);</span><br><span class="line">out:</span><br><span class="line">         <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>该函数映射由file指定的文件。</p>
-<h2 id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址区间</h2>
+<h2
+id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址区间</h2>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">do_mummap</span><span class="params">(<span class="keyword">struct</span> mm_struct *mm, <span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">size_t</span> len)</span>;</span><br></pre></td></tr></table></figure>
 <p>该函数从特定的进程地址空间中删除从地址start开始，长度为len字节的空间。</p>
 <p>而mummap()则是对do)mummap()函数的一个简单封装。</p>
@@ -1395,7 +1440,8 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <p>文件对象由结构体file表示。</p>
 <p>文件操作由结构体file_operations表示，内定义了大量的函数指针。</p>
 <h2 id="和进程相关的数据结构">和进程相关的数据结构</h2>
-<p>有三个结构体将VFS和系统的进程紧密地联系在一起：file_struct, fs_struct和namespace。</p>
+<p>有三个结构体将VFS和系统的进程紧密地联系在一起：file_struct,
+fs_struct和namespace。</p>
 <h3 id="file_struct">file_struct</h3>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">atomic_t</span> count; <span class="comment">/* 共享该表的进程数 */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">rwlock_t</span> file_lock; <span class="comment">/* 保护以下的所有域,以免在tsk-&gt;alloc_lock中的嵌套*/</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> max_fds; <span class="comment">/*当前文件对象的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> max_fdset; <span class="comment">/*当前文件描述符的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> next_fd; ／*已分配的文件描述符加<span class="number">1</span>*/</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> ** <span class="title">fd</span>;</span> <span class="comment">/* 指向文件对象指针数组的指针 */</span></span><br><span class="line"></span><br><span class="line">    fd_set *close_on_exec; <span class="comment">/*指向执行exec( )时需要关闭的文件描述符*/</span></span><br><span class="line"></span><br><span class="line">    fd_set *open_fds; <span class="comment">/*指向打开文件描述符的指针*/</span></span><br><span class="line"></span><br><span class="line">    fd_set close_on_exec_init;<span class="comment">/* 执行exec( )时需要关闭的文件描述符的初 值集合*/</span></span><br><span class="line"></span><br><span class="line">    fd_set open_fds_init; <span class="comment">/*文件描述符的初值集合*/</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> * <span class="title">fd_array</span>[32];</span><span class="comment">/* 文件对象指针的初始化数组*/</span></span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>进程描述符的files域指向该结构体，包含了所有与单个进程相关的文件信息。</p>
@@ -1544,7 +1590,8 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> page * <span class="title function_">alloc_pages</span><span class="params">(<span class="type">gfp_t</span> gfp_mask, <span class="type">unsigned</span> <span class="type">int</span> order)</span>;<span class="comment">//分配2^order个连续的物理页面，指针指向第一个page结构体</span></span><br></pre></td></tr></table></figure>
 <p>也可以获得填充为0的页，避免随机产生了垃圾信息或者敏感信息，保证安全：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">get_zeroed_page</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> gfp_mask)</span>;</span><br></pre></td></tr></table></figure>
-<p>释放页面，释放页需要谨慎，因为传递了错误的struct page或者地址会导致系统，因为内核是完全相信自己的：</p>
+<p>释放页面，释放页需要谨慎，因为传递了错误的struct
+page或者地址会导致系统，因为内核是完全相信自己的：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">free_pages</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> addr, <span class="type">unsigned</span> <span class="type">int</span> order)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">free_page</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> addr)</span>;</span><br></pre></td></tr></table></figure>
 <h2 id="kmalloc">kmalloc()</h2>
 <p>kmalloc()函数与用户控件malloc()类似，都是以字节为单位进行分配，只是多了一个flags参数。</p>
@@ -1598,7 +1645,8 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <p>上面我们讲了多种分配函数，但如何选择呢？</p>
 <p>如果内核需要连续的物理内存，应该使用kmalloc；</p>
 <p>如果需要连续的虚拟内存，应该使用vmalloc，但性能相对于kmalloc会低一点；</p>
-<p>对于高端内存，可以使用alloc_pages，返回一个struct page的结构指针；如果要得到真正的指针，应该使用kmap()，将高端内存映射到内核逻辑地址；</p>
+<p>对于高端内存，可以使用alloc_pages，返回一个struct
+page的结构指针；如果要得到真正的指针，应该使用kmap()，将高端内存映射到内核逻辑地址；</p>
 <p>如果要频繁创建和撤销大的数据结构，slab高速缓存是一种更好的选择，slab层通过维持一个对象高速缓存，避免频繁地分配和释放内存，只需要根据需要从缓存中得到对象就可以了。</p>
 
           
@@ -1736,7 +1784,9 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">long</span> word = <span class="number">0</span>;</span><br><span class="line">set_bit(<span class="number">0</span>, &amp;word);<span class="comment">//设置第0位</span></span><br><span class="line">set_bit(<span class="number">1</span>, &amp;word);<span class="comment">//设置第1位</span></span><br></pre></td></tr></table></figure>
 <h2 id="自旋锁">自旋锁</h2>
 <p>临界区的情况可能非常复杂，不能像上面那样只是简单声明原子变量就可以保证同步，因此就引入更为复杂的同步方法——锁。</p>
-<p>Linux内核中最常见的锁是自旋锁（spin lock）——这种锁最多只能被一个可执行线程持有。一个可争用的自旋锁会使得请求线程busy wait，不断消耗处理器的时间。当然有方法可以让线程先行睡眠，待锁可用时再唤醒。但考虑到上下文切换的消耗，如果持有锁的时间比较短，自旋锁是一个比较好的选择。</p>
+<p>Linux内核中最常见的锁是自旋锁（spin
+lock）——这种锁最多只能被一个可执行线程持有。一个可争用的自旋锁会使得请求线程busy
+wait，不断消耗处理器的时间。当然有方法可以让线程先行睡眠，待锁可用时再唤醒。但考虑到上下文切换的消耗，如果持有锁的时间比较短，自旋锁是一个比较好的选择。</p>
 <p>如果持有自旋锁的时间小于两次上下文切换，那么可以选用自旋锁。</p>
 <h3 id="自旋锁方法">自旋锁方法</h3>
 <p>自旋锁的实现是和体系结构相关的，代码往往通过汇编来实现。基本的使用形式如下：</p>
@@ -2100,8 +2150,7 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

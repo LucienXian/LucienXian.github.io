@@ -96,12 +96,12 @@
 
 
 
-<meta name="description" content="开始看这本神书，做一些笔记： 简单对象模型 第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。  img  表格驱动对象模型 存储两个指针，分别指向data member table和function member table  img  C++对象模型 来看看重头戏——C++对象模型。有几个需要注意的">
+<meta name="description" content="开始看这本神书，做一些笔记： 简单对象模型 第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。   img  表格驱动对象模型 存储两个指针，分别指向data member table和function member table   img  C++对象模型 来看看重头戏——C++对象模型。有几个需要注">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深度探索C++对象模型&lt;一&gt;">
 <meta property="og:url" content="http://yoursite.com/2018/03/01/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%B8%80/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="开始看这本神书，做一些笔记： 简单对象模型 第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。  img  表格驱动对象模型 存储两个指针，分别指向data member table和function member table  img  C++对象模型 来看看重头戏——C++对象模型。有几个需要注意的">
+<meta property="og:description" content="开始看这本神书，做一些笔记： 简单对象模型 第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。   img  表格驱动对象模型 存储两个指针，分别指向data member table和function member table   img  C++对象模型 来看看重头戏——C++对象模型。有几个需要注">
 <meta property="og:locale">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/simple_obj.png">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png">
@@ -162,9 +162,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -342,22 +340,28 @@
 <h1 id="简单对象模型">简单对象模型</h1>
 <p>第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h1 id="表格驱动对象模型">表格驱动对象模型</h1>
 <p>存储两个指针，分别指向data member table和function member table</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h1 id="c对象模型">C++对象模型</h1>
 <p>来看看重头戏——C++对象模型。有几个需要注意的：</p>
 <ul>
 <li><p>非静态数据成员放在类的对象中；</p></li>
 <li><p>静态数据成员和成员函数放在类对象之外；</p></li>
-<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info object；</p></li>
+<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info
+object；</p></li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 
       
@@ -575,8 +579,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

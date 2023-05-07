@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -366,7 +364,8 @@
 </ul></li>
 <li>如果proposer从大多数acceptors收到期待的响应，则可以接着提议一个编号为n并且值为v的提案，这里的v要么是自由选择一个值（所有的响应都没接收过任何的提案），要么是从上面b响应中选出最大编号的提案的值；</li>
 </ul>
-<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求， acceptor就可以接受编号为n的提案。</p>
+<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求，
+acceptor就可以接受编号为n的提案。</p>
 <p>总结起来，acceptor和proposer的算法操作可以分为两个阶段：</p>
 <ul>
 <li>阶段一</li>
@@ -386,25 +385,40 @@
 <p>为了获取到选定的值，learner必须要找出某个以及被大多数acceptors接受的提案。如果是每个acceptors都将通过的提案告知所有的learners，那么通信次数等于两者个数乘积；如果是只告诉一个特定learner，虽然通信次数减少了，但可靠行也降低了；更一般情况是，将它们的通过提案信息发送给一个特定的learners集合，其中的每个learner都可以将该信息告知所有的learners。</p>
 <p>由于信息的丢失，learners可能无法确定一个值是否有一个大多数的acceptors通过了，为了确定选定的值，必须重新发起一次新的提案。</p>
 <h3 id="progress">Progress</h3>
-<p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
+<p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer
+p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer
+q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
 <p>为了保证progress的进行，必须选择一个特定proposer来作为唯一一个提议提案的。如果这个proposer可以和半数以上的acceptors通信，同时使用一个比现有通过编号都大的编号作为提案的话，就可以产生一个成功通过的提案。</p>
 <blockquote>
-<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that a reliable algorithm for electing a proposer must use either randomness or real time—for example, by using timeouts. However, safety is ensured regardless of the success or failure of the election.</p>
+<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that
+a reliable algorithm for electing a proposer must use either randomness
+or real time—for example, by using timeouts. However, safety is ensured
+regardless of the success or failure of the election.</p>
 </blockquote>
 <p>无论选举是否成功，proposer选举算法的安全性都是可以得到保证的。</p>
 <h3 id="the-implementation">The Implementation</h3>
 <p>Paxos算法假设了一个多进程网络，在该算法里，每个进程都扮演了proposer，acceptor及learner的角色。Paxos算法通过选定一个leader来扮演上面提到的特定learner和proposer。Paxos一致性算法就是上述所描述的，其中请求和响应都作为普通消息发送。acceptor在发出响应消息之前，会需要可靠性存储来记录信息。</p>
-<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase 1。</p>
+<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase
+1。</p>
 <h2 id="implementing-a-state-machine">Implementing a State Machine</h2>
 <p>实现分布式系统的一种简单方式是由一组客户端向一个中央服务器发出命令请求，该服务器可以看作是一个按顺序执行客户端命令的状态机。但使用单个服务器的可用性较低，因此想到了可以使用一组服务器，每个服务器独立地实现同样的状态机，只要所有服务器都产生一致的状态和输出，那么发出命令的客户端就可以采用任意一个服务器的输出了。</p>
-<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i 个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
+<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i
+个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
 <p>假设服务器的集合是固定的，一般情况下一个独立的服务器被选为了leader，它就会扮演特定的proposer角色，多个客户端发送命令到leader，leader会决定每个命令的顺序。假设存在某条命令的序号为135，那么它就会通过一致性算法的第135个实例来选定一个提案，这里的命令就是提案的值。这个提案可能成功也可能失败，失败的原因可能来自机器故障，或者是存在另一个服务器认为自己是leader，从而判断了135实例存在其他值。但该算法能够保证最多只有一个命令被选定。</p>
-<p>这个策略的关键在于，Paxos算法中被提出的值只有phase 2才能被选定。前面说过的，phase 1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
-<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase 1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase 2，选定135和140的命令。</p>
-<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的"noop"命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140 号命令就可以被执行了。</p>
+<p>这个策略的关键在于，Paxos算法中被提出的值只有phase
+2才能被选定。前面说过的，phase
+1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
+<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase
+1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase
+2，选定135和140的命令。</p>
+<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的"noop"命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140
+号命令就可以被执行了。</p>
 <p>由此1-140命令都被选定了，leader就可以继续往下推进所有大于140的实例了。</p>
 <p>接下来讲讲空缺的产生，leader可以在提出命令141被选定之前，先提出命令142，但发送的关于141的信息可能会全部丢失，因此其他服务器可能先知道了142命令的选定，而不知道选择了什么作为命令141。这就产生了空缺。</p>
-<p>由于 leader 的故障以及新 leader 的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase 2的成本。在所有的一致性算法中， paxos一致性算法的phase 2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
+<p>由于 leader 的故障以及新 leader
+的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase
+2的成本。在所有的一致性算法中， paxos一致性算法的phase
+2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
 <p>特殊情况下，leader选举失败，导致出现多个“疑似”的leader，但paxos算法的安全性仍然可以保证不会同时有两个命令被选为第i个状态机命令。</p>
 <p>如果服务器的集合是变化的，那么也存在某种方式来决定哪些服务器可以作为这个一致性算法的实力，论文提到的方式是通过状态机自身来实现，即当前的服务器集合作为状态的一部分，比如将在执行完第i个状态机命令后标识的服务器集合，作为一致性算法执行实例i+a的服务器集合。</p>
 
@@ -526,13 +540,18 @@
       
         
           
-            <h1 id="better-io-through-byte-addressable-persistent-memory">Better I/O Through Byte-Addressable, Persistent Memory</h1>
+            <h1 id="better-io-through-byte-addressable-persistent-memory">Better I/O
+Through Byte-Addressable, Persistent Memory</h1>
 <blockquote>
-<p>现代的计算机系统一般是通过基于块的接口来缓慢地访问持久性存储的，但近年来，像Phase-Change Memory这种基于字节寻址的持久性存储技术提供了更快速、和更细粒度的访问方式。本论文介绍了新的文件系统和硬件体系结构，具备基于字节寻址持久性内存的属性。</p>
+<p>现代的计算机系统一般是通过基于块的接口来缓慢地访问持久性存储的，但近年来，像Phase-Change
+Memory这种基于字节寻址的持久性存储技术提供了更快速、和更细粒度的访问方式。本论文介绍了新的文件系统和硬件体系结构，具备基于字节寻址持久性内存的属性。</p>
 </blockquote>
 <h2 id="introduction">INTRODUCTION</h2>
-<p>新的基于字节寻址的持久性存储技术（BPRAM）消除了volatile和non- volatile存储之间的许多传统差异，尤其是随着Phase-Change Memory和memristors等技术的发展，也可像DRAM一样按字节寻址，同时能够像磁盘一样持久化。</p>
-<p>本文通过研究文件系统来探索BPRAM的好处，并为BPRAM线了一个新的文件系统BPFS，提供了远快于传统基于块存储设备的文件系统的速度。此外，与现有系统相比，BPFS通过一种short-circuit shadow paging的新技术来提供了强大的安全性和一致性保证。</p>
+<p>新的基于字节寻址的持久性存储技术（BPRAM）消除了volatile和non-
+volatile存储之间的许多传统差异，尤其是随着Phase-Change
+Memory和memristors等技术的发展，也可像DRAM一样按字节寻址，同时能够像磁盘一样持久化。</p>
+<p>本文通过研究文件系统来探索BPRAM的好处，并为BPRAM线了一个新的文件系统BPFS，提供了远快于传统基于块存储设备的文件系统的速度。此外，与现有系统相比，BPFS通过一种short-circuit
+shadow paging的新技术来提供了强大的安全性和一致性保证。</p>
 <p>BPFS的存储方法在一些重要方面与传统文件系统也存在不同，包括不将DRAM缓冲区高速缓存用于文件系统数据，针对小型随机写入进行优化，减小了尚未持久的数据漏洞窗口。</p>
 <h2 id="design-principles">DESIGN PRINCIPLES</h2>
 <p>论文主要关注两个目标：</p>
@@ -540,7 +559,8 @@
 <li>设计对BPRAM的体系结构支持；</li>
 <li>设计一个文件系统，以利用BPRAM的属性来提高性能和可靠性；</li>
 </ul>
-<h3 id="expose-bpram-directly-to-the-cpu">Expose BPRAM Directly to the CPU</h3>
+<h3 id="expose-bpram-directly-to-the-cpu">Expose BPRAM Directly to the
+CPU</h3>
 <p>传统的永久性存储位于总线控制器和存储控制器的后面，由于对这些控制器的访问带来的性能损耗，即使是最快的NAND闪存SSD，延迟也要几十微秒。</p>
 <p>论文的做法是，将BPRAM直接与DRAM并排放置在内存总线上，使得CPU能够在BPRAM的地址上加载和存储，降低访问延迟。另外，BPRAM的可寻址还能够利用高速缓存的层次结构来提高对持久性存储器的写入性能。</p>
 <p>但将BPRAM放在内存总线上也是有一些缺点：</p>
@@ -550,13 +570,20 @@
 <li>若应用或驱动程序存在缺陷，则可能导致杂散写入，即stray write；</li>
 </ul>
 <p>因此不建议用BPRAM完全替代DRAM，虽然论文也提到一些论据证明这几个缺点不是很大问题的。</p>
-<h3 id="enforce-ordering-and-atomicity-in-hardware">Enforce Ordering and Atomicity in Hardware</h3>
+<h3 id="enforce-ordering-and-atomicity-in-hardware">Enforce Ordering and
+Atomicity in Hardware</h3>
 <p>为了保证安全性和一致性，文件系统需要清楚写入持久性存储的顺序和时间。但执行强制性的排序约束会对性能有一定的影响。文中提出了一种软件机制来声明对硬件的排序约束，软件可以发出特殊的写屏障，以分隔一组epoch的写操作，而硬件将保证每个epoch都按顺序写回到主存器中。</p>
 <p>除了对顺序的限制外，文件系统还考虑对应对故障原子性的问题，如果由于电源故障而中断对持久性存储的写操作，则该存储器可能会处于中间状态，从而破坏了一致性。借助BPRAM，可以直接在硬件中提供一个简单的原子写入基元。</p>
-<h3 id="use-short-circuit-shadow-paging">Use Short-Circuit Shadow Paging</h3>
-<p>大多数存储系统都使用以下两种方式来确保可靠性：WAL预写日志和影子分页shadow paging。WAL会使得大多数写入需要进行两次操作，而shadow paging则是实用写时复制来执行所有更新。由于shadow paging每次写入都会因为传播到文件系统根目录树而输出多个块，shadow paging的副本成本远超日志记录，因此目前应用都是使用前者。</p>
+<h3 id="use-short-circuit-shadow-paging">Use Short-Circuit Shadow
+Paging</h3>
+<p>大多数存储系统都使用以下两种方式来确保可靠性：WAL预写日志和影子分页shadow
+paging。WAL会使得大多数写入需要进行两次操作，而shadow
+paging则是实用写时复制来执行所有更新。由于shadow
+paging每次写入都会因为传播到文件系统根目录树而输出多个块，shadow
+paging的副本成本远超日志记录，因此目前应用都是使用前者。</p>
 <p>但BPRAM的字节寻址能力和快速的随机写入使影子分页成为文件系统设计的一种高效方法，BPFS通过实现一种称为短路影子寻呼（SCSP）的新技术，允许BPFS在文件系统树中的任何位置提交更新，从而避免了将副本传播到文件系统根目录所产生的开销。</p>
-<h2 id="bpfs-design-and-implementation">BPFS DESIGN AND IMPLEMENTATION</h2>
+<h2 id="bpfs-design-and-implementation">BPFS DESIGN AND
+IMPLEMENTATION</h2>
 <h3 id="file-system-layout">File System Layout</h3>
 <p>BPFS的持久数据结构组织成了一个具备固定大小的块的树，使得能够原子更新树的任意部分，并且块大小固定使得释放和分配都比较方便。</p>
 <p>BPFS数据结构由三种文件组成，每种文件都由相同的树数据结构表示。</p>
@@ -566,8 +593,10 @@
 <li>数据文件仅包含用户数据；</li>
 </ul>
 <p>所有文件都是由相同的数据结构组成的，即一棵全由4K块组成的树。树的叶节点代表文件的数据（即用户数据，目录条目或索引节点），每棵树的内部节点包含了指向树的下一级的512个64位指针。文件系统的根结点就是inode文件。</p>
-<p><img src="https://img.imgdb.cn/item/601ed79e3ffa7d37b3abbef5.png" /></p>
-<p>每个树的高度由树的根指针的低位所表示，这使得BPFS可以通过记住从中获取的数来确定给定的块是内部节点还是叶子节点。对于高度为0的树，根指针直接指向一个数据块，该数据块最多可以包含4KB的文件数据。在高度树为1的情况下，根指针指向512个指针的内部块，每个指针指向4KB数据块，总共2 MB。以此类推。内部节点没有存储文件数据。</p>
+<p><img
+src="https://img.imgdb.cn/item/601ed79e3ffa7d37b3abbef5.png" /></p>
+<p>每个树的高度由树的根指针的低位所表示，这使得BPFS可以通过记住从中获取的数来确定给定的块是内部节点还是叶子节点。对于高度为0的树，根指针直接指向一个数据块，该数据块最多可以包含4KB的文件数据。在高度树为1的情况下，根指针指向512个指针的内部块，每个指针指向4KB数据块，总共2
+MB。以此类推。内部节点没有存储文件数据。</p>
 <p>为了简化将数据写入文件中间的任务，我们在树的任何级别使用空指针，以此表示该指针跨越的文件某个范围内的零数据。例如，如果文件的根指针是高度为5的空指针，则它表示一个空的256TB文件。空指针也可以出现在内部节点上，此文件就可以实现大型的稀疏文件的紧凑表示形式。另外，还会存储每个文件的大小以及每个根指针，若文件较大，则假定文件的尾部为零；若文件较小，则忽略文件末尾在树中的任何数据。这样能够在不更新树本身的情况下更改文件大小。</p>
 <h3 id="persistent-data-updates">Persistent Data Updates</h3>
 <p>Short-circuit shadow paging通过三种不同的方法来更新持久性数据：</p>
@@ -576,8 +605,10 @@
 <li>就地追加：就地追加利用了每个文件的根指针附带着文件大小变量。由于超出文件大小的所有数据都将被忽略，因此可以安全地就地写入这些位置，并且一旦写入了所有数据，我们就可以自动更新文件大小来扩展有效数据范围；</li>
 <li>写时复制：在将受此操作影响的树的所有部分上执行写时复制，直到可以通过一次写操作可以提交变更的最少部分。</li>
 </ul>
-<p><img src="https://img.imgdb.cn/item/60217ded3ffa7d37b3d71967.png" /></p>
-<p>对于所有这些操作，必须要在提交该操作的原子写入之前和之后发出epoch barriers。这些屏障确保了提交之前所有写操作都先将被刷新到BPRAM，并且任何后续的文件系统操作都将在提交之后进行。</p>
+<p><img
+src="https://img.imgdb.cn/item/60217ded3ffa7d37b3d71967.png" /></p>
+<p>对于所有这些操作，必须要在提交该操作的原子写入之前和之后发出epoch
+barriers。这些屏障确保了提交之前所有写操作都先将被刷新到BPRAM，并且任何后续的文件系统操作都将在提交之后进行。</p>
 <h3 id="volatile-data-structures">Volatile Data Structures</h3>
 <p>该文件系统布局允许对持久状态进行高效可靠的更新，因此暂不允许将诸如哈希表之类的复杂数据结构存储在持久内存中。但考虑到这些复杂数据结构可以提高性能，因此在易失性内存中维护一些派生的数据结构。这里介绍了三个：</p>
 <ul>
@@ -597,7 +628,8 @@
 <li>Close：关闭文件或目录后，BPFS会检查该文件或目录是否已标记为删除。如果是，crawler则到目录条目的位置写入inumber为0来表示删除。最后则更新易失性数据结构，包括空闲块列表和空闲inumber列表；</li>
 </ul>
 <h3 id="multiprocessor-operation">Multiprocessor Operation</h3>
-<p>BPFS保证将更新按顺序提交给BPRAM。在单处理器系统上，epoch barrier通过按照创建它们的顺序将从缓存子系统中拿到epoch来强制执行此保证。</p>
+<p>BPFS保证将更新按顺序提交给BPRAM。在单处理器系统上，epoch
+barrier通过按照创建它们的顺序将从缓存子系统中拿到epoch来强制执行此保证。</p>
 <p>对于多处理器的情况，硬件修改可确保如果在两个不同的CPU上发出了共享状态的两个epoch，那么这些epoch将被序列化。但如果进程或线程在两个不同的CPU上执行时更新了两个不同的状态，则可以按任何顺序将更新写回PCM。为了正确实现这些更新，必须考虑三种情况：</p>
 <ul>
 <li>可以在单个文件系统操作期间在多个CPU上调度线程；</li>
@@ -614,8 +646,10 @@
 </ul>
 <h2 id="hardware-support">HARDWARE SUPPORT</h2>
 <h3 id="phase-change-memory">Phase Change Memory</h3>
-<p>Phase change memory即PCM是一种非易失性且基于字节寻址的新型存储技术，能提供与DRAM相近的访问速度，也可以组织成类似于DRAM的阵列结构。本论文的假设是基于PCM的存储系统被组织成放置在与DDR兼容的DIMM中一组PCM芯片。</p>
-<h3 id="wear-leveling-and-write-failures">Wear Leveling and Write Failures</h3>
+<p>Phase change
+memory即PCM是一种非易失性且基于字节寻址的新型存储技术，能提供与DRAM相近的访问速度，也可以组织成类似于DRAM的阵列结构。本论文的假设是基于PCM的存储系统被组织成放置在与DDR兼容的DIMM中一组PCM芯片。</p>
+<h3 id="wear-leveling-and-write-failures">Wear Leveling and Write
+Failures</h3>
 <p>尽管PCM比一般的NAND闪存的写耐久性更高，但考虑到PCM放置在存储器总线上而不是I/O总线上，单元将暴露于更大更多的写入活动，因此需要进行耗损均衡：</p>
 <ul>
 <li>最小化写入的方式设计PCM阵列，延长使用寿命；</li>
@@ -627,9 +661,11 @@
 <h3 id="enforcing-ordering">Enforcing Ordering</h3>
 <p>现代的高速缓存和内存控制器可以重新排列从CPU到内存的写入顺序。考虑到使用BPRAM代替DRAM，写回发生的顺序会变的很重要，例如如果高速缓存控制器在选择在写回缓冲区之前先写回指针更新，则BPRAM中的文件系统将不一致，这种不一致性一般会因为高速缓存一致性和内存屏障机制变得不可见。但如果在所有数据都写回到BPRAM之前发生电源故障，则重新引导计算机时文件系统将变得不一致。为了避免这种情况，需要遵守任何排序约束。</p>
 <p>强制排序有多种选择。一种可能是使用直写式缓存；第二种是在每个内存屏障处刷新整个缓存，以确保所有数据都以正确的顺序到达非易失性内存中；第三种是跟踪在操作期间已修改的所有高速缓存行，以便仅刷新包含脏文件系统数据的行。</p>
-<p>这几种方法都有明显的问题，论文的解决方法是允许软件将排序约束明确地传达给硬件，即epoch barrier。epoch是从同一线程向持久性存储器进行写入的序列，由软件发出的新型存储器屏障来界定。</p>
+<p>这几种方法都有明显的问题，论文的解决方法是允许软件将排序约束明确地传达给硬件，即epoch
+barrier。epoch是从同一线程向持久性存储器进行写入的序列，由软件发出的新型存储器屏障来界定。</p>
 <h2 id="conclusion">CONCLUSION</h2>
-<p>本文主要介绍了一种文件系统，支持按字节寻址和持久化内存，同时也介绍了一种硬件体系来确保原子性和顺序保证。新型文件系统使用了short-circuit shadow paging的技术来提供较强的安全性和一致性保证。</p>
+<p>本文主要介绍了一种文件系统，支持按字节寻址和持久化内存，同时也介绍了一种硬件体系来确保原子性和顺序保证。新型文件系统使用了short-circuit
+shadow paging的技术来提供较强的安全性和一致性保证。</p>
 
           
         
@@ -749,7 +785,8 @@
       
         
           
-            <h1 id="bitcoin-a-peer-to-peer-electronic-cash-system">Bitcoin: A Peer-to-Peer Electronic Cash System</h1>
+            <h1 id="bitcoin-a-peer-to-peer-electronic-cash-system">Bitcoin: A
+Peer-to-Peer Electronic Cash System</h1>
 <blockquote>
 <p>一个纯粹的p2p电子支付能够绕过第三方金融机构直接从一方发到另外一方。数字签名能解决部分场景问题，但还不够好，因为仍旧需要一个信任的第三方去防止双重支付。因此论文提出一种解决方案来解决双重支付问题，即使用了一个点对点网络。</p>
 </blockquote>
@@ -758,17 +795,20 @@
 <p>论文提出的电子支付系统就是一个基于密码学证明而非信任的系统，允许双方在不需要第三方机构的前提下进行直接的交易。计算上的不可逆性能保证卖家不被欺骗，而常规的第三方托管机构可以轻松地被使用来保护买家（卖家比买家更有优势？）。在论文里提出了一种方案来解决双重支付问题：使用一种p2p的分布式时间戳服务，生成交易的时间顺序的可计算证明。只要诚实节点共同控制的算力比攻击节点组织控制的算力大，那么整个系统就是安全。</p>
 <h2 id="transactions">Transactions</h2>
 <p>论文对电子货币的定义就是一个带有数字签名的链表，每一个货币拥有者交易给下一个人时，先是通过对上一个交易的输出和接受者公钥进行hash后，然后货币拥有者再用自己的私钥对hash值进行数字签名，这样收款人就可以通过验证签名来进行溯源。</p>
-<p><img src="https://img.imgdb.cn/item/600bdec03ffa7d37b3aef39f.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600bdec03ffa7d37b3aef39f.png" /></p>
 <p>但这个过程有一个问题就是，无法验证付款人有没有双重支付，即这个付款人有没有同时转账给了另一个人。一个可靠的方法是引入一个中央机构，在每一笔交易后，这个货币必须被中央机构回收从而发行一个新的货币，并且只有货币是被直接从可信的中央机构发行才能保证不被双重支付，但这又回到了前面的银行老路了。</p>
 <p>论文的做法是，每一笔交易必须被公开广播出来，收款人需要确保，这笔交易是大多数节点所公认的第一次出现，第一次被接收。因为需要一个系统让所有参与者公认一个唯一的历史序列。</p>
 <h2 id="timestamp-server">Timestamp Server</h2>
 <p>论文提出的解决方案先从时间服务器开始，其工作过程是把一组数据形成的区块hash结果加盖上时间戳并广播这个hash。这个时间戳就证明，这些数据在这个时刻一定是存在的。每一个时间戳在hash过程中都包含前面一个时间戳，随着每个新增的时间戳加强了可信度，让每一个区块都包含了前面所有区块的时间戳，这样构成了一个链条。</p>
-<p><img src="https://img.imgdb.cn/item/600be4823ffa7d37b3b17413.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600be4823ffa7d37b3b17413.png" /></p>
 <h2 id="proof-of-work">Proof-of-Work</h2>
 <p>为了实现一个基于p2p的分布式时间戳服务器，将会需要使用一个工作量证明系统。在hash的时候，工作量证明机制将参与扫描一个值，这个hash从一串0bits开始，平均工作量随着0的增长将呈指数级增长，然而只执行一个hash运算就能验证这个hash值。</p>
 <p>对于时间戳网络，我们通过在区块中增加一个随机数来实现这个工作量证明，直到一个指定块的hash所需要的0-bits值被找到。只要CPU效率被花费来作为工作量证明，除非重新做一遍相当的工作量，否则这个区块就不能再被改变。简单来说就是做的工作越多，找到这个随机数的概率就越大，这样就构建了一个工作量证明机制。</p>
 <p>工作量证明机制同时解决了大多数代表的问题，论文解释了不考虑一个IP一票的这种模式，因为这个机制很容易被拥有大多数IP的给颠覆。工作量证明本质上是一CPU一票，最长的链就表示了大多数，同时也有最大的工作量。如果一个大多数CPU的算力都被诚实节点所控制，那么该链就会增长得最快且超过其他任何链。想要改变一个过去的块，攻击者需要重做这个块和所有在这个块后的块工作量证明，之后还要追赶上并超过现在所有诚实节点的工作。一个更慢的攻击者想要追上不断延伸的区块链，可能性是呈指数级下降的。</p>
-<p><img src="https://img.imgdb.cn/item/600c44fd3ffa7d37b3e712cb.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600c44fd3ffa7d37b3e712cb.png" /></p>
 <p>同时为了抵消硬件速度提升和节点变化的影响，工作量的困难度是由一个变化的平均目标决定的——每一个小时的平均区块，全网只按一个平均时间来生成一个区块。如果块生成的速度更快了，单位时间所需要的工作量就会变得更大，在同等算力下，计算随机数的难度更大了。</p>
 <h2 id="network">Network</h2>
 <p>网络运行的步骤如下：</p>
@@ -778,7 +818,8 @@
 <li>每一个节点都为自己的块去找到那个工作量证明；</li>
 <li>节点找到后，将块广播给所有的节点；</li>
 <li>其他所有节点认可这个块的所有交易合法，并且接受这个块；</li>
-<li>节点开始使用该块的hash作为prev hash，开始转向下一个块的工作量证明；</li>
+<li>节点开始使用该块的hash作为prev
+hash，开始转向下一个块的工作量证明；</li>
 </ol>
 <p>节点总是只认可最长的链，如果2个节点同时广播不同版本的块，一些节点会首先收到其中一个块，并为第一个收到块工作，但同时也保存下另一个块。当下一个工作量证明被发现的时候且这时另一条分支会变得更长，在其他分支工作的节点们也将会转换到这个最长的分支上，即块重组。</p>
 <p>新交易是没必要广播到所有的节点上，只要交易到达了许多节点上，它们就会进入到一个区块中。并且块的广播能够容忍被丢失的信息，节点意识到那一块缺失就可以进行请求。</p>
@@ -790,34 +831,46 @@
 <h2 id="reclaiming-disk-space">Reclaiming Disk Space</h2>
 <p>一旦一个货币最新的交易收入进入足够多的块中，那么在这笔交易之前的交易信息就能够被抛弃来节省硬盘资源。为了不损害块的hash，交易信息被hash成一种Merkle树的形态，只有root节点被包含进了这个区块的hash。通过拔除Merkle树的分支，不保存内部的hash值，以此来压缩块。</p>
 <p>此时一个块的头部大概会是80byte大小。假设块每10分钟就生成一个，那么每年产生<code>80bytes * 6 * 25 * 365 = 4.2MB</code>的数据。</p>
-<p><img src="https://img.imgdb.cn/item/600da6543ffa7d37b3902338.png" /></p>
-<h2 id="simplified-payment-verification">Simplified Payment Verification</h2>
+<p><img
+src="https://img.imgdb.cn/item/600da6543ffa7d37b3902338.png" /></p>
+<h2 id="simplified-payment-verification">Simplified Payment
+Verification</h2>
 <p>支付验证不需要运行所有的网络节点，有些节点已经不再持有全部的块信息，但用户可以通过向网络节点发起询问从而拿到最长工作量证明链条上的块副本，从而得到了Merkle树的分支，连接到这个用户的交易被加上时间戳的地方。用户自己不能验证交易，但可以通过把交易连接到Merkle树的分支。就可以看见一个可以看到一个网络节点曾经接受过它，在它后面增加的块也能证明网络曾经接收过它。</p>
-<p><img src="https://img.imgdb.cn/item/600dae9e3ffa7d37b394b331.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600dae9e3ffa7d37b394b331.png" /></p>
 <p>因而只要有多数诚实节点控制网络，支付的验证就是可靠的，而一旦网络被攻击者控制，一个简单的验证方法就是：当这些网络节点监测到一个非法的块，就会提醒用户去下载相关的全部区块，进行独立的安全验证。</p>
-<h2 id="combining-and-splitting-value">Combining and Splitting Value</h2>
+<h2 id="combining-and-splitting-value">Combining and Splitting
+Value</h2>
 <p>虽然可以独立的处理电子货币，但在一次转账中为每一分钱都构造一个独立的交易是不明智的。为了能让价值能够分割和组合，交易包含了多个输入和输出。通常情况，前面的交易要么是一大笔单一的输入或者是包括很多小额的多笔输入，输出也有两种，一个是付款，另一个是找零。bitcoin只关心差额，不关心货币最小单元。</p>
-<p><img src="https://img.imgdb.cn/item/600db0e83ffa7d37b395e1a6.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600db0e83ffa7d37b395e1a6.png" /></p>
 <h2 id="privacy">Privacy</h2>
 <p>传统的银行系统实现隐私的保护是通过限制访问信息被提供给相关的参与者和第三方。像现在的场景需要将全部交易公开广播的时候，就不能使用这种方法了。这里的做法是公钥匿名，公众可以看到有一个人转账给另一个人，但是没有信息能把交易和人联系在一起。</p>
-<p><img src="https://img.imgdb.cn/item/600db2213ffa7d37b396c40a.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600db2213ffa7d37b396c40a.png" /></p>
 <p>还有一个额外的防范机制，就是每次有新的交易，进来都使用一个新的密钥对。但一旦用户的公私密钥被泄漏，由于信息是全网公开的，通过多笔的输入交易，仍然可能推测出这个人是谁。</p>
 <h2 id="calculations">Calculations</h2>
 <p>接下来我们考虑一个场景，一个攻击者尝试生成一条比目前诚实链还长的替换链。即便这样能实现，也不代表整个系统完全受制于攻击者。节点是不会接受无效的交易作为支付的，攻击者只能只能尝试修改他自己的交易信息，从而要回自己花掉的钱。</p>
-<p>诚实链和攻击链的竞争可以看作是一个Binomial RandomWalk，这是指随机漫步有两个方向的概率模型，要么是诚实链领先，要么是攻击链领先。成功事件是诚实链延长了一个块，使其+1领先，同时失败事件是攻击链延长一个块，使得差距-1。攻击者从一个既定的差距中追上的可能性可以看作是一个Gambler's Ruinproblem。一个攻击者要追上诚实链，如下所示：</p>
+<p>诚实链和攻击链的竞争可以看作是一个Binomial
+RandomWalk，这是指随机漫步有两个方向的概率模型，要么是诚实链领先，要么是攻击链领先。成功事件是诚实链延长了一个块，使其+1领先，同时失败事件是攻击链延长一个块，使得差距-1。攻击者从一个既定的差距中追上的可能性可以看作是一个Gambler's
+Ruinproblem。一个攻击者要追上诚实链，如下所示：</p>
 <ul>
 <li><p>P=诚实链发现下一个区块的概率</p></li>
 <li><p>q=攻击者发现下一个区块的概率</p></li>
 <li><p>qz=攻击者花费了z个区块追赶上了</p></li>
 </ul>
-<p><img src="https://img.imgdb.cn/item/600ef71e3ffa7d37b32d909f.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600ef71e3ffa7d37b32d909f.png" /></p>
 <p>假设p&gt;q，那么攻击者追上的概率就会随着块数目的增加而指数下降。现在可以考虑一个新的交易能够被充分地确认发送方不能再更改交易的情况要等多久，即不能再追上。假设付款人是一个攻击者，他希望收款方认为他已经付过款了，并且在之后把这个钱在付款后拿回来。收款方在这件事情发生的时候会被通知警告，但是付款方希望这件事情很久才发生。</p>
 <p>接收方生成了一个新密钥对并在短时间内把这个公钥给了付款方，这能有效防止付款方事先准备好一个在时间之前的区块链。</p>
 <p>一旦交易被发送，这个不诚实的发送者开始为包含替换他交易版本的并行链而秘密工作。事实上接收方不知道攻击者确切地进展了多少块。假设诚实块是花费平均时间来产生的，那么攻击者的潜在进展会呈现一种泊松密度分布，期望值λ是：</p>
-<p><img src="https://img.imgdb.cn/item/600ef91d3ffa7d37b32e42ca.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600ef91d3ffa7d37b32e42ca.png" /></p>
 <p>为了得到攻击者能追上的概率，将泊松密度乘以从该点追上的概率得到：</p>
-<p><img src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e32.png" /></p>
-<p><img src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e35.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e32.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e35.png" /></p>
 <p>附上一段代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;math.h&gt;</span> </span></span><br><span class="line">doubleAttackerSuccessProbability(<span class="type">double</span> q, <span class="type">int</span> z)&#123;</span><br><span class="line">      <span class="type">double</span> p= <span class="number">1.0</span> - q;</span><br><span class="line">      doublelambda = z * (q / p);</span><br><span class="line">      doublesum = <span class="number">1.0</span>;</span><br><span class="line">      <span class="type">int</span> i, k;</span><br><span class="line">      <span class="keyword">for</span> (k =<span class="number">0</span>; k &lt;= z; k++)</span><br><span class="line">      &#123;</span><br><span class="line">             doublepoisson = <span class="built_in">exp</span>(-lambda);</span><br><span class="line">             <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= k; i++) </span><br><span class="line">                   poisson *= lambda / i; </span><br><span class="line">                   sum -= poisson * (<span class="number">1</span> - <span class="built_in">pow</span>(q / p, z - k));</span><br><span class="line">      &#125;    </span><br><span class="line">      <span class="keyword">return</span> sum; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="总结">总结</h2>
@@ -941,11 +994,15 @@
       
         
           
-            <h1 id="dont-settle-for-eventual-scalable-causal-consistency-for-wide-area-storage-with-cops">Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS</h1>
+            <h1
+id="dont-settle-for-eventual-scalable-causal-consistency-for-wide-area-storage-with-cops">Don’t
+Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage
+with COPS</h1>
 <h2 id="abstract">ABSTRACT</h2>
 <p>COPS的KV存储系统，并引出了一种新的一致性模型——具有收敛性冲突处理的因果一致性。</p>
 <h2 id="introduction">INTRODUCTION</h2>
-<p>对于分布式存储系统，论文从CAP转移到关注ALPS——即可用性、低延迟、分区容忍性和扩展性。论文介绍了一个叫COPS的KV存储系统，并实现了一种新的一致性模型causal+ consistency，收敛冲突处理的因果一致性。除此之外还有一个扩展版本——COPS-GT，提供了get事务来保证提供对于多个key的一致性视图，并且是无锁和非阻塞的。</p>
+<p>对于分布式存储系统，论文从CAP转移到关注ALPS——即可用性、低延迟、分区容忍性和扩展性。论文介绍了一个叫COPS的KV存储系统，并实现了一种新的一致性模型causal+
+consistency，收敛冲突处理的因果一致性。除此之外还有一个扩展版本——COPS-GT，提供了get事务来保证提供对于多个key的一致性视图，并且是无锁和非阻塞的。</p>
 <ul>
 <li>因果一致性：确保数据存储遵循操作之间的因果依赖关系；</li>
 <li>收敛冲突处理：确保副本永远不会发散，并且在所有节点上对相同key的冲突进行相同的处理；</li>
@@ -962,21 +1019,28 @@
 </ul>
 <p>由于CAP的缘故，具备可用性和分区容忍性的分布式系统无法实现强一致性。为了在ALPS系统的要求和易编程之间取得平衡，论文定义了一个中间一致性模型。</p>
 <h2 id="causal-consistency">CAUSAL+ CONSISTENCY</h2>
-<p>对于具有收敛冲突处理的因果一致性来说，其抽象模型只有两种操作：put(key,val)和 get(key)=val，即读写。在COPS系统里，单个逻辑副本就是完整的本地集群的所有节点。</p>
+<p>对于具有收敛冲突处理的因果一致性来说，其抽象模型只有两种操作：put(key,val)和
+get(key)=val，即读写。在COPS系统里，单个逻辑副本就是完整的本地集群的所有节点。</p>
 <p>该模型定义了三条规则：</p>
 <ul>
-<li>Execution Thread：如果a和b是单线程内的两个操作，a-&gt;b表示a发生在b之前；</li>
-<li>Gets From：如果a是一个put操作，b是一个获取a写入值的get操作，则是a-&gt;b；</li>
+<li>Execution
+Thread：如果a和b是单线程内的两个操作，a-&gt;b表示a发生在b之前；</li>
+<li>Gets
+From：如果a是一个put操作，b是一个获取a写入值的get操作，则是a-&gt;b；</li>
 <li>Transitivity：对于操作a、b、c来说，如果存在a-&gt;b和b-&gt;c，则一定有a-&gt;c；</li>
 </ul>
 <p>下图就是这三条规则的一个样例：</p>
-<p><img src="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/5ffb1adb3ffa7d37b392d6ce.png" /></p>
 <h3 id="definition">Definition</h3>
 <p>论文将因果一致性定义为两个属性的组合：因果一致性和收敛性冲突处理。</p>
-<p>所谓的因果一致性就是上图提到的一个操作顺序结果，如果client 2读取x的时候，先读取到4，再读取到1就会违反因果一致性。但如果两个操作a和b没有任何顺序关系，那么因果一致性就会认为这是一个并发操作，不会做任何的约束，提高系统性能。如果a和b都在同一个key上做put操作，就意味着发生冲突。冲突会带来两个问题：冲突的值可能不确定，即不同副本的值可能不一致；冲突可能产生需要特殊处理的特殊情况；</p>
-<p>因此就需要收敛的冲突处理，冲突处理函数必须能在所有副本上以相同的方式进行处理，并且满足交换律和结合律的，即<span class="math inline">\(h(a,h(b,c))=h(c,h(b,a))\)</span>，不同的副本以接收到顺序处理冲突，收敛处理的结果。</p>
+<p>所谓的因果一致性就是上图提到的一个操作顺序结果，如果client
+2读取x的时候，先读取到4，再读取到1就会违反因果一致性。但如果两个操作a和b没有任何顺序关系，那么因果一致性就会认为这是一个并发操作，不会做任何的约束，提高系统性能。如果a和b都在同一个key上做put操作，就意味着发生冲突。冲突会带来两个问题：冲突的值可能不确定，即不同副本的值可能不一致；冲突可能产生需要特殊处理的特殊情况；</p>
+<p>因此就需要收敛的冲突处理，冲突处理函数必须能在所有副本上以相同的方式进行处理，并且满足交换律和结合律的，即<span
+class="math inline">\(h(a,h(b,c))=h(c,h(b,a))\)</span>，不同的副本以接收到顺序处理冲突，收敛处理的结果。</p>
 <p>COPS可以自定义冲突收敛函数，默认使用last writer wins。</p>
-<h3 id="causal-vs.-other-consistency-models">Causal+ vs. Other Consistency Models</h3>
+<h3 id="causal-vs.-other-consistency-models">Causal+ vs. Other
+Consistency Models</h3>
 <p>这一章主要介绍各种一致性模型的对比，从约束能力来看：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Linearizability &gt; Sequential &gt; Causal+ &gt; Causal &gt; FIFO</span><br><span class="line">																			 &gt; Per-Key Sequential &gt; Eventua</span><br></pre></td></tr></table></figure>
 <p>Causal+提供了比较适中的一致性模型，且能满足ALPS的系统要求。</p>
@@ -985,19 +1049,25 @@
 <h3 id="scalable-causality">Scalable Causality</h3>
 <p>有些类似的因果一致性系统使用的是日志交换的序列化，在扩展性方便表现不好。而COPS则是采用了划分key空间和编码依赖关系到key元数据的方式来提高扩展性。</p>
 <h2 id="system-design-of-cops">SYSTEM DESIGN OF COPS</h2>
-<p>COPS是一个实现了causal+一致性的、能满足ALPS的分布式存储系统，论文提及了两个版本：一个是简单版的，支持causal+ 的一致性，另一个则是升级版的，支持get事务，能确保client请求keys的时候，存储系统能提供一个一致的相关values的快照，成为 COPS-GT。</p>
+<p>COPS是一个实现了causal+一致性的、能满足ALPS的分布式存储系统，论文提及了两个版本：一个是简单版的，支持causal+
+的一致性，另一个则是升级版的，支持get事务，能确保client请求keys的时候，存储系统能提供一个一致的相关values的快照，成为
+COPS-GT。</p>
 <h3 id="overview-of-cops">Overview of COPS</h3>
 <p>如下图，COPS就是一个在若干个数据中心运行着的kv存储系统。每个数据中心都有一个本地的COPS集群，保存着完整的一份数据。Client只与本地的数据中心进行联系，并通过COPS的client库进行调用。</p>
-<p><img src="https://img.imgdb.cn/item/6002872f3ffa7d37b3d238d1.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/6002872f3ffa7d37b3d238d1.png" /></p>
 <p>COPS系统主要由两个组件组成的：</p>
 <ul>
 <li>Key-value store：提供了对keys的线性化操作
 <ul>
-<li>每个key- value对都有对应的元数据。对于COPS，这个元数据是版本号；对于COPS-GT，则是有版本号和一系列的依赖‘</li>
-<li>kv存储提供了三种额外的操作：get by version, put after和dep check这三种操作确保了client库和异步复制进程能够提供Casula+一致性和get事务；</li>
+<li>每个key-
+value对都有对应的元数据。对于COPS，这个元数据是版本号；对于COPS-GT，则是有版本号和一系列的依赖‘</li>
+<li>kv存储提供了三种额外的操作：get by version, put after和dep
+check这三种操作确保了client库和异步复制进程能够提供Casula+一致性和get事务；</li>
 <li>对于 COPS-GT，系统保存了kv对的一些老版本数据，提供get事务；</li>
 </ul></li>
-<li>client库：主要提供读写操作，COPS的get， COPS-GT的get_trans，还有put。</li>
+<li>client库：主要提供读写操作，COPS的get，
+COPS-GT的get_trans，还有put。</li>
 </ul>
 <p>另外，COPS为了在确保casual+一致性的时候，能降低资源和性能开销：</p>
 <ul>
@@ -1006,8 +1076,10 @@
 <li>最多进行两次的get事务，降低延迟；</li>
 </ul>
 <h3 id="the-cops-key-value-store">The COPS Key-Value Store</h3>
-<p>对于COPS，存储元组是&lt;key: {value, version}&gt;，存储的是最新版本的数据；</p>
-<p>对于COPS-GT，存储元组是&lt;key: {value, version, deps}&gt;，deps就是一个链表，链表元素是&lt;key, version&gt;；</p>
+<p>对于COPS，存储元组是&lt;key: {value,
+version}&gt;，存储的是最新版本的数据；</p>
+<p>对于COPS-GT，存储元组是&lt;key: {value, version,
+deps}&gt;，deps就是一个链表，链表元素是&lt;key, version&gt;；</p>
 <p>每个COPS集群都持有完整的一份kv存储数据，每个集群节点根据一致性哈希获得一个独立的keys空间。至于容灾，则是通过链式复制来提供的。在每个集群中，每个key都有一个主节点，主节点会复制到集群内的从节点；至于其他集群也有一个对应的主节点；</p>
 <p>集群内的操作是线性化的，本地commit后，跨集群复制时会将数据放到一个队列上异步复制到其他集群的主节点。待其他集群检查完依赖关系后，就会提交该key；</p>
 <h3 id="client-library-and-interface">Client Library and Interface</h3>
@@ -1017,9 +1089,11 @@
 <ul>
 <li>COPS-GT Client Library</li>
 </ul>
-<p>COPS-GT的client库中context存了一组&lt;key, version, deps&gt;，读取时，client会将该key和其依赖关系添加到当前的context里；写入时，client先取出最新版本key的依赖关系，重新计算新依赖D，待写入成功后，则将写入该项&lt;key，返回的version，D&gt;到context；</p>
+<p>COPS-GT的client库中context存了一组&lt;key, version,
+deps&gt;，读取时，client会将该key和其依赖关系添加到当前的context里；写入时，client先取出最新版本key的依赖关系，重新计算新依赖D，待写入成功后，则将写入该项&lt;key，返回的version，D&gt;到context；</p>
 <p>下图就是运行过程中的依赖关系变化图：</p>
-<p><img src="https://img.imgdb.cn/item/6002908b3ffa7d37b3d70194.png" /></p>
+<p><img
+src="https://img.imgdb.cn/item/6002908b3ffa7d37b3d70194.png" /></p>
 <p>这种依赖关系的设计会嗲来两个问题：空间占用大和检查依赖关系的成本高。</p>
 <p>论文的解决方法是：COPS-GT会在依赖关系被提交后进行垃圾回收，另外就是由于依赖关系具备传递性，一旦依赖项被提交，那么可以确定该依赖项的依赖项也被提交了，所以只需要检查最近依赖；</p>
 <blockquote>
@@ -1029,12 +1103,15 @@
 <li>COPS Client Library</li>
 </ul>
 <p>COPS的client库需要更好的状态，因此读取时只需要将拿到的key和版本号添加到context就好，至于写入，则是先使用context作为最近的依赖项，返回数据后，则用返回的数据去副高context。</p>
-<h3 id="writing-values-in-cops-and-cops-gt">Writing Values in COPS and COPS-GT</h3>
+<h3 id="writing-values-in-cops-and-cops-gt">Writing Values in COPS and
+COPS-GT</h3>
 <p>所有对COPS的写入都分为两步：同步写入本地集群，异步复制到其他集群，并且都通过下面的API去完成：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bool,vers&gt; ← put_after (key, val, [deps], nearest, vers=∅)</span><br></pre></td></tr></table></figure>
 <h4 id="写入本地集群">写入本地集群</h4>
 <p>当client调用put接口时，首先需要计算最近的依赖关系，然后client库会去调用put_after接口，这里COPS不需要传入deps参数。然后该key对应的本地主节点会赋予该key一个版本号。put_after接口可以确保本地集群的commit是强一致性的，至于其他集群的提交在后面叙述。</p>
-<p>主节点使用Lamport时间戳来为每次更新计算一个版本号，其中高位是版本号，低位是节点号，通过比较Lamport时间戳，并应用 last-writer-wins 来检查和解决冲突。Lamport时间戳提供了所有分布式事件的偏序关系，与COPS的因果一致性兼容。</p>
+<p>主节点使用Lamport时间戳来为每次更新计算一个版本号，其中高位是版本号，低位是节点号，通过比较Lamport时间戳，并应用
+last-writer-wins
+来检查和解决冲突。Lamport时间戳提供了所有分布式事件的偏序关系，与COPS的因果一致性兼容。</p>
 <h4 id="复制到其他集群">复制到其他集群</h4>
 <p>本地写入提交后，主节点会调用put_after（此时vers参数需要设置为新得到的值）异步复制到其他集群的主节点，主节点进行依赖检查dep_check，一直阻塞直到依赖中的值都写入提交了，参会写入并提交该key值。依赖检查只需要nearest就好。</p>
 <h3 id="reading-values-in-cops">Reading Values in COPS</h3>
@@ -1051,7 +1128,8 @@
 <li>然后根据前面的计算，得到需要进行第二轮get_by_version的调用，此时获取指定版本的值；（同样是并行调用）；</li>
 <li>此时拿到的acl值就是最新的了；</li>
 </ul>
-<h2 id="garbage-faults-and-conflicts">GARBAGE, FAULTS, AND CONFLICTS</h2>
+<h2 id="garbage-faults-and-conflicts">GARBAGE, FAULTS, AND
+CONFLICTS</h2>
 <h3 id="garbage-collection-subsystem">Garbage Collection Subsystem</h3>
 <p>随着key的更新和插入，系统的空间占用将会无限制增长。COPS的垃圾回收子系统能够删除无用的状态，将系统的空间维持在一个合适的大小。</p>
 <ul>
@@ -1071,8 +1149,16 @@
 <p>存储：client存在context里的元数据，包括依赖关系和其他数据。</p>
 <p>COPS清理的方式有两种：</p>
 <ol type="1">
-<li>put_after作用于所有集群后，会对key标记为never- depend，并返回给client，client就可以在context中进行删除；</li>
-<li>COPS节点会从put_after中移除不需要的依赖，这里使用了一个global checkpoint time的概念，版本号比这个小的都移除；global checkpoint time的计算方式：首先是从pending中的put_after里找到最早的Lamport timestamp；然后联系其他集群的等价节点，一对一交换拿到最早的Lamport timestamp，所有数据中心都能知道key范围内最早的Lamport timestamp是什么了；最后数据中心会gossip自己负责的key range的最小时间戳，以找到任何一个节点观测到的最早Lamport timestamp。论文的实现是，每秒执行10次，并且对性能没有明显影响。</li>
+<li>put_after作用于所有集群后，会对key标记为never-
+depend，并返回给client，client就可以在context中进行删除；</li>
+<li>COPS节点会从put_after中移除不需要的依赖，这里使用了一个global
+checkpoint time的概念，版本号比这个小的都移除；global checkpoint
+time的计算方式：首先是从pending中的put_after里找到最早的Lamport
+timestamp；然后联系其他集群的等价节点，一对一交换拿到最早的Lamport
+timestamp，所有数据中心都能知道key范围内最早的Lamport
+timestamp是什么了；最后数据中心会gossip自己负责的key
+range的最小时间戳，以找到任何一个节点观测到的最早Lamport
+timestamp。论文的实现是，每秒执行10次，并且对性能没有明显影响。</li>
 </ol>
 <h3 id="fault-tolerance">Fault Tolerance</h3>
 <h4 id="client-failures">Client Failures</h4>
@@ -1094,7 +1180,8 @@
 <p>数据中心出故障时，COPS-GT无法进行依赖回收，要等到重新配置去掉有问题的数据中心。</p>
 <h3 id="conflict-detection">Conflict Detection</h3>
 <p>多线程并发写同一个key会导致冲突。</p>
-<p>COPS使用的是前文提到过的last- write-win策略来解决冲突，last则是最新的写入版本号。</p>
+<p>COPS使用的是前文提到过的last-
+write-win策略来解决冲突，last则是最新的写入版本号。</p>
 <p>COPS也可以自定义冲突检查和解决策略，但需要考虑三个部分的内容：</p>
 <ul>
 <li>所有的写入都需要带上前面的版本元数据，即本地集群看到的最近版本；</li>
@@ -1103,7 +1190,8 @@
 </ul>
 <p>冲突检查：如果写入的key——new，带有了一个版本号prev，而此时可见的当前版本是curr，如果prev!=curr，则意味着发生冲突。</p>
 <h2 id="conclusion">CONCLUSION</h2>
-<p>本文介绍了一种可扩展的分布式存储系统COPS，可以在不牺牲ALPS属性的情况下提供因果关系+一致性。COPS通过在每个集群的写入之前跟踪并显式检查是否满足因果关系来实现因果一致性。COPS-GT通过在COPS的基础上引入get事务，使client能够获得多个key的一致性视图； COPS-GT进行了优化，减少状态，最小化多轮协议并减少复制开销。</p>
+<p>本文介绍了一种可扩展的分布式存储系统COPS，可以在不牺牲ALPS属性的情况下提供因果关系+一致性。COPS通过在每个集群的写入之前跟踪并显式检查是否满足因果关系来实现因果一致性。COPS-GT通过在COPS的基础上引入get事务，使client能够获得多个key的一致性视图；
+COPS-GT进行了优化，减少状态，最小化多轮协议并减少复制开销。</p>
 
           
         
@@ -1232,34 +1320,56 @@
 <h2 id="overview">Overview</h2>
 <p>论文提到的设计面临的场景是：读多写少，需要能从多个数据源读取数据。</p>
 <p>MemCached提供了一组简单的操作（set、get和delete），这使它能够成为大规模分布式系统重要的基础组件。开源版本是一个单机内存哈希表，本文基于这个开源版本构建了一个可以处理每秒数十亿请求的分布式的KV储存系统。下文将用“memcached”来指代它的源码或者它运行的二进制实例，用“memcache”来指代由每个实例构成的分布式系统。</p>
-<p><img src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c45c.png" /></p>
-<p><strong>Query cache</strong>：依赖memcache来减轻读取数据库的负担。如上图所示，读取的时候先读memcache，不命中再读数据库，查询成功后会更新memcache。写请求则是写到数据库，接着发删除请求到memcache。</p>
-<p><strong>Generic cache</strong>：论文还讲了如何使memcache成为一个更加通用的kv系统，如保存机器学习算法的中间结果。</p>
-<p><img src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c464.png" /></p>
+<p><img
+src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c45c.png" /></p>
+<p><strong>Query
+cache</strong>：依赖memcache来减轻读取数据库的负担。如上图所示，读取的时候先读memcache，不命中再读数据库，查询成功后会更新memcache。写请求则是写到数据库，接着发删除请求到memcache。</p>
+<p><strong>Generic
+cache</strong>：论文还讲了如何使memcache成为一个更加通用的kv系统，如保存机器学习算法的中间结果。</p>
+<p><img
+src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c464.png" /></p>
 <p>在系统的迭代中，论文考虑了两个重要的设计：</p>
 <ul>
 <li>只有对用户或者运维产生影响的问题，才值得优化；</li>
 <li>系统可能会暴露轻微陈旧的数据以便后台免受高负载的影响；</li>
 </ul>
-<h2 id="in-a-cluster-latency-and-load">In a Cluster : Latency and Load</h2>
+<h2 id="in-a-cluster-latency-and-load">In a Cluster : Latency and
+Load</h2>
 <p>这一章主要聚焦于拉取缓存数据时的延迟和缓存不命中时带来的负载</p>
 <h3 id="reducing-latency">Reducing Latency</h3>
-<p>为了减轻数据库的负载，需要准备由数百台memcache机器组成的缓存集群，但多个web服务器对多台memcache服务器的关系，可能会在短时间内导致incast congestion。数据副本可以缓解这种情况，但又会带来内存浪费。</p>
+<p>为了减轻数据库的负载，需要准备由数百台memcache机器组成的缓存集群，但多个web服务器对多台memcache服务器的关系，可能会在短时间内导致incast
+congestion。数据副本可以缓解这种情况，但又会带来内存浪费。</p>
 <p>因此论文中提到的减少延迟的方法主要集中在memcache客户端。</p>
-<p><strong>Parallel requests and batching</strong>：为了尽可能减少网络请求，该系统通过做拓扑图分析来表示数据间的依赖，整合将多个独立请求，并尽可能进行并发操作。</p>
-<p><strong>Client-server communication</strong>：memcached服务器之间并不会直接通信，而是相关控制逻辑集成到client上，memcache的client分为两个部分：sdk和一个叫mcrouter的的proxy，mcrouter在web服务器和memcached服务器之间，提供与memcached相同的接口。</p>
-<p>考虑到对数据错误容忍度高，memcached client的get请求使用UDP与memcached服务器通信，减少了创建和维护连接带来的开销。一旦出现丢包或者乱序包，client会将其作为异常处理，即视作cache miss，get请求会被重传到数据库，论文中提到系统在高峰期也只有0.25%的请求会被丢弃。为了可靠性，对于set和delete，则是通过可靠的TCP通信。</p>
-<p><strong>Incast congestion</strong>：对于Incast congestion问题，memcached的client实现了类似TCP的拥塞控制逻辑，根据网络情况控制滑动窗口。</p>
+<p><strong>Parallel requests and
+batching</strong>：为了尽可能减少网络请求，该系统通过做拓扑图分析来表示数据间的依赖，整合将多个独立请求，并尽可能进行并发操作。</p>
+<p><strong>Client-server
+communication</strong>：memcached服务器之间并不会直接通信，而是相关控制逻辑集成到client上，memcache的client分为两个部分：sdk和一个叫mcrouter的的proxy，mcrouter在web服务器和memcached服务器之间，提供与memcached相同的接口。</p>
+<p>考虑到对数据错误容忍度高，memcached
+client的get请求使用UDP与memcached服务器通信，减少了创建和维护连接带来的开销。一旦出现丢包或者乱序包，client会将其作为异常处理，即视作cache
+miss，get请求会被重传到数据库，论文中提到系统在高峰期也只有0.25%的请求会被丢弃。为了可靠性，对于set和delete，则是通过可靠的TCP通信。</p>
+<p><strong>Incast congestion</strong>：对于Incast
+congestion问题，memcached的client实现了类似TCP的拥塞控制逻辑，根据网络情况控制滑动窗口。</p>
 <h3 id="reducing-load">Reducing Load</h3>
 <p>为了减轻负载，论文提到了三种技术；</p>
 <h4 id="leases">Leases</h4>
-<p>文中引入了租约机制来解决下面两个问题：stale sets和thundering herds，前者是保证了并发更新下的最终一致性，后者则是缓解惊群效应。</p>
-<p>对于stale sets，是因为发生cache miss的时候，并发读取数据库后需要重新写入到memcache，这样就可能出现过期的数据在数据被删除之后才写入，导致数据库和memcache内的数据不一致。通过引入租约，每次出现cache miss的时候都会返回一个与key绑定的lease id，当数据被删除后，之前发出的lease id会失效，写入数据时，sdk需要带上上次收到的lease id，根据该id是否失效来仲裁写入与否。</p>
-<p>对于惊群效应，当数据出现热点的时候，可能会出现大量的cache miss，导致数据库负载增大。memcache通过控制每个key的lease发送速率，比如每个key在10秒内只发送一个lease id，在这期间有对这个key的请求时，会让客户端等待重试，这时数据可能已经被获得lease的给填上，这时就会重试成功。</p>
-<p><strong>过期值</strong>：对于某些能接受过期数据的应用，memcache会将已经删除的数据短暂地保存到另一个数据结构中，此时web server可以决定是等待新的数据还是读取过期数据，从而减轻负载。</p>
+<p>文中引入了租约机制来解决下面两个问题：stale sets和thundering
+herds，前者是保证了并发更新下的最终一致性，后者则是缓解惊群效应。</p>
+<p>对于stale sets，是因为发生cache
+miss的时候，并发读取数据库后需要重新写入到memcache，这样就可能出现过期的数据在数据被删除之后才写入，导致数据库和memcache内的数据不一致。通过引入租约，每次出现cache
+miss的时候都会返回一个与key绑定的lease
+id，当数据被删除后，之前发出的lease
+id会失效，写入数据时，sdk需要带上上次收到的lease
+id，根据该id是否失效来仲裁写入与否。</p>
+<p>对于惊群效应，当数据出现热点的时候，可能会出现大量的cache
+miss，导致数据库负载增大。memcache通过控制每个key的lease发送速率，比如每个key在10秒内只发送一个lease
+id，在这期间有对这个key的请求时，会让客户端等待重试，这时数据可能已经被获得lease的给填上，这时就会重试成功。</p>
+<p><strong>过期值</strong>：对于某些能接受过期数据的应用，memcache会将已经删除的数据短暂地保存到另一个数据结构中，此时web
+server可以决定是等待新的数据还是读取过期数据，从而减轻负载。</p>
 <h4 id="memcache-pools">Memcache Pools</h4>
 <p>将memcache作为通用缓存意味着所有不同的workloads会共享这一设施，Facebook统计过更新频率高的key很可能会将更新频率低的key给逐出来。</p>
-<p>考虑到这一点，Facebook将集群的memcache服务器分割成独立的池，一个默认pool，一个访问频率高但cache miss成本低的small poll，一个访问频率低但cache miss成本高的large pool。</p>
+<p>考虑到这一点，Facebook将集群的memcache服务器分割成独立的池，一个默认pool，一个访问频率高但cache
+miss成本低的small poll，一个访问频率低但cache miss成本高的large
+pool。</p>
 <h3 id="replication-with-in-pools">Replication With in Pools</h3>
 <p>对于某些pool，可以通过数据冗余的方式来提高请求的并发能力。</p>
 <p>###Handling Failures</p>
@@ -1267,19 +1377,28 @@
 <p>对于少数几个server宕机或者网络故障，Facebook主要依赖一个自动恢复机制，如果大规模的停机，Facebook会将用户请求直接转移到另一个数据中心。为了避免在自动恢复的那几分钟里对数据库或者后台服务带来的雪崩，memcached的client会将请求转移到Gutter机器上接管故障服务器的能力。</p>
 <p>一般来说，每次失败的请求都会导致转移到Gutter的存取，从而减轻数据库的负载。</p>
 <h2 id="in-a-region-replication">In a Region: Replication</h2>
-<p>随着流量的增大，需要对Memcached做横向扩展，并且能够解决key的热点问题和网络incast congestion，论文在replication和sharding之间做了取舍，选择了将memcached servers切分成多个集群，这一个memcached集群、前端访问集群还有共享存储集群统称为region。</p>
+<p>随着流量的增大，需要对Memcached做横向扩展，并且能够解决key的热点问题和网络incast
+congestion，论文在replication和sharding之间做了取舍，选择了将memcached
+servers切分成多个集群，这一个memcached集群、前端访问集群还有共享存储集群统称为region。</p>
 <h3 id="regional-invalidations">Regional Invalidations</h3>
-<p>考虑到由于存在多个memcached server集群，需要确保数据的一致性，避免同一条数据的不同版本出现在不同集群上。论文的做法是，监控MySQL，一旦出现数据被删除或者更新，且事务提交，那么对应key就会被一个mcsqueal守护进程记录（读取MySQL的commit log），然后批量地将删除明亮发送给对应的Memcached实例。</p>
-<p><img src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c46b.png" /></p>
+<p>考虑到由于存在多个memcached
+server集群，需要确保数据的一致性，避免同一条数据的不同版本出现在不同集群上。论文的做法是，监控MySQL，一旦出现数据被删除或者更新，且事务提交，那么对应key就会被一个mcsqueal守护进程记录（读取MySQL的commit
+log），然后批量地将删除明亮发送给对应的Memcached实例。</p>
+<p><img
+src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c46b.png" /></p>
 <h3 id="regional-pools">Regional Pools</h3>
 <p>考虑对部分数据的QPS很低，Facebook的做法是不把所有数据在一个region内存储多份冗余，而是在单个region内划分出一个pool来存储那些访问率低的数据。</p>
 <h3 id="cold-cluster-warmup">Cold Cluster Warmup</h3>
-<p>由于现有集群需要进行定期维护，在新集群上线时，缓存命中率会很低。Facebook构建了一个Cold Cluster Warmup的系统，在新集群发生cache miss时从热集群中加载数据，而不是去读持久化存储。</p>
+<p>由于现有集群需要进行定期维护，在新集群上线时，缓存命中率会很低。Facebook构建了一个Cold
+Cluster Warmup的系统，在新集群发生cache
+miss时从热集群中加载数据，而不是去读持久化存储。</p>
 <h2 id="across-regions-consistency">Across Regions: Consistency</h2>
-<p>Facebook在全球都有数据中心，因此每个数据中心都会有若干个region来服务用户。基于MySQL的复制机制，Facebook将一个region设为master，其他的都是只读region，web servers请求的时候只会访问本地的DB或者memcache。至于写入，所有的请求只是发给master处理，然后mysql再将其同步到从region。这样就可能带来一致性的问题，即从region的memcache一直保留着过期数据。</p>
+<p>Facebook在全球都有数据中心，因此每个数据中心都会有若干个region来服务用户。基于MySQL的复制机制，Facebook将一个region设为master，其他的都是只读region，web
+servers请求的时候只会访问本地的DB或者memcache。至于写入，所有的请求只是发给master处理，然后mysql再将其同步到从region。这样就可能带来一致性的问题，即从region的memcache一直保留着过期数据。</p>
 <p>对于这种场景，该系统保持一致性的方法是：</p>
 <ul>
-<li><p>如果在master region写，前端集群收到更新，请求转发到数据库，同时删除本集群的memcache记录。数据库的进程同步修改到其他集群，其他region删除过期的记录；</p></li>
+<li><p>如果在master
+region写，前端集群收到更新，请求转发到数据库，同时删除本集群的memcache记录。数据库的进程同步修改到其他集群，其他region删除过期的记录；</p></li>
 <li><p>在非master region写数据d：</p>
 <ul>
 <li>本地的memcache会设置remote marker，rd；</li>
@@ -1288,7 +1407,9 @@
 <li>等待master DB同步带有rd信息的数据到非master DB；</li>
 <li>该非master DB通过解析数据，然后删除掉rd；</li>
 </ul>
-<p>在这个过程中，非master region有对该数据d进行读取，并发生cache miss时，如果发现了数据带有rd，则直接跨region访问master DB，否则直接读取本地DB。</p></li>
+<p>在这个过程中，非master region有对该数据d进行读取，并发生cache
+miss时，如果发现了数据带有rd，则直接跨region访问master
+DB，否则直接读取本地DB。</p></li>
 </ul>
 <h2 id="总结">总结</h2>
 <p>论文主要是基于memcache技术来满足Facebook的业务需求，有很多取舍在优化线上系统性能时都非常值得参考。</p>
@@ -1411,32 +1532,43 @@
       
         
           
-            <h1 id="resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1>
+            <h1
+id="resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing">Resilient
+Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster
+Computing</h1>
 <blockquote>
 <p>本文提出了一种称之为RDDs的分布式内存抽象，以此解决在大规模集群中以容错的方式提供内存计算的方式。当前的计算框架对于迭代算法和交互式数据挖掘的效率都很低，RDDs通过将数据留在内存来提高性能。本文通过Spark系统来实现RDDs。</p>
 </blockquote>
 <h2 id="introduction">Introduction</h2>
-<p>诸如MapReduce 和Dryad之类的集群计算框架已被广泛用于大规模数据分析。这些系统使用户可以使用一组高级API来编写并行计算，而不必担心工作分配和容错能力。</p>
+<p>诸如MapReduce
+和Dryad之类的集群计算框架已被广泛用于大规模数据分析。这些系统使用户可以使用一组高级API来编写并行计算，而不必担心工作分配和容错能力。</p>
 <p>尽管当前的框架为集群的计算资源提供了许多抽象，但它们还是缺乏对利用分布式内存的抽象。这就导致了在多个计算之间复用中间结果时，显得非常低效。数据重用在许多迭代机器学习和图计算中很常见。另外在交互式数据挖掘中，用户会需要对数据的同一子集运行多个临时查询。然而在大多数框架中，在计算之间（例如在两个MapReducce作业之间）重用数据的唯一方法是将其写入外部稳定的存储系统，例如分布式文件系统。由于数据复制，磁盘IO和序列化，这会导致相当大的开销，这可能会影响应用程序的执行时间。</p>
-<p>在这篇论文中提出了一个全新的抽象，叫做RDDs(Resilient Distributed Datasets)，它可以在广泛的应用程序中实现有效的数据重用。RDDs 是一个可以容错且并行的数据结构，它可以让用户显式的将中间结果数据集保存在内中。</p>
-<p>现存的分布式内存抽象系统，都是基于对可变状态的细粒度更新。这种接口保证容错的方式无非是将数据进行多副本备份，需要在机器节点间复制大量的数据，宽带传输数据的速度远远比RAM 内存慢。</p>
+<p>在这篇论文中提出了一个全新的抽象，叫做RDDs(Resilient Distributed
+Datasets)，它可以在广泛的应用程序中实现有效的数据重用。RDDs
+是一个可以容错且并行的数据结构，它可以让用户显式的将中间结果数据集保存在内中。</p>
+<p>现存的分布式内存抽象系统，都是基于对可变状态的细粒度更新。这种接口保证容错的方式无非是将数据进行多副本备份，需要在机器节点间复制大量的数据，宽带传输数据的速度远远比RAM
+内存慢。</p>
 <p>与这些系统相比，RDD提供了基于粗粒度转换的接口（map，reduce，filter）。这些接口可以对多条数据条目应用相同的操作，这样就可以通过记录来生成某个数据集的一系列转换，而不是记录真实的数据。如果RDD丢失，则RDD具有足够的有关如何从其他RDD派生的信息，可以仅重新计算该分区。因此，丢失的数据通常可以很快恢复。</p>
-<h2 id="resilient-distributed-datasets">Resilient Distributed Datasets</h2>
+<h2 id="resilient-distributed-datasets">Resilient Distributed
+Datasets</h2>
 <p>本章主要介绍RDD和Spark编程接口，并与细粒度共享内存做对比。</p>
 <h3 id="rdd-abstraction">RDD Abstraction</h3>
-<p>RDD是一个只读的、可分区的数据集，可以通过对稳定的存储系统或者其他的RDD进行操作来创建一个新的RDD，这些操作称之为transformations，比如map，filter 以及join。另外用户可以控制RDD的存储和分区，指定存储策略，也可以根据key做hash来做数据分区。</p>
+<p>RDD是一个只读的、可分区的数据集，可以通过对稳定的存储系统或者其他的RDD进行操作来创建一个新的RDD，这些操作称之为transformations，比如map，filter
+以及join。另外用户可以控制RDD的存储和分区，指定存储策略，也可以根据key做hash来做数据分区。</p>
 <h3 id="spark-programming-interface">Spark Programming Interface</h3>
 <p>Spark通过集成编程语言API来表示RDD，每一个数据集就是一个对象，通过对象的方法来操作对象。RDD有两种操作，一种是上面说的transformations，另一种则是action，action操作可以得到应用结果值，比如count可以返回数据集的元素个数、collect返回数据集的所有元素以及save则是将输出结果写入到存储系统中。</p>
 <p>Spark定义RDDs是并不会计算，只是采取lazy特性，可以将transformations组成pipeline，触发了actions操作才会真正计算。用户可以通过RDDs的preset方法来缓存数据，也可以调整缓存策略。</p>
 <h3 id="advantages-of-the-rdd-model">Advantages of the RDD Model</h3>
 <p>论文将RDD和分布式共享内存系统DSM做了比较，RDD只能粗粒度的操作转换，而DSM可以在任意内存位置进行写入。这样RDD的容错机制更加高效，不需要发生非常耗时的checkpoint，只需重新计算丢数据的分区。另外一个好处就是任务备份比较简单，因为RDD是不变的。还有就是，RDD可以进行进行任务调度来提高大批量的写入效率，在scan-base的操作中也能根据需要将内存数据写到磁盘中。</p>
-<h3 id="applications-not-suitable-for-rdds">Applications Not Suitable for RDDs</h3>
+<h3 id="applications-not-suitable-for-rdds">Applications Not Suitable
+for RDDs</h3>
 <p>RDD更适合批量的数据处理场景，并不适合于需要异步且细粒度的更新共享状态的应用。</p>
 <h2 id="spark-programming-interface-1">Spark Programming Interface</h2>
 <p>Spark提供了一个用Scala编写的语言集成API。为了使用Spark，开发者编写了一个driver，该driver会连接workers集群，并定义若干个RDDs，在RDDs上执行action，在driver上的Spark代码会追踪RDDs的lineage。workers是一直运行的进程，能在内存中存储RDD分区。</p>
 <h3 id="rdd-operations-in-spark">RDD Operations in Spark</h3>
 <p>下图列出了Spark中RDD的transformations和actions操作。transformations是定义新RDD的lazy操作，而actions才是真正计算结果或者写数据到外部存储；</p>
-<p><img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abc98.png" /></p>
+<p><img
+src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abc98.png" /></p>
 <h2 id="representing-rdds">Representing RDDs</h2>
 <p>抽象RDDs会带来一个问题：如何在广泛转换中表示追踪lineage。理想情况下，一个实现RDDs的系统应该能够提供丰富的·转换算子，用户可以以任意方式进行组合。在Spark中则是提出了一个简单的图表示来达到以上目的。</p>
 <p>论文提出了一个通用接口去表示RDD，接口表达了五种信息：</p>
@@ -1454,7 +1586,9 @@
 </ul>
 <p>例如，代表HDFS文件的RDD对文件的每个块都有一个分片，并且通过数据位置策略知道每个块在哪台计算机上。</p>
 <figure>
-<img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abcd2.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abcd2.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>窄依赖能在一个节点上流水线执行，节点故障的时候也能高效地通过重新计算父分片来进行恢复；而宽依赖，单一节点故障可能会导致一个RDD的所有祖先分片丢失，需要完全重新执行。</p>
 <h2 id="implementation">Implementation</h2>
@@ -1462,7 +1596,9 @@
 <h3 id="job-scheduling">Job Scheduling</h3>
 <p>Spark的调度器与Dryad类似，另外还会考虑持久化了的RDD的哪些分片在内存中可用。任何时候用户在RDD上执行action，调度器就会检查RDD的lineage，建立由stages组成的DAG，然后执行这个图。调度器会使每个stage包含尽可能多的窄依赖，stages的边界是宽依赖shuffle操作，或者任何计算过的分片。</p>
 <figure>
-<img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd14.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd14.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>调度器会根据数据存放位置使用延迟调度给机器指派任务。</p>
 <p>若一个任务失败了，只要stage的父分片还在，就可以在另一个节点重新运行。如果一些stages都不可用了，就需要重新提交任务去并行计算丢失分片。</p>
@@ -1474,7 +1610,9 @@
 <li>代码生成：代码生成的单例对象是通过生成类的静态方法访问的，为了避免序列化一个访问不到前面定义变量的闭包，Spark将代码生成逻辑改成直接引用每行对象的实例；</li>
 </ul>
 <figure>
-<img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd29.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://pic.downk.cc/item/5ff33b793ffa7d37b34abd29.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="memory-management">Memory Management</h3>
 <p>Spark对RDD的持久化提供了三个选项：</p>
@@ -1608,43 +1746,61 @@
       
         
           
-            <h1 id="no-compromises-distributed-transactions-with-consistency-availability-and-performance">No compromises: distributed transactions with consistency, availability, and performance</h1>
+            <h1
+id="no-compromises-distributed-transactions-with-consistency-availability-and-performance">No
+compromises: distributed transactions with consistency, availability,
+and performance</h1>
 <blockquote>
 <p>强一致性和高可用性的事务简化了分布式系统的构建，但在从前，分布式事务的设计实现不大理想，这就迫使以前构建分布式系统的时候抛弃分布式事务或者使用弱一致性，或者使用单机事务，要求业务方通过数据分区的方式，保证事务数据落在一个机器上。</p>
 <p>本文一个名为FaRM的内存分布式计算平台，具备以下特性：强序列化，高性能，持久性和高可用性。</p>
 </blockquote>
 <h2 id="introduction">Introduction</h2>
 <p>具有高可用性和强序列化的事务通过简单的抽象来简化了分布式系统的编程和推理：单机永不失败，一次执行一个实时同步的事务。但是，先前在分布式系统中实现此抽象的尝试都导致了较差的性能。因此，诸如Dynamo或Memcached之类的系统通过不支持事务或实施弱一致性保证来提高性能。其他系统仅在所有数据都驻留在一台机器中时才提供事务。</p>
-<p>本文证明了现代数据中心中的新软件可以消除折衷的要求。它在一种称为FaRM的内存分布式计算平台中描述了事务，复制和恢复协议。 FaRM为分布式ACID事务提供严格的可简化性，高可用性，高吞吐量和低延迟。FaRM平台利用了两个趋势：带有RDMA的网络和提供非易失性DRAM，消除了存储和网络瓶颈，并通过减少消息数量，使用单面RDMA读写存储而不是消息以及有效利用并行性，来解决CPU瓶颈。</p>
-<p>FaRM允许数据分布在不同机器，同时允许事务跨越任何数量的机器。FaRM通过使用vertical Paxos，而不是通过Paxos协议进行coordinators和数据的复制，此时副本是主-备，然后协调者是单个，不进行复制。FaRM使用具有四个阶段提交协议（锁定，验证，提交备份和主要提交）。</p>
-<p>在事务执行和验证期间和在事务中修改的对象副本上将记录记录到非易失性预写日志WAL时，都会使用RDMA，避免了本地CPU开销。不再需要CPU参与，意味着传统的故障恢复（failure-recovery）协议不再适合FaRM，因此文章使用了precise membership的解决方案：保证所有机器都在当前membership configuration上达成一致，并且只会发送请求给组员。</p>
+<p>本文证明了现代数据中心中的新软件可以消除折衷的要求。它在一种称为FaRM的内存分布式计算平台中描述了事务，复制和恢复协议。
+FaRM为分布式ACID事务提供严格的可简化性，高可用性，高吞吐量和低延迟。FaRM平台利用了两个趋势：带有RDMA的网络和提供非易失性DRAM，消除了存储和网络瓶颈，并通过减少消息数量，使用单面RDMA读写存储而不是消息以及有效利用并行性，来解决CPU瓶颈。</p>
+<p>FaRM允许数据分布在不同机器，同时允许事务跨越任何数量的机器。FaRM通过使用vertical
+Paxos，而不是通过Paxos协议进行coordinators和数据的复制，此时副本是主-备，然后协调者是单个，不进行复制。FaRM使用具有四个阶段提交协议（锁定，验证，提交备份和主要提交）。</p>
+<p>在事务执行和验证期间和在事务中修改的对象副本上将记录记录到非易失性预写日志WAL时，都会使用RDMA，避免了本地CPU开销。不再需要CPU参与，意味着传统的故障恢复（failure-recovery）协议不再适合FaRM，因此文章使用了precise
+membership的解决方案：保证所有机器都在当前membership
+configuration上达成一致，并且只会发送请求给组员。</p>
 <p>FaRM中的故障恢复速度很快，因为它有效地利用了并行性。它在集群中平均分配恢复的数据，并在每台计算机之间并行进行恢复。</p>
 <h2 id="hardware-trends">Hardware trends</h2>
 <p>FaRM的设计受到数据中心机器中大量廉价DRAM的推动。FaRM利用两种硬件趋势来消除存储和网络瓶颈：非易失性DRAM和具有RDMA的网络。</p>
 <h3 id="non-volatile-dram">Non-volatile DRAM</h3>
-<p>distributed uninterruptible power supply (UPS)利用锂离子电池的广泛可用性来降低数据中心UPS的成本，与传统的UPS相比，这种方法更加可靠：锂离子电池配备了多个独立的电池单元，并且电池故障仅会影响机架的一部分。</p>
+<p>distributed uninterruptible power supply
+(UPS)利用锂离子电池的广泛可用性来降低数据中心UPS的成本，与传统的UPS相比，这种方法更加可靠：锂离子电池配备了多个独立的电池单元，并且电池故障仅会影响机架的一部分。</p>
 <p>分布式UPS有效地使DRAM持久耐用。发生电源故障时，分布式UPS使用电池中的能量将内存内容保存到SSD中。这不仅避免了对SSD的同步写入，从而提高了常见情况的性能，而且还通过仅在发生故障时对其进行写入来延长SSD的寿命。另一种方法是使用非易失性DIMM（NVDIMM），它们包含自己的专用闪存，控制器和超级电容器，但这种设备成本更高。</p>
 <p>FaRM将所有数据存储在内存中，并在将其写入多个副本上的NVRAM中时，将其作为持久数据。</p>
 <h3 id="rdma-networking">RDMA networking</h3>
 <p>FaRM尽可能使用单边RDMA操作，因为它们不使用远程CPU。与RPC相比，RDMA的读取性能更高，并且消除了NIC消息速率瓶颈。但RPC和RDMA与CPU有关，减少CPU开销能更好释放新硬件的潜力。</p>
-<h2 id="programming-model-and-architecture">Programming model and architecture</h2>
+<h2 id="programming-model-and-architecture">Programming model and
+architecture</h2>
 <p>FaRM提供了一个全局的抽象地址空间，提供对事务中本地和远程对象的透明访问。应用程序线程可以随时启动事务，而后会成为事务的协调者。在事务执行期间，线程可以执行任何逻辑，包括读取，写入，分配和释放对象。在执行结束时，线程调用FaRM提交事务。</p>
 <p>FaRM事务使用乐观并发控制，更新在执行期间会缓冲在本地，并且仅在成功提交后才对其他事务可见，FaRM对成功提交的事务提供了严格的串行性。至于读，FaRM保证对单个对象操作的原子性，每次读总能返回最新的值。不同对象间的读取不保证原子性，但保证严格串行。</p>
 <p>下图显示了具有四台计算机的FaRM实例和机器A的内部组成。每台机器在用户进程中运行FaRM，且内核线程固定在每个硬件线程上。每个内核线程运行一个事件循环，该循环执行应用程序代码并轮询RDMA完成队列。</p>
-<p><img src="https://pic.downk.cc/item/5fa03c371cd1bbb86b8e1d77.png" /></p>
-<p>扩缩容的时候，FaRM实例会随着时间推移逐步进行一系列配置，配置是⟨i, S, F , CM⟩，其中i是唯一单调递增的64位配置id，S是配置的机器集合，F是Pair&lt;机器, 独立故障域&gt;，CM是配置管理机器。FaRM使用Zookeeper来确保机器就当前配置达成一致并进行存储，但是它不像通常那样依靠Zookeeper来管理租约，检测故障或协调恢复。 而是使用配置管理器通过RDMA快速恢复来负责。</p>
+<p><img
+src="https://pic.downk.cc/item/5fa03c371cd1bbb86b8e1d77.png" /></p>
+<p>扩缩容的时候，FaRM实例会随着时间推移逐步进行一系列配置，配置是⟨i, S,
+F ,
+CM⟩，其中i是唯一单调递增的64位配置id，S是配置的机器集合，F是Pair&lt;机器,
+独立故障域&gt;，CM是配置管理机器。FaRM使用Zookeeper来确保机器就当前配置达成一致并进行存储，但是它不像通常那样依靠Zookeeper来管理租约，检测故障或协调恢复。
+而是使用配置管理器通过RDMA快速恢复来负责。</p>
 <p>FaRM的全局内存以2GB进行划分，每个2GB称为一个region，每个region保存在1个primary和f个backups上，每个region存储在非易失内存中，能够被其他机器通过RMDA直接读取。一般会先读primary，如果在本地有就读本地内存，远程有就读RDMA。region到primary-backups的映射关系信息则是保存在CM上。</p>
-<p>机器可以与CM联系分配新区域。CM从单调递增的计数器分配region id，为该区域选择副本，并尽可能平衡各个机器的region数。与一致性哈希的方法相比，这种集中式方法提供了更大的灵活性来满足故障独立性和局部性约束。它还使平衡机器之间的负载和接近容量运行变得更加容易。</p>
+<p>机器可以与CM联系分配新区域。CM从单调递增的计数器分配region
+id，为该区域选择副本，并尽可能平衡各个机器的region数。与一致性哈希的方法相比，这种集中式方法提供了更大的灵活性来满足故障独立性和局部性约束。它还使平衡机器之间的负载和接近容量运行变得更加容易。</p>
 <p>每台机器还存储基于FIFO队列的环形缓冲区，用于事务日志或消息队列。每个发送方-接收方对都有自己的日志和消息队列，但物理上位于接收方处。发送方通过RDMA直接写到尾部，然后NIC直接回ACK，接收方则周期性的从头部读取数据处理。</p>
-<h2 id="distributed-transactions-and-replication">Distributed transactions and replication</h2>
+<h2 id="distributed-transactions-and-replication">Distributed
+transactions and replication</h2>
 <p>FaRM结合了事务协议和副本协议来提高性能，并利用单端RDMA读写来提高cpu的有效性和低延迟。FaRM在非易失的内存中使用主备副本协议来存储数据和事务日志，协调器没有副本，并且协调器会直接和主备副本进行通信。在执行阶段，事务使用单面RDMA（如果与协调器在同一个机器则使用本地内存）读取对象，并且它们在本地缓冲写操作，下图是FaRM事务的执行时间表：</p>
-<p><img src="https://pic.downk.cc/item/5fa803141cd1bbb86b451dff.png" /></p>
+<p><img
+src="https://pic.downk.cc/item/5fa803141cd1bbb86b451dff.png" /></p>
 <p>执行结束后，通过以下步骤进行提交：</p>
 <ol type="1">
 <li>lock：协调器将LOCK记录（版本、新值和region列表）写入所有被修改对象的primary中。然后primary会使用CAS尝试锁住这些对象的指定版本，返回是否锁成功的消息。如果自从事务读取对象以来发生任何对象版本的更改，或者当前对象已被另一个事务锁定，则锁定可能失败，协调器终止事务；</li>
 <li>Validate：协调器对事务内所有的只读对象进行读校验，从这些只读对象的primary发起RMDA读或RPC读。默认情况下使用单面RDMA读取，只读对象的数量超过4个，则使用RPC。如果版本号变更了，事务就被终止；</li>
 <li>Commit backups：通过RDMA写log到所有backups，等待网卡的确认；</li>
-<li>Commit primaries：在确认所有COMMIT-BACKUP写入之后，协调器将Commit primaries记录写入每个primary的日志中，收到至少一个响应，协调器马上返回给应用成功。primary通过更新对象，增加其版本并对其进行解锁来处理这些记录，从而完成了事务所提交的写入；</li>
+<li>Commit primaries：在确认所有COMMIT-BACKUP写入之后，协调器将Commit
+primaries记录写入每个primary的日志中，收到至少一个响应，协调器马上返回给应用成功。primary通过更新对象，增加其版本并对其进行解锁来处理这些记录，从而完成了事务所提交的写入；</li>
 <li>Truncate：协调器在收到来自所有primary的确认后，会延迟地truncate事务内的primary和backup的日志；</li>
 </ol>
 <p>正确性；</p>
@@ -1660,19 +1816,24 @@
 <p>最后，在初始化期间预先分配租约管理器使用的所有内存，然后分页并固定其使用的所有代码，以避免由于内存管理而造成的延迟。</p>
 <h3 id="reconfiguration">Reconfiguration</h3>
 <p>重新配置协议将FaRM实例从一种配置移到另一种，FaRM使用了RDMA操作来保证极高的性能，因为缺少CPU的使用，因此无法利用租约机制来实现一致性。FaRM使用的是精确的成员身份来实现这个问题，发生故障后，采用新配置的所有计算机必须先同意其成员身份，然后才能进行对象更改。这就允许了在客户端做检查而不是服务端。配置中的计算机不会向不在其中的计算机发出RDMA请求，并且也会忽略配置中不再存在的计算机做回应。</p>
-<p><img src="https://pic.downk.cc/item/5fb00c44ef76db7fe8909662.png" /></p>
+<p><img
+src="https://pic.downk.cc/item/5fb00c44ef76db7fe8909662.png" /></p>
 <ol type="1">
 <li>猜测：当CM上的一个机器租约过期时，CM会猜测那个机器挂了，并初始化重新配置，这个时间点开始阻塞所有外部客户端的请求。如果一个非CM机器上的租约过期了，它会推断CM挂了，这个非CM租约上的机器会尝试请求少量的CM备机去初始化配置。如果超时后配置未更改，则它将尝试重新配置自身。这种设计避免了在CM故障时会有大量机器同时尝试重新配置，在所有情况下，启动重新配置的机器都将尝试成为新的CM，作为重新配置的一部分。</li>
 <li>探测：新的CM向配置中的所有机器发出RDMA读取，除了前面猜测故障的机器和读失败的机器，这些读取探测允许通过一次重新配置来处理影响多台机器的相关故障，例如电源和开关故障。新CM仅在获得大多数响应后才继续进行重新配置。这样可以确保如果网络已分区，则CM不会位于较小的分区中。</li>
-<li>更新配置：CM尝试更新zk的配置为 ⟨c + 1, S, F , CM(id)⟩，c是当前的配置版本号id，S是探测有返回的机器列表，F是故障域映射，CM(id)是自己的id。FaRM使用zk的znode序列号去实现原子的CAS，只有当前配置的的版本仍然是c是，CAS才成功。</li>
-<li>重新映射区域：新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f + 1。它尝试平衡负载并满足容量和故障独立性约束的应用程序指定的局部性提示。对于失败的主数据库，它会将尚存的备份升级为新的主数据库，以减少恢复时间。如果它检测到丢失了所有副本的区域，或者没有空间可以重新复制区域，则会发出错误消息。</li>
+<li>更新配置：CM尝试更新zk的配置为 ⟨c + 1, S, F ,
+CM(id)⟩，c是当前的配置版本号id，S是探测有返回的机器列表，F是故障域映射，CM(id)是自己的id。FaRM使用zk的znode序列号去实现原子的CAS，只有当前配置的的版本仍然是c是，CAS才成功。</li>
+<li>重新映射区域：新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f
++
+1。它尝试平衡负载并满足容量和故障独立性约束的应用程序指定的局部性提示。对于失败的主数据库，它会将尚存的备份升级为新的主数据库，以减少恢复时间。如果它检测到丢失了所有副本的区域，或者没有空间可以重新复制区域，则会发出错误消息。</li>
 <li>发送新配置：重新映射区域后，CM会使用配置标识符，其自身的标识符，配置中其他机器的标识符以及区域到机器的所有新映射，向配置中的所有机器发送NEW-CONFIG消息。并根据需要重置租约或者进行租约交换；</li>
 <li>应用新配置：当机器收到配置标识符大于其自身配置的NEW-CONFIG时，它将更新其当前配置标识符及其区域映射的缓存副本，并分配空间以容纳分配给它的所有新区域副本。同时还会给CM进行租约的授权。</li>
 <li>提交新配置：一旦CM从配置中的所有计算机接收到NEW-CONFIG-ACK消息，它会等待所有不在新配置中的机器的租约过期。然后CM向所有配置成员发送NEW-CONFIG-COMMIT，和第6步租约申请的授权，最后所有成员解锁外部客户端请求；</li>
 </ol>
 <h3 id="transaction-state-recovery">Transaction state recovery</h3>
 <p>在配置更改后，FaRM使用事务修改的对象副本之间的日志来恢复事务状态。这涉及到事务修改的对象副本和协调器恢复状态，以决定事务的结果。</p>
-<p><img src="https://pic.downk.cc/item/5fb016c63e3fc2acb7182059.png" /></p>
+<p><img
+src="https://pic.downk.cc/item/5fb016c63e3fc2acb7182059.png" /></p>
 <ol type="1">
 <li>阻塞访问正在恢复的region：当一个primary的region挂了，其中一个备份就会被提升为primary，在所有更新该region的操作都反映到该primary之前都不允许访问该region；</li>
 <li>清除日志：单面RDMA写一般会和故障恢复冲突，FaRM无法通过网卡来拒绝来自旧配置的消息，只能在收到NEW-CONFIG-COMMIT消息时清除所有的日志记录，然后拒绝新来的日志；</li>
@@ -1803,7 +1964,8 @@
       
         
           
-            <h1 id="spanner-googles-globally-distributed-database">Spanner: Google’s Globally-Distributed Database</h1>
+            <h1 id="spanner-googles-globally-distributed-database">Spanner: Google’s
+Globally-Distributed Database</h1>
 <blockquote>
 <p>Spanner是谷歌提出的一个可扩展、多版本、全球分布和支持同步复制的数据库。这是第一个在全球范围内分发数据并支持外部一致性的分布式系统</p>
 </blockquote>
@@ -1811,24 +1973,36 @@
 <p>Spanner作为一个数据库，它由遍布全球的数据中心的许多Paxos状态机进行数据分片。Spanner会随着数据量或者服务器数量的变化自动在计算机之间重新分片数据，并自动在计算机之间迁移数据。应用程序可以通过跨大洲复制数据的方式来使用Spanner实现高可用性。</p>
 <p>Spanner的主要重心在于管理跨数据中心的复制数据，但也花了不少时间在分布式系统架构上设计和实现重要的数据库功能。</p>
 <p>作为全球分布的数据库，Spanner提供了一些有趣的功能。应用程序可以细粒度动态地控制数据的复制配置，支持在数据中心透明地移动数据，平衡资源使用，也对外提供外部一致的读写等等。</p>
-<p>Spanner会为事务分配具有全局意义的提交时间戳，这里关键因素是新的TrueTime API及其实现。下面会重点介绍。</p>
+<p>Spanner会为事务分配具有全局意义的提交时间戳，这里关键因素是新的TrueTime
+API及其实现。下面会重点介绍。</p>
 <h2 id="implementation">Implementation</h2>
 <p>本章主要介绍Spanner实现的基础架构和原理。然后描述了目录抽象，最后则是描述了数据模型。</p>
-<p>一个Spanner的部署被称为Universe，Spanner则被组织为一组区域，这是管理部署的单位和物理隔离的单位。下图描述了Spanner Universe的服务器，一个区域具有一个zone master和若干个spanserver，通过location proxy来定位提供服务的spannerver。universe master 和 placement driver则是一个单例，前者主要是一个控制台，后者则是定期与spanserver通信，以找出需要移动的数据。</p>
-<p><img src="https://pic.downk.cc/item/5f15cfcd14195aa594670175.png" /></p>
+<p>一个Spanner的部署被称为Universe，Spanner则被组织为一组区域，这是管理部署的单位和物理隔离的单位。下图描述了Spanner
+Universe的服务器，一个区域具有一个zone
+master和若干个spanserver，通过location
+proxy来定位提供服务的spannerver。universe master 和 placement
+driver则是一个单例，前者主要是一个控制台，后者则是定期与spanserver通信，以找出需要移动的数据。</p>
+<p><img
+src="https://pic.downk.cc/item/5f15cfcd14195aa594670175.png" /></p>
 <h3 id="spanserver-software-stack">Spanserver Software Stack</h3>
 <p>这一章主要讲spanserver的实现，软件架构如图所示，底部为每个spanserver负责的100-1000个称为tablet的数据结构，它实现了一组以下的的映射：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(key:string, timestamp:int64) → string</span><br></pre></td></tr></table></figure>
 <p>tablet的状态存储在一个类似B树的文件和一个预写日志中，所有这些都存在一个叫Colossus的组件里。</p>
-<p><img src="https://pic.downk.cc/item/5f17213614195aa594fd18a2.png" /></p>
+<p><img
+src="https://pic.downk.cc/item/5f17213614195aa594fd18a2.png" /></p>
 <p>为了支持复制，Spanserver都在每个tablet的顶部实现了Paxos状态机，用来存储其元数据和tablet的日志。这里的Paxos实现通过基于时间的leader租约来支持生命周期长的leader。Spanner的实现中会写两次Paxos日志，一次在tablet中，一次在Paxos日志里。</p>
 <p>在leader副本中，Spanserver会实现一个锁表来做并发控制，这包含了两阶段锁的状态，能将key的范围映射到锁的状态。需要同步的操作（例如事务性读取）会在锁表中获取锁；其余操作绕过锁表。</p>
 <p>另外，在leader副本中，spansever还实现了一个事务管理器来支持分布式事务。如果一个事物仅仅涉及到一个Paxos组，则可以绕过事务管理器。否则这些组的leader会协调执行两阶段提交。</p>
 <h3 id="directories-and-placement">Directories and Placement</h3>
-<p>在一系列键值映射的上层，Spanner 实现支持一个被称为“目录”的桶抽象，为包含公共前缀的连续键的集合。一个目录是数据放置的基本单位，同一个目录下的所有数据具有相同的副本配置。当数据在不同的paxos组间移动时，会进行逐个目录的移动。如下图所示：</p>
-<p><img src="https://pic.downk.cc/item/5f1c387614195aa594c3a268.png" /></p>
-<p>一个Paxos组包含了若干个目录，tablet不一定是一个行空间内按照字典顺序排序的分区，可以是行空间内的多个分区。Movedir 是一个后台任务，用来在不同的 Paxos 组之间转移目录，也可以用来为Paxos组增加或删除副本。</p>
-<p>一个目录也是应用可以指定的放置策略的最小单元，一个应用就可以控制数据的复制。例如，一个应用可能会在自己的目录里存储每个终端用户的数据，这就有可能使得用户 A 的数据在欧洲有三个副本，用户 B 的数据在北美有 5 个副本。</p>
+<p>在一系列键值映射的上层，Spanner
+实现支持一个被称为“目录”的桶抽象，为包含公共前缀的连续键的集合。一个目录是数据放置的基本单位，同一个目录下的所有数据具有相同的副本配置。当数据在不同的paxos组间移动时，会进行逐个目录的移动。如下图所示：</p>
+<p><img
+src="https://pic.downk.cc/item/5f1c387614195aa594c3a268.png" /></p>
+<p>一个Paxos组包含了若干个目录，tablet不一定是一个行空间内按照字典顺序排序的分区，可以是行空间内的多个分区。Movedir
+是一个后台任务，用来在不同的 Paxos
+组之间转移目录，也可以用来为Paxos组增加或删除副本。</p>
+<p>一个目录也是应用可以指定的放置策略的最小单元，一个应用就可以控制数据的复制。例如，一个应用可能会在自己的目录里存储每个终端用户的数据，这就有可能使得用户
+A 的数据在欧洲有三个副本，用户 B 的数据在北美有 5 个副本。</p>
 <p>当一个目录变得太大时，Spanner会进行分片存储。每个分片可能被保存到不同的Paxos组。Movedir在不同组之间不再是转移目录，而是转移分片。</p>
 <h3 id="data-model">Data Model</h3>
 <p>Spanner暴露给应用的数据特性包括了：基于模式化的半关系表数据模型，SQL类型的查询语言和通用事务。</p>
@@ -1856,11 +2030,17 @@
 </tr>
 </tbody>
 </table>
-<p>本章主要讲TrueTime API，但更多的内容在另一篇论文里。上面的表列出了API的方法，TrueTime是一款高度可用的分布式时钟，面向所有Google服务器上的应用提供，会把时间表达成一个时间区间TTinterval，具有一个有限的时间不确定性。TT.now()方法会返回一个 TTinterval，它可以保证包含调用TT.now()方法时的绝对时间。</p>
+<p>本章主要讲TrueTime
+API，但更多的内容在另一篇论文里。上面的表列出了API的方法，TrueTime是一款高度可用的分布式时钟，面向所有Google服务器上的应用提供，会把时间表达成一个时间区间TTinterval，具有一个有限的时间不确定性。TT.now()方法会返回一个
+TTinterval，它可以保证包含调用TT.now()方法时的绝对时间。</p>
 <p>在底层，TrueTime使用的时间是基于GPS和原子钟实现的，这两种类型的时间具有不同的失败模式。GPS的弱点是天线和接收器失效、局部电磁干扰等等。而由于频率误差，在经过很长的时间以后，原子钟也会产生明显误差。</p>
-<p>TrueTime是由每个数据中心里的许多time master机器和每个机器上的一个timeslave daemon实现的。大多数master都具备专门的相互隔离的GPS接收器，而剩余的master则会配置了原子钟。所有master的时间参考值会进行彼此校对，每个master也会交叉检查时间参考值和本地时间的比值，如果二者差别太大，就会把自己踢出去。</p>
+<p>TrueTime是由每个数据中心里的许多time
+master机器和每个机器上的一个timeslave
+daemon实现的。大多数master都具备专门的相互隔离的GPS接收器，而剩余的master则会配置了原子钟。所有master的时间参考值会进行彼此校对，每个master也会交叉检查时间参考值和本地时间的比值，如果二者差别太大，就会把自己踢出去。</p>
 <p>每个daemon会从许多master中收集投票，获知时间参考值，根据确定的界限，来剔除本地时钟误差较大的机器。</p>
-<p>在同步期间，一个daemon会表现出逐渐增加的时间不确定性。ε是从应用的最差时钟漂移中得到的。ε取决于time master的不确定性，以及与time master之间的通讯延迟。论文提到的线上应用环境里，ε通常是一个关于时间的锯齿函数，在1到7ms之间变化。</p>
+<p>在同步期间，一个daemon会表现出逐渐增加的时间不确定性。ε是从应用的最差时钟漂移中得到的。ε取决于time
+master的不确定性，以及与time
+master之间的通讯延迟。论文提到的线上应用环境里，ε通常是一个关于时间的锯齿函数，在1到7ms之间变化。</p>
 <h2 id="concurrency-control">Concurrency Control</h2>
 <p>本章主要讲trueTime是如何保证并发控制的正确性，简单来说则是实现这样的特性：在时间戳为t的读操作，一定能看到在t时刻之前提交的事务。</p>
 <h3 id="timestamp-management">Timestamp Management</h3>
@@ -1868,20 +2048,25 @@
 <p>一个只读事务是不需要锁机制的，通过选取系统的时间戳来执行，不会阻塞后续到达的写操作。而快照读操作同样不需要锁机制。这两个都可以在任意足够新的副本上执行。</p>
 <h4 id="paxos-leader-leases">Paxos Leader Leases</h4>
 <p>Spanner的Paxos实现中通过时间化的租约，来确保长时间的leader角色（默认10s）。</p>
-<p>一个潜在的leader可以发起请求，请求时间化的租约投票，在收到一定数量的投票后，就可以确保自己拥有租约。另外，当一个副本成功完成一个写操作，会隐式延长自己的租约。而租约快要到期时，则会显式请求延长租约。leader的租约有一个时间区间，起点是收到指定数量投票的那一刻，终点则是由于租约过期而失去一定数量投票的那一刻。注意，每个Paxos leader的租约时间区间和其他leader的时间区间是完全隔离的。</p>
-<p>而Paxos leader的退位则可以通过将slave从投票集合中释放的方式来实现，一个leader必须等到TT.after(smax)是真才能发起退位。</p>
-<h4 id="assigning-timestamps-to-rw-transactions">Assigning Timestamps to RW Transactions</h4>
+<p>一个潜在的leader可以发起请求，请求时间化的租约投票，在收到一定数量的投票后，就可以确保自己拥有租约。另外，当一个副本成功完成一个写操作，会隐式延长自己的租约。而租约快要到期时，则会显式请求延长租约。leader的租约有一个时间区间，起点是收到指定数量投票的那一刻，终点则是由于租约过期而失去一定数量投票的那一刻。注意，每个Paxos
+leader的租约时间区间和其他leader的时间区间是完全隔离的。</p>
+<p>而Paxos
+leader的退位则可以通过将slave从投票集合中释放的方式来实现，一个leader必须等到TT.after(smax)是真才能发起退位。</p>
+<h4 id="assigning-timestamps-to-rw-transactions">Assigning Timestamps to
+RW Transactions</h4>
 <p>事务读写会采用两阶段锁协议，获得所有的锁之后，就可以给事务分配时间戳，这个时间戳是Paxos写操作的，代表了事务提交的时间。在每个Paxos组内，会以单调递增的方式分配时间戳，这个比较好实现。而对于跨越多个leader的情况，一个leader只能分配属于自己租约区间的时间戳。一旦时间戳s被分配，上面提到的smax会变成s。</p>
 <p>另外，Spanner也实现了外部一致性：如果一个事务T2在事务T1提交以后开始执行，那么事务T2的时间戳一定大于事务T1的时间戳。简单来说，写进去的数据能够立即被读到，在被修改之前，读到的数据都是一样的。</p>
 <h4 id="serving-reads-at-a-timestamp">Serving Reads at a Timestamp</h4>
 <p>上面提到的特性，可以使得spanner可以正确地确定副本是否足够新，每个副本会记录一个安全时间值Tsafe，表示副本最近更新后的最大时间，当读操作的时间戳t小于或等于Tsafe的时候，读操作就可以在这个副本上读取。</p>
-<h4 id="assigning-timestamps-to-ro-transactions">Assigning Timestamps to RO Transactions</h4>
+<h4 id="assigning-timestamps-to-ro-transactions">Assigning Timestamps to
+RO Transactions</h4>
 <p>只读事务会分成两个阶段执行：分配时间戳sread，然后按照sread的快照读去执行事务操作。在事务开始后的任意时刻，可以分配sread=TT.now().latese。由于Tsafe的存在，或者smax的变化，sread时刻的读操作有可能被阻塞。因为Spanner最好是分配一个可以保持外部一致性的最大时间戳。</p>
 <h3 id="details">Details</h3>
 <h4 id="read-write-transactions">Read-Write Transactions</h4>
 <p>Spanner的读写事务，客户端对位于合适位置的组内leader副本发起读操作时，会先获取读锁，然后读取最新的数据。当一个客户端完成了所有的读操作后，会在客户端缓存所有的写操作，开始两阶段提交。客户端选择一个协调组，并且发送提交信息给所有参与的协调者leader，同时发送信息给所有缓冲的写操作。</p>
 <p>每个参与其中的、非协调者leader会先获取写锁，然后选择一个合适的时间戳，并通过Paxos将准备提交记录写入日志。最后，这些leader会将自己的准备时间戳告诉协调者。</p>
-<p>此时，扮演协调者的leader也会先获取写锁，然后选择一个事务时间戳，这个时间戳s必须大于或等于从前面获取到的准备时间戳信息，并且应该大于TT.now().latest。这样，这个leader，就会通过Paxos写入一个提交记录到日志，然后开始commit wait，即该leader会一直等待到TT.after(s)为true，最后发送一个提交时间戳给客户端和所有参与的leader。</p>
+<p>此时，扮演协调者的leader也会先获取写锁，然后选择一个事务时间戳，这个时间戳s必须大于或等于从前面获取到的准备时间戳信息，并且应该大于TT.now().latest。这样，这个leader，就会通过Paxos写入一个提交记录到日志，然后开始commit
+wait，即该leader会一直等待到TT.after(s)为true，最后发送一个提交时间戳给客户端和所有参与的leader。</p>
 <p>每个参与的领导者会通过Paxos把事务结果写入日志。所有的参与者会在同一个时间戳进行提交，释放锁。</p>
 <h4 id="read-only-transactions">Read-Only Transactions</h4>
 <p>分配只读事务的时间戳存在三种方案：</p>
@@ -2016,7 +2201,8 @@
           
             <h1 id="object-storage-on-craq">Object Storage on CRAQ</h1>
 <h2 id="abstract">Abstract</h2>
-<p>该论文描述了一种CRAQ(Chain Replication with Apportioned Queries)的对象存储设计，通过链式备份，能够在保证读取吞吐率的同时维持强一致性。</p>
+<p>该论文描述了一种CRAQ(Chain Replication with Apportioned
+Queries)的对象存储设计，通过链式备份，能够在保证读取吞吐率的同时维持强一致性。</p>
 <h2 id="introduction">Introduction</h2>
 <p>对象存储是许多在线服务所需要的，其数据会以一个实体单元来呈现。对象存储支持两种基本原语：读和写。后续，有人开始提出用链式备份的方法来做对象存储，基本思路是将所有存储对象的节点组织在一条链中，其中尾部提供读取请求，而头部则处理所有的写入请求。然后在客户端得到确认之前，写操作会沿着链向后传播。</p>
 <p>但这种思路会有不少局限，比如因为所有的读取都会走到同一个节点。该论文就提出了一种CRAQ的设计，实现了一个能够提供强一致性，并且写入低延迟和高吞吐的对象存储。</p>
@@ -2028,7 +2214,8 @@
 </ol>
 <h2 id="basic-system-model">Basic System Model</h2>
 <p>这一章介绍链式复制模型的主要概念。</p>
-<h3 id="interface-and-consistency-model">Interface and Consistency Model</h3>
+<h3 id="interface-and-consistency-model">Interface and Consistency
+Model</h3>
 <p>一个对象存储系统主要提供两个基本原语：</p>
 <ul>
 <li>write(objID, V);</li>
@@ -2040,11 +2227,14 @@
 <li>最终一致性：对于不同的节点的读取可能会返回过时的数据；</li>
 </ul>
 <h3 id="chain-replication">Chain Replication</h3>
-<p>Chain Replication（CR）是一种在多节点之间备份数据，提供强一致性存储接口的方法。</p>
+<p>Chain
+Replication（CR）是一种在多节点之间备份数据，提供强一致性存储接口的方法。</p>
 <p>简单来说就是，节点组成一个链表，所有的写请求由链表头部接收，然后向后传导，直到到达尾部节点（此时视为committed）。然后尾部节点将会将响应返回到头部，由头部响应成功（因为实际实现使用的是TCP）。</p>
 <p>读请求则是由尾部节点接收。</p>
-<p><img src="https://pic.downk.cc/item/5eaf0238c2a9a83be5078e18.png" /></p>
-<h3 id="chain-replication-with-apportioned-queries">Chain Replication with Apportioned Queries</h3>
+<p><img
+src="https://pic.downk.cc/item/5eaf0238c2a9a83be5078e18.png" /></p>
+<h3 id="chain-replication-with-apportioned-queries">Chain Replication
+with Apportioned Queries</h3>
 <p>对于读取请求比较多的场景，CARQ会通过本地读取来尝试提高读取吞吐量。具体设计如下：</p>
 <ol type="1">
 <li>CARQ的节点会存储对象的多个版本，并且会标示每个版本是dirty还是clean；</li>
@@ -2061,7 +2251,8 @@
 </ol></li>
 </ol>
 <p>具体效果如图所示：</p>
-<p><img src="https://pic.downk.cc/item/5eafce3cc2a9a83be58fe0d0.png" /></p>
+<p><img
+src="https://pic.downk.cc/item/5eafce3cc2a9a83be58fe0d0.png" /></p>
 <h3 id="consistency-models-on-craq">Consistency Models on CRAQ</h3>
 <p>CRAQ提供了三种一致性模型：</p>
 <ul>
@@ -2075,23 +2266,29 @@
 <p>在本节中，我们讨论应用程序如何在CRAQ中指定单个数据中心内和多个数据中心内的部署方案</p>
 <h3 id="chain-placement-strategies">Chain Placement Strategies</h3>
 <p>一个分布式应用需要面临很多问题，比如对象的大多数写入可能位于同一个数据中心，一些对象只与数据中心的子集有关，重要的对象可能需要不同的副本策略。</p>
-<p>CARQ提供了更加灵活的链式配置策略，对于对象来说，使用的是链表ID和key ID结合的两层命名结构，另外就是配置的策略：</p>
+<p>CARQ提供了更加灵活的链式配置策略，对于对象来说，使用的是链表ID和key
+ID结合的两层命名结构，另外就是配置的策略：</p>
 <ul>
-<li>Implicit Datacenters &amp; Global Chain Size: {num_datacenters, chain_size}</li>
+<li>Implicit Datacenters &amp; Global Chain Size: {num_datacenters,
+chain_size}</li>
 </ul>
 <p>简单来说，就是定一个存储链的数据中心数量，通过对数据中心ID作一致性哈希来明确标识唯一的数据中心；</p>
 <ul>
-<li>Explicit Datacenters &amp; Global Chain Size: {chain_size, dc1, dc2, ..., dcN}</li>
+<li>Explicit Datacenters &amp; Global Chain Size: {chain_size, dc1, dc2,
+..., dcN}</li>
 </ul>
 <p>这个方法是每个数据中心都适用相同大小的链表去存储备份，链表头部位于dc1的节点，链表尾部则在dc2的其中一个节点，以此类推；</p>
 <ul>
-<li>Explicit Datacenter Chain Sizes: {dc1, chain_size1, ..., dcN, chain_sizeN}</li>
+<li>Explicit Datacenter Chain Sizes: {dc1, chain_size1, ..., dcN,
+chain_sizeN}</li>
 </ul>
 <p>与上面的方法类似，但每个数据中心的链表大小不同；</p>
-<h3 id="craq-across-multiple-datacenters">CRAQ Across Multiple Datacenters</h3>
+<h3 id="craq-across-multiple-datacenters">CRAQ Across Multiple
+Datacenters</h3>
 <p>CRAQ本地读取的方法降低了延迟，client也可以灵活选择距离更近的节点。</p>
 <p>另一方面，通过链优化，应用程序可以选择组成链的数据中心顺序来最大程度降低写入延迟，确保单个链在每个方向上仅仅需要跨越数据中心的网络边界一次。随着节点增加，很可能写延迟也会明显增加，但相比主备的方法，流水线的写操作可以极大地写入吞吐量。</p>
-<h3 id="zookeeper-coordination-service">ZooKeeper Coordination Service</h3>
+<h3 id="zookeeper-coordination-service">ZooKeeper Coordination
+Service</h3>
 <p>CARQ使用zookeeper来追溯成员身份，并存储链元数据。另外就是当添加或者删除节点时，可以确保CARQ节点能够收到通知。</p>
 <p>由于不了解数据中心原始的拓扑结构，因此Zookeeper节点之间的协调消息会在广域网上多次传输。为了消除跨数据中心ZooKeeper冗余的通讯，一个方法是可以构建一个Zookeeper实例的层次结构：每个数据中心可以包含其自己的本地ZooKeeper实例（由多个节点组成），并具有一个参与全局ZooKeeper实例的代表。另一个方法是，修改ZooKeeper本身以使节点知道网络拓扑。</p>
 <h2 id="extensions">Extensions</h2>
@@ -2112,18 +2309,22 @@
 <h4 id="multi-chain-operations">Multi-Chain Operations</h4>
 <p>对于多链参与多对象更新，优化的两阶段协议提交只需要用多个链表头部节点实现即可，链表锁住所有参与事务的keys，直到满足提交条件。</p>
 <p>当然这个方法没办法pipeline实现，在一定程度上会影响吞吐量。</p>
-<h3 id="lowering-write-latency-with-multicast">Lowering Write Latency with Multicast</h3>
+<h3 id="lowering-write-latency-with-multicast">Lowering Write Latency
+with Multicast</h3>
 <p>CARQ使用多播协议来提高写入性能，由于链的成员资格在节点成员资格改变时是相对文婷的，因此可以为每个链创建一个多播组。然后，不是在整个链上串行传播完整的写入，而是将真实值多播到整个链表，然后紧紧在链上传播少量的元数据信息，以确保所有的副本都在尾部之前收到写操作。</p>
 <p>如果存在节点由于某种原因未接收到多播，则该节点可以在接收到写入提交消息之后，然后进一步传播提交消息之前，从其前任中获取对象。</p>
 <p>另外，当尾部节点接收到传播的写请求时，可以将多播确认消息发送到多播组，而不是将其沿链向后传播。这样既减少了节点对象在写入后重新进入清洁状态所花费的时间，又减少了客户端感知的写入延迟。如果链中的某个节点未收到确认，则当下一个读取操作要求它查询尾部时，它将重新进入clean。</p>
-<h2 id="management-and-implementation">Management and Implementation</h2>
+<h2 id="management-and-implementation">Management and
+Implementation</h2>
 <h3 id="integrating-zookeeper">Integrating ZooKeeper</h3>
 <p>CRAQ使用zookeeper的文件结构来维持数据中心中节点列表的成员资格。</p>
-<p>在初始化时，一个CRAQ节点会创建一个临时文件(/nodes/dc_name/node_id)，dc_name就是数据中心的唯一名称，no de_id就是数据中节点的唯一ID。文件内容则是包含了节点的ip地址和端口号。</p>
+<p>在初始化时，一个CRAQ节点会创建一个临时文件(/nodes/dc_name/node_id)，dc_name就是数据中心的唯一名称，no
+de_id就是数据中节点的唯一ID。文件内容则是包含了节点的ip地址和端口号。</p>
 <p>CRAQ可以查询/nodes/dc_name，来判断数据中的成员资格，通过添加一个watch到/nodes/dc_name，就可以被通知到节点的添加或者删除。</p>
 <p>/chains/chain_id则是在CRAQ节点收到创建新链表的请求时，会创建一个文件，chain_id是一个160位的唯一标识符，文件内容时链表的配置策略。而节点通过监控链表文件，从而保证在链表元数据改变时得到通知。</p>
 <h3 id="chain-node-functionality">Chain Node Functionality</h3>
-<p>节点在加入系统时会生成一个随机标识符每个数据中心内会使用该标识符作为one-hop DHT。节点之间或者节点与客户端之间的RPC通信都是通过TCP连接进行的。每个节点及其链的前任，后继和尾部维护着一组连接的TCP连接。请求通过这些连接进行管道传输和循环轮询。</p>
+<p>节点在加入系统时会生成一个随机标识符每个数据中心内会使用该标识符作为one-hop
+DHT。节点之间或者节点与客户端之间的RPC通信都是通过TCP连接进行的。每个节点及其链的前任，后继和尾部维护着一组连接的TCP连接。请求通过这些连接进行管道传输和循环轮询。</p>
 <p>对于跨多个数据中心的链，一个数据中心的最后一个节点保持与其后继数据中心的第一个节点的连接。当外部数据中心中的节点列表发生更改时，订阅更改的节点可以从其本地ZooKeeper中接收通知。</p>
 <h3 id="handling-memberships-changes">Handling Memberships Changes</h3>
 <p>对于正常的写传播，CRAQ节点遵循前面的协议。在恢复过程中，有时需要第二种传播方式，即反向传播。例如链表节点可能会在完成向后传播到头部节点之前失败。由于这些可能的故障状况，当新节点加入系统时，新节点会从其前任节点接收传播消息，并从其后继节点接收反向传播消息，以确保其正确性。新节点拒绝客户端对特定对象的读取请求，直到其与后继对象达成协议为止。</p>
@@ -2254,7 +2455,8 @@
 <p>Golang的内存模型描述了这样的一种场景：在一个goroutine中对一个变量的读取能保证是由不同gorountine写入相同变量所产生的。</p>
 <h2 id="happens-before">Happens Before</h2>
 <p>在单个goroutine中，只有在满足不改变语言规范所定义的行为时，编译器才能对单个goroutine所执行的读写进行重新排序。但由于重新排序，一个goroutine所观察到的执行顺序可能与另一个goroutine察觉到的执行顺序不同。</p>
-<p>为了指定读写要求，在go程序中定义了一个叫Happens Before的偏序关系——如果事件e1发生在事件e2之前，那么我们说e2发生在e1之后。同样，如果e1不在e2之前发生并且在e2之后也没有发生，那么我们说e1和e2同时发生。</p>
+<p>为了指定读写要求，在go程序中定义了一个叫Happens
+Before的偏序关系——如果事件e1发生在事件e2之前，那么我们说e2发生在e1之后。同样，如果e1不在e2之前发生并且在e2之后也没有发生，那么我们说e1和e2同时发生。</p>
 <p>在单个goroutine中，Happens Before的顺序就是程序所表现出来的顺序。</p>
 <p>为了保证对变量的读取R可以读取到由特定的对变量的写入W，即W是R可以观察到的唯一写入，必须要满足以下两个条件：</p>
 <ol type="1">
@@ -2279,14 +2481,18 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>, <span class="number">10</span>)</span><br><span class="line"><span class="keyword">var</span> a <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">&quot;hello, world&quot;</span></span><br><span class="line">	c &lt;- <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	&lt;-c</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这样就能保证打印出hello, world。</p>
 <p>另外，channel的关闭会发生在返回零值的接收之前，这样用close(c)替代c&lt;-0也可以产生相同的保证行为。</p>
-<p>而对于缺乏buffer的channel，其接收会发生在该channel的发送完成之前，例如这样也可以保证打印出正确的hello world，这里的发送和接收顺序与上面的例子相反。</p>
+<p>而对于缺乏buffer的channel，其接收会发生在该channel的发送完成之前，例如这样也可以保证打印出正确的hello
+world，这里的发送和接收顺序与上面的例子相反。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>)</span><br><span class="line"><span class="keyword">var</span> a <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">&quot;hello, world&quot;</span></span><br><span class="line">	&lt;-c</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	c &lt;- <span class="number">0</span></span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>但如果channel是带有buffer，就无法保证打印出hello world了。</p>
-<p>在容量为C的通道上的第k个接收发生在该通道的第k + C个发送完成之前，因为不从channel接收数据就无法继续写入。</p>
-<p>该规则将前一个规则推广到缓冲通道。 它允许通过缓冲的通道对计数信号量进行建模：channel中的项目数量对应于活动使用的数量，channel的容量对应于同时使用的最大数量，发送一个项目获取信号量，接收项目则会释放信号量。通过这种操作就可以限制其并发。</p>
+<p>在容量为C的通道上的第k个接收发生在该通道的第k +
+C个发送完成之前，因为不从channel接收数据就无法继续写入。</p>
+<p>该规则将前一个规则推广到缓冲通道。
+它允许通过缓冲的通道对计数信号量进行建模：channel中的项目数量对应于活动使用的数量，channel的容量对应于同时使用的最大数量，发送一个项目获取信号量，接收项目则会释放信号量。通过这种操作就可以限制其并发。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> limit = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> work &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(w <span class="keyword">func</span>()</span></span>) &#123;</span><br><span class="line">			limit &lt;- <span class="number">1</span></span><br><span class="line">			w() <span class="comment">// 不处理完成，无法释放该信号量</span></span><br><span class="line">			&lt;-limit</span><br><span class="line">		&#125;(w)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">select</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="locks">Locks</h3>
-<p>sync包里实现了两种锁相关的数据类型：sync.Mutex和sync.RWMutex。通过锁的使用，我们可以在goroutine中保证同步。这样的一个程序就可以顺利打印出hello world。</p>
+<p>sync包里实现了两种锁相关的数据类型：sync.Mutex和sync.RWMutex。通过锁的使用，我们可以在goroutine中保证同步。这样的一个程序就可以顺利打印出hello
+world。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> l sync.Mutex</span><br><span class="line"><span class="keyword">var</span> a <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">&quot;hello, world&quot;</span></span><br><span class="line">	l.Unlock()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	l.Lock()</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	l.Lock()</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="once">Once</h3>
 <p>sync包还提供了一种初始化的安全机制，通过使用Once数据类型，多个线程都可以执行once.Do(f)，但只有一个会运行f()，其他的调用将会block直接f()返回。</p>
@@ -2468,8 +2674,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

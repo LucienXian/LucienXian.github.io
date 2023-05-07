@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -349,13 +347,16 @@
 <p>如果shared_ptr已经被删除，lock()函数返回空的shared_ptr。</p>
 <h2 id="unique_ptr">unique_ptr</h2>
 <p>unique_ptr是c++11提供的智能指针实现之一，用于防止内存泄漏。unique_ptr对象包装了一个原始指针，并负责其生命周期。当该对象被破坏时，然后在其析构函数中删除关联的原始指针。</p>
-<p>它跟shared_ptr的用法类似，也能使用原生指针的一些操作符。但不同的是归属权，unique_ptr对象始终是关联的原始指针的唯一所有者。 我们无法复制unique_ptr对象，它只能移动。也因为如吃，其析构函数中不需要任何引用计数，可以直接删除相关的指针。</p>
+<p>它跟shared_ptr的用法类似，也能使用原生指针的一些操作符。但不同的是归属权，unique_ptr对象始终是关联的原始指针的唯一所有者。
+我们无法复制unique_ptr对象，它只能移动。也因为如吃，其析构函数中不需要任何引用计数，可以直接删除相关的指针。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create a unique_ptr object through raw pointer</span></span><br><span class="line"><span class="function">std::unique_ptr&lt;Task&gt; <span class="title">taskPtr2</span><span class="params">(<span class="keyword">new</span> Task(<span class="number">55</span>))</span></span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line">std::unique_ptr&lt;Task&gt; taskPtr3 = taskPtr2; <span class="comment">// Compile error</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">// Compile Error : unique_ptr object is Not copyable</span></span><br><span class="line">taskPtr = taskPtr2; <span class="comment">//compile error</span></span><br></pre></td></tr></table></figure>
 <p>在unique_ptr类中，拷贝构造函数和赋值构造函数都已经被删除了。</p>
-<h3 id="transfering-the-ownership-of-unique_ptr-object">Transfering the ownership of unique_ptr object</h3>
+<h3 id="transfering-the-ownership-of-unique_ptr-object">Transfering the
+ownership of unique_ptr object</h3>
 <p>虽然不能拷贝一个unique_ptr对象，但我们可以move它们，即传递拥有权。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unique_ptr&lt;Task&gt; <span class="title">taskPtr2</span><span class="params">(<span class="keyword">new</span> Task(<span class="number">55</span>))</span></span>;</span><br><span class="line">std::unique_ptr&lt;Task&gt; taskPtr4 = std::<span class="built_in">move</span>(taskPtr2);</span><br></pre></td></tr></table></figure>
-<h3 id="releasing-the-associated-raw-pointer">Releasing the associated raw pointer</h3>
+<h3 id="releasing-the-associated-raw-pointer">Releasing the associated
+raw pointer</h3>
 <p>对unique_ptr对象调用release()函数可以释放相关原始指针的拥有权，即返还一个原始指针。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::unique_ptr&lt;Task&gt; <span class="title">taskPtr5</span><span class="params">(<span class="keyword">new</span> Task(<span class="number">55</span>))</span></span>;</span><br><span class="line">Task * ptr = taskPtr5.<span class="built_in">release</span>();</span><br></pre></td></tr></table></figure>
 
@@ -532,7 +533,9 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#weak_ptrunique_ptr"><span class="nav-number">1.</span> <span class="nav-text">weak_ptr&amp;unique_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#weak_ptr"><span class="nav-number">1.1.</span> <span class="nav-text">weak_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#now-how-to-fix-this-problem"><span class="nav-number">1.1.1.</span> <span class="nav-text">Now How to fix this problem?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unique_ptr"><span class="nav-number">1.2.</span> <span class="nav-text">unique_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#transfering-the-ownership-of-unique_ptr-object"><span class="nav-number">1.2.1.</span> <span class="nav-text">Transfering the ownership of unique_ptr object</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#releasing-the-associated-raw-pointer"><span class="nav-number">1.2.2.</span> <span class="nav-text">Releasing the associated raw pointer</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#weak_ptrunique_ptr"><span class="nav-number">1.</span> <span class="nav-text">weak_ptr&amp;unique_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#weak_ptr"><span class="nav-number">1.1.</span> <span class="nav-text">weak_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#now-how-to-fix-this-problem"><span class="nav-number">1.1.1.</span> <span class="nav-text">Now How to fix this problem?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unique_ptr"><span class="nav-number">1.2.</span> <span class="nav-text">unique_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#transfering-the-ownership-of-unique_ptr-object"><span class="nav-number">1.2.1.</span> <span class="nav-text">Transfering the
+ownership of unique_ptr object</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#releasing-the-associated-raw-pointer"><span class="nav-number">1.2.2.</span> <span class="nav-text">Releasing the associated
+raw pointer</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -574,8 +577,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

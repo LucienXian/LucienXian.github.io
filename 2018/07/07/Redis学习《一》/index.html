@@ -160,9 +160,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,7 +339,8 @@
 <p>Redis是一个远程的，高性能的，内存数据库。Redis有几个特点：</p>
 <ul>
 <li>性能高——读写速度比传统数据库更快；</li>
-<li>数据类型丰富——支持二进制的strings，lists，hash，sets和ordered sets五种类型；</li>
+<li>数据类型丰富——支持二进制的strings，lists，hash，sets和ordered
+sets五种类型；</li>
 <li>支持数据备份——拥有两种不同形式的持久化方法，可以用小而紧凑的格式将内存中的数据写入到磁盘；</li>
 </ul>
 <h2 id="redis安装">Redis安装</h2>
@@ -350,14 +349,19 @@
 <p>我用的是docker-redis：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$</span><span class="language-bash">docker search redis</span></span><br></pre></td></tr></table></figure>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/docker-redis-search.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/docker-redis-search.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$</span><span class="language-bash">docker pull redis</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">docker run -p 6379:6379 -v <span class="variable">$PWD</span>/data:/data  -d redis redis-server --appendonly <span class="built_in">yes</span></span></span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>命令说明：</p>
-<p><strong>-p 6379:6379 :</strong> 将容器的6379端口映射到主机的6379端口</p>
-<p><strong>-v $PWD/data:/data :</strong> 将主机中当前目录下的data挂载到容器的/data</p>
-<p><strong>redis-server --appendonly yes :</strong> 在容器执行redis-server启动命令，并打开redis持久化配置</p>
+<p><strong>-p 6379:6379 :</strong>
+将容器的6379端口映射到主机的6379端口</p>
+<p><strong>-v $PWD/data:/data :</strong>
+将主机中当前目录下的data挂载到容器的/data</p>
+<p><strong>redis-server --appendonly yes :</strong>
+在容器执行redis-server启动命令，并打开redis持久化配置</p>
 </blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it 43f7a65ec7f8 redis-cli</span><br></pre></td></tr></table></figure>
 <p>执行redis-cli命令连接刚启动的容器服务器</p>
@@ -379,12 +383,14 @@
 <tr class="odd">
 <td style="text-align: center;">string</td>
 <td style="text-align: center;">字符串、整数或者浮点数</td>
-<td style="text-align: center;">redis最基本的类型。该类型是二进制安全的，比如JPG图片或者序列化的对象</td>
+<td
+style="text-align: center;">redis最基本的类型。该类型是二进制安全的，比如JPG图片或者序列化的对象</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">list</td>
 <td style="text-align: center;">一个链表，结点是字符串</td>
-<td style="text-align: center;">该链表按照插入顺序排序，可以添加一个元素到头部或者尾部</td>
+<td
+style="text-align: center;">该链表按照插入顺序排序，可以添加一个元素到头部或者尾部</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">hash</td>
@@ -394,12 +400,15 @@
 <tr class="even">
 <td style="text-align: center;">set</td>
 <td style="text-align: center;">包含字符串的无序集合</td>
-<td style="text-align: center;">string类型的无序集合，并且该集合是通过哈希表实现的</td>
+<td
+style="text-align: center;">string类型的无序集合，并且该集合是通过哈希表实现的</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">zset</td>
 <td style="text-align: center;">有序集合，字符串成员与score的映射</td>
-<td style="text-align: center;">有序集合，每个元素都会关联到一个double类型的分数。 通过分数来为集合中的成员进行从小到大的排序，成员是唯一的，分数可以重复。分数一样的按照字符串排序。</td>
+<td
+style="text-align: center;">有序集合，每个元素都会关联到一个double类型的分数。
+通过分数来为集合中的成员进行从小到大的排序，成员是唯一的，分数可以重复。分数一样的按照字符串排序。</td>
 </tr>
 </tbody>
 </table>
@@ -619,8 +628,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

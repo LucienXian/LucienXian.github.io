@@ -96,12 +96,12 @@
 
 
 
-<meta name="description" content="Tensorflow安装指南 简介 当然你可以查看 因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0 我的电脑显卡为：GeForce GTX 850M 硬件支持：    Distribution Kernel GCC GLIBC ICC PGI XLC CLANG     x86_64">
+<meta name="description" content="Tensorflow安装指南 简介 当然你可以查看 因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0 我的电脑显卡为：GeForce GTX 850M 硬件支持：              Distribution Kernel GCC GLIBC ICC PGI XLC CLANG">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Tensorflow安装指南">
 <meta property="og:url" content="http://yoursite.com/2018/07/19/Tensorflow%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="Tensorflow安装指南 简介 当然你可以查看 因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0 我的电脑显卡为：GeForce GTX 850M 硬件支持：    Distribution Kernel GCC GLIBC ICC PGI XLC CLANG     x86_64">
+<meta property="og:description" content="Tensorflow安装指南 简介 当然你可以查看 因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0 我的电脑显卡为：GeForce GTX 850M 硬件支持：              Distribution Kernel GCC GLIBC ICC PGI XLC CLANG">
 <meta property="og:locale">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/CUDA9.0.png">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/cudnn.png">
@@ -161,9 +161,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -339,11 +337,22 @@
       
         <h1 id="tensorflow安装指南">Tensorflow安装指南</h1>
 <h2 id="简介">简介</h2>
-<p>当然你可以<a target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-metas">查看</a></p>
+<p>当然你可以<a
+target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-metas">查看</a></p>
 <p>因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0</p>
 <p>我的电脑显卡为：GeForce GTX 850M</p>
 <p>硬件支持：</p>
 <table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 12%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 10%" />
+<col style="width: 8%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Distribution</th>
@@ -510,9 +519,11 @@
 </tbody>
 </table>
 <h2 id="安装cuda">安装CUDA</h2>
-<p>我这里选择的是<a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-90-download-archive">9.0</a></p>
+<p>我这里选择的是<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-90-download-archive">9.0</a></p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/CUDA9.0.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/CUDA9.0.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>下载完之后，一次输入以下指令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i cuda-repo-ubuntu1604-9-0-local_9.0.176-1_amd64.deb</span><br><span class="line">sudo apt-key add /var/cuda-repo-&lt;version&gt;/7fa2af80.pub</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install cuda</span><br></pre></td></tr></table></figure>
@@ -534,18 +545,28 @@
 <p>安装CUDA之后，需要添加环境变量：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/usr/local/cuda-9.0/bin$&#123;PATH:+:$&#123;PATH&#125;&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">64bit</span></span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">32bit</span></span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="安装cudnn">安装cuDNN</h2>
-<p>在<a target="_blank" rel="noopener" href="https://developer.nvidia.com/cudnn">这里</a>注册一下，要做一个下的问卷调查。</p>
-<p>进入<a target="_blank" rel="noopener" href="https://developer.nvidia.com/rdp/cudnn-download">download界面</a></p>
-<p>勾选<strong>I Agree To the Terms of the cuDNN Software License Agreement</strong></p>
-<p>我选择的是v7.0.5版本的，记得Runtime Library和Developer Library都要下载，即：</p>
+<p>在<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/cudnn">这里</a>注册一下，要做一个下的问卷调查。</p>
+<p>进入<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/rdp/cudnn-download">download界面</a></p>
+<p>勾选<strong>I Agree To the Terms of the cuDNN Software License
+Agreement</strong></p>
+<p>我选择的是v7.0.5版本的，记得Runtime Library和Developer
+Library都要下载，即：</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7_7.0.5.15-1+cuda9.0_amd64">cuDNN v7.0.5 Runtime Library for Ubuntu16.04 (Deb)</a></li>
-<li><a target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7-dev_7.0.5.15-1+cuda9.0_amd64">cuDNN v7.0.5 Developer Library for Ubuntu16.04 (Deb)</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7_7.0.5.15-1+cuda9.0_amd64">cuDNN
+v7.0.5 Runtime Library for Ubuntu16.04 (Deb)</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7-dev_7.0.5.15-1+cuda9.0_amd64">cuDNN
+v7.0.5 Developer Library for Ubuntu16.04 (Deb)</a></li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/cudnn.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/cudnn.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>一开始我只下载了<strong>Developer Library</strong> ，在安装的时候出现了这样的错误：</p>
+<p>一开始我只下载了<strong>Developer Library</strong>
+，在安装的时候出现了这样的错误：</p>
 <blockquote>
 <p>Package libcudnn7 is not installed.</p>
 </blockquote>
@@ -553,13 +574,17 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i libcudnn7*.deb</span><br></pre></td></tr></table></figure>
 <p>输入nvidia-smi，看到：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/nvidia-smi.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/nvidia-smi.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <blockquote>
 <p>如果显示报错，建议重启一下</p>
 </blockquote>
 <h2 id="安装tensorflow">安装TensorFlow</h2>
-<p>可以查看官网，选择一种<a target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#determine_which_tensorflow_to_install">安装方式</a>。建议使用 Virtualenv 进行<a target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#installing_with_virtualenv">安装</a></p>
+<p>可以查看官网，选择一种<a
+target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#determine_which_tensorflow_to_install">安装方式</a>。建议使用
+Virtualenv 进行<a
+target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#installing_with_virtualenv">安装</a></p>
 <h2 id="验证安装">验证安装</h2>
 <p>进入交互界面，输入以下代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">hello = tf.constant(<span class="string">&#x27;Hello, TensorFlow!&#x27;</span>)</span><br><span class="line">sess = tf.Session()</span><br><span class="line"><span class="built_in">print</span>(sess.run(hello))</span><br></pre></td></tr></table></figure>
@@ -775,8 +800,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

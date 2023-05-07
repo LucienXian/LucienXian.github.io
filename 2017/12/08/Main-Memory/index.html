@@ -96,12 +96,12 @@
 
 
 
-<meta name="description" content="Main memory Background 首先提两个概念,这两个寄存器是由操作系统载入的：  base register：存着最小的合法物理地址 limit register：存着可用范围   img   address binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行 logical address：由CPU定义的，用户程序生成 physical add">
+<meta name="description" content="Main memory Background 首先提两个概念,这两个寄存器是由操作系统载入的：  base register：存着最小的合法物理地址 limit register：存着可用范围    img   address binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行 logical address：由CPU定义的，用户程序生成 physical ad">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Main Memory">
 <meta property="og:url" content="http://yoursite.com/2017/12/08/Main-Memory/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="Main memory Background 首先提两个概念,这两个寄存器是由操作系统载入的：  base register：存着最小的合法物理地址 limit register：存着可用范围   img   address binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行 logical address：由CPU定义的，用户程序生成 physical add">
+<meta property="og:description" content="Main memory Background 首先提两个概念,这两个寄存器是由操作系统载入的：  base register：存着最小的合法物理地址 limit register：存着可用范围    img   address binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行 logical address：由CPU定义的，用户程序生成 physical ad">
 <meta property="og:locale">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/os_8_1.png">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/os_8_2.png">
@@ -164,9 +164,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -348,15 +346,18 @@
 <li>limit register：存着可用范围</li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_1.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
-<li>address binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行</li>
+<li>address
+binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行</li>
 <li>logical address：由CPU定义的，用户程序生成</li>
 <li>physical address：真实的物理地址</li>
 <li>memory-management unit(MMU)：负责将逻辑地址映射到物理地址</li>
 <li>dynamic loading：为了更好地管理内存，使得进程不受物理内存的限制</li>
-<li>dynamically linked libraries：通常是系统库，在执行前动态链接进来，避免占用太多内存</li>
+<li>dynamically linked
+libraries：通常是系统库，在执行前动态链接进来，避免占用太多内存</li>
 </ul>
 <h2 id="swapping">swapping</h2>
 <p>进程可以在内存和后台存储区（通常是磁盘）中交换。把需要的进程换进来，把暂时不用的进程替换出去</p>
@@ -366,7 +367,8 @@
 <h2 id="contiguous-memory-allocation">contiguous memory allocation</h2>
 <p>通常而言，贮存会被分为两部分，一部分是给操作系统，另一部分给用户空间。</p>
 <ul>
-<li>内存保护：limit register有一个地址空间范围，在进程被CPU执行时，这个范围会被加载进去，由操作系统进行验证；</li>
+<li>内存保护：limit
+register有一个地址空间范围，在进程被CPU执行时，这个范围会被加载进去，由操作系统进行验证；</li>
 <li>multiple-partition allocation：给每个进程分一个分区</li>
 <li>fixed partition（固定分区）
 <ul>
@@ -393,12 +395,15 @@
 <li>frames：将物理内存分成帧</li>
 <li>pages：将逻辑地址分为页
 <ul>
-<li>每个地址被分为了page number(代表着页表的项数)和page offset（代表着页的大小）</li>
-<li>page number构成了page table的索引表，表中存着frame number，对应着内存中的frame</li>
+<li>每个地址被分为了page number(代表着页表的项数)和page
+offset（代表着页的大小）</li>
+<li>page number构成了page table的索引表，表中存着frame
+number，对应着内存中的frame</li>
 </ul></li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_2.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_2.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>分页不会产生外部碎片，但有可能产生内部碎片，即每一页中的缺失</li>
@@ -408,10 +413,12 @@
 <ul>
 <li>传统上需要访问物理内存两次，一次是访问获取页表的内容，另外一次是根据页表的指引去访问内存</li>
 <li>TLB是页表的一部分，只存有页表的部分条目，但不同于页表，TLB一般是存在cache，这样满足快速读取。</li>
-<li>在进程被加载进来时，TLB会被填充，寻找frame时，CPU同时在TLB和page table中寻找。找到则返回frame，找不到则在page table中寻找</li>
+<li>在进程被加载进来时，TLB会被填充，寻找frame时，CPU同时在TLB和page
+table中寻找。找到则返回frame，找不到则在page table中寻找</li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_3.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_3.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>有效访问时间
@@ -431,7 +438,8 @@
 </blockquote>
 <p>因此，我们可以使用二级页表，将页表分页。一个地址将会如下图所示：页目录是页表的索引，页表是进程物理空间本身的索引。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_4.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_4.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>(P1是外部表的索引，P2是二级表的索引)</p>
 <h3 id="hashed-page-tables">hashed page tables</h3>
@@ -439,7 +447,8 @@
 <p>哈希页表的每一条目都包括一个链表的元素，每个元素有三个域：虚拟页码，物理帧号，指向下一个元素的指针。</p>
 <p>通过页码途径哈希函数得到对应的条目，从而获得物理帧号。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_5.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_5.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="inverted-page-tables">inverted page tables</h3>
 <p>真正被使用的帧才会记录到在反向表的条目中。整个系统只有一张页表，对每个物理内存帧都只有一个条目，包括了逻辑地址和进程号。</p>
@@ -659,8 +668,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -103,14 +103,13 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="Atomicity: All-or-Nothing and Before-or-After——MIT6.824  《Principles Computer System Design Introduction》  Before-or-After Atomicity: Coordinating Concurrent Threads 并发操作中经常会出现data race condition，从程序员">
 <meta property="og:locale">
-<meta property="og:image" content="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0">
 <meta property="og:image" content="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0">
 <meta property="article:published_time" content="2019-08-17T17:12:19.000Z">
 <meta property="article:modified_time" content="2019-08-19T17:10:11.199Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="分布式">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0">
+<meta name="twitter:image" content="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0">
 
 
 
@@ -161,9 +160,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -337,34 +334,55 @@
       
 
       
-        <h1 id="atomicity-all-or-nothing-and-before-or-aftermit6.824">Atomicity: All-or-Nothing and Before-or-After——MIT6.824</h1>
+        <h1 id="atomicity-all-or-nothing-and-before-or-aftermit6.824">Atomicity:
+All-or-Nothing and Before-or-After——MIT6.824</h1>
 <blockquote>
 <p>《Principles Computer System Design Introduction》</p>
 </blockquote>
-<h2 id="before-or-after-atomicity-coordinating-concurrent-threads">Before-or-After Atomicity: Coordinating Concurrent Threads</h2>
-<p>并发操作中经常会出现data race condition，从程序员的角度看，有两种不同的并发协调做法：序列协调和原子性（<em>sequence coordina­tion</em> and <em>before-or-after atomicity</em>）。序列协调指的是约束"动作W必须在动作X之前发生"，而原子性则是一种更普遍的约束，即同时对同一个数据进行操作的若干动作不会相互干扰。我们对Before-or-after atomicity的定义是：</p>
+<h2
+id="before-or-after-atomicity-coordinating-concurrent-threads">Before-or-After
+Atomicity: Coordinating Concurrent Threads</h2>
+<p>并发操作中经常会出现data race
+condition，从程序员的角度看，有两种不同的并发协调做法：序列协调和原子性（<em>sequence
+coordina­tion</em> and <em>before-or-after
+atomicity</em>）。序列协调指的是约束"动作W必须在动作X之前发生"，而原子性则是一种更普遍的约束，即同时对同一个数据进行操作的若干动作不会相互干扰。我们对Before-or-after
+atomicity的定义是：</p>
 <blockquote>
-<p>Concurrent actions have the <em>before-or-afte</em>r property if their effect from the point of view of their invokers is the same as if the actions occurred either <em>completely before</em> or <em>completely after</em> one another.</p>
+<p>Concurrent actions have the <em>before-or-afte</em>r property if
+their effect from the point of view of their invokers is the same as if
+the actions occurred either <em>completely before</em> or <em>completely
+after</em> one another.</p>
 </blockquote>
 <p>与序列协调不同，before-or-after原子性对于程序员来说无法知道共享变量的所有其他动作的ID。程序员需要的是一种自动的隐式机制，可确保正确处理每个共享变量。举个例子，在操作系统中，几个并发线程可能决定在某个时间使用共享打印机。而且，哪个线程首先使用打印机并不重要，重要的是是打印机的一次使用在下一次开始之前必须要完成。</p>
 <p>否则，多个线程交叉发生很可能引起最终的结果不一致，如图，如果两个线程对这个操作交叉执行，就会产生不一致的行为，原子性要保证的就是两个线程对B的操作必须是原子操作。</p>
 <figure>
-<img src="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://puui.qpic.cn/fans_admin/0/3_1871029897_1565538342332/0"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<h2 id="correctness-and-serialization">Correctness and Serialization</h2>
+<h2 id="correctness-and-serialization">Correctness and
+Serialization</h2>
 <p>我们的目标是对before-or-after原子性进行正确性的验证，而不会涉及使用该机制的应用程序是否正确的问题。此正确性标准意味着如果并发操作的结果是通过某些纯串行应用的相同操作获得的结果，则算正确协调并发操作。</p>
 <p>因此我们对before-or-after原子性的定义就是每个before-or-after的行为都表现得是执行之前或者完全执行之后的效果。</p>
 <h2 id="simple-locking">Simple Locking</h2>
-<p>simple locking有两个规则，首先是每个事务必须在执行任何实际读取和写入之前为其操作的所有共享对象获取锁；其次是必须事务完成上次更新并提交或者重新加载数据并终止后才会释放锁。</p>
-<p>simple locking能有效地协调并发事务，在该规则下一个事务必须在前一个事务完成之后进行、在后一个事务开始之前进行，并且进行中的事务不会拥有共同的数据。并发事务产生的结果就像是按照序列化顺序进行的一样。</p>
-<p>但是simple locking也会因为性能问题影响其并发过程，因为它要求事务获取它将要读取或写入的每个共享对象的锁，如果其需要读取的锁数量大于当前的数量，那么就会在一定程度上影响其并发性能。</p>
+<p>simple
+locking有两个规则，首先是每个事务必须在执行任何实际读取和写入之前为其操作的所有共享对象获取锁；其次是必须事务完成上次更新并提交或者重新加载数据并终止后才会释放锁。</p>
+<p>simple
+locking能有效地协调并发事务，在该规则下一个事务必须在前一个事务完成之后进行、在后一个事务开始之前进行，并且进行中的事务不会拥有共同的数据。并发事务产生的结果就像是按照序列化顺序进行的一样。</p>
+<p>但是simple
+locking也会因为性能问题影响其并发过程，因为它要求事务获取它将要读取或写入的每个共享对象的锁，如果其需要读取的锁数量大于当前的数量，那么就会在一定程度上影响其并发性能。</p>
 <h2 id="two-phase-locking">Two-Phase Locking</h2>
 <p>两阶段锁协议整个过程分为两个阶段：一是加锁，二是释放锁。加锁过程中事务只能加锁或者操作数据，在其通过某个锁定点之前都不能释放锁。而释放锁的过程中事务只能解锁或者操作数据，而不能再重新上锁了。</p>
-<p>虽然两阶段锁协议比简单的锁定具有更好的并发性能，例如假设事务T1读取X，接着写Y，而事务T2只执行写入Y。在两阶段锁协议下，T2只能在T1两个动作之前或者之后发生。但事实上T2在T1两个动作中间进行与T2完全在T1之前进行的效果是一样的。允许所有可能的并发性同时确保的before-or-after atomicity规则很难设计。</p>
+<p>虽然两阶段锁协议比简单的锁定具有更好的并发性能，例如假设事务T1读取X，接着写Y，而事务T2只执行写入Y。在两阶段锁协议下，T2只能在T1两个动作之前或者之后发生。但事实上T2在T1两个动作中间进行与T2完全在T1之前进行的效果是一样的。允许所有可能的并发性同时确保的before-or-after
+atomicity规则很难设计。</p>
 <p>锁与日志之间的关系有两点是需要考虑的：单个的中止事务和系统恢复。对于前者，协议要求中止事务在释放任何锁之前将其更改的数据对象恢复为原始值，因此不需要对中止的事务采取特殊的计算。至于后者，锁不是在非易失性存储中，因此在系统的恢复过程中必须将锁捕获以释放锁。然而我们还需要考虑的是，基于日志的恢复算法是否构建了正确的系统状态，因为系统崩溃可能是由于在崩溃之前提交的那些事务的串行排序引起的。</p>
 <p>假设锁是在易失性存储器中，在系统崩溃的瞬间所有锁的记录都丢失。某些事务（记录BEGIN记录但尚未记录END记录的事务）可能尚未完成。但由于在那一瞬间所有事物的锁集合都是不重叠的，因此在恢复过程中可以不加锁地通过执行恢复算法重建系统状态，当然这一恢复过程中不能有新的事务产生。</p>
-<h2 id="multiple-site-atomicity-distributed-two-phase-commit">Multiple-Site Atomicity: Distributed Two-Phase Commit</h2>
-<p>如果事务需要在分布式的环境下执行，则需要使用结合了persis­tent senders, duplicate suppression和single-site transactions的两阶段提交协议。</p>
+<h2
+id="multiple-site-atomicity-distributed-two-phase-commit">Multiple-Site
+Atomicity: Distributed Two-Phase Commit</h2>
+<p>如果事务需要在分布式的环境下执行，则需要使用结合了persis­tent senders,
+duplicate suppression和single-site transactions的两阶段提交协议。</p>
 <p>这是因为分布式架构中，不同的节点之间只能知道自己的操作是否成功，而无法知道其他节点的操作的成功或失败。为了保证事务的特性，需要引入一个作为<strong>协调者</strong>的组件来统一掌控所有节点（<strong>参与者</strong>）的操作结果并最终指示这些节点的最终提交。</p>
 <p>第一阶段：提交请求的投票阶段</p>
 <ol type="1">
@@ -381,7 +399,9 @@
 </ol>
 <p>通信流程参考：</p>
 <figure>
-<img src="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0" alt="img" /><figcaption>img</figcaption>
+<img src="https://puui.qpic.cn/fans_admin/0/3_368264658_1565804825622/0"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>2PC也存在一些缺点，其中一个就是执行过程中，节点处于阻塞状态；另一个就是出现节点崩溃时，只能依赖协调者去进行回滚；并且协调者还存在单点故障的问题。</p>
 
@@ -558,7 +578,11 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#atomicity-all-or-nothing-and-before-or-aftermit6.824"><span class="nav-number">1.</span> <span class="nav-text">Atomicity: All-or-Nothing and Before-or-After——MIT6.824</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#before-or-after-atomicity-coordinating-concurrent-threads"><span class="nav-number">1.1.</span> <span class="nav-text">Before-or-After Atomicity: Coordinating Concurrent Threads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#correctness-and-serialization"><span class="nav-number">1.2.</span> <span class="nav-text">Correctness and Serialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#simple-locking"><span class="nav-number">1.3.</span> <span class="nav-text">Simple Locking</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#two-phase-locking"><span class="nav-number">1.4.</span> <span class="nav-text">Two-Phase Locking</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multiple-site-atomicity-distributed-two-phase-commit"><span class="nav-number">1.5.</span> <span class="nav-text">Multiple-Site Atomicity: Distributed Two-Phase Commit</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#atomicity-all-or-nothing-and-before-or-aftermit6.824"><span class="nav-number">1.</span> <span class="nav-text">Atomicity:
+All-or-Nothing and Before-or-After——MIT6.824</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#before-or-after-atomicity-coordinating-concurrent-threads"><span class="nav-number">1.1.</span> <span class="nav-text">Before-or-After
+Atomicity: Coordinating Concurrent Threads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#correctness-and-serialization"><span class="nav-number">1.2.</span> <span class="nav-text">Correctness and
+Serialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#simple-locking"><span class="nav-number">1.3.</span> <span class="nav-text">Simple Locking</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#two-phase-locking"><span class="nav-number">1.4.</span> <span class="nav-text">Two-Phase Locking</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multiple-site-atomicity-distributed-two-phase-commit"><span class="nav-number">1.5.</span> <span class="nav-text">Multiple-Site
+Atomicity: Distributed Two-Phase Commit</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -600,8 +624,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -96,12 +96,12 @@
 
 
 
-<meta name="description" content="Need of Event Handling 本文将集中讨论多线程环境下的事件处理机制。有时线程需要等待某事件发生，例如条件变量成为真或由另一个线程完成的任务。 举个例子，应用处理以下的任务：  与服务器握手； 从文件读取数据； 处理读出来的数据；  在上面的任务中，任务1是独立的，而任务3则依赖于任务2。因此我们可以将该应用拆分为2个线程去处理：  img  创建一个默认值为false的布尔全局">
+<meta name="description" content="Need of Event Handling 本文将集中讨论多线程环境下的事件处理机制。有时线程需要等待某事件发生，例如条件变量成为真或由另一个线程完成的任务。 举个例子，应用处理以下的任务：  与服务器握手； 从文件读取数据； 处理读出来的数据；  在上面的任务中，任务1是独立的，而任务3则依赖于任务2。因此我们可以将该应用拆分为2个线程去处理：   img  创建一个默认值为false的布尔全">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Need of Event Handling">
 <meta property="og:url" content="http://yoursite.com/2019/04/23/Need-of-Event-Handling/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="Need of Event Handling 本文将集中讨论多线程环境下的事件处理机制。有时线程需要等待某事件发生，例如条件变量成为真或由另一个线程完成的任务。 举个例子，应用处理以下的任务：  与服务器握手； 从文件读取数据； 处理读出来的数据；  在上面的任务中，任务1是独立的，而任务3则依赖于任务2。因此我们可以将该应用拆分为2个线程去处理：  img  创建一个默认值为false的布尔全局">
+<meta property="og:description" content="Need of Event Handling 本文将集中讨论多线程环境下的事件处理机制。有时线程需要等待某事件发生，例如条件变量成为真或由另一个线程完成的任务。 举个例子，应用处理以下的任务：  与服务器握手； 从文件读取数据； 处理读出来的数据；  在上面的任务中，任务1是独立的，而任务3则依赖于任务2。因此我们可以将该应用拆分为2个线程去处理：   img  创建一个默认值为false的布尔全">
 <meta property="og:locale">
 <meta property="og:image" content="https://thispointer.com//wp-content/uploads/2015/06/first.png">
 <meta property="article:published_time" content="2019-04-23T06:13:17.000Z">
@@ -160,9 +160,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -346,7 +344,9 @@
 </ol>
 <p>在上面的任务中，任务1是独立的，而任务3则依赖于任务2。因此我们可以将该应用拆分为2个线程去处理：</p>
 <figure>
-<img src="https://thispointer.com//wp-content/uploads/2015/06/first.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://thispointer.com//wp-content/uploads/2015/06/first.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>创建一个默认值为false的布尔全局变量。在线程2中将其值设置为true，并且线程1在循环中检查其值，一旦变为真，线程1将继续处理数据。但由于它是两个线程共享的全局变量，因此需要与互斥锁同步。</p>
 <p><strong>不过这种方式有以下的缺点：</strong></p>
@@ -568,8 +568,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

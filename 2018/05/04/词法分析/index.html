@@ -162,9 +162,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -429,23 +427,27 @@
 </table>
 <p>但是，考虑这样一个字符串<strong>if8</strong>，到底是认为其为一个标识符，还是两个tokens：if和8呢？为了消除二义性，我们可以试用一下两个规则：</p>
 <ul>
-<li>Longest match：对于输入的字符串，取可以与任意正则表达式规则匹配的字符串中最长的那一个作为下一个token；</li>
+<li>Longest
+match：对于输入的字符串，取可以与任意正则表达式规则匹配的字符串中最长的那一个作为下一个token；</li>
 <li>Rule priority：给正则表达式赋予某些优先权，选择优先级高的；</li>
 </ul>
 <h2 id="有限自动机">有限自动机</h2>
 <p>虽然用正则表达式已经可以很好地指明词法规则，但我们还需要一种能用计算机程序来实现的的形式化方法。这就是有限自动机<strong>(DFA)</strong>所做的事情。有限自动机包含了有限状态的集合和一些从一个状态到另一个状态的边。</p>
 <p>在DFA中，不会有从同一个状态出发的两条边却包含了相同的符号。若对n个字符的字符串，进行了n次的转换之后，如果自动机到达了一个终态，则选择接收该字符串。如果没有到达终态，或者找不到与输入字符匹配的边，则拒绝接收字符串。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-3.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-3.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="识别最长的匹配">识别最长的匹配</h3>
-<p>为了识别一个字符串是否会被接收，词法分析器往往会选择最长的匹配，作为合法的token。因此需要两个变量来记住自动机最近一次处于final states的时机。</p>
+<p>为了识别一个字符串是否会被接收，词法分析器往往会选择最长的匹配，作为合法的token。因此需要两个变量来记住自动机最近一次处于final
+states的时机。</p>
 <h2 id="非确定有限自动机">非确定有限自动机</h2>
 <p>与确定有限自动机不同，非确定有限自动机<strong>(NFA)</strong>需要做出选择，对从一个状态出发的<strong>多条标有相同符号</strong>的边进行选择。</p>
 <h3 id="将正则表达式转换为nfa">将正则表达式转换为NFA</h3>
 <p>有了NFA之后，我们可以很容易地将正则表达式转化为NFA，一个正则表达式要么是一个简单的primitive，要么是由多个较小的表达式组合而成。如图：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-6.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-6.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="将nfa转换为dfa">将NFA转换为DFA</h3>
 <p>先来看NFA的模拟算法：</p>
@@ -453,7 +455,8 @@
 <p>首先构造s1的eplison闭包，然后从该闭包的状态集合出发，吃进符号c，到达一个新的状态集合。</p>
 <p>看一个例子：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-7.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/Compiler2-7.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>以字符串in为例子，先计算出eplison闭包，即求得状态集合为{1,4,9,14}；接着要根据字符i来进行状态转换，从状态1可到状态2，4可以到5，9无处可去，14可以到15，因此得到状态集合{2,5,15}，但是我们还要计算一次闭包，因此得到最终状态集合为{2,5,6,8,15}；同理，根据字符n进行转换。</p>
 <p>这样的自动机还不是最理想的，我们还可以构造最小的自动机。我们只会在这种情况下称两个状态是等价的，如果一个开始于s1的自动机接收字符串a，当且仅当一个开始s2的自动机接收字符串a。这样我们就可以使得所有进入s2的边指向s1，并删除s2。</p>
@@ -673,8 +676,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

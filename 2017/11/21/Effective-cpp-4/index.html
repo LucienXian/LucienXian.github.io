@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,14 +332,18 @@
       
 
       
-        <h1 id="make-sure-that-objects-are-initialized-before-theyre-used">Make sure that objects are initialized before they're used</h1>
-<h2 id="尽量使用member-initialization-list">尽量使用member initialization list</h2>
+        <h1 id="make-sure-that-objects-are-initialized-before-theyre-used">Make
+sure that objects are initialized before they're used</h1>
+<h2 id="尽量使用member-initialization-list">尽量使用member
+initialization list</h2>
 <ul>
 <li>如果只是在构造函数体内进行赋值，非内置类型会在<strong>default</strong>构造函数中先被初始化</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">myClass</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="built_in">myClass</span>(std::string&amp; address, std::list&lt;myClass&gt;&amp; l)&#123;</span><br><span class="line">      addr = address;<span class="comment">//只是赋值，早在默认构造函数已经被初始化</span></span><br><span class="line">      list = l;</span><br><span class="line">  	&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	std::string addr;</span><br><span class="line">  	std::list&lt;myClass&gt; list;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>如果使用member initialization list，会更加高效，避免了内置类型进行结果相同的初始化和赋值；而且member initialization list也能通过默认构造函数初始化成员变量；</li>
+<li>如果使用member initialization
+list，会更加高效，避免了内置类型进行结果相同的初始化和赋值；而且member
+initialization list也能通过默认构造函数初始化成员变量；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">myClass::<span class="built_in">myClass</span>()</span><br><span class="line">	:<span class="built_in">addr</span>(),</span><br><span class="line">	 <span class="built_in">list</span>()</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
 <ul>
@@ -351,7 +353,8 @@
 <li>class的成员变量按照声明次序初始化；</li>
 </ul></li>
 </ul>
-<h2 id="不同编译单元的non-local-static对象">不同编译单元的non-local static对象</h2>
+<h2 id="不同编译单元的non-local-static对象">不同编译单元的non-local
+static对象</h2>
 <ul>
 <li>这个问题的起源是C++不保证不同的编译单元的初始化次序。</li>
 <li>例如</li>
@@ -360,12 +363,16 @@
 <ul>
 <li>在这种情况，倘若tfs在tempDir初始化并没有完成初始化，这样就会出现问题；</li>
 </ul>
-<p>为了解决这个问题，我们采取singleton模式，把每个non-local static放到专属函数中。以local static对象替代non-local static对象。因为C++保证一个local static对象会在函数调用期间/首次遇到该对象被定义时进行初始化。</p>
+<p>为了解决这个问题，我们采取singleton模式，把每个non-local
+static放到专属函数中。以local static对象替代non-local
+static对象。因为C++保证一个local
+static对象会在函数调用期间/首次遇到该对象被定义时进行初始化。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">FileSystem&amp; <span class="title">tfs</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="type">static</span> FileSystem fs;</span><br><span class="line">  <span class="keyword">return</span> fs;</span><br><span class="line">&#125;<span class="comment">//第一行是定义并初始化一个对象，第二行是返回该对象的引用。</span></span><br><span class="line"><span class="comment">//而且如果函数被反复调用，可以声明为inline</span></span><br></pre></td></tr></table></figure>
 <h2 id="建议">建议</h2>
 <ul>
 <li>构造函数最好使用member initialization list；</li>
-<li>以local static对象替代non-local static对象，保证跨编译单元的对象初始化；</li>
+<li>以local static对象替代non-local
+static对象，保证跨编译单元的对象初始化；</li>
 </ul>
 
       
@@ -541,7 +548,10 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#make-sure-that-objects-are-initialized-before-theyre-used"><span class="nav-number">1.</span> <span class="nav-text">Make sure that objects are initialized before they&#39;re used</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8member-initialization-list"><span class="nav-number">1.1.</span> <span class="nav-text">尽量使用member initialization list</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%BC%96%E8%AF%91%E5%8D%95%E5%85%83%E7%9A%84non-local-static%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.2.</span> <span class="nav-text">不同编译单元的non-local static对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#make-sure-that-objects-are-initialized-before-theyre-used"><span class="nav-number">1.</span> <span class="nav-text">Make
+sure that objects are initialized before they&#39;re used</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8member-initialization-list"><span class="nav-number">1.1.</span> <span class="nav-text">尽量使用member
+initialization list</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%BC%96%E8%AF%91%E5%8D%95%E5%85%83%E7%9A%84non-local-static%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.2.</span> <span class="nav-text">不同编译单元的non-local
+static对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -583,8 +593,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

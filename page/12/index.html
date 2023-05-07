@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -337,7 +335,8 @@
       
         
           
-            <h1 id="在公有类中使用访问方法而非公有域">在公有类中使用访问方法而非公有域</h1>
+            <h1
+id="在公有类中使用访问方法而非公有域">在公有类中使用访问方法而非公有域</h1>
 <p>不提供封装的类，如果不改变API，就无法改变它的数据表示法，也无法强加任何约束条件；</p>
 <p>例如这种：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> x;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -470,9 +469,12 @@
 <h2 id="建议">建议</h2>
 <p>一旦类实现了Comparable接口，它可以跟许多泛型算法进行协作。在Java平台类库中的所有值类都实现了Comparable接口。</p>
 <ol type="1">
-<li>实现者必须确保所有的x和y都满足sgn(x.compareTo(y)) == -sgn(y.compareTo(x))；</li>
-<li>确保比较关系可传递：x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z) &gt; 0，那么x.compareTo(z)&gt;0为true；</li>
-<li>x.compareTo(y) ==0 意味着所有z都满足sgn(x.compareTo(z)) == sgn(y.compareTo(z))</li>
+<li>实现者必须确保所有的x和y都满足sgn(x.compareTo(y)) ==
+-sgn(y.compareTo(x))；</li>
+<li>确保比较关系可传递：x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z)
+&gt; 0，那么x.compareTo(z)&gt;0为true；</li>
+<li>x.compareTo(y) ==0 意味着所有z都满足sgn(x.compareTo(z)) ==
+sgn(y.compareTo(z))</li>
 </ol>
 <p>另外，强烈建议：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x.compareTo(y)==<span class="number">0</span>) == (x.equals(y))</span><br></pre></td></tr></table></figure>
@@ -599,7 +601,10 @@
 <h2 id="概述">概述</h2>
 <p>对于Java而言，垃圾回收技术和内存动态分配是它的一大特点，本文将介绍Java虚拟机内存的各个区域。</p>
 <h2 id="运行时数据区域">运行时数据区域</h2>
-<p>Java虚拟机在执行Java程序的过程中会把它管理的内存划分为多个不同的数据区域——方法区(Method kArea)、堆(Heap)、虚拟机栈(VM Stack)、本地方法栈(Native Method Stacj)、程序计数器(Program Counter Register)。前面两个是所有线程共享的，后者则是线程独立的。</p>
+<p>Java虚拟机在执行Java程序的过程中会把它管理的内存划分为多个不同的数据区域——方法区(Method
+kArea)、堆(Heap)、虚拟机栈(VM Stack)、本地方法栈(Native Method
+Stacj)、程序计数器(Program Counter
+Register)。前面两个是所有线程共享的，后者则是线程独立的。</p>
 <h3 id="程序计数器">程序计数器</h3>
 <p>每个线程都有自己的程序计数器，它可以看做是当前线程执行的字节码的行号指示器，通过改变这个计数器的值就可以选取下一条需要执行的字节码指令。</p>
 <blockquote>
@@ -632,15 +637,18 @@
 <li>去常量池中检查是否能够定位到这个类的符号引用，并且检查这个类是否已被加载、解析和初始化过；</li>
 <li>在类加载检查通过后会去分配内存，这里有两种情况：
 <ul>
-<li>Java堆中内存规整，就会把所有用过的内存放一边，空闲的在另一边，中间使用指针作为分界点的指示器。每次分配内存的时候就移动指针——Bump the Pointer；</li>
+<li>Java堆中内存规整，就会把所有用过的内存放一边，空闲的在另一边，中间使用指针作为分界点的指示器。每次分配内存的时候就移动指针——Bump
+the Pointer；</li>
 <li>非规整内存，则是维护一个空闲列表，记录哪些内存块可用；</li>
 </ul></li>
 </ul>
 <p>Java堆是否规整与采用的垃圾回收器有关，CMS这种基于Mark-Sweep算法的收集器则是采用空闲列表。</p>
-<p>另外，为了解决线程安全的问题，有两种解决方法：一是采用CAS配上失败重试的方式保证更新内存操作的原子性；二是将内存分配的操作按照线程划分在不同的空间中，则提取为线程分配缓存Thread Local Allocation Buffer——TLAB；可以通过-XX:+/-UseTLAB参数进行设定</p>
+<p>另外，为了解决线程安全的问题，有两种解决方法：一是采用CAS配上失败重试的方式保证更新内存操作的原子性；二是将内存分配的操作按照线程划分在不同的空间中，则提取为线程分配缓存Thread
+Local Allocation Buffer——TLAB；可以通过-XX:+/-UseTLAB参数进行设定</p>
 <ul>
 <li>分配完内存后，会将内存空间中除对象头外都初始化为零值；</li>
-<li>接下来，虚拟机对对象进行必要的设置，将一些元数据信息，对象的哈希码，GC分代年龄等记录在Object Header中。</li>
+<li>接下来，虚拟机对对象进行必要的设置，将一些元数据信息，对象的哈希码，GC分代年龄等记录在Object
+Header中。</li>
 <li>最后，会执行init方法，进行对象初始化。</li>
 </ul>
 <h3 id="对象的内存布局">对象的内存布局</h3>
@@ -648,7 +656,9 @@
 <ol type="1">
 <li>对象头</li>
 </ol>
-<p>对象头包含两部分信息，一是存储对象自身的运行时数据，如对象的哈希码，GC分代年龄等，并且这部分数据的长度在32位和64位的虚拟机中分别为32bit和64bit，即Mark Word。例如Mark Word的32bit空间中25bit存储对象哈希码，4bit存储对象分代年龄，2bit存储锁标志位，1bit固定为0；</p>
+<p>对象头包含两部分信息，一是存储对象自身的运行时数据，如对象的哈希码，GC分代年龄等，并且这部分数据的长度在32位和64位的虚拟机中分别为32bit和64bit，即Mark
+Word。例如Mark
+Word的32bit空间中25bit存储对象哈希码，4bit存储对象分代年龄，2bit存储锁标志位，1bit固定为0；</p>
 <p>二是类型指针，即对象指向它的类元数据的指针，这样就可以通过这个指针确定对象是哪个类的实例。</p>
 <ol start="2" type="1">
 <li>实例数据</li>
@@ -788,7 +798,8 @@
 <blockquote>
 <p>在分布式系统中，每个节点虽然可以知道自己的操作是否成功，但当一个事物跨越多个节点时，为了保证事务的ACID特性，系统需要引入一个协调者组件来管控所有节点的操作；</p>
 </blockquote>
-<p>2 Phase Commit（简称2PC）协议是在分布式事务中，用于在多个节点达成一致性的协议。</p>
+<p>2 Phase
+Commit（简称2PC）协议是在分布式事务中，用于在多个节点达成一致性的协议。</p>
 <h2 id="协议内容">协议内容</h2>
 <ul>
 <li><p>角色</p>
@@ -826,11 +837,17 @@
 <p><strong>流程如下</strong>：</p>
 <p>Coordinator</p>
 <figure>
-<img src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-coord.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-coord.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>Participant</p>
 <figure>
-<img src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-part.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://cseweb.ucsd.edu/classes/sp16/cse291-e/applications/ln/2pc-part.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="pc的缺点">2PC的缺点</h2>
 <p>尽管2PC看起来能提供原子性的事务，但其也有局限：</p>
@@ -841,7 +858,8 @@
 <h2 id="总结">总结</h2>
 <p>相比2PC，3PC能解决一些单点故障和阻塞的问题，但都无法彻底解决分布式的一致性问题，只有Paxos算法才是完整的一致性算法</p>
 <blockquote>
-<p>there is only one consensus protocol, and that’s Paxos” – all other approaches are just broken versions of Paxos. ——————Mike Burrows</p>
+<p>there is only one consensus protocol, and that’s Paxos” – all other
+approaches are just broken versions of Paxos. ——————Mike Burrows</p>
 </blockquote>
 <h2 id="reference">Reference</h2>
 <ol type="1">
@@ -968,7 +986,8 @@
       
         
           
-            <h1 id="用私有构造器或者枚举类型强化singleton属性">用私有构造器或者枚举类型强化Singleton属性</h1>
+            <h1
+id="用私有构造器或者枚举类型强化singleton属性">用私有构造器或者枚举类型强化Singleton属性</h1>
 <h2 id="概述">概述</h2>
 <p>Singleton指仅仅被实例化一次的类。</p>
 <h2 id="实现方式">实现方式</h2>
@@ -1247,7 +1266,8 @@
       
         
           
-            <h1 id="遇到多个构造器参数时要考虑使用builder">遇到多个构造器参数时要考虑使用builder</h1>
+            <h1
+id="遇到多个构造器参数时要考虑使用builder">遇到多个构造器参数时要考虑使用builder</h1>
 <h2 id="概述">概述</h2>
 <p>静态工厂和构造函数都不能很好地扩展到大量的可选参数。</p>
 <h2 id="场景">场景</h2>
@@ -1255,7 +1275,8 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">NutritionFactsOne</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> servingSize; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> servings; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> calorries;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> fat;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> sodium;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> carbohydrate;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">NutritionFactsOne</span><span class="params">(<span class="type">int</span> servingSize, <span class="type">int</span> servings)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>(servingSize, servings, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">NutritionFactsOne</span><span class="params">(<span class="type">int</span> servingSize, <span class="type">int</span> servings, <span class="type">int</span> calorries)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>(servingSize, servings, calorries, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">NutritionFactsOne</span><span class="params">(<span class="type">int</span> servingSize, <span class="type">int</span> servings, <span class="type">int</span> calorries, <span class="type">int</span> fat)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>(servingSize, servings, calorries, fat, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">NutritionFactsOne</span><span class="params">(<span class="type">int</span> servingSize, <span class="type">int</span> servings, <span class="type">int</span> calorries, <span class="type">int</span> fat, <span class="type">int</span> sodium, <span class="type">int</span> carbohydrate)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.servingSize = servingSize;</span><br><span class="line">		<span class="built_in">this</span>.servings = servings;</span><br><span class="line">        <span class="built_in">this</span>.calorries = calorries;</span><br><span class="line">        <span class="built_in">this</span>.fat = fat;</span><br><span class="line">		<span class="built_in">this</span>.sodium = sodium;</span><br><span class="line">        <span class="built_in">this</span>.carbohydrate = carbohydrate;</span><br><span class="line">	&#125;	</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这样，我们创建一个实例时，就很不容易阅读：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">NutritionFactsOne</span> <span class="variable">n</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NutritionFactsOne</span>(<span class="number">240</span>, <span class="number">8</span>, <span class="number">100</span>, <span class="number">0</span>, <span class="number">35</span>, <span class="number">27</span>);</span><br></pre></td></tr></table></figure>
-<p>当然，也可以考虑用java beans的模式，然后调用setter设置每个必要的参数，已经相关的可选参数。</p>
+<p>当然，也可以考虑用java
+beans的模式，然后调用setter设置每个必要的参数，已经相关的可选参数。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">NutritionFactsTwo</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> servingSize; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> servings; <span class="comment">//require</span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> calorries;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> fat;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> sodium;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> carbohydrate;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setServingSize</span><span class="params">(<span class="type">int</span> servingSize)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.servingSize = servingSize;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setServings</span><span class="params">(<span class="type">int</span> servings)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.servings = servings;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setCalorries</span><span class="params">(<span class="type">int</span> calorries)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.calorries = calorries;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setFat</span><span class="params">(<span class="type">int</span> fat)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.fat = fat;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setSodium</span><span class="params">(<span class="type">int</span> sodium)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.sodium = sodium;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setCarbohydrate</span><span class="params">(<span class="type">int</span> carbohydrate)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.carbohydrate = carbohydrate;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>紧接着</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">NutritionFactsTwo</span> <span class="variable">n</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NutritionFactsTwo</span>();</span><br><span class="line">n.setServingSize(<span class="number">240</span>);</span><br><span class="line">n.setServings(<span class="number">8</span>);</span><br><span class="line">n.setCalorries(<span class="number">100</span>);</span><br><span class="line">n.setFat(<span class="number">35</span>);</span><br></pre></td></tr></table></figure>
@@ -1400,7 +1421,8 @@
 <li>不能保证及时地被执行，因为JVM可能会延迟执行终结方法；</li>
 <li>在不同的JVM上对于执行终结方法的实现，即垃圾回收算法的实现是不同的；</li>
 <li>当一个程序终止时，某些已经无法访问对象上的终结方法可能根本没有执行；</li>
-<li>System.gc System.runFinalization这个两个方法并不能保证终结方法被执行；</li>
+<li>System.gc
+System.runFinalization这个两个方法并不能保证终结方法被执行；</li>
 <li>如果未被捕获的异常在终结过程中被跑出来，那么异常可以被忽略，并且终结过程也会终止。这样的对象会处于破坏的状态；</li>
 <li>最后，使用终结方法会有严重的性能损失；</li>
 </ul>
@@ -1538,7 +1560,9 @@
 <ol type="1">
 <li>拥有显式的名称；</li>
 </ol>
-<p>用户可以清楚地知道自己需要那个构造函数构造的对象，例如<strong>BigInteger(int, int, Random)</strong>返回的是素数，但使用静态工厂方法<strong>BigInteger.probablePrime</strong>会更加明显。</p>
+<p>用户可以清楚地知道自己需要那个构造函数构造的对象，例如<strong>BigInteger(int,
+int,
+Random)</strong>返回的是素数，但使用静态工厂方法<strong>BigInteger.probablePrime</strong>会更加明显。</p>
 <ol start="2" type="1">
 <li>不必每次调用的时候都创建一个新对象</li>
 </ol>
@@ -1680,7 +1704,8 @@
       
         
           
-            <h1 id="通过私有构造器强化不可实例化的能力">通过私有构造器强化不可实例化的能力</h1>
+            <h1
+id="通过私有构造器强化不可实例化的能力">通过私有构造器强化不可实例化的能力</h1>
 <h2 id="概述">概述</h2>
 <p>一些工具类可能不希望被实例化，因为实例化对它没有任何含义。诸如Java.lang.Math这种类只含有静态方法和静态域。</p>
 <h2 id="方法">方法</h2>
@@ -1854,8 +1879,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

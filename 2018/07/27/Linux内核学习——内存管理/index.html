@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -354,7 +352,8 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> page * <span class="title function_">alloc_pages</span><span class="params">(<span class="type">gfp_t</span> gfp_mask, <span class="type">unsigned</span> <span class="type">int</span> order)</span>;<span class="comment">//分配2^order个连续的物理页面，指针指向第一个page结构体</span></span><br></pre></td></tr></table></figure>
 <p>也可以获得填充为0的页，避免随机产生了垃圾信息或者敏感信息，保证安全：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">get_zeroed_page</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> gfp_mask)</span>;</span><br></pre></td></tr></table></figure>
-<p>释放页面，释放页需要谨慎，因为传递了错误的struct page或者地址会导致系统，因为内核是完全相信自己的：</p>
+<p>释放页面，释放页需要谨慎，因为传递了错误的struct
+page或者地址会导致系统，因为内核是完全相信自己的：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">free_pages</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> addr, <span class="type">unsigned</span> <span class="type">int</span> order)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">free_page</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> addr)</span>;</span><br></pre></td></tr></table></figure>
 <h2 id="kmalloc">kmalloc()</h2>
 <p>kmalloc()函数与用户控件malloc()类似，都是以字节为单位进行分配，只是多了一个flags参数。</p>
@@ -408,7 +407,8 @@
 <p>上面我们讲了多种分配函数，但如何选择呢？</p>
 <p>如果内核需要连续的物理内存，应该使用kmalloc；</p>
 <p>如果需要连续的虚拟内存，应该使用vmalloc，但性能相对于kmalloc会低一点；</p>
-<p>对于高端内存，可以使用alloc_pages，返回一个struct page的结构指针；如果要得到真正的指针，应该使用kmap()，将高端内存映射到内核逻辑地址；</p>
+<p>对于高端内存，可以使用alloc_pages，返回一个struct
+page的结构指针；如果要得到真正的指针，应该使用kmap()，将高端内存映射到内核逻辑地址；</p>
 <p>如果要频繁创建和撤销大的数据结构，slab高速缓存是一种更好的选择，slab层通过维持一个对象高速缓存，避免频繁地分配和释放内存，只需要根据需要从缓存中得到对象就可以了。</p>
 
       
@@ -626,8 +626,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -345,14 +343,20 @@
 <p>它将在内部调用add()函数，并在_1的位置传递第一个参数，在_2的位置传递第二个参数。</p>
 <p>现在假设我们想在一个特殊场景中使用这个add函数，我们应该将第一个参数始终固定为12，并让第二个参数由用户传递，即：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> new_add_func = std::<span class="built_in">bind</span>(&amp;add, <span class="number">12</span>, _1);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> x = <span class="built_in">new_add_func</span>(<span class="number">5</span>);</span><br><span class="line"><span class="comment">// Will return 17</span></span><br></pre></td></tr></table></figure>
-<p>我们也可以使用std :: bind()重新排列参数，即_1和_2等决定要传递的参数的位：</p>
+<p>我们也可以使用std ::
+bind()重新排列参数，即_1和_2等决定要传递的参数的位：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> mod_add_func = std::<span class="built_in">bind</span>(&amp;add, _2, _1);</span><br><span class="line"></span><br><span class="line"><span class="comment">// mod_add_func(12,15) === add(15, 12).</span></span><br></pre></td></tr></table></figure>
-<h2 id="use-of-stdbind-in-stl-algorithms">Use of std::bind in STL algorithms</h2>
-<p>由于std :: bind充当功能适配器并提供新的函数对象，因此它对于许多STL算法非常有用。</p>
-<p>例如， 我们有一个数字列表，我们想要计算5的倍数。要实现这一点，我们有一个现有的函数，即:</p>
+<h2 id="use-of-stdbind-in-stl-algorithms">Use of std::bind in STL
+algorithms</h2>
+<p>由于std ::
+bind充当功能适配器并提供新的函数对象，因此它对于许多STL算法非常有用。</p>
+<p>例如，
+我们有一个数字列表，我们想要计算5的倍数。要实现这一点，我们有一个现有的函数，即:</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">divisible</span><span class="params">(<span class="type">int</span> num , <span class="type">int</span> den)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(num % den == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>一般的算法是遍历判断，但我们可以使用std :: count_if这一个STL算法，即：</p>
-<p><strong><em>count_if (InputIterator firstValue, InputIterator lastValue, UnaryPredicate predFunctionObject);</em></strong></p>
+<p>一般的算法是遍历判断，但我们可以使用std ::
+count_if这一个STL算法，即：</p>
+<p><strong><em>count_if (InputIterator firstValue, InputIterator
+lastValue, UnaryPredicate predFunctionObject);</em></strong></p>
 <p>通过bind函数，我们就可以将divisible转换为一元参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">approach_2</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> arr[<span class="number">10</span>] = &#123;<span class="number">1</span>,<span class="number">20</span>,<span class="number">13</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">10</span>,<span class="number">28</span>,<span class="number">19</span>,<span class="number">15</span>&#125;;</span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">count_if</span>(arr, arr + <span class="built_in">sizeof</span>(arr)/<span class="built_in">sizeof</span>(<span class="type">int</span>) , std::<span class="built_in">bind</span>(&amp;divisible, _1, <span class="number">5</span>));</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="what-stdbind-returns">What std::bind returns ?</h2>
@@ -532,7 +536,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdbind"><span class="nav-number">1.</span> <span class="nav-text">std::bind</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#use-of-stdbind-in-stl-algorithms"><span class="nav-number">1.1.</span> <span class="nav-text">Use of std::bind in STL algorithms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#what-stdbind-returns"><span class="nav-number">1.2.</span> <span class="nav-text">What std::bind returns ?</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdbind"><span class="nav-number">1.</span> <span class="nav-text">std::bind</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#use-of-stdbind-in-stl-algorithms"><span class="nav-number">1.1.</span> <span class="nav-text">Use of std::bind in STL
+algorithms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#what-stdbind-returns"><span class="nav-number">1.2.</span> <span class="nav-text">What std::bind returns ?</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -574,8 +579,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -342,14 +340,23 @@
 <blockquote>
 <p>Given training data, generate new samples from same distribution.</p>
 </blockquote>
-<p>这是非监督学习的一种，目标是学习生成一个模型。使用Generative Models，我们可以构造一些艺术工作的真实样式，通过时间序列的数据去仿真，还有就是Generative Models可以用来推荐潜在的表示模式。</p>
-<p>Generative Models有两种：Explicit density模型和implicit density模型。</p>
+<p>这是非监督学习的一种，目标是学习生成一个模型。使用Generative
+Models，我们可以构造一些艺术工作的真实样式，通过时间序列的数据去仿真，还有就是Generative
+Models可以用来推荐潜在的表示模式。</p>
+<p>Generative Models有两种：Explicit density模型和implicit
+density模型。</p>
 <p>生成模型族谱：</p>
 <figure>
-<img src="https://static.leiphone.com/uploads/new/article/740_740/201702/589978abeec64.png?imageMogr2/format/jpg/quality/90" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://static.leiphone.com/uploads/new/article/740_740/201702/589978abeec64.png?imageMogr2/format/jpg/quality/90"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="pixel-rnn-pixel-cnn">Pixel Rnn &amp; Pixel Cnn</h2>
-<p>在讨论具体的显式密度模型之前，我们先来看一下<strong>完全可见置信网络 Fully visible belief networks</strong>。该模型通过使用概率的链式规则来将一个n维的向量x的概率分布分解为一个一维的概率分布： <span class="math display">\[
+<p>在讨论具体的显式密度模型之前，我们先来看一下<strong>完全可见置信网络
+Fully visible belief
+networks</strong>。该模型通过使用概率的链式规则来将一个n维的向量x的概率分布分解为一个一维的概率分布：
+<span class="math display">\[
 P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,...,x_{i-1})
 \]</span></p>
 <ul>
@@ -357,33 +364,51 @@ P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,...,x_{i-1})
 </ul>
 <p>从Corner开始生成图像像素，然后往周边序列化地生成像素，一般可以通过RNN或者LSTN去生成周边的像素。缺点就是序列化生成非常慢。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelRNN.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelRNN.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>Pixel Cnn</li>
 </ul>
-<p>跟前面一样，从Corner开始生成图像像素。但不同的是，下一个像素的生成是利用上一个像素丢入CNN后生成的。相对pixel rnn会更快，但是总体来说还是比较慢的。</p>
+<p>跟前面一样，从Corner开始生成图像像素。但不同的是，下一个像素的生成是利用上一个像素丢入CNN后生成的。相对pixel
+rnn会更快，但是总体来说还是比较慢的。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelCNN.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelCNN.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="autoencoders">Autoencoders</h2>
 <p>这是非监督学习的一种方法，可以从没有标记过的数据中学习到一些低维度的特征。z是比x维度更低的数据，z包含了重要的信息，并且z应该能够学习到可以被抓取的特征。z能够通过decoder重建输入数据。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/autoencoders1.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/autoencoders1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="gan">GAN</h2>
 <p>GAN的提出是为了解决从一个复杂的、高维的训练分布数据中进行采样的问题，我们可以从一个简单分布进行采样，例如随机噪声，然后去学习transformation到训练的分布。我们使用神经网络去表示这个复杂的transformation。</p>
 <h3 id="two-player-game">Two player game</h3>
 <ul>
-<li>Generator network: try to fool the discriminator by generating real-looking images;</li>
-<li>Discriminator network: try to distinguish between real and fake images;</li>
+<li>Generator network: try to fool the discriminator by generating
+real-looking images;</li>
+<li>Discriminator network: try to distinguish between real and fake
+images;</li>
 </ul>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/gan1.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/gan1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>目标函数： <span class="math display">\[
-\underset{\theta_g}{min}\ \underset{\theta_d}{max} [E_{x-p_{data} }logD_{\theta_d(x)} + E_{x-p_z }log(1-D_{\theta_d}(G_{\theta_g}(z)))]
-\]</span> 其中，<span class="math inline">\(D_{\theta_d(x)}\)</span>是真实数据x的Discriminator的输出，<span class="math inline">\(D_{\theta_d}(G_{\theta_g}(z))\)</span>是假数据的输出。Discriminator想要最大化目标函数，使得D(x)接近1，并且D(G(z))接近0；而Generator则是最小化目标函数，使得D(G(z))接近1。</p>
+\underset{\theta_g}{min}\ \underset{\theta_d}{max} [E_{x-p_{data}
+}logD_{\theta_d(x)} + E_{x-p_z }log(1-D_{\theta_d}(G_{\theta_g}(z)))]
+\]</span> 其中，<span
+class="math inline">\(D_{\theta_d(x)}\)</span>是真实数据x的Discriminator的输出，<span
+class="math inline">\(D_{\theta_d}(G_{\theta_g}(z))\)</span>是假数据的输出。Discriminator想要最大化目标函数，使得D(x)接近1，并且D(G(z))接近0；而Generator则是最小化目标函数，使得D(G(z))接近1。</p>
 
           
         
@@ -508,7 +533,8 @@ P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,...,x_{i-1})
 <p>Java有两种机制允许定义一个多实现的类型——接口和抽象类。从Java8起，接口引入了默认方法。因此这两种机制都能让用户为一些实例方法提供实现。</p>
 <h2 id="优点">优点</h2>
 <p><strong>现有类可以很容易被改造以实现一个新的接口</strong>。对于一个想要实现新接口的类来说，它只需要添加需要的方法即可。若是使用了抽象类，如果你想要让两个类扩展同一个抽象类，这样就强迫了所有的后带来都要扩展这个父类，而不管这个扩展是否合适。</p>
-<p><strong>接口是定义混合类型的理想选择</strong>。混合类型：一个类除了实现它的"primary type"之外，还可以声明其提供一些额外的行为。比如Complarable接口，它允许一个类声明其实例可以与其它可相互比较的对象进行排序。因为它在主要功能之外提供了一些额外的行为。而抽象类无法被改造到现有的类当中。</p>
+<p><strong>接口是定义混合类型的理想选择</strong>。混合类型：一个类除了实现它的"primary
+type"之外，还可以声明其提供一些额外的行为。比如Complarable接口，它允许一个类声明其实例可以与其它可相互比较的对象进行排序。因为它在主要功能之外提供了一些额外的行为。而抽象类无法被改造到现有的类当中。</p>
 <p><strong>接口构造非层次结构的框架</strong>。类层次结构不一定适合一些其它的层次结构中，但接口可以，假设我们有一个接口，这个接口代表了一个歌手（singer），同时还有另一个代表作曲人（songwriter）的接口。我们就可以同时扩展这两个接口。</p>
 
           
@@ -631,24 +657,37 @@ P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,...,x_{i-1})
           
             <h1 id="neural-style-transfer">Neural Style Transfer</h1>
 <h2 id="概述">概述</h2>
-<p>计算机视觉新流行的一种算法：Neural Style Transfer。卷积神经网络的出现带来的对图像特征，特别是抽象特征的提取，使得风格和内容的分离成为了可能。</p>
+<p>计算机视觉新流行的一种算法：Neural Style
+Transfer。卷积神经网络的出现带来的对图像特征，特别是抽象特征的提取，使得风格和内容的分离成为了可能。</p>
 <h2 id="原理">原理</h2>
 <p>首先来看看架构图：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/neuralStyleTransfer1.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/neuralStyleTransfer1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>从架构图可以看到，input有三个：<span class="math inline">\(y_s\)</span>风格图片，<span class="math inline">\(y_c\)</span>内容图片，还有一个生成图片。在更新过程中，CNN网络参数被更新，输出图片也会被更新。</p>
+<p>从架构图可以看到，input有三个：<span
+class="math inline">\(y_s\)</span>风格图片，<span
+class="math inline">\(y_c\)</span>内容图片，还有一个生成图片。在更新过程中，CNN网络参数被更新，输出图片也会被更新。</p>
 <p>至于损失函数，则为： <span class="math display">\[
 J(G) = \alpha J_{content} + \beta J_{style}
 \]</span> alpha和beta的主要作用是平衡风格和内容的博弈。</p>
 <p>具体的内容损失函数的计算： <span class="math display">\[
 J_{content} = || a^{[l][c]} - a^{[l][g]} || ^ 2
-\]</span> 在CNN的某一层，我们拿到内容图和输出图的feature map，计算其损失函数（相近度），损失函数越低越好。</p>
-<p>难点在于风格的损失函数，我们怎么定义风格呢？所谓风格，应该是在某一层feature map，所有channels之间的correlation。我们用一个gram matrix来描述一张图片所有的channels之间的correlation相关性。</p>
-<p>而gram matrix则是，假设某个feature map有多个channels，两两channels之间某个长宽位置固定的点相乘，然后计算所有位置相乘之后求和。最后就可以得到一个矩阵。我们就用这个矩阵来表示style。</p>
-<p>我们对输出图和style图都取gram matrix，然后计算： <span class="math display">\[
+\]</span> 在CNN的某一层，我们拿到内容图和输出图的feature
+map，计算其损失函数（相近度），损失函数越低越好。</p>
+<p>难点在于风格的损失函数，我们怎么定义风格呢？所谓风格，应该是在某一层feature
+map，所有channels之间的correlation。我们用一个gram
+matrix来描述一张图片所有的channels之间的correlation相关性。</p>
+<p>而gram matrix则是，假设某个feature
+map有多个channels，两两channels之间某个长宽位置固定的点相乘，然后计算所有位置相乘之后求和。最后就可以得到一个矩阵。我们就用这个矩阵来表示style。</p>
+<p>我们对输出图和style图都取gram matrix，然后计算： <span
+class="math display">\[
 J_{style} = || M^{[l][s]} - &lt;^{[l][g]} || ^ 2
-\]</span> 虽然我们可以只取一层求损失函数，但为了使得风格更加饱满，我们可以在每一层都计算损失函数，最后求和： <span class="math display">\[
+\]</span>
+虽然我们可以只取一层求损失函数，但为了使得风格更加饱满，我们可以在每一层都计算损失函数，最后求和：
+<span class="math display">\[
 J_style(S, G) = \sum_{\lambda} \lambda^{t} J^{t}(S, G)
 \]</span></p>
 <h2 id="problme">Problme</h2>
@@ -775,13 +814,19 @@ J_style(S, G) = \sum_{\lambda} \lambda^{t} J^{t}(S, G)
       
         
           
-            <h1 id="visualizing-and-understanding">Visualizing and Understanding</h1>
+            <h1 id="visualizing-and-understanding">Visualizing and
+Understanding</h1>
 <h2 id="概述">概述</h2>
-<p>这是cs231N的一个章节，主要讲述的是CNN可视化理解。2014年ECCV上的paper：<strong>《Visualizing and Understanding Convolutional Networks》</strong>讲述了CNN每一层到底学习到了什么特征，即可视化CNN模型。这里的可视化指的是可视化CNN模型中的卷积核。</p>
+<p>这是cs231N的一个章节，主要讲述的是CNN可视化理解。2014年ECCV上的paper：<strong>《Visualizing
+and Understanding Convolutional
+Networks》</strong>讲述了CNN每一层到底学习到了什么特征，即可视化CNN模型。这里的可视化指的是可视化CNN模型中的卷积核。</p>
 <h2 id="利用反卷积实现特征可视化">利用反卷积实现特征可视化</h2>
 <p>论文里通过反卷积的方法进行可视化，反卷积就是以各层得到的特征图作为输入，进行反池化、反激活、反卷积的过程。例如一个Alexnet的conv5的特征图，通过这个过程之后，就可以把一个13*13的特征图放大回到一个与原输入图片大小的图片(227*227)。</p>
 <figure>
-<img src="http://kvfrans.com/content/images/2016/06/Screen-Shot-2016-06-15-at-10-32-01-AM.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="http://kvfrans.com/content/images/2016/06/Screen-Shot-2016-06-15-at-10-32-01-AM.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="反池化">反池化</h3>
 <p>池化本身是一个不可逆的过程，但我们可以在池化过程中，将最大激活值的坐标位置记录下来。然后在反池化的时候，只把该位置的值激活，然后其它值置为0。这是一种近似的过程。</p>
@@ -792,14 +837,21 @@ J_style(S, G) = \sum_{\lambda} \lambda^{t} J^{t}(S, G)
 <h2 id="可视化结果">可视化结果</h2>
 <p>通过cnn学习之后，layer1和layer2学习到的特征基本是颜色、边缘等低层特征，越往上，学习到的特征将会变得更加完整，有辨别性。</p>
 <h3 id="saliency-maps">Saliency Maps</h3>
-<p><strong>Saliency Maps</strong>关注的是当我们使用CNN去抓取图片特征或者理解图片的时候，我们神经网络真正关注的区域。而所有的Saliency Map都将一张图片中最核心表意区域勾画出来了。</p>
-<p>而计算原理，则是利用类别得分，即最后一层的梯度去计算哪一个像素对于分类的贡献最大，得到Saliency Maps。这里也可以看出像素层次的不同影响。</p>
+<p><strong>Saliency
+Maps</strong>关注的是当我们使用CNN去抓取图片特征或者理解图片的时候，我们神经网络真正关注的区域。而所有的Saliency
+Map都将一张图片中最核心表意区域勾画出来了。</p>
+<p>而计算原理，则是利用类别得分，即最后一层的梯度去计算哪一个像素对于分类的贡献最大，得到Saliency
+Maps。这里也可以看出像素层次的不同影响。</p>
 <p>同样，得到的图也可以用于图像分割。</p>
 <figure>
-<img src="https://analyticsindiamag.com/wp-content/uploads/2018/07/sal-1.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://analyticsindiamag.com/wp-content/uploads/2018/07/sal-1.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="fooling-images">Fooling images</h3>
-<p>fooling images的思想主要是在一个已经训练好的分类器的基础上，通过选择某一错误分类计算loss，然后更新梯度来更新图片pixel，从而使得分类器对图片错误分类。</p>
+<p>fooling
+images的思想主要是在一个已经训练好的分类器的基础上，通过选择某一错误分类计算loss，然后更新梯度来更新图片pixel，从而使得分类器对图片错误分类。</p>
 <ul>
 <li>Start from an arbitrary image</li>
 <li>Pick an arbitrary class</li>
@@ -808,22 +860,38 @@ J_style(S, G) = \sum_{\lambda} \lambda^{t} J^{t}(S, G)
 </ul>
 <h3 id="class-visualization">Class visualization</h3>
 <p>从随机噪音图像开始并且在目标类上执行梯度上升，我们可以生成这样一个图像，它被网络认为是目标类别。</p>
-<p>具体来说，假设<span class="math display">\[I\]</span>是一个图像，让<span class="math display">\[y\]</span>成为目标类别。假设<span class="math inline">\(s_y(I)\)</span>是卷积网络初始分配给<span class="math inline">\(I\)</span>的关于<span class="math inline">\(y\)</span>的初始分数。最后我们生成一个图片<span class="math inline">\(I^*\)</span>，其将在类别<span class="math inline">\(y\)</span>上获得高的得分。 <span class="math display">\[
+<p>具体来说，假设<span
+class="math display">\[I\]</span>是一个图像，让<span
+class="math display">\[y\]</span>成为目标类别。假设<span
+class="math inline">\(s_y(I)\)</span>是卷积网络初始分配给<span
+class="math inline">\(I\)</span>的关于<span
+class="math inline">\(y\)</span>的初始分数。最后我们生成一个图片<span
+class="math inline">\(I^*\)</span>，其将在类别<span
+class="math inline">\(y\)</span>上获得高的得分。 <span
+class="math display">\[
 I^* = \arg\max_I s_y(I) - R(I)
-\]</span> R是一个regularizer，一般我们可以用L2正则器： <span class="math display">\[
+\]</span> R是一个regularizer，一般我们可以用L2正则器： <span
+class="math display">\[
 R(I) = \lambda \|I\|_2^2
 \]</span></p>
 <h2 id="pytorch知识点">pytorch知识点</h2>
 <blockquote>
-<p>a leaf Variable that requires grad has been used in an in-place operation</p>
+<p>a leaf Variable that requires grad has been used in an in-place
+operation</p>
 </blockquote>
-<p>这是<a target="_blank" rel="noopener" href="https://discuss.pytorch.org/t/leaf-variable-was-used-in-an-inplace-operation/308">因为</a></p>
-<p>A “leaf variable” is a variable you create directly, not as the result of some other operation.</p>
+<p>这是<a
+target="_blank" rel="noopener" href="https://discuss.pytorch.org/t/leaf-variable-was-used-in-an-inplace-operation/308">因为</a></p>
+<p>A “leaf variable” is a variable you create directly, not as the
+result of some other operation.</p>
 <p>For example,</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = torch.autograd.Variable(torch.Tensor([1, 2, 3, 4]))  # leaf variable</span><br><span class="line">y = x + 1  # not a leaf variable</span><br></pre></td></tr></table></figure>
-<p>An in-place operation is something which modifies the data of a variable. For example,</p>
+<p>An in-place operation is something which modifies the data of a
+variable. For example,</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x += 1  # in-place</span><br><span class="line">y = x + 1 # not in place</span><br></pre></td></tr></table></figure>
-<p>PyTorch doesn’t allow in-place operations on variables you create directly (such as parameters of your model) because that usually isn’t correct. You can work around it by either using an operations that’s not in-place or by cloning the variable.</p>
+<p>PyTorch doesn’t allow in-place operations on variables you create
+directly (such as parameters of your model) because that usually isn’t
+correct. You can work around it by either using an operations that’s not
+in-place or by cloning the variable.</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x2 = x.clone()  # clone the variable</span><br><span class="line">x2 += 1  # in-place operation</span><br></pre></td></tr></table></figure>
 
           
@@ -944,7 +1012,8 @@ R(I) = \lambda \|I\|_2^2
       
         
           
-            <h1 id="若要设计继承则提供文档说明否则禁止继承">若要设计继承，则提供文档说明，否则禁止继承</h1>
+            <h1
+id="若要设计继承则提供文档说明否则禁止继承">若要设计继承，则提供文档说明，否则禁止继承</h1>
 <h2 id="概述">概述</h2>
 <p>对于那些不是为了继承，并且没有良好说明文档的外来类来说，去继承产生子类是非常危险的。</p>
 <h2 id="如何设计文档">如何设计文档</h2>
@@ -955,8 +1024,19 @@ R(I) = \lambda \|I\|_2^2
 <p>调用可覆盖方法的方法应该在注释末尾包含这些调用的描述，这可以由Javadoc标签@implSpec生成。</p>
 <p>以下为ava.util.AbstractCollection的remove方法的规范：</p>
 <blockquote>
-<p>Removes a single instance of the specified element from this collection, if it is present (optional operation). More formally, removes an element e such that Objects.equals(o, e), if this collection contains one or more such elements. Returns true if this collection contained the specified element (or equivalently, if this collection changed as a result of the call).</p>
-<p><strong>Implementation Requirements:</strong>This implementation iterates over the collection looking for the specified element. If it finds the element, it removes the element from the collection using the iterator’s remove method. Note that this implementation throws an UnsupportedOperationException if the iterator returned by this collection’s iterator method does not implement the remove method and this collection contains the specified object.</p>
+<p>Removes a single instance of the specified element from this
+collection, if it is present (optional operation). More formally,
+removes an element e such that Objects.equals(o, e), if this collection
+contains one or more such elements. Returns true if this collection
+contained the specified element (or equivalently, if this collection
+changed as a result of the call).</p>
+<p><strong>Implementation Requirements:</strong>This implementation
+iterates over the collection looking for the specified element. If it
+finds the element, it removes the element from the collection using the
+iterator’s remove method. Note that this implementation throws an
+UnsupportedOperationException if the iterator returned by this
+collection’s iterator method does not implement the remove method and
+this collection contains the specified object.</p>
 </blockquote>
 <ol start="2" type="1">
 <li>父类必须以某种形式提供能够进入到其内部运转的hook</li>
@@ -1099,7 +1179,8 @@ R(I) = \lambda \|I\|_2^2
 <h2 id="来源">来源</h2>
 <p>https://classroom.udacity.com/courses/cs344/lessons/55120467/concepts/670743010923</p>
 <h2 id="cpu与gpu">CPU与GPU</h2>
-<p>异构型计算机(termed heterogeneous)有两种：根据不同的处理器区分——CPU与GPU。cuda编程模型允许我们在GPU上运行。程序运行在CPU的部分成为host，在GPU的部分则是的device，并且还假设host和device有各自分开的内存。在CPU与GPU的关系中，前者占据着重要的位置，它告诉GPU应该做什么</p>
+<p>异构型计算机(termed
+heterogeneous)有两种：根据不同的处理器区分——CPU与GPU。cuda编程模型允许我们在GPU上运行。程序运行在CPU的部分成为host，在GPU的部分则是的device，并且还假设host和device有各自分开的内存。在CPU与GPU的关系中，前者占据着重要的位置，它告诉GPU应该做什么</p>
 <p>流程：</p>
 <ol type="1">
 <li>从CPU拷贝数据到GPU</li>
@@ -1115,7 +1196,8 @@ R(I) = \lambda \|I\|_2^2
 <h3 id="设置kernel启动">设置kernel启动</h3>
 <p>以这个为例：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">square&lt;&lt;&lt;<span class="number">1</span>, ARRAY_SIZE&gt;&gt;&gt;(d_out, d_in);</span><br><span class="line"><span class="comment">//square&lt;&lt;&lt;dim3(bx, by, bz), dim3(tx, ty, tz), shmem&gt;&gt;&gt;(d_out, d_in);</span></span><br><span class="line"><span class="comment">//相对于启动了bx*by*bz个block，每个block具有tx*ty*tz个线程。sheme默认0</span></span><br></pre></td></tr></table></figure>
-<p>我们使用了这些启动参数1, ARRAY_SIZE，并以这些自变量d_out, d_in来启动它。</p>
+<p>我们使用了这些启动参数1, ARRAY_SIZE，并以这些自变量d_out,
+d_in来启动它。</p>
 <p>在这里我们启动了64个线程，即1个带有64个线程的块。对于kernel而言：</p>
 <ul>
 <li>能够同时运行多个块；</li>
@@ -1532,7 +1614,8 @@ R(I) = \lambda \|I\|_2^2
 <p>注意，clone方法返回的是PhoneNumber，永远不要让那个客户去做类库能替用户完成的事情。</p>
 <h2 id="注意">注意</h2>
 <p>如果对象中包含的域引用了可变的对象，那这种clone实现可能导致灾难性后果。因为修改原始的实例可能会破坏克隆对象的约束条件。</p>
-<p>复杂对象的克隆，需要先调用super.clone，再把结果对象中的所有域设置为空白状态，然后调用higher level去重新设置对象状态。</p>
+<p>复杂对象的克隆，需要先调用super.clone，再把结果对象中的所有域设置为空白状态，然后调用higher
+level去重新设置对象状态。</p>
 <p>跟构造器一样，clone不应该调用一个被覆盖的方法，因为该方法可能先执行，导致克隆对象和原始对象不一致。</p>
 <h2 id="总结">总结</h2>
 <p>所有实现了Cloneable接口的类都应该用一个公有的方法去覆盖clone：先调用super.clone，然后修正需要的域，这意味着需要拷贝任何包含内部深层结构的可变对象。</p>
@@ -1844,8 +1927,7 @@ R(I) = \lambda \|I\|_2^2
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

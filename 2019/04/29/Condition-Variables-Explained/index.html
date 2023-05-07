@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,12 +332,14 @@
       
 
       
-        <h1 id="condition-variables-explained">Condition Variables Explained</h1>
+        <h1 id="condition-variables-explained">Condition Variables
+Explained</h1>
 <h2 id="condition-variables">Condition Variables</h2>
 <p>条件变量是一种用于在若干个线程之间发送信号的事件，一个或者多个线程可以等待其他线程发出信号。条件变量在C++11的头文件是：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;condition_variable&gt;</span></span></span><br></pre></td></tr></table></figure>
 <p>条件变量往往与锁一起工作。</p>
-<p><strong>How things actually work with condition variable,</strong></p>
+<p><strong>How things actually work with condition
+variable,</strong></p>
 <ul>
 <li>线程1调用条件变量的wait，改变量在内部获取互斥锁并检查是否满足所需条件；</li>
 <li>如果不满足。则释放锁并等待条件变量发出信号，此时现场阻塞。条件变量的wait函数以原子的方式提供这两个操作；</li>
@@ -347,7 +347,8 @@
 <li>一旦条件变量发出信号，正在等待它的线程1恢复，获取互斥锁，并检查是否实际满足与条件变量相关的条件，或者它是否是上级调用。如果有多个线程在等待，那么notify_one()将只解除阻塞一个线程；</li>
 <li>如果它是一个上级调用，那么它再次调用wait()函数；</li>
 </ul>
-<p><strong>Main member functions for std::condition_variable are</strong></p>
+<p><strong>Main member functions for std::condition_variable
+are</strong></p>
 <h3 id="wait">Wait()</h3>
 <p>该函数使得当前线程阻塞，直到条件变量发出信号或者发生虚假唤醒。</p>
 <p>其以原子方式释放附属的的互斥锁，阻塞当前线程，并将其添加到等待当前条件变量对象的线程列表中。当某个线程在相同的条件变量对象上调用notify_one()或notify_all()时，该线程将被解除阻塞。</p>
@@ -531,7 +532,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#condition-variables-explained"><span class="nav-number">1.</span> <span class="nav-text">Condition Variables Explained</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#condition-variables"><span class="nav-number">1.1.</span> <span class="nav-text">Condition Variables</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wait"><span class="nav-number">1.1.1.</span> <span class="nav-text">Wait()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#notify_one"><span class="nav-number">1.1.2.</span> <span class="nav-text">notify_one()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#notify_all"><span class="nav-number">1.1.3.</span> <span class="nav-text">notify_all()</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#condition-variables-explained"><span class="nav-number">1.</span> <span class="nav-text">Condition Variables
+Explained</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#condition-variables"><span class="nav-number">1.1.</span> <span class="nav-text">Condition Variables</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wait"><span class="nav-number">1.1.1.</span> <span class="nav-text">Wait()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#notify_one"><span class="nav-number">1.1.2.</span> <span class="nav-text">notify_one()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#notify_all"><span class="nav-number">1.1.3.</span> <span class="nav-text">notify_all()</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -573,8 +575,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

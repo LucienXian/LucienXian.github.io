@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,35 +339,49 @@
 <p>golang1.2引进了一种新的测试覆盖工具，采用一种特别的方法来生成覆盖率统计数据。</p>
 <h2 id="覆盖率测试">覆盖率测试</h2>
 <p>代码覆盖率测试是指，通过运行一个测试来查看有多少代码被执行了。如果使用的测试样例导致80%的源代码语句运行，我们就认为代码覆盖率为80%。</p>
-<p>go语言引进了一个轻量级的测试框架<strong>testing</strong>和自带的<strong>go test</strong>命令来实现单元测试和性能测试。这套框架的原理很简单，就是在2变异之前重写package的源代码以添加检测、编译和运行修改后的源代码，并且将统计信息转移。</p>
+<p>go语言引进了一个轻量级的测试框架<strong>testing</strong>和自带的<strong>go
+test</strong>命令来实现单元测试和性能测试。这套框架的原理很简单，就是在2变异之前重写package的源代码以添加检测、编译和运行修改后的源代码，并且将统计信息转移。</p>
 <h2 id="golang的覆盖率测试">golang的覆盖率测试</h2>
 <p>假设有这样一个源代码：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;negative&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;zero&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;small&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;big&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;huge&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;enormous&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>和这样的一个测试样例：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;testing&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Test <span class="keyword">struct</span> &#123;</span><br><span class="line">    in  <span class="type">int</span></span><br><span class="line">    out <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> tests = []Test&#123;</span><br><span class="line">    &#123;<span class="number">-1</span>, <span class="string">&quot;negative&quot;</span>&#125;,</span><br><span class="line">    &#123;<span class="number">5</span>, <span class="string">&quot;small&quot;</span>&#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSize</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i, test := <span class="keyword">range</span> tests &#123;</span><br><span class="line">        size := Size(test.in)</span><br><span class="line">        <span class="keyword">if</span> size != test.out &#123;</span><br><span class="line">            t.Errorf(<span class="string">&quot;#%d: Size(%d)=%s; want %s&quot;</span>, i, test.in, size, test.out)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然后使用go test命令加上<strong>-cover</strong>选项来测试代码覆盖率，产生结果如下：</p>
+<p>然后使用go
+test命令加上<strong>-cover</strong>选项来测试代码覆盖率，产生结果如下：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok  	_/Users/lucien/Study/gosrc	0.006s</span><br></pre></td></tr></table></figure>
 <ul>
-<li>由于go test命令只能在一个相应的目录下执行所有文件，注意这两个文件需要在同一个目录下。</li>
-<li>另外测试文件必须要以_test.go结尾，这样在执行go test的时候才能执行到相应的代码。</li>
-<li>在测试文件中必须要import testing这个包，另外所有测试函数都以Test开头，并且参数是testing.T，用来记录错误或者测试状态；格式为：</li>
+<li>由于go
+test命令只能在一个相应的目录下执行所有文件，注意这两个文件需要在同一个目录下。</li>
+<li>另外测试文件必须要以_test.go结尾，这样在执行go
+test的时候才能执行到相应的代码。</li>
+<li>在测试文件中必须要import
+testing这个包，另外所有测试函数都以Test开头，并且参数是testing.T，用来记录错误或者测试状态；格式为：</li>
 </ul>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestXxx</span> <span class="params">(t *testing.T)</span></span> <span class="comment">//Xxx开头必须大写</span></span><br></pre></td></tr></table></figure>
-<p>上面的结果显示，我们代码的测试覆盖率为42.9%，这个数字怎么来的呢？当启用测试覆盖的时候，go test会用cover工具在编译之前重写源代码，在原始代码中寻找分支，然后在每个分支"种下"锚点。 等所有的case都跑完后，通过统计执行锚点的数量来计算覆盖率。比如变成这样：</p>
+<p>上面的结果显示，我们代码的测试覆盖率为42.9%，这个数字怎么来的呢？当启用测试覆盖的时候，go
+test会用cover工具在编译之前重写源代码，在原始代码中寻找分支，然后在每个分支"种下"锚点。
+等所有的case都跑完后，通过统计执行锚点的数量来计算覆盖率。比如变成这样：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    GoCover.Count[<span class="number">0</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">2</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;negative&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">3</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;zero&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        GoCover.Count[<span class="number">4</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;small&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        GoCover.Count[<span class="number">5</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;big&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        GoCover.Count[<span class="number">6</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;huge&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    GoCover.Count[<span class="number">1</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;enormous&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>虽然这样重写代码的方式开销看起来比较昂贵，但实际上它会被编译为单个的move指令，在实际测试时开销仅仅增加3%。</p>
 <blockquote>
-<p>Although that annotating assignment might look expensive, it compiles to a single "move" instruction. Its run-time overhead is therefore modest, adding only about 3% when running a typical (more realistic) test. That makes it reasonable to include test coverage as part of the standard development pipeline.</p>
+<p>Although that annotating assignment might look expensive, it compiles
+to a single "move" instruction. Its run-time overhead is therefore
+modest, adding only about 3% when running a typical (more realistic)
+test. That makes it reasonable to include test coverage as part of the
+standard development pipeline.</p>
 </blockquote>
 <h2 id="查看结果">查看结果</h2>
-<p>实际上，刚刚那种测试结果看起来比较简陋，我们需要了解更加详细的测试内容，因此我们可以使用go test来输出一个<strong>coverage profile</strong>，该文件保存着收集的统计信息的文件，使得我们研究它们更加方便。</p>
+<p>实际上，刚刚那种测试结果看起来比较简陋，我们需要了解更加详细的测试内容，因此我们可以使用go
+test来输出一个<strong>coverage
+profile</strong>，该文件保存着收集的统计信息的文件，使得我们研究它们更加方便。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">% </span><span class="language-bash">go <span class="built_in">test</span> -coverprofile=coverage.out</span> </span><br><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok      size    0.030s</span><br><span class="line"><span class="meta prompt_">%</span></span><br></pre></td></tr></table></figure>
 <p>输出结果为：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mode: set</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:3.25,4.12 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:16.5,16.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:5.16,6.26 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:7.17,8.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:9.17,10.23 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:11.18,12.21 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:13.19,14.22 1 0</span><br></pre></td></tr></table></figure>
 <p>有了这么一个文件，我们可以不进行测试，直接查看测试结果：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">% </span><span class="language-bash">go tool cover -func=coverage.out</span></span><br><span class="line">size.go:    Size          42.9%</span><br><span class="line">total:      (statements)  42.9%</span><br><span class="line"><span class="meta prompt_">%</span></span><br></pre></td></tr></table></figure>
 <h2 id="热图">热图</h2>
-<p>我们可以以多种方式来检测代码覆盖率，go test接受-covermode标志来将覆盖模式设置为以下三种：</p>
+<p>我们可以以多种方式来检测代码覆盖率，go
+test接受-covermode标志来将覆盖模式设置为以下三种：</p>
 <ul>
 <li>set：每个语句都运行了吗</li>
 <li>count：每个语句运行了多少次</li>
@@ -593,8 +605,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

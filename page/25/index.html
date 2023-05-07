@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -337,9 +335,11 @@
       
         
           
-            <h1 id="prefers-const-enums-and-inlines-to-defines">prefers const, enums, and inlines to #defines</h1>
+            <h1 id="prefers-const-enums-and-inlines-to-defines">prefers const,
+enums, and inlines to #defines</h1>
 <p>这条规则的本质是利用编译器去替换预处理器。</p>
-<p>比如在代码中，ASPECT_RATIO可能会被编译器忽略，因为编译器在处理源码之前预处理器以及把这个标记移走，而该记号无法被记载进symbol table。所以如果遇到编译错误时，我们可能只看到1.653而无法看到ASPECT_RATIO，特别是假如改行代码是别人写的，你就更加难以发现错误了。</p>
+<p>比如在代码中，ASPECT_RATIO可能会被编译器忽略，因为编译器在处理源码之前预处理器以及把这个标记移走，而该记号无法被记载进symbol
+table。所以如果遇到编译错误时，我们可能只看到1.653而无法看到ASPECT_RATIO，特别是假如改行代码是别人写的，你就更加难以发现错误了。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ASPECT_RATIO 1.653</span></span><br></pre></td></tr></table></figure>
 <h2 id="const">const</h2>
 <ul>
@@ -349,7 +349,8 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span>&#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="type">static</span> <span class="type">const</span> <span class="type">int</span> Num = <span class="number">5</span>;<span class="comment">//也可以只是声明const int Num; 在另一个文件内定义int MyClass:Num = 5;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="enum">enum</h2>
 <ul>
-<li>假如编译不允许在类内使用static整数型常量，此时可以用<strong>the enum hack</strong>的做法；</li>
+<li>假如编译不允许在类内使用static整数型常量，此时可以用<strong>the enum
+hack</strong>的做法；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span>&#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="keyword">enum</span> &#123;Num = <span class="number">5</span>&#125;;</span><br><span class="line">  	<span class="type">int</span> scores[Num];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
@@ -491,7 +492,8 @@
       
         
           
-            <p>不管怎样，先立个<strong>flag</strong>，要每天看一章节《effective c++》</p>
+            <p>不管怎样，先立个<strong>flag</strong>，要每天看一章节《effective
+c++》</p>
 
           
         
@@ -1355,7 +1357,8 @@
 <ul>
 <li>这里一共执行了3步操作：
 <ul>
-<li>new调用一个名为<strong>operator new/new[]</strong>的库函数，该函数分配正确的原始内存来存储对象或对象数组；</li>
+<li>new调用一个名为<strong>operator
+new/new[]</strong>的库函数，该函数分配正确的原始内存来存储对象或对象数组；</li>
 <li>编译器运行构造函数初始化对象，并传入初始值；</li>
 <li>返回指向该对象的指针；</li>
 </ul></li>
@@ -1369,7 +1372,8 @@
 </ul></li>
 </ul>
 <blockquote>
-<p>如果应用程序希望自定义内存分配，则需要自己定义operator new和operator delete；</p>
+<p>如果应用程序希望自定义内存分配，则需要自己定义operator new和operator
+delete；</p>
 </blockquote>
 <h3 id="malloc">malloc</h3>
 <p>malloc函数是一个库函数，接受一个表示待分配的size_t字节数，返回分配空间的指针，或者NULL表示分配失败。</p>
@@ -1676,16 +1680,21 @@
 <p>先来看几个指标，这几个指标可以用来判断调度策略优劣的：</p>
 <blockquote>
 <p>Throughput(吞吐量)：单位时间内进程完成的数量；</p>
-<p>Turnaround time(周转时间)：执行一个进程花费的时间(从进入就绪队列到完成 Termination time - Arrival time)；</p>
+<p>Turnaround
+time(周转时间)：执行一个进程花费的时间(从进入就绪队列到完成 Termination
+time - Arrival time)；</p>
 <p>Waiting time：一个进程在ready队列中等待的时间；</p>
-<p>Response time：从进程提出请求道首次被响应的时间（不包括执行完成）；</p>
+<p>Response
+time：从进程提出请求道首次被响应的时间（不包括执行完成）；</p>
 </blockquote>
 <h2 id="first-come-first-served">First come, First served</h2>
 <p>非抢占式的，根据它们的到达时间，系统维一个FIFO的进程列表；</p>
 <h2 id="shortest-job-first">Shortest-Job-First</h2>
 <p>系统在ready queue中，优先选择那些CPU burst time最少的进程。</p>
-<p>这种调度策略分为抢占式和非抢占式两种，抢占式的没什么好说，非抢占式的：当一个新的需要更少CPU burst time的进程到达时，CPU便会重新分配。</p>
-<p>SJF还有一种变形，即highest response ration next（等待时间+要求执行时间/要求执行时间）</p>
+<p>这种调度策略分为抢占式和非抢占式两种，抢占式的没什么好说，非抢占式的：当一个新的需要更少CPU
+burst time的进程到达时，CPU便会重新分配。</p>
+<p>SJF还有一种变形，即highest response ration
+next（等待时间+要求执行时间/要求执行时间）</p>
 <h2 id="priority">Priority</h2>
 <p>同样，优先级策略也分为抢占式和非抢占式两种。</p>
 <p>这种调度策略会导致一个非常严重的问题——<strong>starvation</strong>，优先级低的进程可能一直无法被执行。为了解决这个问题，我们可以采取动态优先级的策略，随着时间推移，我们提升某些进程的优先级。</p>
@@ -1708,7 +1717,9 @@
 <p>当时间片Q太大时，就变成了FIFO；</p>
 <p>当Q太小，但不能小到切换上下文的花费比Q还小时；</p>
 </blockquote>
-<p>这种策略的turnaround time会比SJF更高，因为SJF选择的是更低burst time，避免等待时间增多；但response time会更少，因为它的切换频率更快，使得响应更快；</p>
+<p>这种策略的turnaround time会比SJF更高，因为SJF选择的是更低burst
+time，避免等待时间增多；但response
+time会更少，因为它的切换频率更快，使得响应更快；</p>
 <h2 id="multilevel-queue">Multilevel Queue</h2>
 <p>分配进程到多个队列中，每个队列使用不同的调度算法：</p>
 <p>前台交互式(foreground)——RR</p>
@@ -1887,8 +1898,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

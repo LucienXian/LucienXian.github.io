@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -336,20 +334,25 @@
       
         <h1 id="member的各种调用方式">Member的各种调用方式</h1>
 <h2 id="nonstatic-member-functions">Nonstatic Member Functions</h2>
-<p>由于C++的一个设计标准就是使得nonstatic member function要有和一般的nonmember function有相同的效率；</p>
-<p>这就带来了一个变化，就是编译器内部会将nonstatic member function转换为等价的nonmember function实体；</p>
+<p>由于C++的一个设计标准就是使得nonstatic member
+function要有和一般的nonmember function有相同的效率；</p>
+<p>这就带来了一个变化，就是编译器内部会将nonstatic member
+function转换为等价的nonmember function实体；</p>
 <p>转化步骤：</p>
 <ul>
 <li>改写函数的原型，安插一个新的参数，即this指针；</li>
-<li>将每一个对nontatic data member的存取操作改写为通过this指针的操作；</li>
+<li>将每一个对nontatic data
+member的存取操作改写为通过this指针的操作；</li>
 <li>将member function改写成一个外部函数，修改函数名称；</li>
 </ul>
 <p>例如一个这样的函数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point3d <span class="title">Point3d::normalize</span><span class="params">()</span> <span class="type">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="type">float</span> mag = <span class="built_in">magnitude</span>();</span><br><span class="line">    Point3d normal;</span><br><span class="line">    normal.x = x/mag;</span><br><span class="line">    normal.y = y/mag;</span><br><span class="line">    normal.z = z/mag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>将可能会改写成：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">normalize_7Point3dFv</span><span class="params">(<span class="keyword">register</span> <span class="type">const</span> Point3d *<span class="type">const</span> <span class="keyword">this</span>, Point3d &amp;__result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="type">float</span> mag = <span class="keyword">this</span>-&gt;<span class="built_in">magnitude</span>();</span><br><span class="line">    __result.Point3d::<span class="built_in">Point3d</span>(<span class="keyword">this</span>-&gt;x/mag, <span class="keyword">this</span>-&gt;y/mag, <span class="keyword">this</span>-&gt;z/mag);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
-<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name mangling的原因。</p>
+<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern
+C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
+<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name
+mangling的原因。</p>
 <h2 id="virtual-member-functions">Virtual member functions</h2>
 <p>如果normalize()是一个虚函数，那么以下调用会转化为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;<span class="built_in">normalize</span>();</span><br><span class="line">(*ptr-&gt;vptr[<span class="number">1</span>])(ptr);</span><br></pre></td></tr></table></figure>
@@ -363,19 +366,25 @@
 <ul>
 <li>不能直接存取其中class的nonstatic members；</li>
 <li>不能被声明为const, volatile或者virtual；</li>
-<li>不需要经由对象调用（但是如果static member是一个private，就很可能要依赖于对象）；</li>
+<li>不需要经由对象调用（但是如果static
+member是一个private，就很可能要依赖于对象）；</li>
 </ul>
-<p>如果要取一个static member function的地址，那么其类型会是：unsigned int (*)();</p>
+<p>如果要取一个static member function的地址，那么其类型会是：unsigned
+int (*)();</p>
 <h1 id="virtual-member-functions-1">Virtual Member Functions</h1>
-<p>为了支持virtual function机制，必须要有某种策略能够在运行期进行类型判断。考虑这样的一个调用：</p>
+<p>为了支持virtual
+function机制，必须要有某种策略能够在运行期进行类型判断。考虑这样的一个调用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;<span class="built_in">z</span>()</span><br></pre></td></tr></table></figure>
 <p>这样的一个调用需要两个信息：</p>
 <ul>
 <li>指针指向的对象的地址；</li>
 <li>对象类型的某种编码或者某种结构的地址；</li>
 </ul>
-<p>为了提高效率，不支持多态的类是不需要这些额外的信息的。因此我们可以通过类中是否含有virtual functions判断是否支持多台。</p>
-<p>那么virtual function是如何被构建的呢？每一个类都会有一个virtual table，而每一个table内含其对应的类对象所有虚函数的地址，每一个虚函数都会被指派一个索引值。而每个类对象都会被编译器安插一个指针，指向该virtual table。</p>
+<p>为了提高效率，不支持多态的类是不需要这些额外的信息的。因此我们可以通过类中是否含有virtual
+functions判断是否支持多台。</p>
+<p>那么virtual function是如何被构建的呢？每一个类都会有一个virtual
+table，而每一个table内含其对应的类对象所有虚函数的地址，每一个虚函数都会被指派一个索引值。而每个类对象都会被编译器安插一个指针，指向该virtual
+table。</p>
 <p>一个类继承基类的时候：</p>
 <ul>
 <li>继承所有的虚函数实体，将这些函数实体的地址拷贝到派生类的虚函数表的slot中；</li>
@@ -387,28 +396,39 @@
 <blockquote>
 <p>derived : base1, base2</p>
 </blockquote>
-<p>这种多重继承的关键在于base2 subobject的身上：假如为派生对象指派一个base2的指针：</p>
+<p>这种多重继承的关键在于base2
+subobject的身上：假如为派生对象指派一个base2的指针：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base2 *pbase2 = <span class="keyword">new</span> Derived;</span><br></pre></td></tr></table></figure>
-<p>那么在编译器需要调整指针的指向，使其指向base2 subobject的位置。不然是无法通过指针调用。</p>
+<p>那么在编译器需要调整指针的指向，使其指向base2
+subobject的位置。不然是无法通过指针调用。</p>
 <h1 id="指向member-function的指针">指向member function的指针</h1>
-<p>前面我们提到过，取一个nonstatic data menber的地址，如果该函数是nonvirtual的，则得到的是它在内存中的地址，但是这个地址也是依赖于对象地址的。</p>
-<p>事实上，一个member function的指针，如果不用于virtual function这些情况的话，它的效率并不会比使用一个nonmember function的指针更高</p>
-<h2 id="支持指向virtual-member-functions的指针">支持指向virtual member functions的指针</h2>
+<p>前面我们提到过，取一个nonstatic data
+menber的地址，如果该函数是nonvirtual的，则得到的是它在内存中的地址，但是这个地址也是依赖于对象地址的。</p>
+<p>事实上，一个member function的指针，如果不用于virtual
+function这些情况的话，它的效率并不会比使用一个nonmember
+function的指针更高</p>
+<h2 id="支持指向virtual-member-functions的指针">支持指向virtual member
+functions的指针</h2>
 <p>考虑这样的一个程序片段：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">float</span> (Point::*pmf)() = &amp;Point::z;</span><br><span class="line">Point *ptr = <span class="keyword">new</span> Point3d;</span><br></pre></td></tr></table></figure>
 <p>那么无论是通过prt去调用，还是通过pmf的间接调用，虚拟机制都是有效的：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;<span class="built_in">z</span>();</span><br><span class="line">(ptr-&gt;*pmf)();</span><br></pre></td></tr></table></figure>
-<p>上一节提到过，对一个nonstatic member function取地址，得到的是该函数在内存中的地址，然而对于一个virtual function来说，其地址在编译器是位置的，因此如果对这样的函数取地址，返回的将会是一个索引值。</p>
+<p>上一节提到过，对一个nonstatic member
+function取地址，得到的是该函数在内存中的地址，然而对于一个virtual
+function来说，其地址在编译器是位置的，因此如果对这样的函数取地址，返回的将会是一个索引值。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">    	<span class="keyword">virtual</span> ~<span class="built_in">Point</span>();</span><br><span class="line">    	<span class="function"><span class="type">float</span> <span class="title">x</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="function"><span class="type">float</span> <span class="title">y</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="function"><span class="keyword">virtual</span> <span class="type">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="comment">//...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>进行各种取地址操作：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&amp;Point::~Point; <span class="comment">//1</span></span><br><span class="line">&amp;Point::<span class="built_in">x</span>();<span class="comment">//返回的是这两个函数在内存中的地址</span></span><br><span class="line">&amp;Point::<span class="built_in">y</span>();</span><br><span class="line">&amp;Point::<span class="built_in">z</span>();<span class="comment">//2</span></span><br></pre></td></tr></table></figure>
-<h2 id="多重继承下指向member-function的指针">多重继承下，指向member function的指针</h2>
-<p>为了让指向member functions的指针能够支持多重继承和虚拟继承，c++设计了这样一个结构：</p>
+<h2 id="多重继承下指向member-function的指针">多重继承下，指向member
+function的指针</h2>
+<p>为了让指向member
+functions的指针能够支持多重继承和虚拟继承，c++设计了这样一个结构：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">__mptr</span>&#123;</span><br><span class="line">    <span class="type">int</span> delta;<span class="comment">//this指针的offset值</span></span><br><span class="line">    <span class="type">int</span> index;<span class="comment">//virtual table的索引</span></span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        ptrtofunc faddr;<span class="comment">//nonvirtual member function地址</span></span><br><span class="line">        <span class="type">int</span> v_offset;<span class="comment">//virtual base class的vptr的位置</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h2 id="inline-functions">Inline Functions</h2>
 <p>一个inline函数，在被编译器处理的过程中，有两个阶段：</p>
 <ul>
-<li>分析函数定义，判断函数的<strong>intrinsic inlien ability</strong>。如果函数因其复杂性，或者内部的构建问题，被判断为不可inline，那么它会被转为一个static函数，然后在被编译的模块中产生相应的函数定义；</li>
+<li>分析函数定义，判断函数的<strong>intrinsic inlien
+ability</strong>。如果函数因其复杂性，或者内部的构建问题，被判断为不可inline，那么它会被转为一个static函数，然后在被编译的模块中产生相应的函数定义；</li>
 <li>真正的inline函数扩展是在调用的那一点上，这会产生参数的求值操作和临时性的对象管理。</li>
 </ul>
 <h3 id="formal-arguments">formal arguments</h3>
@@ -591,7 +611,9 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#member%E7%9A%84%E5%90%84%E7%A7%8D%E8%B0%83%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">Member的各种调用方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#nonstatic-member-functions"><span class="nav-number">1.1.</span> <span class="nav-text">Nonstatic Member Functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtual-member-functions"><span class="nav-number">1.2.</span> <span class="nav-text">Virtual member functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#static-member-functions"><span class="nav-number">1.3.</span> <span class="nav-text">Static Member Functions</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#virtual-member-functions-1"><span class="nav-number">2.</span> <span class="nav-text">Virtual Member Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8B%E7%9A%84virtual-function"><span class="nav-number">2.1.</span> <span class="nav-text">多重继承下的virtual function</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%87%E5%90%91member-function%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">3.</span> <span class="nav-text">指向member function的指针</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E6%8C%87%E5%90%91virtual-member-functions%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">3.1.</span> <span class="nav-text">支持指向virtual member functions的指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8B%E6%8C%87%E5%90%91member-function%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">3.2.</span> <span class="nav-text">多重继承下，指向member function的指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inline-functions"><span class="nav-number">3.3.</span> <span class="nav-text">Inline Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#formal-arguments"><span class="nav-number">3.3.1.</span> <span class="nav-text">formal arguments</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">3.3.2.</span> <span class="nav-text">局部变量</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#member%E7%9A%84%E5%90%84%E7%A7%8D%E8%B0%83%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">Member的各种调用方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#nonstatic-member-functions"><span class="nav-number">1.1.</span> <span class="nav-text">Nonstatic Member Functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtual-member-functions"><span class="nav-number">1.2.</span> <span class="nav-text">Virtual member functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#static-member-functions"><span class="nav-number">1.3.</span> <span class="nav-text">Static Member Functions</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#virtual-member-functions-1"><span class="nav-number">2.</span> <span class="nav-text">Virtual Member Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8B%E7%9A%84virtual-function"><span class="nav-number">2.1.</span> <span class="nav-text">多重继承下的virtual function</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%87%E5%90%91member-function%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">3.</span> <span class="nav-text">指向member function的指针</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E6%8C%87%E5%90%91virtual-member-functions%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">3.1.</span> <span class="nav-text">支持指向virtual member
+functions的指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8B%E6%8C%87%E5%90%91member-function%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">3.2.</span> <span class="nav-text">多重继承下，指向member
+function的指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inline-functions"><span class="nav-number">3.3.</span> <span class="nav-text">Inline Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#formal-arguments"><span class="nav-number">3.3.1.</span> <span class="nav-text">formal arguments</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">3.3.2.</span> <span class="nav-text">局部变量</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -633,8 +655,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

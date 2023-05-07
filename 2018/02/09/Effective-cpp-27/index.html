@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,16 +336,39 @@
 <h2 id="动机">动机</h2>
 <p>C++的设计目标就是要保证“类型错误”不可能发生，使得程序能够“干净地”通过编译。</p>
 <h2 id="使用">使用</h2>
-<p>一般来说，在C++中有两种转型——"old-style casts"和"new-style casts"。 * old：(T)expression或者T(expression)； * new: <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">const_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">dynamic_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">reinterpret_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="keyword">static_cast</span>&lt;T&gt;)exp</span><br></pre></td></tr></table></figure></p>
+<p>一般来说，在C++中有两种转型——"old-style casts"和"new-style casts"。 *
+old：(T)expression或者T(expression)； * new: <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">const_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">dynamic_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">reinterpret_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="keyword">static_cast</span>&lt;T&gt;)exp</span><br></pre></td></tr></table></figure></p>
 <ol type="1">
 <li>const_cast：通常用来去除对象的常量性；</li>
 <li>dynamic_cast：主要执行“安全向下转型”，但会耗费大量的运行成本；</li>
-<li>reinterpret_cast：主要是执行低级转型，实际结果取决于编译器，所以其不可移植。例如将一个<strong>pointer to int转为int</strong>；</li>
-<li>static_cast：用来强迫隐式转换，例如将non-const转为const，int转为double，同样也可以是void*转为typed指针，或者pointer to base转为pointer to derived</li>
+<li>reinterpret_cast：主要是执行低级转型，实际结果取决于编译器，所以其不可移植。例如将一个<strong>pointer
+to int转为int</strong>；</li>
+<li>static_cast：用来强迫隐式转换，例如将non-const转为const，int转为double，同样也可以是void*转为typed指针，或者pointer
+to base转为pointer to derived</li>
 </ol>
-<p><br> 之所以要用新式转换，有两个原因：一是很容易能够在代码中辨认出来，便于debug；二是将转型动作窄化，编译器更可能诊断出错误运用。 <br> 至于什么时候用旧式转换——调用一个explicit构造函数讲一个对象传递给一个函数时。例如：</p>
+<p><br>
+之所以要用新式转换，有两个原因：一是很容易能够在代码中辨认出来，便于debug；二是将转型动作窄化，编译器更可能诊断出错误运用。
+<br>
+至于什么时候用旧式转换——调用一个explicit构造函数讲一个对象传递给一个函数时。例如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span>&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">explicit</span> <span class="title">Widget</span><span class="params">(<span class="type">int</span> size)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">doSomeWork</span><span class="params">(<span class="type">const</span> Widget&amp; w)</span></span>;</span><br><span class="line"><span class="built_in">doSomeWork</span>(<span class="built_in">Widget</span>(<span class="number">15</span>));</span><br><span class="line"><span class="built_in">doSomeWork</span>(<span class="built_in">Static_cast</span>&lt;Widget&gt;(<span class="number">15</span>));</span><br></pre></td></tr></table></figure>
-<p>往往，转型动作会令到编译器编译出运行期间不同执行的码。例如： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;...&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&#123;...&#125;;</span><br><span class="line">Derived d;</span><br><span class="line">Base* pd = &amp;d;</span><br></pre></td></tr></table></figure> 我们可以看到，在这种情况下建立一个base class指针指向一个derived class对象，会有一个偏移量在运行期被施行于Derived<em>指针身上，用以取得正确的Base </em>指针值. <br> <br> 另一个有趣的事情是，如果我们希望在derived classes内的virtual函数代码第一个动作先调用base class的对应函数。使用以下的方式，其实是错误的： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Window</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SpecialWindow</span>: <span class="keyword">public</span> Windos&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="built_in">static_cast</span>&lt;Window&gt;(*<span class="keyword">this</span>).<span class="built_in">onResize</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> 其实这种行为，调用的并不是当前对象上的函数，而是稍早转型动作所建立的一个"*this对象的base class成分"的暂时副本身上的onResize! <br> <br> <br> 再来看看dynamic_cast，之所以需要dynamic_cast，通常是因为你只有一个“指向Base”的指针或引用，但希望在一个你认定为derived class对象身上执行derived class操作函数。<br> 对于这种情况，有两个解决办法：<br> 使用容器并在其中存储指向derived class对象的指针，并且尽量避免转型： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> std::vector&lt;std::trl::shared_ptr&lt;SpecialWindow&gt; &gt;VPSW;</span><br><span class="line">VPSW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span> (VPSW::iterator iter = winPtrs.<span class="built_in">begin</span>();</span><br><span class="line">     iter != winPtrs.<span class="built_in">end</span>();</span><br><span class="line">     ++iter)</span><br><span class="line">    (*iter)-&gt;<span class="built_in">blink</span>();</span><br></pre></td></tr></table></figure> 但是这种方法，不能在同一个容器中存储指针“指向所有可能的Window派生类”。 <br><br> 另外一种做法就可以让你通过base class 接口处理“所有可能的各种Window派生类”，那就是在base class内提供virtual函数做你想对各个Window派生类做的事。当然，在base class只是提供一个“什么都不做”的缺省实现码。</p>
+<p>往往，转型动作会令到编译器编译出运行期间不同执行的码。例如：
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;...&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&#123;...&#125;;</span><br><span class="line">Derived d;</span><br><span class="line">Base* pd = &amp;d;</span><br></pre></td></tr></table></figure> 我们可以看到，在这种情况下建立一个base
+class指针指向一个derived
+class对象，会有一个偏移量在运行期被施行于Derived<em>指针身上，用以取得正确的Base
+</em>指针值. <br> <br> 另一个有趣的事情是，如果我们希望在derived
+classes内的virtual函数代码第一个动作先调用base
+class的对应函数。使用以下的方式，其实是错误的： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Window</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SpecialWindow</span>: <span class="keyword">public</span> Windos&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="built_in">static_cast</span>&lt;Window&gt;(*<span class="keyword">this</span>).<span class="built_in">onResize</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+其实这种行为，调用的并不是当前对象上的函数，而是稍早转型动作所建立的一个"*this对象的base
+class成分"的暂时副本身上的onResize! <br> <br> <br>
+再来看看dynamic_cast，之所以需要dynamic_cast，通常是因为你只有一个“指向Base”的指针或引用，但希望在一个你认定为derived
+class对象身上执行derived class操作函数。<br>
+对于这种情况，有两个解决办法：<br> 使用容器并在其中存储指向derived
+class对象的指针，并且尽量避免转型： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> std::vector&lt;std::trl::shared_ptr&lt;SpecialWindow&gt; &gt;VPSW;</span><br><span class="line">VPSW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span> (VPSW::iterator iter = winPtrs.<span class="built_in">begin</span>();</span><br><span class="line">     iter != winPtrs.<span class="built_in">end</span>();</span><br><span class="line">     ++iter)</span><br><span class="line">    (*iter)-&gt;<span class="built_in">blink</span>();</span><br></pre></td></tr></table></figure>
+但是这种方法，不能在同一个容器中存储指针“指向所有可能的Window派生类”。
+<br><br> 另外一种做法就可以让你通过base class
+接口处理“所有可能的各种Window派生类”，那就是在base
+class内提供virtual函数做你想对各个Window派生类做的事。当然，在base
+class只是提供一个“什么都不做”的缺省实现码。</p>
 <h2 id="建议">建议</h2>
 <ul>
 <li>如果可以，尽量避免转型，尤其是注重效率的代码中避免使用dynamic_cast；</li>
@@ -570,8 +591,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

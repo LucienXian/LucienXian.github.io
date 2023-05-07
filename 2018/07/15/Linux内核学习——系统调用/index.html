@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -360,7 +358,8 @@
 </ul>
 <h2 id="系统调用处理程序">系统调用处理程序</h2>
 <p>由于用户空间的程序无法直接执行内核代码，所以需要某种机制保证用户去通知内核执行某个系统调用。</p>
-<p>这个机制是用软中断实现的，通过引发一个异常（int $0x80指令）使得系统切换到内核态去执行异常处理程序（第128号异常处理程序），而这个异常处理程序实际上就是系统调用处理程序——system_call()。</p>
+<p>这个机制是用软中断实现的，通过引发一个异常（int
+$0x80指令）使得系统切换到内核态去执行异常处理程序（第128号异常处理程序），而这个异常处理程序实际上就是系统调用处理程序——system_call()。</p>
 <h3 id="指定恰当的系统调用">指定恰当的系统调用</h3>
 <p>刚刚的操作只是切换到内核态，但我们仍然需要告诉内核用户进程的系统调用号，在x86里，该系统调用号是通过寄存器eax传递的。在陷入内核态之前将系统调用号存放到eax里，这样就可以在系统调用程序运行的时候拿到数据。</p>
 <p>在拿到系统调用号后，system_call()就会将系统调用号和NR_syscalls作比对，检查有效性。</p>
@@ -585,8 +584,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

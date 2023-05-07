@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -347,13 +345,16 @@
 <p>getData()是一个右值，在赋值之后这个临时值就失效了，里面的data是拷贝出来的，因此我们不能取其地址。</p>
 <h2 id="is-rvalue-immutable-in-c">Is rvalue immutable in C++</h2>
 <p>虽然我们不能获取右值的地址，但我们能根据右值的数据类型去修改其。</p>
-<h3 id="rvalues-of-builtin-data-type-is-immutable">rvalues of builtin data type is Immutable</h3>
+<h3 id="rvalues-of-builtin-data-type-is-immutable">rvalues of builtin
+data type is Immutable</h3>
 <p>我们无法修改内置的数据类型，例如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(x+<span class="number">7</span>) = <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">getData</span>() = <span class="number">9</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Both Compile Error</span></span><br></pre></td></tr></table></figure>
-<h3 id="rvalue-of-user-defined-data-type-is-not-immutable">rvalue of User Defined data type is not Immutable</h3>
+<h3 id="rvalue-of-user-defined-data-type-is-not-immutable">rvalue of
+User Defined data type is not Immutable</h3>
 <p>如果右值是用户定义的数据类型，我们可以在同一个表达式中使用成员函数去修改右值：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">		<span class="type">int</span> mAge;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Person</span>() &#123;</span><br><span class="line">      	mAge = <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">incrementAge</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      	mAge = mAge + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="function">Person <span class="title">getPerson</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">Person</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">getPerson</span>().<span class="built_in">incrementAge</span>(); <span class="comment">// persist in single expression</span></span><br></pre></td></tr></table></figure>
-<h2 id="what-is-rvalue-reference-in-c11">What is rvalue reference in C++11</h2>
+<h2 id="what-is-rvalue-reference-in-c11">What is rvalue reference in
+C++11</h2>
 <h3 id="lvalue-references">lvalue references</h3>
 <p>在C++11以前只有引用，即指向现存变量的别名。</p>
 <p>c++11将原来的引用变成了左值引用，只能引用左值：</p>
@@ -535,7 +536,10 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rvalue-in-c"><span class="nav-number">1.</span> <span class="nav-text">Rvalue in C++</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#lvalue-vs-rvalue"><span class="nav-number">1.1.</span> <span class="nav-text">lvalue vs rvalue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-lvalue"><span class="nav-number">1.1.1.</span> <span class="nav-text">What is lvalue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-rvalue"><span class="nav-number">1.1.2.</span> <span class="nav-text">What is rvalue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#is-rvalue-immutable-in-c"><span class="nav-number">1.2.</span> <span class="nav-text">Is rvalue immutable in C++</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalues-of-builtin-data-type-is-immutable"><span class="nav-number">1.2.1.</span> <span class="nav-text">rvalues of builtin data type is Immutable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalue-of-user-defined-data-type-is-not-immutable"><span class="nav-number">1.2.2.</span> <span class="nav-text">rvalue of User Defined data type is not Immutable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-rvalue-reference-in-c11"><span class="nav-number">1.3.</span> <span class="nav-text">What is rvalue reference in C++11</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lvalue-references"><span class="nav-number">1.3.1.</span> <span class="nav-text">lvalue references</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalue-reference"><span class="nav-number">1.3.2.</span> <span class="nav-text">rvalue Reference</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rvalue-in-c"><span class="nav-number">1.</span> <span class="nav-text">Rvalue in C++</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#lvalue-vs-rvalue"><span class="nav-number">1.1.</span> <span class="nav-text">lvalue vs rvalue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-lvalue"><span class="nav-number">1.1.1.</span> <span class="nav-text">What is lvalue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-rvalue"><span class="nav-number">1.1.2.</span> <span class="nav-text">What is rvalue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#is-rvalue-immutable-in-c"><span class="nav-number">1.2.</span> <span class="nav-text">Is rvalue immutable in C++</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalues-of-builtin-data-type-is-immutable"><span class="nav-number">1.2.1.</span> <span class="nav-text">rvalues of builtin
+data type is Immutable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalue-of-user-defined-data-type-is-not-immutable"><span class="nav-number">1.2.2.</span> <span class="nav-text">rvalue of
+User Defined data type is not Immutable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-rvalue-reference-in-c11"><span class="nav-number">1.3.</span> <span class="nav-text">What is rvalue reference in
+C++11</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lvalue-references"><span class="nav-number">1.3.1.</span> <span class="nav-text">lvalue references</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalue-reference"><span class="nav-number">1.3.2.</span> <span class="nav-text">rvalue Reference</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -577,8 +581,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

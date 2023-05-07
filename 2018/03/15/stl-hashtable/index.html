@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -346,14 +344,16 @@
 <h2 id="hashtable的数据结构">hashtable的数据结构</h2>
 <p>默认使用std::alloc。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Value</span>, <span class="keyword">class</span> <span class="title class_">Key</span>, <span class="keyword">class</span> <span class="title class_">HashFun</span>, </span><br><span class="line">            <span class="keyword">class</span> <span class="title class_">ExtractKey</span>, <span class="keyword">class</span> <span class="title class_">EqualKey</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span> = alloc&gt;</span><br><span class="line"><span class="keyword">class</span> hashtable&#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>虽然使用开链法不需要指定table的大小为质数，但SGI stl还是使用了质数。做法就是提供一个函数用以查询最接近于某数n,但大于某数n的质数。</p>
+<p>虽然使用开链法不需要指定table的大小为质数，但SGI
+stl还是使用了质数。做法就是提供一个函数用以查询最接近于某数n,但大于某数n的质数。</p>
 <h2 id="hashtable的构造与内存管理">hashtable的构造与内存管理</h2>
 <p>由这一段代码可知，加入我们需要50个节点，它会返回53个节点（质数）：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">initialize_buckets</span><span class="params">(size_type n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">const</span> size_type n_buckets = <span class="built_in">next_size</span>(n);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>进行插入操作时，会判断是否需要重建（resize）：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">...::<span class="built_in">resize</span>(size_type num_elementsz_hint)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//比较新老的size</span></span><br><span class="line">    <span class="type">const</span> size_type old_n = buckets.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">if</span> (num_elementsz_hint &gt; old_n) &#123; <span class="comment">//如果新的size比较大</span></span><br><span class="line">        <span class="type">const</span> size_type n = <span class="built_in">next_size</span>(num_elementsz_hint);</span><br><span class="line">        <span class="keyword">if</span> (n &gt; old_n) &#123;</span><br><span class="line">            <span class="function">vector&lt;node*, A&gt; <span class="title">tmp</span><span class="params">(n, (node*) <span class="number">0</span>)</span></span>;</span><br><span class="line">            <span class="comment">//处理每一个旧的buckets</span></span><br><span class="line">            <span class="comment">//首先是获取bucket的起始节点</span></span><br><span class="line">            <span class="comment">//迭代地将每个节点插在tmp（也就是新的buckets）的起始位置</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="hashfunction">hashfunction</h2>
-<p>在使用hashfunction时，SGI将其封装成bkt_num()，再由它来调用hash function。通常来说，stl只对char,long,int,short等进行处理。如果要处理其它类型的，必须要提供hashfunction，比如hash<string></p>
+<p>在使用hashfunction时，SGI将其封装成bkt_num()，再由它来调用hash
+function。通常来说，stl只对char,long,int,short等进行处理。如果要处理其它类型的，必须要提供hashfunction，比如hash<string></p>
 
       
     </div>
@@ -570,8 +570,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

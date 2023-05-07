@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -339,7 +337,8 @@
           
             <p>#基本UDP套接字编程</p>
 <h2 id="概述">概述</h2>
-<p>与TCP不一样，UDP是无连接不可靠的数据报协议。在有些应用程序上会用到UDP，比如DNS, NFS, SNMP。</p>
+<p>与TCP不一样，UDP是无连接不可靠的数据报协议。在有些应用程序上会用到UDP，比如DNS,
+NFS, SNMP。</p>
 <p>由于UDP不等待连接，所以客户端只管调用sendto函数，而服务端也只管调用recvfrom函数。</p>
 <h2 id="recvfrom和sendto函数">recvfrom和sendto函数</h2>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">recvfrom</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buff, <span class="type">size_t</span> nbytes, <span class="type">int</span> flags, <span class="keyword">struct</span> sockaddr *from, <span class="type">socklen_t</span> *addrlen)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendto</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buff, <span class="type">size_t</span> nbytes, <span class="type">int</span> flags, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *to, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
@@ -358,7 +357,8 @@
 <p>之前我们提到过，除非UDP的套接字已连接，否则异步错误是不会返回到UDP的套接字的。</p>
 <p>我们可以在UDP的套接字上使用connect，但与TCP不同的是，这里没有三次握手的过程，只是检测是否存在立即可以感知的错误，记录对端的IP地址和端口号，并返回调用进程。</p>
 <p>对于使用了connect的UDP套接字，接受和发送数据不能再使用sendto和recvfrom，而是read、write等。一个以连接的套接字仅仅与一个IP地址交换数据报。</p>
-<h2 id="给一个udp套接字多次使用connect">给一个UDP套接字多次使用connect</h2>
+<h2
+id="给一个udp套接字多次使用connect">给一个UDP套接字多次使用connect</h2>
 <p>这样做有两个目的：</p>
 <ul>
 <li>指定新的IP地址和端口号;</li>
@@ -502,7 +502,8 @@
         
           
             <h1 id="member-initialization-list">Member Initialization List</h1>
-<p>在使用构造函数的时候，你可以用两种方式来设定成员变量的初始值。要么使用initialization list，要么在构造函数内部进行构造。</p>
+<p>在使用构造函数的时候，你可以用两种方式来设定成员变量的初始值。要么使用initialization
+list，要么在构造函数内部进行构造。</p>
 <p>首先说明，在以下的情形必须使用初始化列表：</p>
 <ul>
 <li>初始化一个引用变量</li>
@@ -518,14 +519,18 @@
 <p>然而如果是用的初始化列表：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Word::Word: _name(<span class="number">0</span>)&#123;</span><br><span class="line">    _cnt = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//会被扩张成</span></span><br><span class="line"></span><br><span class="line">Word::<span class="built_in">Word</span>()</span><br><span class="line">&#123;</span><br><span class="line">    _name.string::<span class="built_in">string</span>(<span class="number">0</span>);</span><br><span class="line">    _cnt = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="编译器的操作">编译器的操作</h2>
-<p>编译器会按照<strong>声明</strong>顺序一一地执行initialization list，在constructor安插初始化的操作。</p>
+<p>编译器会按照<strong>声明</strong>顺序一一地执行initialization
+list，在constructor安插初始化的操作。</p>
 <p>注意是按照声明的顺序，例如以下的情况会出问题：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">X</span> &#123;</span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="type">int</span> j;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">X</span>(<span class="type">int</span> val):<span class="built_in">j</span>(val), <span class="built_in">i</span>(j)&#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>由于i先初始化，但j还没初始化，这样就会出现无法预知的值。</p>
 <p>因此，可以这样设置：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X::<span class="built_in">X</span>(<span class="type">int</span> val):<span class="built_in">j</span>(val)&#123;</span><br><span class="line">    i = j;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因为initialization list的初始化操作，编译器会将初始化操作安插在explicit user assignment的操作之前。</p>
-<h2 id="调用member-function设置初始值">调用member function设置初始值</h2>
+<p>因为initialization
+list的初始化操作，编译器会将初始化操作安插在explicit user
+assignment的操作之前。</p>
+<h2 id="调用member-function设置初始值">调用member
+function设置初始值</h2>
 <p>考虑这样的例子：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X::<span class="built_in">X</span>(<span class="type">int</span> val): <span class="built_in">i</span>(<span class="built_in">xfoo</span>(val)), <span class="built_in">j</span>(val)&#123;&#125;</span><br></pre></td></tr></table></figure>
 <p>在这种情况下不会有问题，因为this指针已经构建号，代码会被扩张成：</p>
@@ -649,7 +654,8 @@
       
         
           
-            <h1 id="implementation-of-lexical-analysis">Implementation of Lexical Analysis</h1>
+            <h1 id="implementation-of-lexical-analysis">Implementation of Lexical
+Analysis</h1>
 <h2 id="regular-languages">Regular languages</h2>
 <ul>
 <li>Epsilon: a simple string namely the empty string</li>
@@ -660,9 +666,11 @@
 <p>正则表达式可能有多个表示方式</p>
 <h2 id="formal-languages">Formal languages</h2>
 <p>alphabet 表示一系列的字符，adcii码</p>
-<p>meaning function L : maps syntax to semantics，将表达式映射到字符串的集合。比如：</p>
+<p>meaning function L : maps syntax to
+semantics，将表达式映射到字符串的集合。比如：</p>
 <p>L(epison) = {""} L('c') = {"c"} L(A+B) = L(A) U L(B)</p>
-<p>Reason for meaning function：有时候一个semantics可以用多个syntax表示，可能是多对一的映射关系。用于不会有一对多的关系。</p>
+<p>Reason for meaning
+function：有时候一个semantics可以用多个syntax表示，可能是多对一的映射关系。用于不会有一对多的关系。</p>
 <h2 id="lexical-specification">lexical specification</h2>
 <ul>
 <li>letter = [a-zA-Z]</li>
@@ -674,7 +682,8 @@
 </ul>
 <p>考虑如何匹配一个邮箱地址：anyone@cs.stanford.edu(考虑前面只由字母组成)</p>
 <ul>
-<li>得到这样的正则表达式：letter+ '@' letter+ '.' letter+ '.' letter+</li>
+<li>得到这样的正则表达式：letter+ '@' letter+ '.' letter+ '.'
+letter+</li>
 </ul>
 <p>注意:</p>
 <ul>
@@ -715,7 +724,8 @@
 <li>which token is used?</li>
 </ul>
 <p>x1..xi 属于L(R); R = R1+R2...Rn。</p>
-<p>如果有x1...xi属于L(Ri),也有x1...xi属于L(Rj),那么采用priority choose。例如if应该是keyword，不是identifier。</p>
+<p>如果有x1...xi属于L(Ri),也有x1...xi属于L(Rj),那么采用priority
+choose。例如if应该是keyword，不是identifier。</p>
 <h2 id="finite-automa">Finite Automa</h2>
 <ul>
 <li>Regular expressions = specification</li>
@@ -731,21 +741,27 @@
 </ul>
 <p>from state1, inpute a, go to state2;</p>
 <p>如果输入完之后还处于接收状态，就接收；</p>
-<p>否则，就拒绝：处于结束状态（terminate states，no transitions）；遇到错误匹配</p>
+<p>否则，就拒绝：处于结束状态（terminate states，no
+transitions）；遇到错误匹配</p>
 <h2 id="regular-expressions-to-nfas">Regular Expressions to NFAS</h2>
-<p>Lexical Specification-&gt; Regular expressions-&gt; NFA-&gt; DFA-&gt; Table-driven Implementation of DFA</p>
+<p>Lexical Specification-&gt; Regular expressions-&gt; NFA-&gt; DFA-&gt;
+Table-driven Implementation of DFA</p>
 <p>对于NFA，每个notation的图表示与正则表达式相对应，比如正则表达式的epsilon就与开始状态，接收一个epsilon，到达的结束状态的图表示相对应。比如AB，就是状态A接收一个epsilon到达状态B。</p>
 <p>我觉得在这种情况下，AB中的A或者B用状态机来表示比较恰当。假如A是一个组合状态，就递归进去解析，直到得到最终的单元的notation。</p>
 <h2 id="nfa-to-dfa">NFA to DFA</h2>
 <p>假如在NFA中，由B分别经过epsilon可以到达B和C，那么可以说：</p>
-<p>epsilon-closure(B) = {B, C, D}，就是仅仅经过epsilon，迭代可以到达的状态</p>
-<p>对于NFA来说，在不同的时间NFA可能处于多个状态，a(X) = {y|x属于X and x-&gt;(a)y}表示a应用于X后到达Y</p>
+<p>epsilon-closure(B) = {B, C,
+D}，就是仅仅经过epsilon，迭代可以到达的状态</p>
+<p>对于NFA来说，在不同的时间NFA可能处于多个状态，a(X) = {y|x属于X and
+x-&gt;(a)y}表示a应用于X后到达Y</p>
 <ul>
 <li>定义DFA</li>
 </ul>
 <p>states: subset of S(all states in NFA)</p>
 <p>start: epsilon-closure(s)</p>
-<p>final: {X|x与NFA中final states的交集不等于空集的集合},也就是到达的状态中包含了NFA中的final states，就意味着这是DFA中的final states</p>
+<p>final: {X|x与NFA中final
+states的交集不等于空集的集合},也就是到达的状态中包含了NFA中的final
+states，就意味着这是DFA中的final states</p>
 <p>transitions: X-&gt;(a)Y, if y == epsilon-closure(a(X))</p>
 <h2 id="implementing-finite-automata">implementing finite automata</h2>
 <p>由DFA组织一个表，有多少种状态就多少行，有多少种输入就多少列，表示出每种状态在不同输入的情况下到达的状态。</p>
@@ -1031,16 +1047,20 @@
       
         
           
-            <h1 id="program-transformation-semantics">Program Transformation Semantics</h1>
+            <h1 id="program-transformation-semantics">Program Transformation
+Semantics</h1>
 <h2 id="明确的初始化">明确的初始化</h2>
 <p>考虑这样的显式定义：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">X x0;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo_bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">X <span class="title">x1</span><span class="params">(x0)</span></span>;</span><br><span class="line">    X x2 = x0;</span><br><span class="line">    X x3 = <span class="built_in">X</span>(x0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里的定义会分两个阶段进行：重写定义和安插copy constructor。如下：</p>
+<p>这里的定义会分两个阶段进行：重写定义和安插copy
+constructor。如下：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo_bar</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X x1;</span><br><span class="line">    X x2;</span><br><span class="line">    X x3;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//安插代码</span></span><br><span class="line">    x1.X::<span class="built_in">X</span>(x0);</span><br><span class="line">    x2.X::<span class="built_in">X</span>(x0);</span><br><span class="line">    x3.X:;<span class="built_in">X</span>(x0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="参数的初始化">参数的初始化</h2>
-<p>C++标准中要求的是，当把一个class object当做参数传入函数或者作为返回值时，会这样初始化：</p>
+<p>C++标准中要求的是，当把一个class
+object当做参数传入函数或者作为返回值时，会这样初始化：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">X xx = arg;<span class="comment">//arg是实参</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">(X x0)</span></span>;</span><br><span class="line"></span><br><span class="line">X xx;</span><br><span class="line"><span class="built_in">foo</span>(xx);</span><br></pre></td></tr></table></figure>
-<p>而编译器的优化技术有两种方法，一个是采用临时值，然后修改foo函数；另一个方法就是采用<strong>copy contruct</strong>的方式把实参直接构建在应该的位置上。</p>
+<p>而编译器的优化技术有两种方法，一个是采用临时值，然后修改foo函数；另一个方法就是采用<strong>copy
+contruct</strong>的方式把实参直接构建在应该的位置上。</p>
 <p>对于第一个方法，如下：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//产生临时对象</span></span><br><span class="line"></span><br><span class="line">X _temp0;</span><br><span class="line">_temp0.X::<span class="built_in">X</span>(x0);</span><br><span class="line"></span><br><span class="line"><span class="built_in">foo</span>(_temp0);</span><br><span class="line"></span><br><span class="line"><span class="comment">//修改foo函数，变成穿引用</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">(X &amp;x0)</span></span>;</span><br></pre></td></tr></table></figure>
 <h2 id="返回值的初始化">返回值的初始化</h2>
@@ -1049,12 +1069,15 @@
 <p>那么，这个局部对象是如何返回的呢？编译器采用的是双阶段的转化.</p>
 <ul>
 <li>首先是添加一个引用参数，作为返回值；</li>
-<li>在return之前安插copy constructor的操作，以便将要传回的object作为初始值；</li>
+<li>在return之前安插copy
+constructor的操作，以便将要传回的object作为初始值；</li>
 </ul>
 <p>修改的代码如下：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">bar</span><span class="params">(X &amp;__result)</span><span class="comment">//额外参数</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X xx;</span><br><span class="line">    xx.X:<span class="built_in">XX</span>();</span><br><span class="line"></span><br><span class="line">    __result.X::<span class="built_in">X</span>(xx);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="摘要">摘要</h2>
-<p>由于copy constructor的应用,编译器会对代码进行一定程度的优化。尤其是当函数以穿值的方式传回一个object时,编译器会对copy constructor进行优化,以一个额外的第一参数取代NRV。</p>
+<p>由于copy
+constructor的应用,编译器会对代码进行一定程度的优化。尤其是当函数以穿值的方式传回一个object时,编译器会对copy
+constructor进行优化,以一个额外的第一参数取代NRV。</p>
 
           
         
@@ -1180,7 +1203,10 @@
 <p>假如有两个源文件：main.c和sum.c</p>
 <p>那么要通过这两个源程序生成可执行文件，要经过这些步骤：预处理——编译——汇编——链接。</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-dc69ba053b205af7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/357" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-dc69ba053b205af7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/357"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>以main.c为例，预处理器会将main.c翻译成一个ascii码的中间文件mian.i。接着运行编译器，生成main.s的汇编语言文件。然后是运行汇编器，将汇编语言翻译成二进制的可重定位目标文件main.o。最后与经过同样步骤生成的sum.o进链接，生成可执行的目标文件。</p>
 <p>当shell要执行文件时，shell会调用一个loader的函数，将代码和数据复制到内存，然后将控制权移动到程序的开头。</p>
@@ -1201,7 +1227,10 @@
 <h2 id="可重定位目标文件">可重定位目标文件</h2>
 <p>首先来看这种类型的文件具体表示</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-f5ea954f51122c88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/276" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-f5ea954f51122c88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/276"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>我们逐个section来看：</p>
 <ul>
@@ -1247,7 +1276,10 @@
 <p>在Linux系统中，静态库以一种称为存档（archive）的特殊文件格式存放在磁盘中，是一组连接起来的可重定位目标文件的集合。以后缀.a标识。</p>
 <p>举个与静态库连接的例子：</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-a56677ede8a55219.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/603" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-a56677ede8a55219.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/603"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>创建一个静态库的方法：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">linux&gt; </span><span class="language-bash">gcc -c addvec.c multvec.c</span></span><br><span class="line"><span class="meta prompt_">linux&gt; </span><span class="language-bash">ar rcs libvector.a addvec.o multvec.o</span></span><br><span class="line"></span><br><span class="line">创建可执行文件</span><br><span class="line"><span class="meta prompt_">linux&gt; </span><span class="language-bash">gcc -c main2.c</span></span><br><span class="line"><span class="meta prompt_">linux&gt; </span><span class="language-bash">gcc -static -o prog2c main2.o ./libvector.a</span></span><br></pre></td></tr></table></figure>
@@ -1265,18 +1297,27 @@
 <h3 id="重定位条目">重定位条目</h3>
 <p>由于汇编器有可能会遇到不知道数据和代码的内存位置的情况，因此会把信息存储在重定位条目，即代码的重定位条目在.rel.text中，数据的重定位条目在.rel.data中。</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-7cd5047c4892996b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-7cd5047c4892996b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>ELF有基本的两种重定位类型：R_X86_64_PC32（相对地址），R_X86_64_32（绝对地址）</p>
 <h3 id="重定位符号引用">重定位符号引用</h3>
 <p>迭代地在每个节和每个节相关联的重定位条目执行重定位：</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-33f22824c94ff95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-33f22824c94ff95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="可执行目标文件">可执行目标文件</h2>
 <p>文件格式</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-f3a09952bf9326be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/450" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-f3a09952bf9326be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/450"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>ELF头会描述文件的总体格式，还会有一个程序的入口点。.init节中有一个_init的函数来初始化代码。</p>
 <p>可执行的目标文件可以轻易加载到内存，并且文件的连续的chunk与内存段有着直接的映射。</p>
@@ -1286,13 +1327,19 @@
 <p>因为prog不是一个内置的命令，所以shell会调用loader去加载运行它，loader将可执行文件的代码和数据从磁盘复制到内存，然后跳转到程序的第一条指令或入口点来运行该程序。</p>
 <p>内存映像如下：</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-865dbae0f07c3f10.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/491" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-865dbae0f07c3f10.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/491"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="动态链接共享库">动态链接共享库</h2>
 <p>静态链接库的问题是，运行时调用的库函数会被复制到每个运行进程的文本段里面，这里带来的问题就是对内存造成了浪费。</p>
 <p>而共享库可以解决这个问题，共享库是一个目标模块，在运行时会加载到任意的内存地址，并和一个在内存的程序链接起来，这是由动态链接器完成的。</p>
 <figure>
-<img src="https://upload-images.jianshu.io/upload_images/3010486-5b2b951f27e58469.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/442" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload-images.jianshu.io/upload_images/3010486-5b2b951f27e58469.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/442"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>一个库只有一个.so文件，所有引用该库的可执行目标文件共享这个.so文件的代码和数据，而不是像静态文件那样复制嵌入到它们的可执行文件里面去。</p>
 <p>执行指令：</p>
@@ -1433,27 +1480,32 @@
 <p>套接字上的输入分为两步：首先是等待数据从网络中到达。到达后会先将数据复制到内核缓冲区，接着复制到应用进程缓冲区。</p>
 <h3 id="阻塞式io模型">阻塞式I/O模型</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>进程在调用recvfrom()之后，一直阻塞直到数据复制到应用进程缓冲区或者返回错误</p>
 <h3 id="非阻塞式io模型">非阻塞式I/O模型</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>应用进程持续的轮询，查看操作是否就绪。如果没有就绪就会返回一个错误。这种做法会耗费大量的CPU时间</p>
 <h3 id="io复用模型">I/O复用模型</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>对于这种模型，我们可以使用select或者poll来完成我们的需求。通过select这个系统调用（阻塞于此），让内核在IO就绪的情况下通知应用进程，然后应用进程再调用recvfrom。这里使用了两个系统调用，但好处是可以等待多个描述符就绪。</p>
 <h3 id="信号驱动式io">信号驱动式I/O</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>对于这种模型，首先是安装一个信号驱动函数，并马上返回。在内核发现描述符就绪后，通过信号通知应用进程。这样，在等待数据到达的期间进程不会被阻塞。</p>
 <h3 id="异步io">异步I/O</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>这种模型比之信号驱动式I/O更绝，它是内核完成IO操作之后才会通知应用进程</p>
 <p>前面四种模型都是同步I/O模型，因为进程都会因为IO请求而阻塞，知道IO操作完成</p>
@@ -1539,7 +1591,8 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">short</span> events;</span><br><span class="line">    <span class="type">short</span> revents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>需要测试的条件由events指定，函数会在revents成员中返回描述符的测试结果。具体表现如下图：</p>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>从这个表可以看到，我们可以测试读写和异常三种操作，另外还能识别三类数据：普通数据，优先级带，高优先级带。至于怎么区分这些数据的类型，就有些争议了，这里就不写了。</p>
 <p>timeout参数跟select的类似，也是指定poll函数返回前等待多长时间。</p>
@@ -1833,14 +1886,16 @@
 <h2 id="hashtable的数据结构">hashtable的数据结构</h2>
 <p>默认使用std::alloc。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Value</span>, <span class="keyword">class</span> <span class="title class_">Key</span>, <span class="keyword">class</span> <span class="title class_">HashFun</span>, </span><br><span class="line">            <span class="keyword">class</span> <span class="title class_">ExtractKey</span>, <span class="keyword">class</span> <span class="title class_">EqualKey</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span> = alloc&gt;</span><br><span class="line"><span class="keyword">class</span> hashtable&#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>虽然使用开链法不需要指定table的大小为质数，但SGI stl还是使用了质数。做法就是提供一个函数用以查询最接近于某数n,但大于某数n的质数。</p>
+<p>虽然使用开链法不需要指定table的大小为质数，但SGI
+stl还是使用了质数。做法就是提供一个函数用以查询最接近于某数n,但大于某数n的质数。</p>
 <h2 id="hashtable的构造与内存管理">hashtable的构造与内存管理</h2>
 <p>由这一段代码可知，加入我们需要50个节点，它会返回53个节点（质数）：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">initialize_buckets</span><span class="params">(size_type n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">const</span> size_type n_buckets = <span class="built_in">next_size</span>(n);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>进行插入操作时，会判断是否需要重建（resize）：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">...::<span class="built_in">resize</span>(size_type num_elementsz_hint)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//比较新老的size</span></span><br><span class="line">    <span class="type">const</span> size_type old_n = buckets.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">if</span> (num_elementsz_hint &gt; old_n) &#123; <span class="comment">//如果新的size比较大</span></span><br><span class="line">        <span class="type">const</span> size_type n = <span class="built_in">next_size</span>(num_elementsz_hint);</span><br><span class="line">        <span class="keyword">if</span> (n &gt; old_n) &#123;</span><br><span class="line">            <span class="function">vector&lt;node*, A&gt; <span class="title">tmp</span><span class="params">(n, (node*) <span class="number">0</span>)</span></span>;</span><br><span class="line">            <span class="comment">//处理每一个旧的buckets</span></span><br><span class="line">            <span class="comment">//首先是获取bucket的起始节点</span></span><br><span class="line">            <span class="comment">//迭代地将每个节点插在tmp（也就是新的buckets）的起始位置</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="hashfunction">hashfunction</h2>
-<p>在使用hashfunction时，SGI将其封装成bkt_num()，再由它来调用hash function。通常来说，stl只对char,long,int,short等进行处理。如果要处理其它类型的，必须要提供hashfunction，比如hash<string></p>
+<p>在使用hashfunction时，SGI将其封装成bkt_num()，再由它来调用hash
+function。通常来说，stl只对char,long,int,short等进行处理。如果要处理其它类型的，必须要提供hashfunction，比如hash<string></p>
 
           
         
@@ -1969,30 +2024,42 @@
 </ul>
 <p>形式：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X::<span class="built_in">X</span>(<span class="type">const</span> X&amp; x);</span><br><span class="line"><span class="comment">//可以是多参数模式，但第二个参数及其之后的参数都要以默认值提供</span></span><br><span class="line">Y::<span class="built_in">Y</span>(<span class="type">const</span> Y&amp; y, <span class="type">int</span> x = <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="default-memberwise-initialization">Default Memberwise Initialization</h2>
-<p>如果一个类没有显式的定义拷贝构造函数，那么在发送以其它对象进行初始化就会进行所谓的<strong>default memberwise initialization</strong>行为。也就是把内部的数据成员的值一个一个地拷贝都被初始化的类对象中，如果其中有其他类的对象成员，那么就会递归地对该类进行<strong>default memberwise initialization</strong>。</p>
-<p>而所谓的memberwise initialization分为两种：Bitwise Copy and Copy Constructor。</p>
+<h2 id="default-memberwise-initialization">Default Memberwise
+Initialization</h2>
+<p>如果一个类没有显式的定义拷贝构造函数，那么在发送以其它对象进行初始化就会进行所谓的<strong>default
+memberwise
+initialization</strong>行为。也就是把内部的数据成员的值一个一个地拷贝都被初始化的类对象中，如果其中有其他类的对象成员，那么就会递归地对该类进行<strong>default
+memberwise initialization</strong>。</p>
+<p>而所谓的memberwise initialization分为两种：Bitwise Copy and Copy
+Constructor。</p>
 <h2 id="bitwise-copy-semantics">Bitwise Copy Semantics</h2>
-<p>在C++中，默认进行的就是Bitwise Copy。例如这种情况只包含原生的数据成员，就是进行Bitwise Copy：</p>
+<p>在C++中，默认进行的就是Bitwise
+Copy。例如这种情况只包含原生的数据成员，就是进行Bitwise Copy：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Class Word &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Word</span>(<span class="type">const</span> <span class="type">char</span>* );</span><br><span class="line">    ~<span class="built_in">Word</span>()&#123;<span class="keyword">delete</span> []str;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> cnt;</span><br><span class="line">    <span class="type">char</span> *str;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>但这种情况下，会出现的问题就是：由于只是单纯地拷贝指针的值，在进行拷贝之后，会出现两个对象的内部的指针指向了同一块内存。如果某个对象被销毁了，那么指针所指向的内存也回收了。这样另外一个对象的指针就变成了野指针。</p>
 <h2 id="不要bitwise-copy-semantics">不要Bitwise Copy Semantics</h2>
 <p>在以下的情况下，一个类不表现出Bitwise Copy Semantics：</p>
 <ul>
-<li>当class内含一个member object，而后者的class声明有一个copy constructor时（不论是用户自己定义的，还是编译器生成的）</li>
-<li>当class继承自一个base class而后者存在一个copy constructor时（再次强调，不论是显示声明或编译器合成）</li>
+<li>当class内含一个member object，而后者的class声明有一个copy
+constructor时（不论是用户自己定义的，还是编译器生成的）</li>
+<li>当class继承自一个base class而后者存在一个copy
+constructor时（再次强调，不论是显示声明或编译器合成）</li>
 <li>当class声明了一个或多个virtual functions时</li>
-<li>当class派生自一个继承串链时，其中有一个或多个virtual base classes时</li>
+<li>当class派生自一个继承串链时，其中有一个或多个virtual base
+classes时</li>
 </ul>
 <p>前两种操作，必须把成员对象或者基类对象的拷贝构造代码插入到合成的拷贝构造函数中；</p>
 <p>至于后面两种情况</p>
 <h2 id="重新设定virtual-table的指针">重新设定virtual table的指针</h2>
 <p>由于如果类中有虚函数，那么需要为该类增加一个虚表，并且为该类的每个对象增加一个指针，指向虚表。</p>
 <p>这就是为什么编译器需要合成一个拷贝构造函数，主要目的就是为了为新的对象增加一个指针。</p>
-<p>这样可以避免了这种情况，子啊这种情况中，base内含的指针应该是指向基类的虚表，如果是Bitwise Copy，那就变成派生类的虚表了</p>
+<p>这样可以避免了这种情况，子啊这种情况中，base内含的指针应该是指向基类的虚表，如果是Bitwise
+Copy，那就变成派生类的虚表了</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base base = derived;</span><br></pre></td></tr></table></figure>
 <h2 id="virtual-base-class-subject">virtual base class subject</h2>
-<p>这种情况跟上面的差不多，也是为了保证virtual base class subobject的位置在编译器被确定下来，而合成拷贝构造函数。这种情况一般也是发送在用派生类对象去初始化基类，因为这样如果没有合成拷贝构造函数，将会难以确定virtual base class subobject的位置。</p>
+<p>这种情况跟上面的差不多，也是为了保证virtual base class
+subobject的位置在编译器被确定下来，而合成拷贝构造函数。这种情况一般也是发送在用派生类对象去初始化基类，因为这样如果没有合成拷贝构造函数，将会难以确定virtual
+base class subobject的位置。</p>
 
           
         
@@ -2159,8 +2226,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

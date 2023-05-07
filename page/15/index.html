@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -648,11 +646,22 @@
           
             <h1 id="tensorflow安装指南">Tensorflow安装指南</h1>
 <h2 id="简介">简介</h2>
-<p>当然你可以<a target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-metas">查看</a></p>
+<p>当然你可以<a
+target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-metas">查看</a></p>
 <p>因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0</p>
 <p>我的电脑显卡为：GeForce GTX 850M</p>
 <p>硬件支持：</p>
 <table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 12%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 10%" />
+<col style="width: 8%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Distribution</th>
@@ -819,9 +828,11 @@
 </tbody>
 </table>
 <h2 id="安装cuda">安装CUDA</h2>
-<p>我这里选择的是<a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-90-download-archive">9.0</a></p>
+<p>我这里选择的是<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-90-download-archive">9.0</a></p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/CUDA9.0.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/CUDA9.0.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>下载完之后，一次输入以下指令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i cuda-repo-ubuntu1604-9-0-local_9.0.176-1_amd64.deb</span><br><span class="line">sudo apt-key add /var/cuda-repo-&lt;version&gt;/7fa2af80.pub</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install cuda</span><br></pre></td></tr></table></figure>
@@ -843,18 +854,28 @@
 <p>安装CUDA之后，需要添加环境变量：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/usr/local/cuda-9.0/bin$&#123;PATH:+:$&#123;PATH&#125;&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">64bit</span></span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">32bit</span></span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="安装cudnn">安装cuDNN</h2>
-<p>在<a target="_blank" rel="noopener" href="https://developer.nvidia.com/cudnn">这里</a>注册一下，要做一个下的问卷调查。</p>
-<p>进入<a target="_blank" rel="noopener" href="https://developer.nvidia.com/rdp/cudnn-download">download界面</a></p>
-<p>勾选<strong>I Agree To the Terms of the cuDNN Software License Agreement</strong></p>
-<p>我选择的是v7.0.5版本的，记得Runtime Library和Developer Library都要下载，即：</p>
+<p>在<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/cudnn">这里</a>注册一下，要做一个下的问卷调查。</p>
+<p>进入<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/rdp/cudnn-download">download界面</a></p>
+<p>勾选<strong>I Agree To the Terms of the cuDNN Software License
+Agreement</strong></p>
+<p>我选择的是v7.0.5版本的，记得Runtime Library和Developer
+Library都要下载，即：</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7_7.0.5.15-1+cuda9.0_amd64">cuDNN v7.0.5 Runtime Library for Ubuntu16.04 (Deb)</a></li>
-<li><a target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7-dev_7.0.5.15-1+cuda9.0_amd64">cuDNN v7.0.5 Developer Library for Ubuntu16.04 (Deb)</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7_7.0.5.15-1+cuda9.0_amd64">cuDNN
+v7.0.5 Runtime Library for Ubuntu16.04 (Deb)</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7-dev_7.0.5.15-1+cuda9.0_amd64">cuDNN
+v7.0.5 Developer Library for Ubuntu16.04 (Deb)</a></li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/cudnn.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/cudnn.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>一开始我只下载了<strong>Developer Library</strong> ，在安装的时候出现了这样的错误：</p>
+<p>一开始我只下载了<strong>Developer Library</strong>
+，在安装的时候出现了这样的错误：</p>
 <blockquote>
 <p>Package libcudnn7 is not installed.</p>
 </blockquote>
@@ -862,13 +883,17 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i libcudnn7*.deb</span><br></pre></td></tr></table></figure>
 <p>输入nvidia-smi，看到：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/nvidia-smi.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/nvidia-smi.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <blockquote>
 <p>如果显示报错，建议重启一下</p>
 </blockquote>
 <h2 id="安装tensorflow">安装TensorFlow</h2>
-<p>可以查看官网，选择一种<a target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#determine_which_tensorflow_to_install">安装方式</a>。建议使用 Virtualenv 进行<a target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#installing_with_virtualenv">安装</a></p>
+<p>可以查看官网，选择一种<a
+target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#determine_which_tensorflow_to_install">安装方式</a>。建议使用
+Virtualenv 进行<a
+target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#installing_with_virtualenv">安装</a></p>
 <h2 id="验证安装">验证安装</h2>
 <p>进入交互界面，输入以下代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">hello = tf.constant(<span class="string">&#x27;Hello, TensorFlow!&#x27;</span>)</span><br><span class="line">sess = tf.Session()</span><br><span class="line"><span class="built_in">print</span>(sess.run(hello))</span><br></pre></td></tr></table></figure>
@@ -1126,20 +1151,25 @@
           
             <h1 id="member的各种调用方式">Member的各种调用方式</h1>
 <h2 id="nonstatic-member-functions">Nonstatic Member Functions</h2>
-<p>由于C++的一个设计标准就是使得nonstatic member function要有和一般的nonmember function有相同的效率；</p>
-<p>这就带来了一个变化，就是编译器内部会将nonstatic member function转换为等价的nonmember function实体；</p>
+<p>由于C++的一个设计标准就是使得nonstatic member
+function要有和一般的nonmember function有相同的效率；</p>
+<p>这就带来了一个变化，就是编译器内部会将nonstatic member
+function转换为等价的nonmember function实体；</p>
 <p>转化步骤：</p>
 <ul>
 <li>改写函数的原型，安插一个新的参数，即this指针；</li>
-<li>将每一个对nontatic data member的存取操作改写为通过this指针的操作；</li>
+<li>将每一个对nontatic data
+member的存取操作改写为通过this指针的操作；</li>
 <li>将member function改写成一个外部函数，修改函数名称；</li>
 </ul>
 <p>例如一个这样的函数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point3d <span class="title">Point3d::normalize</span><span class="params">()</span> <span class="type">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="type">float</span> mag = <span class="built_in">magnitude</span>();</span><br><span class="line">    Point3d normal;</span><br><span class="line">    normal.x = x/mag;</span><br><span class="line">    normal.y = y/mag;</span><br><span class="line">    normal.z = z/mag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>将可能会改写成：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">normalize_7Point3dFv</span><span class="params">(<span class="keyword">register</span> <span class="type">const</span> Point3d *<span class="type">const</span> <span class="keyword">this</span>, Point3d &amp;__result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="type">float</span> mag = <span class="keyword">this</span>-&gt;<span class="built_in">magnitude</span>();</span><br><span class="line">    __result.Point3d::<span class="built_in">Point3d</span>(<span class="keyword">this</span>-&gt;x/mag, <span class="keyword">this</span>-&gt;y/mag, <span class="keyword">this</span>-&gt;z/mag);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
-<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name mangling的原因。</p>
+<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern
+C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
+<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name
+mangling的原因。</p>
 <h2 id="virtual-member-functions">Virtual member functions</h2>
 <p>如果normalize()是一个虚函数，那么以下调用会转化为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;<span class="built_in">normalize</span>();</span><br><span class="line">(*ptr-&gt;vptr[<span class="number">1</span>])(ptr);</span><br></pre></td></tr></table></figure>
@@ -1153,19 +1183,25 @@
 <ul>
 <li>不能直接存取其中class的nonstatic members；</li>
 <li>不能被声明为const, volatile或者virtual；</li>
-<li>不需要经由对象调用（但是如果static member是一个private，就很可能要依赖于对象）；</li>
+<li>不需要经由对象调用（但是如果static
+member是一个private，就很可能要依赖于对象）；</li>
 </ul>
-<p>如果要取一个static member function的地址，那么其类型会是：unsigned int (*)();</p>
+<p>如果要取一个static member function的地址，那么其类型会是：unsigned
+int (*)();</p>
 <h1 id="virtual-member-functions-1">Virtual Member Functions</h1>
-<p>为了支持virtual function机制，必须要有某种策略能够在运行期进行类型判断。考虑这样的一个调用：</p>
+<p>为了支持virtual
+function机制，必须要有某种策略能够在运行期进行类型判断。考虑这样的一个调用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;<span class="built_in">z</span>()</span><br></pre></td></tr></table></figure>
 <p>这样的一个调用需要两个信息：</p>
 <ul>
 <li>指针指向的对象的地址；</li>
 <li>对象类型的某种编码或者某种结构的地址；</li>
 </ul>
-<p>为了提高效率，不支持多态的类是不需要这些额外的信息的。因此我们可以通过类中是否含有virtual functions判断是否支持多台。</p>
-<p>那么virtual function是如何被构建的呢？每一个类都会有一个virtual table，而每一个table内含其对应的类对象所有虚函数的地址，每一个虚函数都会被指派一个索引值。而每个类对象都会被编译器安插一个指针，指向该virtual table。</p>
+<p>为了提高效率，不支持多态的类是不需要这些额外的信息的。因此我们可以通过类中是否含有virtual
+functions判断是否支持多台。</p>
+<p>那么virtual function是如何被构建的呢？每一个类都会有一个virtual
+table，而每一个table内含其对应的类对象所有虚函数的地址，每一个虚函数都会被指派一个索引值。而每个类对象都会被编译器安插一个指针，指向该virtual
+table。</p>
 <p>一个类继承基类的时候：</p>
 <ul>
 <li>继承所有的虚函数实体，将这些函数实体的地址拷贝到派生类的虚函数表的slot中；</li>
@@ -1177,28 +1213,39 @@
 <blockquote>
 <p>derived : base1, base2</p>
 </blockquote>
-<p>这种多重继承的关键在于base2 subobject的身上：假如为派生对象指派一个base2的指针：</p>
+<p>这种多重继承的关键在于base2
+subobject的身上：假如为派生对象指派一个base2的指针：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base2 *pbase2 = <span class="keyword">new</span> Derived;</span><br></pre></td></tr></table></figure>
-<p>那么在编译器需要调整指针的指向，使其指向base2 subobject的位置。不然是无法通过指针调用。</p>
+<p>那么在编译器需要调整指针的指向，使其指向base2
+subobject的位置。不然是无法通过指针调用。</p>
 <h1 id="指向member-function的指针">指向member function的指针</h1>
-<p>前面我们提到过，取一个nonstatic data menber的地址，如果该函数是nonvirtual的，则得到的是它在内存中的地址，但是这个地址也是依赖于对象地址的。</p>
-<p>事实上，一个member function的指针，如果不用于virtual function这些情况的话，它的效率并不会比使用一个nonmember function的指针更高</p>
-<h2 id="支持指向virtual-member-functions的指针">支持指向virtual member functions的指针</h2>
+<p>前面我们提到过，取一个nonstatic data
+menber的地址，如果该函数是nonvirtual的，则得到的是它在内存中的地址，但是这个地址也是依赖于对象地址的。</p>
+<p>事实上，一个member function的指针，如果不用于virtual
+function这些情况的话，它的效率并不会比使用一个nonmember
+function的指针更高</p>
+<h2 id="支持指向virtual-member-functions的指针">支持指向virtual member
+functions的指针</h2>
 <p>考虑这样的一个程序片段：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">float</span> (Point::*pmf)() = &amp;Point::z;</span><br><span class="line">Point *ptr = <span class="keyword">new</span> Point3d;</span><br></pre></td></tr></table></figure>
 <p>那么无论是通过prt去调用，还是通过pmf的间接调用，虚拟机制都是有效的：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;<span class="built_in">z</span>();</span><br><span class="line">(ptr-&gt;*pmf)();</span><br></pre></td></tr></table></figure>
-<p>上一节提到过，对一个nonstatic member function取地址，得到的是该函数在内存中的地址，然而对于一个virtual function来说，其地址在编译器是位置的，因此如果对这样的函数取地址，返回的将会是一个索引值。</p>
+<p>上一节提到过，对一个nonstatic member
+function取地址，得到的是该函数在内存中的地址，然而对于一个virtual
+function来说，其地址在编译器是位置的，因此如果对这样的函数取地址，返回的将会是一个索引值。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">    	<span class="keyword">virtual</span> ~<span class="built_in">Point</span>();</span><br><span class="line">    	<span class="function"><span class="type">float</span> <span class="title">x</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="function"><span class="type">float</span> <span class="title">y</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="function"><span class="keyword">virtual</span> <span class="type">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    	<span class="comment">//...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>进行各种取地址操作：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&amp;Point::~Point; <span class="comment">//1</span></span><br><span class="line">&amp;Point::<span class="built_in">x</span>();<span class="comment">//返回的是这两个函数在内存中的地址</span></span><br><span class="line">&amp;Point::<span class="built_in">y</span>();</span><br><span class="line">&amp;Point::<span class="built_in">z</span>();<span class="comment">//2</span></span><br></pre></td></tr></table></figure>
-<h2 id="多重继承下指向member-function的指针">多重继承下，指向member function的指针</h2>
-<p>为了让指向member functions的指针能够支持多重继承和虚拟继承，c++设计了这样一个结构：</p>
+<h2 id="多重继承下指向member-function的指针">多重继承下，指向member
+function的指针</h2>
+<p>为了让指向member
+functions的指针能够支持多重继承和虚拟继承，c++设计了这样一个结构：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">__mptr</span>&#123;</span><br><span class="line">    <span class="type">int</span> delta;<span class="comment">//this指针的offset值</span></span><br><span class="line">    <span class="type">int</span> index;<span class="comment">//virtual table的索引</span></span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        ptrtofunc faddr;<span class="comment">//nonvirtual member function地址</span></span><br><span class="line">        <span class="type">int</span> v_offset;<span class="comment">//virtual base class的vptr的位置</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h2 id="inline-functions">Inline Functions</h2>
 <p>一个inline函数，在被编译器处理的过程中，有两个阶段：</p>
 <ul>
-<li>分析函数定义，判断函数的<strong>intrinsic inlien ability</strong>。如果函数因其复杂性，或者内部的构建问题，被判断为不可inline，那么它会被转为一个static函数，然后在被编译的模块中产生相应的函数定义；</li>
+<li>分析函数定义，判断函数的<strong>intrinsic inlien
+ability</strong>。如果函数因其复杂性，或者内部的构建问题，被判断为不可inline，那么它会被转为一个static函数，然后在被编译的模块中产生相应的函数定义；</li>
 <li>真正的inline函数扩展是在调用的那一点上，这会产生参数的求值操作和临时性的对象管理。</li>
 </ul>
 <h3 id="formal-arguments">formal arguments</h3>
@@ -1352,7 +1399,8 @@
 </ul>
 <h2 id="系统调用处理程序">系统调用处理程序</h2>
 <p>由于用户空间的程序无法直接执行内核代码，所以需要某种机制保证用户去通知内核执行某个系统调用。</p>
-<p>这个机制是用软中断实现的，通过引发一个异常（int $0x80指令）使得系统切换到内核态去执行异常处理程序（第128号异常处理程序），而这个异常处理程序实际上就是系统调用处理程序——system_call()。</p>
+<p>这个机制是用软中断实现的，通过引发一个异常（int
+$0x80指令）使得系统切换到内核态去执行异常处理程序（第128号异常处理程序），而这个异常处理程序实际上就是系统调用处理程序——system_call()。</p>
 <h3 id="指定恰当的系统调用">指定恰当的系统调用</h3>
 <p>刚刚的操作只是切换到内核态，但我们仍然需要告诉内核用户进程的系统调用号，在x86里，该系统调用号是通过寄存器eax传递的。在陷入内核态之前将系统调用号存放到eax里，这样就可以在系统调用程序运行的时候拿到数据。</p>
 <p>在拿到系统调用号后，system_call()就会将系统调用号和NR_syscalls作比对，检查有效性。</p>
@@ -1482,7 +1530,8 @@
           
             <h1 id="线性模型">线性模型</h1>
 <h2 id="基本形式">基本形式</h2>
-<p>线性模型是通过一个属性的线性组合进行预测的函数： <span class="math display">\[
+<p>线性模型是通过一个属性的线性组合进行预测的函数： <span
+class="math display">\[
 f(x) = w_1x_1 + w_2x_2 + ... + w_dx_d + b = w^Tx + b
 \]</span></p>
 <ul>
@@ -1490,9 +1539,13 @@ f(x) = w_1x_1 + w_2x_2 + ... + w_dx_d + b = w^Tx + b
 <li>另外，向量w直观地表达了各个属性在预测中的重要性；</li>
 </ul>
 <h2 id="线性回归">线性回归</h2>
-<p>给定数据集<span class="math inline">\(D={(x_1, y_1), (x_2, y_2),...,(x_m, y_m)}\)</span>，其中向量<span class="math inline">\(x_i=(x_{i1};x_{i2};...;x_{id})\)</span>。而线性回归就是希望找到一个线性模型能够准确地预测出值。也就是试图学习得： <span class="math display">\[
+<p>给定数据集<span class="math inline">\(D={(x_1, y_1), (x_2,
+y_2),...,(x_m, y_m)}\)</span>，其中向量<span
+class="math inline">\(x_i=(x_{i1};x_{i2};...;x_{id})\)</span>。而线性回归就是希望找到一个线性模型能够准确地预测出值。也就是试图学习得：
+<span class="math display">\[
 f(x) == w^Tx + b，使得f(x_i)\approx{y_i}
-\]</span> 那么这里的关键要确定w和b，也就是保证f(x)和y之间最小的时候获得w和b，从几何的角度来看，就是找到一条直线使得所有样本到直线上的欧氏距离之和最小。</p>
+\]</span>
+那么这里的关键要确定w和b，也就是保证f(x)和y之间最小的时候获得w和b，从几何的角度来看，就是找到一条直线使得所有样本到直线上的欧氏距离之和最小。</p>
 <p>假设有 <span class="math display">\[
 X=
 \begin{bmatrix}
@@ -1505,50 +1558,74 @@ X=
 <p><span class="math display">\[
 y = (y_1; y_2;...;y_m)
 \]</span></p>
-<p>令<span class="math inline">\(E_w = (y-Xw)^T (y-Xw)\)</span>，对<span class="math inline">\(w\)</span>求导，得 <span class="math display">\[
+<p>令<span class="math inline">\(E_w = (y-Xw)^T (y-Xw)\)</span>，对<span
+class="math inline">\(w\)</span>求导，得 <span class="math display">\[
 \frac{\alpha{E_w}}{\alpha{w}} = 2X^T(Xw-y)
-\]</span> 当<span class="math inline">\(X^TX\)</span>为正定矩阵或者满秩矩阵，令导数为0可得： <span class="math display">\[
+\]</span> 当<span
+class="math inline">\(X^TX\)</span>为正定矩阵或者满秩矩阵，令导数为0可得：
+<span class="math display">\[
 2X^T(Xw-y) = 0 \\
 X^TXw = X^Ty \\
 w = (X^TX)^{-1}X^Ty
-\]</span> 假如我们认为对应的输入会导致在指数尺度上发生变化，可以转换成对数线性回归： <span class="math display">\[
+\]</span>
+假如我们认为对应的输入会导致在指数尺度上发生变化，可以转换成对数线性回归：
+<span class="math display">\[
 ln y = w^T+b
 \]</span></p>
 <h2 id="对数几率回归">对数几率回归</h2>
 <p>上面提及的是利用线性模型做回归学习，如果面对分类任务应该怎么做呢？</p>
-<p>考虑二分类问题，则<span class="math inline">\(y\in({0, 1})\)</span>，我们需要将线性回归模型产生的值转换为0/1值。则</p>
+<p>考虑二分类问题，则<span class="math inline">\(y\in({0,
+1})\)</span>，我们需要将线性回归模型产生的值转换为0/1值。则</p>
 <blockquote>
 <p>当z&lt;0，y = 0;</p>
 <p>当z=0，y = 0.5;</p>
 <p>当z&gt;0，y = 1</p>
 </blockquote>
-<p>因此我们可以sigmoid函数代替，<span class="math inline">\(y = \frac{1}{1+e^{-z}}\)</span>，图像如下：</p>
+<p>因此我们可以sigmoid函数代替，<span class="math inline">\(y =
+\frac{1}{1+e^{-z}}\)</span>，图像如下：</p>
 <figure>
-<img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>带入上式，可以得到： <span class="math display">\[
 y = \frac{1}{1+e^{-{(w^Tx+b)}}} \\
 ln \frac{y}{1-y} = w^Tx+b
-\]</span> 若把y视为样本x作为正例的可能性，1-y为其反例可能性，那么$ln  $就是对数几率。这个方法不仅仅可以预测出类别，更可以得到近似概率的预测，提高决策效果。</p>
-<p>当要确定w和b的时候，可以使用极大似然法来估计，目的是使得每个样本属于真实样本的可能性越大越好： <span class="math display">\[
+\]</span> 若把y视为样本x作为正例的可能性，1-y为其反例可能性，那么$ln
+$就是对数几率。这个方法不仅仅可以预测出类别，更可以得到近似概率的预测，提高决策效果。</p>
+<p>当要确定w和b的时候，可以使用极大似然法来估计，目的是使得每个样本属于真实样本的可能性越大越好：
+<span class="math display">\[
 \iota(w, b) = \sum_{i=1}^{m}ln p(y_i|x_i;w,n)
 \]</span> 其中似然项可以写成： <span class="math display">\[
 p(y_i|x_i;w, b) = y_ip(y=1|x,w;b) + (1-y_i)p(y=0|x,w;b)
 \]</span> 带入上式之后，使用梯度下降可以求得最优解。</p>
-<p>关于极大似然法，可以<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2018/05/15/Bayesian/">参考</a></p>
+<p>关于极大似然法，可以<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2018/05/15/Bayesian/">参考</a></p>
 <h2 id="线性判别分析">线性判别分析</h2>
-<p><strong>linear discriminant analysis(LDA)</strong>是一种经典的线性学习方法，可用作分类，也可以为后续的分类做降维操作。</p>
+<p><strong>linear discriminant
+analysis(LDA)</strong>是一种经典的线性学习方法，可用作分类，也可以为后续的分类做降维操作。</p>
 <p>LDA的思想：设法将样本投影到这样的一条直线上：同类的样例的投影点尽可能相近，异类样例的投影点尽可能远离，这样就可以根据投影点的位置来确定新样本的类别。</p>
 <figure>
-<img src="https://i.stack.imgur.com/9k7iT.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://i.stack.imgur.com/9k7iT.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <blockquote>
 <p>https://i.stack.imgur.com/9k7iT.png</p>
 </blockquote>
-<p>令<span class="math inline">\(X_i, \mu_i, \Sigma_{i}\)</span>分别表示第i类实例的集合、均值向量和协方差矩阵。在将样本值投影到直线之后，两个样本的协方差分别为<span class="math inline">\(w_T\Sigma_0w\)</span>和<span class="math inline">\(w_T\Sigma_1w\)</span>，而样本中心的投影则是<span class="math inline">\(w_T\mu_0\)</span>和<span class="math inline">\(w_T\mu_1\)</span>。因此，为了使得同类样例的投影点尽可能接近，异类样例的投影中心尽可能大，则需要最大化目标函数： <span class="math display">\[
-J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w} \\
+<p>令<span class="math inline">\(X_i, \mu_i,
+\Sigma_{i}\)</span>分别表示第i类实例的集合、均值向量和协方差矩阵。在将样本值投影到直线之后，两个样本的协方差分别为<span
+class="math inline">\(w_T\Sigma_0w\)</span>和<span
+class="math inline">\(w_T\Sigma_1w\)</span>，而样本中心的投影则是<span
+class="math inline">\(w_T\mu_0\)</span>和<span
+class="math inline">\(w_T\mu_1\)</span>。因此，为了使得同类样例的投影点尽可能接近，异类样例的投影中心尽可能大，则需要最大化目标函数：
+<span class="math display">\[
+J = \frac{\Arrowvert
+w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w} \\
 = \frac{w_T(\mu_0-\mu_1)(\mu_0-\mu_1)^Tw}{w_T(\Sigma_0+\Sigma_1)w}
-\]</span> 分子<span class="math inline">\(\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2\)</span>尽可能大，保证类中心之间距离尽可能大。分母<span class="math inline">\(w_T\Sigma_0w+w_T\Sigma_1w\)</span>尽可能小，使得同样例的投影点的协方差尽可能小。</p>
+\]</span> 分子<span class="math inline">\(\Arrowvert
+w^T\mu_0-w^T\mu_1\Arrowvert^2_2\)</span>尽可能大，保证类中心之间距离尽可能大。分母<span
+class="math inline">\(w_T\Sigma_0w+w_T\Sigma_1w\)</span>尽可能小，使得同样例的投影点的协方差尽可能小。</p>
 <h2 id="多分类学习">多分类学习</h2>
 <p>多分类学习的任务，可以基于二分类学习进行推广，即将多分类任务拆分为若干个二分类任务进行求解。有三种拆分策略：</p>
 <ul>
@@ -1569,15 +1646,26 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
 </ul>
 <p>类别的划分通过编码矩阵来指定，常见形式有二元码和三元码：</p>
 <figure>
-<img src="https://www.researchgate.net/profile/S_Escalera/publication/224347110/figure/fig1/AS:302774504968192@1449198475244/a-Binary-ECOC-design-for-a-4-class-problem-An-input-test-codeword-x-is-classified-to.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.researchgate.net/profile/S_Escalera/publication/224347110/figure/fig1/AS:302774504968192@1449198475244/a-Binary-ECOC-design-for-a-4-class-problem-An-input-test-codeword-x-is-classified-to.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>三元码的0表示<span class="math inline">\(f_i\)</span>分类器不使用该类样本。</p>
+<p>三元码的0表示<span
+class="math inline">\(f_i\)</span>分类器不使用该类样本。</p>
 <p>纠错输出码对分类器的错误有一定的容忍和纠正能力，假设某个分类器出现了错误，基于这个编码仍能产生正确的分类的结果。另外ECOC编码越长，或者任意两个类别之间的编码距离越远，它的纠错能力就越强。</p>
 <h2 id="类别不平衡问题">类别不平衡问题</h2>
 <p>前面几章介绍的分类学习方法都有一个基本的前提，那就是不同类别的训练样本树木相当。但假设反例有998个，正例有2个，那么学习方法只要每次都返回一个永远将样本预测设为反例的学习器，那么精确度就有99.8%。但显然，这种学习没有意义。</p>
-<p>线性分类时，当我们用<span class="math inline">\(y = w^Tx+b\)</span>对新样本x进行分类时，事实上是用y跟一个阈值进行比较。实际上y代表了正例的可能性，那么几率<span class="math inline">\(\frac{y}{1-y}\)</span>代表了正例与反例的可能性比值，则： <span class="math display">\[
+<p>线性分类时，当我们用<span class="math inline">\(y =
+w^Tx+b\)</span>对新样本x进行分类时，事实上是用y跟一个阈值进行比较。实际上y代表了正例的可能性，那么几率<span
+class="math inline">\(\frac{y}{1-y}\)</span>代表了正例与反例的可能性比值，则：
+<span class="math display">\[
 若\frac{y}{1-y} &gt; 1，预测为正例
-\]</span> 然而当训练集正反例数目不等时，令<span class="math inline">\(m^+\)</span>为正例数目，<span class="math inline">\(m^-\)</span>为反例数目，那么观测几率就是<span class="math inline">\(\frac{m^+}{m^-}\)</span>，这是基于真实样本是无偏差采样的。因此，我们可以对类别平衡的样本进行一次<strong>“再缩放”</strong>。 <span class="math display">\[
+\]</span> 然而当训练集正反例数目不等时，令<span
+class="math inline">\(m^+\)</span>为正例数目，<span
+class="math inline">\(m^-\)</span>为反例数目，那么观测几率就是<span
+class="math inline">\(\frac{m^+}{m^-}\)</span>，这是基于真实样本是无偏差采样的。因此，我们可以对类别平衡的样本进行一次<strong>“再缩放”</strong>。
+<span class="math display">\[
 \frac{y}{1-y} = \frac{y}{1-y} \times \frac{m^+}{m^-}
 \]</span> 现有技术对于这种类别平衡问题有三种做法：</p>
 <ul>
@@ -1717,7 +1805,8 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
 <p>优先级高的进程先获得处理器时间，低的后运行，相同的优先级按照轮转的方式进行调度。</p>
 <p>linux采用了两种不同的优先级范围：</p>
 <ul>
-<li>nice值，[-20-19]，默认值为0，高nice值则优先级低，低nice值则属于高优先级，可以通过命令<strong>ps -el</strong>查看进程列表；</li>
+<li>nice值，[-20-19]，默认值为0，高nice值则优先级低，低nice值则属于高优先级，可以通过命令<strong>ps
+-el</strong>查看进程列表；</li>
 <li>实时优先级，[0-99]，与nice值意义相反，99代表最高优先级。另外任何的实时进程的优先级都高于普通进程；</li>
 </ul>
 <h3 id="时间片">时间片</h3>
@@ -1733,9 +1822,11 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
 <h2 id="linux调度的实现">Linux调度的实现</h2>
 <p>CFS的具体实现代码位于文件<strong>kernel/sched_fair.c</strong>中。</p>
 <h3 id="时间记账">时间记账</h3>
-<p>CFS虽然没有时间片的概念，但不变的是它也必须维护每个进程运行的时间记账，确保进程只在公平分配给它的处理器时间内运行。CFS使用了一个结构体<strong>struct sched_entity</strong>进行追踪。</p>
+<p>CFS虽然没有时间片的概念，但不变的是它也必须维护每个进程运行的时间记账，确保进程只在公平分配给它的处理器时间内运行。CFS使用了一个结构体<strong>struct
+sched_entity</strong>进行追踪。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sched_entity</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">load_weight</span>	<span class="title">load</span>;</span>		<span class="comment">/* for load-balancing */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">rb_node</span>		<span class="title">run_node</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>	<span class="title">group_node</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>		on_rq;</span><br><span class="line"></span><br><span class="line">	u64			exec_start;</span><br><span class="line">	u64			sum_exec_runtime;</span><br><span class="line">	u64			vruntime;</span><br><span class="line">	u64			prev_sum_exec_runtime;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	u64			nr_migrations;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_SCHEDSTATS</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">sched_statistics</span> <span class="title">statistics</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_FAIR_GROUP_SCHED</span></span><br><span class="line">	<span class="type">int</span>			depth;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">sched_entity</span>	*<span class="title">parent</span>;</span></span><br><span class="line">	<span class="comment">/* rq on which this entity is (to be) queued: */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">cfs_rq</span>		*<span class="title">cfs_rq</span>;</span></span><br><span class="line">	<span class="comment">/* rq &quot;owned&quot; by this entity/group: */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">cfs_rq</span>		*<span class="title">my_q</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_SMP</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Per entity load average tracking.</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 * Put into separate cache line so it does not</span></span><br><span class="line"><span class="comment">	 * collide with read-mostly values above.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">sched_avg</span>	<span class="title">avg</span> ____<span class="title">cacheline_aligned_in_smp</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>而task_struct 包含关于 sched_entity 和 sched_class 这两种结构的信息：</p>
+<p>而task_struct 包含关于 sched_entity 和 sched_class
+这两种结构的信息：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> &#123;</span> <span class="comment">/* Defined in 2.6.23:/usr/include/linux/sched.h */</span></span><br><span class="line">	....</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">prio_array</span> *<span class="title">array</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">sched_entity</span> <span class="title">se</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">sched_class</span> *<span class="title">sched_class</span>;</span></span><br><span class="line">	....</span><br><span class="line">	....</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>虚拟实时</li>
@@ -1927,36 +2018,46 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
         
           
             <h1 id="sgi-stl中的copy算法">SGI STL中的copy算法</h1>
-<p>在stl中，copy是一个调用非常频繁的函数，而这些操作又涉及到了各种的内存操作——运用assignment operator或者copy constructor。为了提高效率，对于拥有trivial assignment operator的元素类型，可以使用直接的内存复制（例如C库函数——memmove或者memcpy）。</p>
+<p>在stl中，copy是一个调用非常频繁的函数，而这些操作又涉及到了各种的内存操作——运用assignment
+operator或者copy constructor。为了提高效率，对于拥有trivial assignment
+operator的元素类型，可以使用直接的内存复制（例如C库函数——memmove或者memcpy）。</p>
 <p>copy算法脉络：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_2.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_2.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>在这里有一个需要注意的问题，就是由于copy算啊是将输入区间内的元素复制到输出区间中，因此当输入区间与输出区间重叠的时候很有可能出现问题。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_3.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_3.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>这里出现问题的原因是由于deque的迭代器不是原生指针，如果使用的是vector，迭代器是原生指针，调用copy算法后会以memmove执行实际的复制操作，这样整块内存进行复制就不会出错。</p>
 <blockquote>
 <p>但是这个在我的机器上运行是正确的</p>
 <p>gcc version 5.4.0</p>
 </blockquote>
-<p><a target="_blank" rel="noopener" href="https://github.com/LucienXian/stl_algorithms/blob/master/algobase/my_copy_overlap.cpp">my_copy_overlap.cpp</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://github.com/LucienXian/stl_algorithms/blob/master/algobase/my_copy_overlap.cpp">my_copy_overlap.cpp</a></p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iterator&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;deque&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print</span><span class="params">(<span class="type">int</span> v[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">9</span>;i++)</span><br><span class="line">        cout &lt;&lt; v[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="built_in">copy</span>(ia+<span class="number">2</span>, ia+<span class="number">7</span>,ia);<span class="comment">//输出区间的终点与输入区间重叠，copy正常</span></span><br><span class="line">        <span class="built_in">print</span>(ia); <span class="comment">//2 3 4 5 6 5 6 7 8</span></span><br><span class="line">    &#125;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="function">deque&lt;<span class="type">int</span>&gt; <span class="title">id</span><span class="params">(ia, ia+<span class="number">9</span>)</span></span>;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator first = id.<span class="built_in">begin</span>();</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator last = id.<span class="built_in">end</span>();</span><br><span class="line">        ++++first; <span class="comment">//advance 2</span></span><br><span class="line">        cout &lt;&lt; *first &lt;&lt; endl;</span><br><span class="line">        ----last; <span class="comment">//advance -2</span></span><br><span class="line">        cout &lt;&lt; *last &lt;&lt; endl;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator res = id.<span class="built_in">begin</span>();</span><br><span class="line">        <span class="built_in">copy</span>(first, last, res);</span><br><span class="line">        <span class="built_in">copy</span>(id.<span class="built_in">begin</span>(), id.<span class="built_in">end</span>(), <span class="built_in">ostream_iterator</span>&lt;<span class="type">int</span>&gt;(cout, <span class="string">&quot; &quot;</span>));<span class="comment">//2 3 4 5 6 5 6 7 8</span></span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="function">deque&lt;<span class="type">int</span>&gt; <span class="title">id</span><span class="params">(ia, ia+<span class="number">9</span>)</span></span>;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator first = id.<span class="built_in">begin</span>();</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator last = id.<span class="built_in">end</span>();</span><br><span class="line">        ++++first; <span class="comment">//advance 2</span></span><br><span class="line">        cout &lt;&lt; *first &lt;&lt; endl;</span><br><span class="line">        ----last; <span class="comment">//advance -2</span></span><br><span class="line">        cout &lt;&lt; *last &lt;&lt; endl;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator res = id.<span class="built_in">begin</span>();</span><br><span class="line">        res = res+<span class="number">4</span>;</span><br><span class="line">        <span class="built_in">copy</span>(first, last, res);</span><br><span class="line">        <span class="built_in">copy</span>(id.<span class="built_in">begin</span>(), id.<span class="built_in">end</span>(), <span class="built_in">ostream_iterator</span>&lt;<span class="type">int</span>&gt;(cout, <span class="string">&quot; &quot;</span>));<span class="comment">//0 1 2 3 2 3 4 5 6</span></span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>我们还是回到SGI的STL吧，以下是唯一的对外接口：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> OutputIterator <span class="title">copy</span><span class="params">(InputIterator first, InputIterator last, OutputIterator result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> __copy_dispatch&lt;InputIterator, OutputIterator&gt;()(first, last, result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外，会有两个重载函数，针对原始指针——const char<em>和const wchar_t</em>，进行内存直接拷贝操作：</p>
+<p>另外，会有两个重载函数，针对原始指针——const char<em>和const
+wchar_t</em>，进行内存直接拷贝操作：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">char</span>* <span class="title">copy</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* first, <span class="type">const</span> <span class="type">char</span>* last, <span class="type">char</span>* result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">memmove</span>(result, first, last-first);</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">wchar_t</span>* <span class="title">copy</span><span class="params">(<span class="type">const</span> <span class="type">wchar_t</span>* first, <span class="type">const</span> <span class="type">wchar_t</span>* last, <span class="type">wchar_t</span>* result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">memmove</span>(result, first, <span class="built_in">sizeof</span>(<span class="type">wchar_t</span>)*(last-first));</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>接下来，我们看一下copy()函数中调用的__copy_dispatch()：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line">strcut __copy_dispatch</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function">OutputIterator <span class="title">operator</span><span class="params">()</span><span class="params">(InputIterator first, InputIterator last, OutputIterator result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> __copy(first, last, result, <span class="built_in">iterator_category</span>(first));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//另外，提供两个偏特化版本，针对的是T*指针类型</span></span><br><span class="line"><span class="comment">//这里的目的是在参数为原生指针的前提下，判断指针所指对象是否拥有trivial assignment operator，如果是，则直接使用memmove进行内存拷贝，否则，需要调用assignment operator进行复制</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">strcut __copy_dispatch&lt;T*, T*&gt;</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function">T* <span class="title">operator</span><span class="params">()</span><span class="params">(T* first, T* last, T* result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">typedef</span> <span class="keyword">typename</span> __type_traits&lt;T&gt;::has_trivial_assignment_operator t;</span><br><span class="line">		<span class="keyword">return</span> <span class="type">__copy_t</span>(first, last, result, <span class="built_in">t</span>());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">strcut __copy_dispatch&lt;<span class="type">const</span> T*, T*&gt;</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function">T* <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> T* first, <span class="type">const</span> T* last, T* result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">typedef</span> <span class="keyword">typename</span> __type_traits&lt;T&gt;::has_trivial_assignment_operator t;</span><br><span class="line">		<span class="keyword">return</span> <span class="type">__copy_t</span>(first, last, result, <span class="built_in">t</span>());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>先来看看泛化版本的**__copy_dispatch调用的** 函数**__copy**，该函数针对不同类型的迭代器使用的循环条件不同：</p>
+<p>先来看看泛化版本的**__copy_dispatch调用的**
+函数**__copy**，该函数针对不同类型的迭代器使用的循环条件不同：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> OutputIterator __copy(InputIterator first, InputIterator last, OutputIterator result, input_iterator_tag)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (; first!=last; ++result, ++first)</span><br><span class="line">        *result = *first;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">RandomAccessIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> OutputIterator __copy(RandomAccessIterator first, RandomAccessIterator last, OutputIterator result, random_access_iterator_tag)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//抽出这个函数，是因为接下来也有被使用的地方</span></span><br><span class="line">    <span class="keyword">return</span> __copy_d(first, last, result, <span class="built_in">distance_type</span>(first));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>接下来是__copy_d的实现：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">RandomAccessIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>, <span class="keyword">class</span> <span class="title class_">Distance</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> OutputIterator __copy_d(RandomAccessIterator first, RandomAccessIterator last, OutputIterator result, Distance*)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (Distance n = last-first; n&gt;<span class="number">0</span>; --n, ++result, ++first)</span><br><span class="line">        *result = *first;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>回到__copy_dispatch的偏特化版本中，这个函数里面调用 __copy_t()</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> T* <span class="type">__copy_t</span>(<span class="type">const</span> T* first, <span class="type">const</span> T* last, T* result, __true_type)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">memmove</span>(result, first, <span class="built_in">sizeof</span>(T)*(last-first));</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> T* <span class="type">__copy_t</span>(<span class="type">const</span> T* first, <span class="type">const</span> T* last, T* result, __false_type)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//原生指针是一种RandomAccessIterator，所以交给了__copy_d</span></span><br><span class="line">    <span class="keyword">return</span> __copy_d(first, last, result, (<span class="type">ptrdiff_t</span>*)<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>即便自定义的class C具备trivial operator=，它仍然可能被判断__false_type，这是因为&lt;type_triais.h&gt;中只针对某些类型做了记录。</p>
+<p>即便自定义的class C具备trivial
+operator=，它仍然可能被判断__false_type，这是因为&lt;type_triais.h&gt;中只针对某些类型做了记录。</p>
 </blockquote>
 
           
@@ -2085,10 +2186,12 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
 <p>程序可以通过exit()系统调用退出，释放掉该进行所占有的资源。</p>
 <p>父进程可以通过wait()查询子进程是否终结，终结的进程处于僵死状态，直到父进程调用wait()相关的系统调用。</p>
 <h2 id="进程描述符及任务结构">进程描述符及任务结构</h2>
-<p>内核把进程的列表存放在task list的双向循环链表中，链表中每个结点类型为task_struct，该结构比较大，包含了一个进程所有信息。打个比方：</p>
+<p>内核把进程的列表存放在task
+list的双向循环链表中，链表中每个结点类型为task_struct，该结构比较大，包含了一个进程所有信息。打个比方：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">// ...  </span></span><br><span class="line">    <span class="type">void</span> *<span class="built_in">stack</span>;    <span class="comment">//  指向内核栈的指针  </span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h3 id="分配进程描述符">分配进程描述符</h3>
-<p>使用slab分配器动态生成task_struct，并且在堆栈的低地址区创建一个新的结构<strong>struct thread_info</strong>，该结构用来存放特定体系结构的汇编代码段需要访问的那部分进程的数据，这是因为Linux内核是支持不同体系的。然后在thread_info中嵌入指向task_struct的指针。</p>
+<p>使用slab分配器动态生成task_struct，并且在堆栈的低地址区创建一个新的结构<strong>struct
+thread_info</strong>，该结构用来存放特定体系结构的汇编代码段需要访问的那部分进程的数据，这是因为Linux内核是支持不同体系的。然后在thread_info中嵌入指向task_struct的指针。</p>
 <h3 id="进程描述符的存放">进程描述符的存放</h3>
 <p>内核通过一个唯一的进程描述符来标识每个进程——PID，最大值默认设置为32768，也就是允许同时存在进程的最大数目。</p>
 <p>有些体系结构会把当前的task_struct放在特定寄存器里，有些体系结构则是通过thread_info，然后计算偏移间接查找task_struct，比如x86</p>
@@ -2097,7 +2200,8 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
 <ul>
 <li>TASK_RUNNING：该状态的进程可以在CPU上运行，或正在执行，或是在运行队列中等待执行，合并了常见操作系统书中——running和ready的两种状态</li>
 <li>TASK_INTERRUPTIPLE：该进程被阻塞，正在等待某些条件达成，比如等待socket的连接，某些信号的接收</li>
-<li>TASK_UNINTERRUPTIPLE：在该状态下，即便是接收到某些信号（比如kill ），该进程也不会被中断。这种状态用的比较少，一般用在不想被干扰的进程。比如内核的某些处理流程是不应该被中断，或者在进行硬件操作的时候，一旦进程被中断，就可能造成设备不可控</li>
+<li>TASK_UNINTERRUPTIPLE：在该状态下，即便是接收到某些信号（比如kill
+），该进程也不会被中断。这种状态用的比较少，一般用在不想被干扰的进程。比如内核的某些处理流程是不应该被中断，或者在进行硬件操作的时候，一旦进程被中断，就可能造成设备不可控</li>
 <li>__TASK_TRACED：被其它进程跟踪的进程，例如调用ptrace或者gdb进行调试的时候</li>
 <li>__TASK_STOPPED：进程停止执行，这种情况发送在接收到SIGSTOP,SIGTSTP,SIGTTIN,SIGTTOU等信号的时候</li>
 </ul>
@@ -2285,8 +2389,7 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

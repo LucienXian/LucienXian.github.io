@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -351,7 +349,8 @@
 <p>注意，clone方法返回的是PhoneNumber，永远不要让那个客户去做类库能替用户完成的事情。</p>
 <h2 id="注意">注意</h2>
 <p>如果对象中包含的域引用了可变的对象，那这种clone实现可能导致灾难性后果。因为修改原始的实例可能会破坏克隆对象的约束条件。</p>
-<p>复杂对象的克隆，需要先调用super.clone，再把结果对象中的所有域设置为空白状态，然后调用higher level去重新设置对象状态。</p>
+<p>复杂对象的克隆，需要先调用super.clone，再把结果对象中的所有域设置为空白状态，然后调用higher
+level去重新设置对象状态。</p>
 <p>跟构造器一样，clone不应该调用一个被覆盖的方法，因为该方法可能先执行，导致克隆对象和原始对象不一致。</p>
 <h2 id="总结">总结</h2>
 <p>所有实现了Cloneable接口的类都应该用一个公有的方法去覆盖clone：先调用super.clone，然后修正需要的域，这意味着需要拷贝任何包含内部深层结构的可变对象。</p>
@@ -573,8 +572,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

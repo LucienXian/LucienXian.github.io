@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -343,9 +341,13 @@
 <p>当然主程序会打印：pancake。</p>
 <p>但如果存在另一个叫Dessert.java的源文件里定义了两个相同的类：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Two classes defined in one file. Don&#x27;t ever do this!</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Utensil</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">NAME</span> <span class="operator">=</span> <span class="string">&quot;pot&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Dessert</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">NAME</span> <span class="operator">=</span> <span class="string">&quot;pie&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在这个情况，如果编译时使用的命令为<strong>javac Main.java Dessert.java</strong>，会编译失败，因为编译器发现了重复定义。</p>
-<p>如果你用命令<strong>“javac Main.java”</strong>或<strong>“javac Main.java Utensil.java”</strong>来编译程序，它的行为将与你写Dessert.java文件之前的行为一样，打印出“pancake”。</p>
-<p>但如果用命令<strong>“javac Dessert.java Main.java”</strong>来编译程序，它将会打印出“potpie”。</p>
+<p>在这个情况，如果编译时使用的命令为<strong>javac Main.java
+Dessert.java</strong>，会编译失败，因为编译器发现了重复定义。</p>
+<p>如果你用命令<strong>“javac Main.java”</strong>或<strong>“javac
+Main.java
+Utensil.java”</strong>来编译程序，它的行为将与你写Dessert.java文件之前的行为一样，打印出“pancake”。</p>
+<p>但如果用命令<strong>“javac Dessert.java
+Main.java”</strong>来编译程序，它将会打印出“potpie”。</p>
 <p>这种依赖于编译顺序的代码风格不是我们想要的，因此解决方法就是，永远不要将多个顶级类或者接口放到一个源文件里。</p>
 
       
@@ -563,8 +565,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

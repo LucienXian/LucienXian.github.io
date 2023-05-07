@@ -103,14 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="图像分类 数据驱动方法 图像识别时，计算机接收图像，并从固定的标签从选择一个标签，计算机看到的图像其实是一个多维数组。 但改变相机角度，环境光度，图像变形，遮挡，与背景重叠，类内差异等情况，计算机的识别算法应该是robust的。 实际上，我们不会考虑为某个是别的物体硬编码某个规则，而是收集图像数据和标签，然后用机器学习去训练分类器，再利用分类器去预测标签。这就是一种数据驱动的算法。 在比较图像时，">
 <meta property="og:locale">
-<meta property="og:image" content="https://pic2.zhimg.com/80/51aef845faa10195e33bdd4657592f86_hd.jpg">
-<meta property="og:image" content="https://pic4.zhimg.com/80/7c204cd1010c0af1e7b50000bfff1d8e_hd.jpg">
 <meta property="article:published_time" content="2018-05-29T15:13:33.000Z">
 <meta property="article:modified_time" content="2018-05-29T15:16:10.903Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="网络课程">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pic2.zhimg.com/80/51aef845faa10195e33bdd4657592f86_hd.jpg">
 
 
 
@@ -161,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -342,11 +337,15 @@
 <p>图像识别时，计算机接收图像，并从固定的标签从选择一个标签，计算机看到的图像其实是一个多维数组。</p>
 <p>但改变相机角度，环境光度，图像变形，遮挡，与背景重叠，类内差异等情况，计算机的识别算法应该是robust的。</p>
 <p>实际上，我们不会考虑为某个是别的物体硬编码某个规则，而是收集图像数据和标签，然后用机器学习去训练分类器，再利用分类器去预测标签。这就是一种数据驱动的算法。</p>
-<p>在比较图像时，我们可以使用L1 distance: <span class="math inline">\(d_1(I_1, I_2)=\sum_{p}|I_1^2-I_2^2|\)</span></p>
+<p>在比较图像时，我们可以使用L1 distance: <span
+class="math inline">\(d_1(I_1, I_2)=\sum_{p}|I_1^2-I_2^2|\)</span></p>
 <p>对于NNC，最近邻分类器，它的train是O(1)，而predict是O(N)，而我们希望的是训练可以慢一点，而测试要快一点。另外就是，最近邻可能会使得分类不够泛化，因此我们使用knn来解决这个问题。</p>
 <p>下面这张图很好地表示了knn带来的效果，使得分类更加平滑：</p>
 <figure>
-<img src="https://pic2.zhimg.com/80/51aef845faa10195e33bdd4657592f86_hd.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://pic2.zhimg.com/80/51aef845faa10195e33bdd4657592f86_hd.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="k最近邻算法">k最近邻算法</h2>
 <p>L1距离有坐标依赖，如果特征有特别的意义，一般选择L1距离。但最好都尝试一下。</p>
@@ -363,7 +362,10 @@
 <p>image-&gt;f(x, W)=Wx+b-&gt;10 number giving class scores</p>
 <p>打个比方，以下的图可以看作</p>
 <figure>
-<img src="https://pic4.zhimg.com/80/7c204cd1010c0af1e7b50000bfff1d8e_hd.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://pic4.zhimg.com/80/7c204cd1010c0af1e7b50000bfff1d8e_hd.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>对于图像来说，我们可以将图像想象成高维空间的一个点，线性分类器就是一条分割线。</p>
 <h2 id="问题">问题</h2>
@@ -374,14 +376,21 @@
 </blockquote></li>
 </ol>
 <p>也就是无法编译pillow，导致在virtualenv中无法pip要求的库。从这里找到了答案：https://github.com/Microsoft/WSL/issues/256，把依赖装上</p>
-<p><strong>sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk</strong></p>
+<p><strong>sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev
+libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev
+python-tk</strong></p>
 <ol start="2" type="1">
 <li>用脚本，下载数据集太慢了，还不如手动下载</li>
-<li>pip install -r requirements.txt 时遇到了site无法安装，按照<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/48696858/unable-to-install-distribution-site">这里</a>的说法，site是内置的。</li>
+<li>pip install -r requirements.txt 时遇到了site无法安装，按照<a
+target="_blank" rel="noopener" href="https://stackoverflow.com/questions/48696858/unable-to-install-distribution-site">这里</a>的说法，site是内置的。</li>
 </ol>
 <blockquote>
-<p><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/site.html"><code>site</code></a> is internal to the Python interpreter, and is used to initialize machine-specific details of your Python installation.</p>
-<p>What's telling you that you need to install this module? Ignore it. It's wrong.</p>
+<p><a
+target="_blank" rel="noopener" href="https://docs.python.org/3/library/site.html"><code>site</code></a>
+is internal to the Python interpreter, and is used to initialize
+machine-specific details of your Python installation.</p>
+<p>What's telling you that you need to install this module? Ignore it.
+It's wrong.</p>
 </blockquote>
 
       
@@ -599,8 +608,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

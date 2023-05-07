@@ -103,18 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing Abstract 本文介绍了弹性的分布式数据集，这是一种分布式的内存抽象形式，它可以让程序员以一种容错的方式在大型集群中进行内存计算。 Introduction 尽管想MapReduce之类的框架已经提供了关于访问">
 <meta property="og:locale">
-<meta property="og:image" content="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0">
-<meta property="og:image" content="https://pic1.superbed.cn/item/5de5470ef1f6f81c50404c93.png">
-<meta property="og:image" content="https://pic.superbed.cn/item/5de7e86ff1f6f81c50a2a07f.png">
-<meta property="og:image" content="https://pic2.superbed.cn/item/5de7ea33f1f6f81c50a2e1cc.png">
-<meta property="og:image" content="https://pic.superbed.cn/item/5de7edaaf1f6f81c50a37d20.png">
-<meta property="og:image" content="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0">
 <meta property="article:published_time" content="2019-12-07T15:54:18.000Z">
 <meta property="article:modified_time" content="2019-12-07T15:55:35.489Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="分布式">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0">
 
 
 
@@ -165,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,14 +332,18 @@
       
 
       
-        <h1 id="resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</h1>
+        <h1
+id="resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing">Resilient
+Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster
+Computing</h1>
 <h2 id="abstract">Abstract</h2>
 <p>本文介绍了弹性的分布式数据集，这是一种分布式的内存抽象形式，它可以让程序员以一种容错的方式在大型集群中进行内存计算。</p>
 <h2 id="introduction">Introduction</h2>
 <p>尽管想MapReduce之类的框架已经提供了关于访问集群的计算资源的抽象，但仍然缺乏对于分布式内存的抽象，这使得它们在处理需要重用多个计算中中间结果的应用程序上不够高效。像一些机器学习算法、图算法，交互式数据挖掘都需要对数据子集做临时的查询，但那些框架的做法往往是将其写入到外部的存储系统里，这里IO、序列化之类的开销非常大。</p>
 <p>本文提出了一种弹性的分布式数据集的新抽象。其可以将中间结果明确地保存在内存中，控制其分区进行优化放置，并使用一组丰富的运算符进行操作。</p>
 <p>Apache Spark应运而生。</p>
-<h2 id="resilient-distributed-datasets-rdds">Resilient Distributed Datasets (RDDs)</h2>
+<h2 id="resilient-distributed-datasets-rdds">Resilient Distributed
+Datasets (RDDs)</h2>
 <h3 id="rdd-abstraction">RDD Abstraction</h3>
 <p>所谓的弹性的分布式数据集，这里的弹性指的是在任何时候都可以进行重算，让用户不会感知到某部分内容曾经丢失过，这是Spark的核心抽象，是一种只读的、分区的数据记录集合。RDD的产生，要么通过从确定存储中获取，要么就是通过其它的RDD进行转换获取，这里的转换包括map、filter和join。</p>
 <p>RDD应该有足够的信息，去记录自身是如何从其它数据集派生而来的。用户可以控制RDD的持久化和分区，比如指示重用的RDD和存储策略，也可以命令RDD的元素进行分区。分区依照特定规则将具有相同属性的数据记录放在一起，每个分区相当于一个数据集片段。</p>
@@ -358,20 +353,24 @@
 <h3 id="advantages-of-the-rdd-model">Advantages of the RDD Model</h3>
 <p>RDD与分布式共享内存最大的区别就是，RDD只能通过粗粒度的转换得来，而DSM则可以读取/写入到每一个内存位置。这样RDD在处理容错时，就不会产生额外的有关checkpoint的开销，如果有分区丢失，RDD可以在不同的节点并行地重建，而不需要回滚整个系统。</p>
 <p>由于RDD的不可变特性，系统可以通过运行较慢的备份副本来缓解慢速节点，而DSM在这种情况会因为多副本访问相同内存位置，而产生干扰更新。</p>
-<h3 id="applications-not-suitable-for-rdds">Applications Not Suitable for RDDs</h3>
+<h3 id="applications-not-suitable-for-rdds">Applications Not Suitable
+for RDDs</h3>
 <p>RDD更适用于在批处理应用程序中对全集数据执行相同的操作，在这种情况下，RDD能够很好地记录每一步的转换，并且能够在分区丢失时快速恢复。</p>
 <p>而对于那些需要对共享状态进行异步更新的应用，RDD则不适合。</p>
 <h2 id="spark-programming-interface-1">Spark Programming Interface</h2>
 <p>为了使用Spark，开发人员编写了一个驱动程序，用以连接到一组worker，并通过一个或多个RDD来调用action，同时该驱动程序上的Spark代码还可以跟踪RDD的lineage（血统？）。</p>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_467752339_1574789500166/0" /></p>
 <p>这些worker是一个长期活跃的进程，在内存中存着RDD分区。</p>
 <h3 id="rdd-operations-in-spark">RDD Operations in Spark</h3>
 <p>下表列出了Spark中可用的RDD转换和可用操作：</p>
-<p><img src="https://pic1.superbed.cn/item/5de5470ef1f6f81c50404c93.png" /></p>
+<p><img
+src="https://pic1.superbed.cn/item/5de5470ef1f6f81c50404c93.png" /></p>
 <h2 id="representing-rdds">Representing RDDs</h2>
 <p>论文中提到使用了大约14000行Scala代码实现了Spark，这个系统在Mesos集群上运行。每个Spark程序都作为一个单独的Mesos应用程序，具有独立的驱动程序和worker程序，并且这些应用程序之间的资源共享由Mesos处理。</p>
 <p>论文中提到RDD的表示是一种基于图的表示。因此对于RDD的表示，则是通过暴露5个接口方法来实现的。</p>
-<p><img src="https://pic.superbed.cn/item/5de7e86ff1f6f81c50a2a07f.png" /></p>
+<p><img
+src="https://pic.superbed.cn/item/5de7e86ff1f6f81c50a2a07f.png" /></p>
 <ul>
 <li>Partions：数据集的原子结构；</li>
 <li>preferredLocations：能更快访问分区的系列节点；</li>
@@ -379,16 +378,19 @@
 <li>iterator：用于从父RDD计算子RDD；</li>
 <li>patitioner：数据分区的元信息；</li>
 </ul>
-<p>至于如何表示RDD的关系，由于RDD在物理上是分区的，散列在集群不同机器的内存上的，文中将其定义为窄依赖（Narrow Dependency）和宽依赖（Wide Dependency）两种。</p>
+<p>至于如何表示RDD的关系，由于RDD在物理上是分区的，散列在集群不同机器的内存上的，文中将其定义为窄依赖（Narrow
+Dependency）和宽依赖（Wide Dependency）两种。</p>
 <ul>
 <li>宽依赖：父RDD中的分区可能被子RDD中的多个分区所依赖；</li>
 <li>窄依赖：父RDD的每个分区至多被子RDD中的一个分区所依赖；像map/filter这些操作都属于窄依赖；</li>
 </ul>
-<p><img src="https://pic2.superbed.cn/item/5de7ea33f1f6f81c50a2e1cc.png" /></p>
+<p><img
+src="https://pic2.superbed.cn/item/5de7ea33f1f6f81c50a2e1cc.png" /></p>
 <p>这两种依赖的差别在于：窄依赖可以pipeline执行，在失败时只需要重新执行对应的父RDD即可；而宽依赖则需要shuffle，并且如果出现故障恢复则需要重算所有父RDD；</p>
 <h3 id="job-scheduling">Job Scheduling</h3>
 <p>每当用户在RDD执行action的时候，调度器就会检查RDD的谱系图，以构建要执行的DAG（有向无环图）。如下图所示：</p>
-<p><img src="https://pic.superbed.cn/item/5de7edaaf1f6f81c50a37d20.png" /></p>
+<p><img
+src="https://pic.superbed.cn/item/5de7edaaf1f6f81c50a37d20.png" /></p>
 <p>每个stage内部都包含尽可能多的具有窄依赖的操作。这些stage的边界是宽依赖所必需执行的shuffle操作，另外任何已经计算出的分区都可以使父RDD的计算短路。调度程序会集群上启动任务以计算每个阶段中缺少的分区，直到它计算出目标RDD。</p>
 <p>调度器会根据数据局部性的原则来执行delay scheduling算法：</p>
 <ul>
@@ -405,7 +407,8 @@
 <li>类传递：为了让工作节点能够获取在每一行上创建的类的字节码，解释器会通过HTTP为这些类提供服务；</li>
 <li>修改代码的生成：因为每行代码的单例对象都是通过对应的静态方法访问，这意味着无法引用上一行定义的变量。因此需要修改代码的生成，以便直接引用每行对象的实例，如下图：</li>
 </ol>
-<p><img src="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0" /></p>
+<p><img
+src="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0" /></p>
 <h3 id="memory-management">Memory Management</h3>
 <p>Spark提供了三种对持久化RDD的存储策略：</p>
 <ul>
@@ -591,7 +594,11 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing"><span class="nav-number">1.</span> <span class="nav-text">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#resilient-distributed-datasets-rdds"><span class="nav-number">1.3.</span> <span class="nav-text">Resilient Distributed Datasets (RDDs)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rdd-abstraction"><span class="nav-number">1.3.1.</span> <span class="nav-text">RDD Abstraction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spark-programming-interface"><span class="nav-number">1.3.2.</span> <span class="nav-text">Spark Programming Interface</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#advantages-of-the-rdd-model"><span class="nav-number">1.3.3.</span> <span class="nav-text">Advantages of the RDD Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#applications-not-suitable-for-rdds"><span class="nav-number">1.3.4.</span> <span class="nav-text">Applications Not Suitable for RDDs</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spark-programming-interface-1"><span class="nav-number">1.4.</span> <span class="nav-text">Spark Programming Interface</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rdd-operations-in-spark"><span class="nav-number">1.4.1.</span> <span class="nav-text">RDD Operations in Spark</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#representing-rdds"><span class="nav-number">1.5.</span> <span class="nav-text">Representing RDDs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#job-scheduling"><span class="nav-number">1.5.1.</span> <span class="nav-text">Job Scheduling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interpreter-integration"><span class="nav-number">1.5.2.</span> <span class="nav-text">Interpreter Integration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memory-management"><span class="nav-number">1.5.3.</span> <span class="nav-text">Memory Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#support-for-checkpointing"><span class="nav-number">1.5.4.</span> <span class="nav-text">Support for Checkpointing</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing"><span class="nav-number">1.</span> <span class="nav-text">Resilient
+Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster
+Computing</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#resilient-distributed-datasets-rdds"><span class="nav-number">1.3.</span> <span class="nav-text">Resilient Distributed
+Datasets (RDDs)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rdd-abstraction"><span class="nav-number">1.3.1.</span> <span class="nav-text">RDD Abstraction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spark-programming-interface"><span class="nav-number">1.3.2.</span> <span class="nav-text">Spark Programming Interface</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#advantages-of-the-rdd-model"><span class="nav-number">1.3.3.</span> <span class="nav-text">Advantages of the RDD Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#applications-not-suitable-for-rdds"><span class="nav-number">1.3.4.</span> <span class="nav-text">Applications Not Suitable
+for RDDs</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spark-programming-interface-1"><span class="nav-number">1.4.</span> <span class="nav-text">Spark Programming Interface</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rdd-operations-in-spark"><span class="nav-number">1.4.1.</span> <span class="nav-text">RDD Operations in Spark</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#representing-rdds"><span class="nav-number">1.5.</span> <span class="nav-text">Representing RDDs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#job-scheduling"><span class="nav-number">1.5.1.</span> <span class="nav-text">Job Scheduling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interpreter-integration"><span class="nav-number">1.5.2.</span> <span class="nav-text">Interpreter Integration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memory-management"><span class="nav-number">1.5.3.</span> <span class="nav-text">Memory Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#support-for-checkpointing"><span class="nav-number">1.5.4.</span> <span class="nav-text">Support for Checkpointing</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -633,8 +640,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

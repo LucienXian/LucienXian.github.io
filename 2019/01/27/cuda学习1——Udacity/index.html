@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,7 +336,8 @@
 <h2 id="来源">来源</h2>
 <p>https://classroom.udacity.com/courses/cs344/lessons/55120467/concepts/670743010923</p>
 <h2 id="cpu与gpu">CPU与GPU</h2>
-<p>异构型计算机(termed heterogeneous)有两种：根据不同的处理器区分——CPU与GPU。cuda编程模型允许我们在GPU上运行。程序运行在CPU的部分成为host，在GPU的部分则是的device，并且还假设host和device有各自分开的内存。在CPU与GPU的关系中，前者占据着重要的位置，它告诉GPU应该做什么</p>
+<p>异构型计算机(termed
+heterogeneous)有两种：根据不同的处理器区分——CPU与GPU。cuda编程模型允许我们在GPU上运行。程序运行在CPU的部分成为host，在GPU的部分则是的device，并且还假设host和device有各自分开的内存。在CPU与GPU的关系中，前者占据着重要的位置，它告诉GPU应该做什么</p>
 <p>流程：</p>
 <ol type="1">
 <li>从CPU拷贝数据到GPU</li>
@@ -354,7 +353,8 @@
 <h3 id="设置kernel启动">设置kernel启动</h3>
 <p>以这个为例：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">square&lt;&lt;&lt;<span class="number">1</span>, ARRAY_SIZE&gt;&gt;&gt;(d_out, d_in);</span><br><span class="line"><span class="comment">//square&lt;&lt;&lt;dim3(bx, by, bz), dim3(tx, ty, tz), shmem&gt;&gt;&gt;(d_out, d_in);</span></span><br><span class="line"><span class="comment">//相对于启动了bx*by*bz个block，每个block具有tx*ty*tz个线程。sheme默认0</span></span><br></pre></td></tr></table></figure>
-<p>我们使用了这些启动参数1, ARRAY_SIZE，并以这些自变量d_out, d_in来启动它。</p>
+<p>我们使用了这些启动参数1, ARRAY_SIZE，并以这些自变量d_out,
+d_in来启动它。</p>
 <p>在这里我们启动了64个线程，即1个带有64个线程的块。对于kernel而言：</p>
 <ul>
 <li>能够同时运行多个块；</li>
@@ -586,8 +586,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

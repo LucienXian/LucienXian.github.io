@@ -103,7 +103,6 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="Introduction 计算机图形学课上介绍了一个由两点所决定的直线的算法——Bresenham 算法 ； 这个算法用到了快速的整数加法，减法和位元移位，是计算机图形里面描绘直线的较为快速的算法。 首先来介绍一下，绘制直线的基本方法:  假设我们需要由(x0, y0)这一点，绘画一直线至右下角的另一点(x1, y1)，x,y分别代表其水平及垂直坐标，并且x1 - x0 &gt; y1 - y0。">
 <meta property="og:locale">
-<meta property="og:image" content="https://wikimedia.org/api/rest_v1/media/math/render/svg/387e6bb11041b587f22a579d6023dccac395e395">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/B_alg.png">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/line.png">
 <meta property="article:published_time" content="2017-09-25T05:38:40.000Z">
@@ -111,7 +110,7 @@
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="computer graphics">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://wikimedia.org/api/rest_v1/media/math/render/svg/387e6bb11041b587f22a579d6023dccac395e395">
+<meta name="twitter:image" content="http://ou7boskhm.bkt.clouddn.com/B_alg.png">
 
 
 
@@ -162,9 +161,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -339,15 +336,22 @@
 
       
         <h1 id="introduction">Introduction</h1>
-<p>计算机图形学课上介绍了一个由两点所决定的直线的算法——<strong>Bresenham 算法</strong> ；</p>
+<p>计算机图形学课上介绍了一个由两点所决定的直线的算法——<strong>Bresenham
+算法</strong> ；</p>
 <p>这个算法用到了快速的整数加法，减法和位元移位，是计算机图形里面描绘直线的较为快速的算法。</p>
 <p>首先来介绍一下，绘制直线的基本方法:</p>
 <blockquote>
-<p>假设我们需要由(<em>x</em>0, <em>y</em>0)这一点，绘画一直线至右下角的另一点(<em>x</em>1, <em>y</em>1)，x,y分别代表其水平及垂直坐标，并且<em>x</em>1 - <em>x</em>0 &gt; <em>y</em>1 - <em>y</em>0。</p>
-<p>因为像素点需要的x及y皆为整数，但并非每一点x所对应的y皆为整数，因此没有必要去计算每一点x所对应之y值。反之由于此线的斜率介乎于1至0之间，因此我们只需要找出当x到达那一个数值时，会使y上升1，若x尚未到此值，则y不变。至于如何找出相关的x值，则需依靠斜率。斜率之计算方法为<img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/387e6bb11041b587f22a579d6023dccac395e395" alt="m=(y_{1}-y_{0})/(x_{1}-x_{0})" />。由于此值不变，故可于运算前预先计算，减少运算次数。</p>
+<p>假设我们需要由(<em>x</em>0,
+<em>y</em>0)这一点，绘画一直线至右下角的另一点(<em>x</em>1,
+<em>y</em>1)，x,y分别代表其水平及垂直坐标，并且<em>x</em>1 - <em>x</em>0
+&gt; <em>y</em>1 - <em>y</em>0。</p>
+<p>因为像素点需要的x及y皆为整数，但并非每一点x所对应的y皆为整数，因此没有必要去计算每一点x所对应之y值。反之由于此线的斜率介乎于1至0之间，因此我们只需要找出当x到达那一个数值时，会使y上升1，若x尚未到此值，则y不变。至于如何找出相关的x值，则需依靠斜率。斜率之计算方法为<img
+src="https://wikimedia.org/api/rest_v1/media/math/render/svg/387e6bb11041b587f22a579d6023dccac395e395"
+alt="m=(y_{1}-y_{0})/(x_{1}-x_{0})" />。由于此值不变，故可于运算前预先计算，减少运算次数。</p>
 </blockquote>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/B_alg.png" alt="如图" /><figcaption>如图</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/B_alg.png" alt="如图" />
+<figcaption aria-hidden="true">如图</figcaption>
 </figure>
 <p><br></p>
 <h1 id="problem">Problem</h1>
@@ -357,22 +361,27 @@
 <li>首先来看这张图：</li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/line.png" alt="line" /><figcaption>line</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/line.png" alt="line" />
+<figcaption aria-hidden="true">line</figcaption>
 </figure>
 <ul>
-<li>由此可见，每次xi增加时，yi都有两个选择：<em>y(i+1) =yi or y(i+1) =yi + 1</em>；因此我们需要比较d1和d2的大小：
+<li>由此可见，每次xi增加时，yi都有两个选择：<em>y(i+1) =yi or y(i+1) =yi
++ 1</em>；因此我们需要比较d1和d2的大小：
 <ul>
 <li><em>y = m(xi + 1) + b</em><br />
 </li>
 <li><em>d1 = y - yi</em></li>
 <li><em>d2 = yi + 1 - y</em></li>
-<li>If <em>d1-d2 &gt; 0</em>，then <em>y(i+1)=yi + 1</em>，else <em>yi+1 = yi</em></li>
+<li>If <em>d1-d2 &gt; 0</em>，then <em>y(i+1)=yi + 1</em>，else <em>yi+1
+= yi</em></li>
 </ul></li>
-<li>根据上面的式子和m = dy/dx (dy = y1 - y0；dx = x1 - x0)，我们可以计算得：
+<li>根据上面的式子和m = dy/dx (dy = y1 - y0；dx = x1 -
+x0)，我们可以计算得：
 <ul>
 <li><em>d1-d2= 2y - 2yi - 1= 2dy/dx</em>xi + 2dy/dx + 2b - 2yi - 1*</li>
 </ul></li>
-<li><strong>关键点</strong>来了，为了避免浮点数运算，我们在两边乘以dx；假设 dx*(d1-d2) = Pi:
+<li><strong>关键点</strong>来了，为了避免浮点数运算，我们在两边乘以dx；假设
+dx*(d1-d2) = Pi:
 <ul>
 <li><em>Pi = 2xidy - 2yidx + 2dy + (2b-1)dx</em></li>
 <li>同理：<em>P(i+1) = 2x(i+1)dy - 2y(i+1)dx + 2dy + (2b-1)dx</em></li>
@@ -382,12 +391,14 @@
 <p>这时，当Pi &gt; 0，下一个y取 yi + 1，否则还是yi；</p>
 </blockquote>
 <ul>
-<li>因此我们可以得到一个<strong>增量函数</strong>：<em>P(i+1) = Pi+2dy-2(y(i+1)-yi)dx</em>;</li>
+<li>因此我们可以得到一个<strong>增量函数</strong>：<em>P(i+1) =
+Pi+2dy-2(y(i+1)-yi)dx</em>;</li>
 <li>既然是增量函数：我们要求起始P0：
 <ul>
 <li>由上面的式子，<em>P0 = 2x0dy - 2y0dx + 2dy + (2b-1)dx</em>；</li>
 <li>两边除以dx，得到 <em>P0/dx = 2x0m - 2y0 + 2m + (2b-1)</em>；</li>
-<li>结合: <em>2x0m - 2y0 + 2b = 0</em>，得到<em>P0 = 2mdx - dx = 2dy - dx</em> ；</li>
+<li>结合: <em>2x0m - 2y0 + 2b = 0</em>，得到<em>P0 = 2mdx - dx = 2dy -
+dx</em> ；</li>
 </ul></li>
 </ul>
 <blockquote>
@@ -613,8 +624,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

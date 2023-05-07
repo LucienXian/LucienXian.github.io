@@ -103,15 +103,13 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="线性模型 基本形式 线性模型是通过一个属性的线性组合进行预测的函数： \[ f(x) &#x3D; w_1x_1 + w_2x_2 + ... + w_dx_d + b &#x3D; w^Tx + b \]  许多非线性模型可以通过在线性模型的基础上引入层级结构或者高维映射形成； 另外，向量w直观地表达了各个属性在预测中的重要性；  线性回归 给定数据集\(D&#x3D;{(x_1, y_1), (x_2, y_2),...,">
 <meta property="og:locale">
-<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg">
 <meta property="og:image" content="https://i.stack.imgur.com/9k7iT.png">
-<meta property="og:image" content="https://www.researchgate.net/profile/S_Escalera/publication/224347110/figure/fig1/AS:302774504968192@1449198475244/a-Binary-ECOC-design-for-a-4-class-problem-An-input-test-codeword-x-is-classified-to.png">
 <meta property="article:published_time" content="2018-07-12T14:43:49.000Z">
 <meta property="article:modified_time" content="2018-07-12T14:48:28.000Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="Machine Learning">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg">
+<meta name="twitter:image" content="https://i.stack.imgur.com/9k7iT.png">
 
 
 
@@ -162,9 +160,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,7 +336,8 @@
       
         <h1 id="线性模型">线性模型</h1>
 <h2 id="基本形式">基本形式</h2>
-<p>线性模型是通过一个属性的线性组合进行预测的函数： <span class="math display">\[
+<p>线性模型是通过一个属性的线性组合进行预测的函数： <span
+class="math display">\[
 f(x) = w_1x_1 + w_2x_2 + ... + w_dx_d + b = w^Tx + b
 \]</span></p>
 <ul>
@@ -348,9 +345,13 @@ f(x) = w_1x_1 + w_2x_2 + ... + w_dx_d + b = w^Tx + b
 <li>另外，向量w直观地表达了各个属性在预测中的重要性；</li>
 </ul>
 <h2 id="线性回归">线性回归</h2>
-<p>给定数据集<span class="math inline">\(D={(x_1, y_1), (x_2, y_2),...,(x_m, y_m)}\)</span>，其中向量<span class="math inline">\(x_i=(x_{i1};x_{i2};...;x_{id})\)</span>。而线性回归就是希望找到一个线性模型能够准确地预测出值。也就是试图学习得： <span class="math display">\[
+<p>给定数据集<span class="math inline">\(D={(x_1, y_1), (x_2,
+y_2),...,(x_m, y_m)}\)</span>，其中向量<span
+class="math inline">\(x_i=(x_{i1};x_{i2};...;x_{id})\)</span>。而线性回归就是希望找到一个线性模型能够准确地预测出值。也就是试图学习得：
+<span class="math display">\[
 f(x) == w^Tx + b，使得f(x_i)\approx{y_i}
-\]</span> 那么这里的关键要确定w和b，也就是保证f(x)和y之间最小的时候获得w和b，从几何的角度来看，就是找到一条直线使得所有样本到直线上的欧氏距离之和最小。</p>
+\]</span>
+那么这里的关键要确定w和b，也就是保证f(x)和y之间最小的时候获得w和b，从几何的角度来看，就是找到一条直线使得所有样本到直线上的欧氏距离之和最小。</p>
 <p>假设有 <span class="math display">\[
 X=
 \begin{bmatrix}
@@ -363,50 +364,74 @@ X=
 <p><span class="math display">\[
 y = (y_1; y_2;...;y_m)
 \]</span></p>
-<p>令<span class="math inline">\(E_w = (y-Xw)^T (y-Xw)\)</span>，对<span class="math inline">\(w\)</span>求导，得 <span class="math display">\[
+<p>令<span class="math inline">\(E_w = (y-Xw)^T (y-Xw)\)</span>，对<span
+class="math inline">\(w\)</span>求导，得 <span class="math display">\[
 \frac{\alpha{E_w}}{\alpha{w}} = 2X^T(Xw-y)
-\]</span> 当<span class="math inline">\(X^TX\)</span>为正定矩阵或者满秩矩阵，令导数为0可得： <span class="math display">\[
+\]</span> 当<span
+class="math inline">\(X^TX\)</span>为正定矩阵或者满秩矩阵，令导数为0可得：
+<span class="math display">\[
 2X^T(Xw-y) = 0 \\
 X^TXw = X^Ty \\
 w = (X^TX)^{-1}X^Ty
-\]</span> 假如我们认为对应的输入会导致在指数尺度上发生变化，可以转换成对数线性回归： <span class="math display">\[
+\]</span>
+假如我们认为对应的输入会导致在指数尺度上发生变化，可以转换成对数线性回归：
+<span class="math display">\[
 ln y = w^T+b
 \]</span></p>
 <h2 id="对数几率回归">对数几率回归</h2>
 <p>上面提及的是利用线性模型做回归学习，如果面对分类任务应该怎么做呢？</p>
-<p>考虑二分类问题，则<span class="math inline">\(y\in({0, 1})\)</span>，我们需要将线性回归模型产生的值转换为0/1值。则</p>
+<p>考虑二分类问题，则<span class="math inline">\(y\in({0,
+1})\)</span>，我们需要将线性回归模型产生的值转换为0/1值。则</p>
 <blockquote>
 <p>当z&lt;0，y = 0;</p>
 <p>当z=0，y = 0.5;</p>
 <p>当z&gt;0，y = 1</p>
 </blockquote>
-<p>因此我们可以sigmoid函数代替，<span class="math inline">\(y = \frac{1}{1+e^{-z}}\)</span>，图像如下：</p>
+<p>因此我们可以sigmoid函数代替，<span class="math inline">\(y =
+\frac{1}{1+e^{-z}}\)</span>，图像如下：</p>
 <figure>
-<img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>带入上式，可以得到： <span class="math display">\[
 y = \frac{1}{1+e^{-{(w^Tx+b)}}} \\
 ln \frac{y}{1-y} = w^Tx+b
-\]</span> 若把y视为样本x作为正例的可能性，1-y为其反例可能性，那么$ln  $就是对数几率。这个方法不仅仅可以预测出类别，更可以得到近似概率的预测，提高决策效果。</p>
-<p>当要确定w和b的时候，可以使用极大似然法来估计，目的是使得每个样本属于真实样本的可能性越大越好： <span class="math display">\[
+\]</span> 若把y视为样本x作为正例的可能性，1-y为其反例可能性，那么$ln
+$就是对数几率。这个方法不仅仅可以预测出类别，更可以得到近似概率的预测，提高决策效果。</p>
+<p>当要确定w和b的时候，可以使用极大似然法来估计，目的是使得每个样本属于真实样本的可能性越大越好：
+<span class="math display">\[
 \iota(w, b) = \sum_{i=1}^{m}ln p(y_i|x_i;w,n)
 \]</span> 其中似然项可以写成： <span class="math display">\[
 p(y_i|x_i;w, b) = y_ip(y=1|x,w;b) + (1-y_i)p(y=0|x,w;b)
 \]</span> 带入上式之后，使用梯度下降可以求得最优解。</p>
-<p>关于极大似然法，可以<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2018/05/15/Bayesian/">参考</a></p>
+<p>关于极大似然法，可以<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2018/05/15/Bayesian/">参考</a></p>
 <h2 id="线性判别分析">线性判别分析</h2>
-<p><strong>linear discriminant analysis(LDA)</strong>是一种经典的线性学习方法，可用作分类，也可以为后续的分类做降维操作。</p>
+<p><strong>linear discriminant
+analysis(LDA)</strong>是一种经典的线性学习方法，可用作分类，也可以为后续的分类做降维操作。</p>
 <p>LDA的思想：设法将样本投影到这样的一条直线上：同类的样例的投影点尽可能相近，异类样例的投影点尽可能远离，这样就可以根据投影点的位置来确定新样本的类别。</p>
 <figure>
-<img src="https://i.stack.imgur.com/9k7iT.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://i.stack.imgur.com/9k7iT.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <blockquote>
 <p>https://i.stack.imgur.com/9k7iT.png</p>
 </blockquote>
-<p>令<span class="math inline">\(X_i, \mu_i, \Sigma_{i}\)</span>分别表示第i类实例的集合、均值向量和协方差矩阵。在将样本值投影到直线之后，两个样本的协方差分别为<span class="math inline">\(w_T\Sigma_0w\)</span>和<span class="math inline">\(w_T\Sigma_1w\)</span>，而样本中心的投影则是<span class="math inline">\(w_T\mu_0\)</span>和<span class="math inline">\(w_T\mu_1\)</span>。因此，为了使得同类样例的投影点尽可能接近，异类样例的投影中心尽可能大，则需要最大化目标函数： <span class="math display">\[
-J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w} \\
+<p>令<span class="math inline">\(X_i, \mu_i,
+\Sigma_{i}\)</span>分别表示第i类实例的集合、均值向量和协方差矩阵。在将样本值投影到直线之后，两个样本的协方差分别为<span
+class="math inline">\(w_T\Sigma_0w\)</span>和<span
+class="math inline">\(w_T\Sigma_1w\)</span>，而样本中心的投影则是<span
+class="math inline">\(w_T\mu_0\)</span>和<span
+class="math inline">\(w_T\mu_1\)</span>。因此，为了使得同类样例的投影点尽可能接近，异类样例的投影中心尽可能大，则需要最大化目标函数：
+<span class="math display">\[
+J = \frac{\Arrowvert
+w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w} \\
 = \frac{w_T(\mu_0-\mu_1)(\mu_0-\mu_1)^Tw}{w_T(\Sigma_0+\Sigma_1)w}
-\]</span> 分子<span class="math inline">\(\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2\)</span>尽可能大，保证类中心之间距离尽可能大。分母<span class="math inline">\(w_T\Sigma_0w+w_T\Sigma_1w\)</span>尽可能小，使得同样例的投影点的协方差尽可能小。</p>
+\]</span> 分子<span class="math inline">\(\Arrowvert
+w^T\mu_0-w^T\mu_1\Arrowvert^2_2\)</span>尽可能大，保证类中心之间距离尽可能大。分母<span
+class="math inline">\(w_T\Sigma_0w+w_T\Sigma_1w\)</span>尽可能小，使得同样例的投影点的协方差尽可能小。</p>
 <h2 id="多分类学习">多分类学习</h2>
 <p>多分类学习的任务，可以基于二分类学习进行推广，即将多分类任务拆分为若干个二分类任务进行求解。有三种拆分策略：</p>
 <ul>
@@ -427,15 +452,26 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
 </ul>
 <p>类别的划分通过编码矩阵来指定，常见形式有二元码和三元码：</p>
 <figure>
-<img src="https://www.researchgate.net/profile/S_Escalera/publication/224347110/figure/fig1/AS:302774504968192@1449198475244/a-Binary-ECOC-design-for-a-4-class-problem-An-input-test-codeword-x-is-classified-to.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.researchgate.net/profile/S_Escalera/publication/224347110/figure/fig1/AS:302774504968192@1449198475244/a-Binary-ECOC-design-for-a-4-class-problem-An-input-test-codeword-x-is-classified-to.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>三元码的0表示<span class="math inline">\(f_i\)</span>分类器不使用该类样本。</p>
+<p>三元码的0表示<span
+class="math inline">\(f_i\)</span>分类器不使用该类样本。</p>
 <p>纠错输出码对分类器的错误有一定的容忍和纠正能力，假设某个分类器出现了错误，基于这个编码仍能产生正确的分类的结果。另外ECOC编码越长，或者任意两个类别之间的编码距离越远，它的纠错能力就越强。</p>
 <h2 id="类别不平衡问题">类别不平衡问题</h2>
 <p>前面几章介绍的分类学习方法都有一个基本的前提，那就是不同类别的训练样本树木相当。但假设反例有998个，正例有2个，那么学习方法只要每次都返回一个永远将样本预测设为反例的学习器，那么精确度就有99.8%。但显然，这种学习没有意义。</p>
-<p>线性分类时，当我们用<span class="math inline">\(y = w^Tx+b\)</span>对新样本x进行分类时，事实上是用y跟一个阈值进行比较。实际上y代表了正例的可能性，那么几率<span class="math inline">\(\frac{y}{1-y}\)</span>代表了正例与反例的可能性比值，则： <span class="math display">\[
+<p>线性分类时，当我们用<span class="math inline">\(y =
+w^Tx+b\)</span>对新样本x进行分类时，事实上是用y跟一个阈值进行比较。实际上y代表了正例的可能性，那么几率<span
+class="math inline">\(\frac{y}{1-y}\)</span>代表了正例与反例的可能性比值，则：
+<span class="math display">\[
 若\frac{y}{1-y} &gt; 1，预测为正例
-\]</span> 然而当训练集正反例数目不等时，令<span class="math inline">\(m^+\)</span>为正例数目，<span class="math inline">\(m^-\)</span>为反例数目，那么观测几率就是<span class="math inline">\(\frac{m^+}{m^-}\)</span>，这是基于真实样本是无偏差采样的。因此，我们可以对类别平衡的样本进行一次<strong>“再缩放”</strong>。 <span class="math display">\[
+\]</span> 然而当训练集正反例数目不等时，令<span
+class="math inline">\(m^+\)</span>为正例数目，<span
+class="math inline">\(m^-\)</span>为反例数目，那么观测几率就是<span
+class="math inline">\(\frac{m^+}{m^-}\)</span>，这是基于真实样本是无偏差采样的。因此，我们可以对类别平衡的样本进行一次<strong>“再缩放”</strong>。
+<span class="math display">\[
 \frac{y}{1-y} = \frac{y}{1-y} \times \frac{m^+}{m^-}
 \]</span> 现有技术对于这种类别平衡问题有三种做法：</p>
 <ul>
@@ -659,8 +695,7 @@ J = \frac{\Arrowvert w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w}
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -346,7 +344,8 @@
 <li>统一：接口统一，便于移植</li>
 </ul></li>
 </ul>
-<h2 id="x86的运行模式地址空间与上下文">x86的运行模式、地址空间与上下文</h2>
+<h2
+id="x86的运行模式地址空间与上下文">x86的运行模式、地址空间与上下文</h2>
 <ul>
 <li>linux使用了两个运行模式
 <ul>
@@ -375,7 +374,8 @@
 <h2 id="系统调用处理过程">系统调用处理过程</h2>
 <ul>
 <li>应用程序调用C库函数</li>
-<li>通过软中断int 0x80进入内核，中断程序将参数，一般是系统调用号放在寄存器eax上传到内核</li>
+<li>通过软中断int
+0x80进入内核，中断程序将参数，一般是系统调用号放在寄存器eax上传到内核</li>
 <li>调用system_call函数，保存系统调用号和所有需要的寄存器到栈中；保存PCB的地址；检查系统调用号；有效则根据系统调用号表去调用内核函数（特定的服务程序）</li>
 <li>转入ret_from_sys_call例程，返回</li>
 </ul>
@@ -595,8 +595,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

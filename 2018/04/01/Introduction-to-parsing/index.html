@@ -96,12 +96,12 @@
 
 
 
-<meta name="description" content="Introduction to parsing Input: sequence of tokens from lexer Output: parse tree of the program  img  Context-Free grammars  不是所有tokens都是有效的，怕parsers要进行区分 程序语言是具有递归结构的  CFG包含了以下内容：  A set of terminals-">
+<meta name="description" content="Introduction to parsing Input: sequence of tokens from lexer Output: parse tree of the program   img  Context-Free grammars  不是所有tokens都是有效的，怕parsers要进行区分 程序语言是具有递归结构的  CFG包含了以下内容：  A set of terminals">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Introduction to parsing">
 <meta property="og:url" content="http://yoursite.com/2018/04/01/Introduction-to-parsing/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="Introduction to parsing Input: sequence of tokens from lexer Output: parse tree of the program  img  Context-Free grammars  不是所有tokens都是有效的，怕parsers要进行区分 程序语言是具有递归结构的  CFG包含了以下内容：  A set of terminals-">
+<meta property="og:description" content="Introduction to parsing Input: sequence of tokens from lexer Output: parse tree of the program   img  Context-Free grammars  不是所有tokens都是有效的，怕parsers要进行区分 程序语言是具有递归结构的  CFG包含了以下内容：  A set of terminals">
 <meta property="og:locale">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/compilers_chap5_1.png">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/compilers_chap52.png">
@@ -163,9 +163,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -343,7 +341,9 @@
 <p>Input: sequence of tokens from lexer</p>
 <p>Output: parse tree of the program</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap5_1.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap5_1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="context-free-grammars">Context-Free grammars</h2>
 <ul>
@@ -371,21 +371,30 @@
 <p>terminals是不能被替换，是永恒的，terminals就是语言的tokens；</p>
 <p>因此CFG就是指所有的production的左边只有一个非终结符</p>
 <h2 id="derivations">Derivations</h2>
-<p>derivations: 一些列的productions，可以表示成一颗树，根就是start symbol，箭头右边的就是子节点，</p>
+<p>derivations: 一些列的productions，可以表示成一颗树，根就是start
+symbol，箭头右边的就是子节点，</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap52.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap52.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p>叶节点都是terminals，根就是start symbol。这种推导就是left-most derivation，每一步都替代掉最左边的non-terminal。</p>
+<p>叶节点都是terminals，根就是start symbol。这种推导就是left-most
+derivation，每一步都替代掉最左边的non-terminal。</p>
 <p>同理，也有right-most derivation：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap53.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap53.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>right-most和left-most有着相同的parse tree。</p>
 <h2 id="ambiguity">Ambiguity</h2>
-<p>考虑grammar：<strong>E-&gt;E+E|E<em>E|(E)|id<strong> ， </strong>string为id</em>id+id</strong></p>
+<p>考虑grammar：<strong>E-&gt;E+E|E<em>E|(E)|id<strong> ，
+</strong>string为id</em>id+id</strong></p>
 <p>会解释得到两个parse tree：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap54.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap54.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>如果有两颗以上的parse tree，我们就认为一个grammar是ambiguous。</p>
 
@@ -604,8 +613,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

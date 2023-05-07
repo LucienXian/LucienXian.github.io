@@ -103,15 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="lexical analysis goals converts from phsical description of a program into sequence of tokens. (token: one logical piece of the source file)  Each token associated with a lexeme have opitional attribu">
 <meta property="og:locale">
-<meta property="og:image" content="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg">
-<meta property="og:image" content="https://i.stack.imgur.com/XHuWu.png">
-<meta property="og:image" content="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg">
 <meta property="article:published_time" content="2018-03-12T15:10:25.000Z">
 <meta property="article:modified_time" content="2018-03-12T15:10:45.538Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="Compilers">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg">
 
 
 
@@ -162,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,14 +334,16 @@
       
         <h1 id="lexical-analysis">lexical analysis</h1>
 <h2 id="goals">goals</h2>
-<p>converts from phsical description of a program into sequence of tokens. (token: one logical piece of the source file)</p>
+<p>converts from phsical description of a program into sequence of
+tokens. (token: one logical piece of the source file)</p>
 <ul>
 <li>Each token associated with a lexeme</li>
 <li>have opitional attributes</li>
 </ul>
 <h2 id="choosing-good-tokens">choosing good tokens</h2>
 <p>依赖于不同的语言：</p>
-<p>选择关键词； 将lexeme分成不同组的id，如数字，字符串等； 丢弃无用的信息，如空格，注释等；</p>
+<p>选择关键词； 将lexeme分成不同组的id，如数字，字符串等；
+丢弃无用的信息，如空格，注释等；</p>
 <h2 id="扫描的困难">扫描的困难</h2>
 <ul>
 <li>如何判断哪一个的lexeme对应于tokens</li>
@@ -365,10 +361,14 @@
 </ul>
 <h3 id="实现正则表达式">实现正则表达式</h3>
 <p>正则表达式能通过有限自动机来实现。</p>
-<p>而有限自动机有两种： NFA(nondeterministic finite automa) DFA(deterministic finite automa)</p>
-<p>以图表示的话，圆圈表示状态，箭头表示转移，双圆圈表示结束: <img src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg" alt="img" /></p>
+<p>而有限自动机有两种： NFA(nondeterministic finite automa)
+DFA(deterministic finite automa)</p>
+<p>以图表示的话，圆圈表示状态，箭头表示转移，双圆圈表示结束: <img
+src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg"
+alt="img" /></p>
 <p>如果一个状态有多个transitions，那么多条transitions都要进行。</p>
-<p>Epsilon transition: 不消耗任何输入,但会进行transitions。 <img src="https://i.stack.imgur.com/XHuWu.png" alt="img" /></p>
+<p>Epsilon transition: 不消耗任何输入,但会进行transitions。 <img
+src="https://i.stack.imgur.com/XHuWu.png" alt="img" /></p>
 <h3 id="simulating-an-nfa">Simulating an NFA</h3>
 <ol type="1">
 <li>有限初始化，追踪开始状态和所有可以通过ε转移到达的状态；</li>
@@ -385,9 +385,13 @@
 <p>通常情况下选择最长match.</p>
 <p>具体做法是，将所有正则表达式转化为NFA，然后合并成一个状态机，扫描输入，记录上一个已知的匹配。选择更高优先级的。</p>
 <h3 id="dfa">DFA</h3>
-<p>与NFA不同，DFA的每一个状态只有一个与某个字符相关的转移，并且没有ε transitions</p>
+<p>与NFA不同，DFA的每一个状态只有一个与某个字符相关的转移，并且没有ε
+transitions</p>
 <figure>
-<img src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>Make the DFA simulate the NFA</li>
@@ -395,8 +399,11 @@
 <p>(q0是开始状态)</p>
 <p>Step 1: Initially Q’ = ɸ.</p>
 <p>Step 2: Add q0 to Q’.</p>
-<p>Step 3: For each state in Q’, find the possible set of states for each input symbol using transition function of NFA. If this set of states is not in Q’, add it to Q’.</p>
-<p>Step 4: Final state of DFA will be all states with contain F (final states of NFA)</p>
+<p>Step 3: For each state in Q’, find the possible set of states for
+each input symbol using transition function of NFA. If this set of
+states is not in Q’, add it to Q’.</p>
+<p>Step 4: Final state of DFA will be all states with contain F (final
+states of NFA)</p>
 <p>参考资料：https://www.geeksforgeeks.org/theory-of-computation-conversion-from-nfa-to-dfa/</p>
 
       
@@ -614,8 +621,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

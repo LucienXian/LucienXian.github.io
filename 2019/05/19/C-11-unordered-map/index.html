@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -335,15 +333,19 @@
 
       
         <h1 id="unordered-map">Unordered Map</h1>
-<h2 id="basic-usage-detail-and-example">Basic Usage Detail and Example</h2>
-<p>Unordered map是C++11新出的特性，它提供了一种map的实现机制，可以存储键值对。Unordered map内部实现了哈希函数，当我们插入一个新的元素时：</p>
+<h2 id="basic-usage-detail-and-example">Basic Usage Detail and
+Example</h2>
+<p>Unordered
+map是C++11新出的特性，它提供了一种map的实现机制，可以存储键值对。Unordered
+map内部实现了哈希函数，当我们插入一个新的元素时：</p>
 <ul>
 <li>首先对key做哈希函数处理，然后选择一个合适的bucket；</li>
 <li>比较该bucket下的key是否重复；</li>
 <li>在不重复的情况下，添加该元素到bucket中；</li>
 </ul>
 <p>因此Unordered map时无序的，并且其搜索元素的时间复杂度为O(1)。</p>
-<h2 id="different-ways-to-initialize-an-unordered_map">Different Ways to initialize an unordered_map</h2>
+<h2 id="different-ways-to-initialize-an-unordered_map">Different Ways to
+initialize an unordered_map</h2>
 <p>unordered map提供了三种不同的重载构造器：</p>
 <ul>
 <li>通过initializer_list初始化</li>
@@ -360,7 +362,8 @@
 <h2 id="searching-in-unordered_map">Searching in unordered_map</h2>
 <p>unordered_map提供了一个成员函数find()，改函数接受一个key作为参数，在找到元素的时候就会返回一个相对应的迭代器，否则会返回map的尾部迭代器。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">find</span> <span class="params">( <span class="type">const</span> key_type&amp; k )</span></span>;</span><br></pre></td></tr></table></figure>
-<h2 id="different-ways-to-insert-elements-in-an-unordered_map">Different ways to insert elements in an unordered_map</h2>
+<h2 id="different-ways-to-insert-elements-in-an-unordered_map">Different
+ways to insert elements in an unordered_map</h2>
 <p>unordered_map提供了多种insert()成员函数的重载版本，我们来一一讨论：</p>
 <ul>
 <li>通过initializer_list插入多个元素；</li>
@@ -368,7 +371,8 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">insert</span> <span class="params">( initializer_list&lt;value_type&gt; il )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Example</span></span><br><span class="line">std::unordered_map&lt;std::string, <span class="type">int</span>&gt; wordMap;</span><br><span class="line"><span class="comment">// Inserting elements through an initializer_list</span></span><br><span class="line">wordMap.<span class="built_in">insert</span>(&#123; &#123;<span class="string">&quot;First&quot;</span>, <span class="number">1</span>&#125;, &#123;<span class="string">&quot;Second&quot;</span>, <span class="number">2</span>&#125;, &#123;<span class="string">&quot;Third&quot;</span>, <span class="number">3</span>&#125; &#125; );</span><br></pre></td></tr></table></figure>
 <p>这种插入方式有一个缺点，因为insert()返回的是void类型，因此在添加重复key的元素时，用户无法确定插入是否成功。</p>
 <ul>
-<li>unordered_map提供了一个重载版本，它接受std::pair of key – value 作为参数，并返回一对迭代器和bool变量，通过该bool变量我们就可以判断插入是否成功；</li>
+<li>unordered_map提供了一个重载版本，它接受std::pair of key – value
+作为参数，并返回一对迭代器和bool变量，通过该bool变量我们就可以判断插入是否成功；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">pair&lt;iterator,<span class="type">bool</span>&gt; <span class="title">insert</span> <span class="params">( <span class="type">const</span> value_type&amp; val )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> std::unordered_map&lt;std::string, <span class="type">int</span>&gt;::iterator UOMIterator;</span><br><span class="line"><span class="comment">// Pair of Map Iterator and bool value</span></span><br><span class="line">std::pair&lt; UOMIterator , <span class="type">bool</span>&gt; result;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Inserting an element through pair</span></span><br><span class="line">result = wordMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>&lt;std::string, <span class="type">int</span>&gt;(<span class="string">&quot;Second&quot;</span>, <span class="number">6</span>));</span><br><span class="line"><span class="keyword">if</span>(result.second == <span class="literal">false</span>)</span><br><span class="line">      std::cout&lt;&lt;<span class="string">&quot;Element &#x27;Second&#x27; not inserted again&quot;</span>&lt;&lt;std::endl;</span><br></pre></td></tr></table></figure>
 <h2 id="erasing-an-element">Erasing an element</h2>
@@ -388,7 +392,8 @@
 <ul>
 <li>内部实现：与std::unordered_map不同，std::map是通过二叉搜索树存储元素的，因此它能通过key进行排序；</li>
 <li>内存使用：std::unordered_map需要更多的内存来存储哈希表；</li>
-<li>搜索的时间复杂度：由于std::map是树的结构，因此其时间复杂度为O(log n)，而std::unordered_map最好的时间复杂度是O(1)，最坏的情况是O(n)，即所有元素在同一个bucket；</li>
+<li>搜索的时间复杂度：由于std::map是树的结构，因此其时间复杂度为O(log
+n)，而std::unordered_map最好的时间复杂度是O(1)，最坏的情况是O(n)，即所有元素在同一个bucket；</li>
 <li>自定义key的使用方法：使用自定义key时，对于std::map来说，需要重载&lt;操作符或者传入外部的comparator比较器，对于std::unordered_map则需要提供std::hash&lt;K&gt;，同时我们还需要重载==操作符；</li>
 </ul>
 
@@ -565,7 +570,10 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#unordered-map"><span class="nav-number">1.</span> <span class="nav-text">Unordered Map</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#basic-usage-detail-and-example"><span class="nav-number">1.1.</span> <span class="nav-text">Basic Usage Detail and Example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#different-ways-to-initialize-an-unordered_map"><span class="nav-number">1.2.</span> <span class="nav-text">Different Ways to initialize an unordered_map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#searching-in-unordered_map"><span class="nav-number">1.3.</span> <span class="nav-text">Searching in unordered_map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#different-ways-to-insert-elements-in-an-unordered_map"><span class="nav-number">1.4.</span> <span class="nav-text">Different ways to insert elements in an unordered_map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#erasing-an-element"><span class="nav-number">1.5.</span> <span class="nav-text">Erasing an element</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stdmap-vs-stdunordered_map"><span class="nav-number">1.6.</span> <span class="nav-text">std::map vs std::unordered_map</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#unordered-map"><span class="nav-number">1.</span> <span class="nav-text">Unordered Map</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#basic-usage-detail-and-example"><span class="nav-number">1.1.</span> <span class="nav-text">Basic Usage Detail and
+Example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#different-ways-to-initialize-an-unordered_map"><span class="nav-number">1.2.</span> <span class="nav-text">Different Ways to
+initialize an unordered_map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#searching-in-unordered_map"><span class="nav-number">1.3.</span> <span class="nav-text">Searching in unordered_map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#different-ways-to-insert-elements-in-an-unordered_map"><span class="nav-number">1.4.</span> <span class="nav-text">Different
+ways to insert elements in an unordered_map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#erasing-an-element"><span class="nav-number">1.5.</span> <span class="nav-text">Erasing an element</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stdmap-vs-stdunordered_map"><span class="nav-number">1.6.</span> <span class="nav-text">std::map vs std::unordered_map</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -607,8 +615,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

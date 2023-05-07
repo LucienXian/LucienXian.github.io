@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -363,7 +361,8 @@
 </ul></li>
 <li>如果proposer从大多数acceptors收到期待的响应，则可以接着提议一个编号为n并且值为v的提案，这里的v要么是自由选择一个值（所有的响应都没接收过任何的提案），要么是从上面b响应中选出最大编号的提案的值；</li>
 </ul>
-<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求， acceptor就可以接受编号为n的提案。</p>
+<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求，
+acceptor就可以接受编号为n的提案。</p>
 <p>总结起来，acceptor和proposer的算法操作可以分为两个阶段：</p>
 <ul>
 <li>阶段一</li>
@@ -383,25 +382,40 @@
 <p>为了获取到选定的值，learner必须要找出某个以及被大多数acceptors接受的提案。如果是每个acceptors都将通过的提案告知所有的learners，那么通信次数等于两者个数乘积；如果是只告诉一个特定learner，虽然通信次数减少了，但可靠行也降低了；更一般情况是，将它们的通过提案信息发送给一个特定的learners集合，其中的每个learner都可以将该信息告知所有的learners。</p>
 <p>由于信息的丢失，learners可能无法确定一个值是否有一个大多数的acceptors通过了，为了确定选定的值，必须重新发起一次新的提案。</p>
 <h3 id="progress">Progress</h3>
-<p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
+<p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer
+p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer
+q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
 <p>为了保证progress的进行，必须选择一个特定proposer来作为唯一一个提议提案的。如果这个proposer可以和半数以上的acceptors通信，同时使用一个比现有通过编号都大的编号作为提案的话，就可以产生一个成功通过的提案。</p>
 <blockquote>
-<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that a reliable algorithm for electing a proposer must use either randomness or real time—for example, by using timeouts. However, safety is ensured regardless of the success or failure of the election.</p>
+<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that
+a reliable algorithm for electing a proposer must use either randomness
+or real time—for example, by using timeouts. However, safety is ensured
+regardless of the success or failure of the election.</p>
 </blockquote>
 <p>无论选举是否成功，proposer选举算法的安全性都是可以得到保证的。</p>
 <h3 id="the-implementation">The Implementation</h3>
 <p>Paxos算法假设了一个多进程网络，在该算法里，每个进程都扮演了proposer，acceptor及learner的角色。Paxos算法通过选定一个leader来扮演上面提到的特定learner和proposer。Paxos一致性算法就是上述所描述的，其中请求和响应都作为普通消息发送。acceptor在发出响应消息之前，会需要可靠性存储来记录信息。</p>
-<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase 1。</p>
+<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase
+1。</p>
 <h2 id="implementing-a-state-machine">Implementing a State Machine</h2>
 <p>实现分布式系统的一种简单方式是由一组客户端向一个中央服务器发出命令请求，该服务器可以看作是一个按顺序执行客户端命令的状态机。但使用单个服务器的可用性较低，因此想到了可以使用一组服务器，每个服务器独立地实现同样的状态机，只要所有服务器都产生一致的状态和输出，那么发出命令的客户端就可以采用任意一个服务器的输出了。</p>
-<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i 个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
+<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i
+个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
 <p>假设服务器的集合是固定的，一般情况下一个独立的服务器被选为了leader，它就会扮演特定的proposer角色，多个客户端发送命令到leader，leader会决定每个命令的顺序。假设存在某条命令的序号为135，那么它就会通过一致性算法的第135个实例来选定一个提案，这里的命令就是提案的值。这个提案可能成功也可能失败，失败的原因可能来自机器故障，或者是存在另一个服务器认为自己是leader，从而判断了135实例存在其他值。但该算法能够保证最多只有一个命令被选定。</p>
-<p>这个策略的关键在于，Paxos算法中被提出的值只有phase 2才能被选定。前面说过的，phase 1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
-<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase 1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase 2，选定135和140的命令。</p>
-<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的"noop"命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140 号命令就可以被执行了。</p>
+<p>这个策略的关键在于，Paxos算法中被提出的值只有phase
+2才能被选定。前面说过的，phase
+1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
+<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase
+1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase
+2，选定135和140的命令。</p>
+<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的"noop"命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140
+号命令就可以被执行了。</p>
 <p>由此1-140命令都被选定了，leader就可以继续往下推进所有大于140的实例了。</p>
 <p>接下来讲讲空缺的产生，leader可以在提出命令141被选定之前，先提出命令142，但发送的关于141的信息可能会全部丢失，因此其他服务器可能先知道了142命令的选定，而不知道选择了什么作为命令141。这就产生了空缺。</p>
-<p>由于 leader 的故障以及新 leader 的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase 2的成本。在所有的一致性算法中， paxos一致性算法的phase 2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
+<p>由于 leader 的故障以及新 leader
+的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase
+2的成本。在所有的一致性算法中， paxos一致性算法的phase
+2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
 <p>特殊情况下，leader选举失败，导致出现多个“疑似”的leader，但paxos算法的安全性仍然可以保证不会同时有两个命令被选为第i个状态机命令。</p>
 <p>如果服务器的集合是变化的，那么也存在某种方式来决定哪些服务器可以作为这个一致性算法的实力，论文提到的方式是通过状态机自身来实现，即当前的服务器集合作为状态的一部分，比如将在执行完第i个状态机命令后标识的服务器集合，作为一致性算法执行实例i+a的服务器集合。</p>
 
@@ -620,8 +634,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

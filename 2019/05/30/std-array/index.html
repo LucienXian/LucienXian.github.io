@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,16 +339,20 @@
 <p>T为元素类型，N为数组元素的个数。</p>
 <p>头文件为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;array&gt;</span></span></span><br></pre></td></tr></table></figure>
-<h2 id="defining-and-initializing-an-stdarray-object">Defining and Initializing an std::array&lt;&gt; object</h2>
+<h2 id="defining-and-initializing-an-stdarray-object">Defining and
+Initializing an std::array&lt;&gt; object</h2>
 <p>举两个例子：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::array&lt;std::string, 200&gt; arr1;</span><br><span class="line">std::array&lt;<span class="type">int</span>, 10&gt; arr3 = &#123; <span class="number">34</span>, <span class="number">45</span> &#125;;<span class="comment">//Init: 34 , 45 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,</span></span><br></pre></td></tr></table></figure>
 <p>std::array还提供了一个方法可以一次性对所有的元素设置相同的值。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::array&lt;<span class="type">int</span>, 10&gt; arr4;</span><br><span class="line"><span class="comment">// Fill all elements in array with same value</span></span><br><span class="line">arr4.<span class="built_in">fill</span>(<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="how-to-get-the-size-of-stdarray">How to get the size of std::array</h2>
+<h2 id="how-to-get-the-size-of-stdarray">How to get the size of
+std::array</h2>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr.<span class="built_in">size</span>();</span><br></pre></td></tr></table></figure>
-<h2 id="how-to-access-elements-in-stdarray">How to access elements in std::array</h2>
+<h2 id="how-to-access-elements-in-stdarray">How to access elements in
+std::array</h2>
 <ul>
-<li><strong>operator []</strong>：访问超出范围的元素时会引起undefined behaviour；</li>
+<li><strong>operator []</strong>：访问超出范围的元素时会引起undefined
+behaviour；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = arr[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
 <ul>
@@ -358,10 +360,12 @@
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = arr.<span class="built_in">at</span>(<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
 <ul>
-<li><strong>std::tuple’s get&lt;&gt;()</strong>：访问超出范围的元素时会编译错误；</li>
+<li><strong>std::tuple’s
+get&lt;&gt;()</strong>：访问超出范围的元素时会编译错误；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = std::<span class="built_in">get</span>&lt;<span class="number">2</span>&gt;(arr);</span><br></pre></td></tr></table></figure>
-<h2 id="how-to-iterate-over-a-stdarray-object">How to Iterate over a std::array&lt;&gt; object</h2>
+<h2 id="how-to-iterate-over-a-stdarray-object">How to Iterate over a
+std::array&lt;&gt; object</h2>
 <p>对array的遍历，存在四种方法：</p>
 <ul>
 <li>使用基于范围的迭代循环；</li>
@@ -543,7 +547,11 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdarray"><span class="nav-number">1.</span> <span class="nav-text">std::array</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#defining-and-initializing-an-stdarray-object"><span class="nav-number">1.1.</span> <span class="nav-text">Defining and Initializing an std::array&lt;&gt; object</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-get-the-size-of-stdarray"><span class="nav-number">1.2.</span> <span class="nav-text">How to get the size of std::array</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-access-elements-in-stdarray"><span class="nav-number">1.3.</span> <span class="nav-text">How to access elements in std::array</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-iterate-over-a-stdarray-object"><span class="nav-number">1.4.</span> <span class="nav-text">How to Iterate over a std::array&lt;&gt; object</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdarray"><span class="nav-number">1.</span> <span class="nav-text">std::array</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#defining-and-initializing-an-stdarray-object"><span class="nav-number">1.1.</span> <span class="nav-text">Defining and
+Initializing an std::array&lt;&gt; object</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-get-the-size-of-stdarray"><span class="nav-number">1.2.</span> <span class="nav-text">How to get the size of
+std::array</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-access-elements-in-stdarray"><span class="nav-number">1.3.</span> <span class="nav-text">How to access elements in
+std::array</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-iterate-over-a-stdarray-object"><span class="nav-number">1.4.</span> <span class="nav-text">How to Iterate over a
+std::array&lt;&gt; object</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -585,8 +593,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

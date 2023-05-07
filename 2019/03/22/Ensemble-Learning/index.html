@@ -96,20 +96,18 @@
 
 
 
-<meta name="description" content="集成学习 个体与集成 集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，  img  集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。 假设存在二分类问题和真实函数">
+<meta name="description" content="集成学习 个体与集成 集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，   img  集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。 假设存在二分类问题和真实函">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Ensemble Learning">
 <meta property="og:url" content="http://yoursite.com/2019/03/22/Ensemble-Learning/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="集成学习 个体与集成 集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，  img  集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。 假设存在二分类问题和真实函数">
+<meta property="og:description" content="集成学习 个体与集成 集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，   img  集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。 假设存在二分类问题和真实函">
 <meta property="og:locale">
-<meta property="og:image" content="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png">
 <meta property="article:published_time" content="2019-03-22T13:38:20.000Z">
 <meta property="article:modified_time" content="2019-03-22T13:39:23.138Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="Machine Learning">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png">
 
 
 
@@ -160,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,40 +336,60 @@
 <h2 id="个体与集成">个体与集成</h2>
 <p>集成学习通过构建并结合多个学习器来完成学习任务，以下图为例，集成学习时先产生一组个体学习器，然后通过某种策略将其结合起来。如果其中的个体学习器是同种类型的，则是同质集成，否则叫异质的，</p>
 <figure>
-<img src="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.researchgate.net/publication/276549421/figure/fig1/AS:339851649011717@1458038355897/Ensemble-learning.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>集成学习的结果是通过投票法产生的，为了使得集成学习的效果比单一学习器更好，应该要保证个体学习器具备一定的准确性，同时要有多样性，则学习器之间具有差异。</p>
-<p>假设存在二分类问题和真实函数f，如果基分类器的错误率为<span class="math inline">\(\epsilon\)</span>，则对于每个分类器hi有： <span class="math display">\[
+<p>假设存在二分类问题和真实函数f，如果基分类器的错误率为<span
+class="math inline">\(\epsilon\)</span>，则对于每个分类器hi有： <span
+class="math display">\[
 P(h_i(x) \ne f(x)) = \epsilon
-\]</span> 如果基分类器的错误率相互独立，那么集成学习的错误率有： <span class="math display">\[
-P(h_i(x) \ne f(x)) = \sum_{k=0}^{[T/2]} C_T^k (1-\epsilon)^k \epsilon^{T-k} \\
+\]</span> 如果基分类器的错误率相互独立，那么集成学习的错误率有： <span
+class="math display">\[
+P(h_i(x) \ne f(x)) = \sum_{k=0}^{[T/2]} C_T^k (1-\epsilon)^k
+\epsilon^{T-k} \\
 \leq exp(-1/2T(1-2\epsilon)^2)
 \]</span> 可以看到随着个体学习器数目的增加，集成的错误率降指数下降。</p>
 <p>但往往基学习器的误差不是相互独立的，而且一般准确性很高的话，要增加多样性就必须牺牲准确性，</p>
-<p>目前集成学习中，个体学习强依赖的代表是Boosting，而非强依赖的代表是Bagging和Random Forest。</p>
+<p>目前集成学习中，个体学习强依赖的代表是Boosting，而非强依赖的代表是Bagging和Random
+Forest。</p>
 <h2 id="boosting">Boosting</h2>
 <p>Boosting是将弱学习器提升为强学习器的算法：先从初始训练集中训练出一个基学习器，然后根据该学习器的表现对训练样本的分布进行调整，根据调整后的样本分布来训练下一个基学习器。</p>
 <p>Boost的代表是AdaBoost。</p>
-<p>AdaBoost有多种推导方式，我们这里采用基学习器的线性组合： <span class="math display">\[
+<p>AdaBoost有多种推导方式，我们这里采用基学习器的线性组合： <span
+class="math display">\[
 H(x) = \sum_{t=1}^T\alpha_th_t(x)
 \]</span> AdaBoost的算法如下：</p>
-<p>给定一个训练数据集D={(x1,y1), (x2,y2)…(xN,yN)}，yi属于标记集合{-1,+1}。</p>
+<p>给定一个训练数据集D={(x1,y1),
+(x2,y2)…(xN,yN)}，yi属于标记集合{-1,+1}。</p>
 <ol type="1">
-<li><span class="math inline">\(D_1(x) = 1/m\)</span>，每一个训练样本最开始时都被赋予相同的权值：1/N；</li>
+<li><span class="math inline">\(D_1(x) =
+1/m\)</span>，每一个训练样本最开始时都被赋予相同的权值：1/N；</li>
 <li>进行多轮迭代，假设迭代T次。for t = 1, 2, .. ,T</li>
 </ol>
 <ul>
-<li><span class="math inline">\(h_t = \xi(D, D_t);\)</span>基于分布<span class="math inline">\(D_t\)</span>从数据集中训练出分类器<span class="math inline">\(h_t\)</span>；</li>
-<li><span class="math inline">\(\epsilon_{t} = P_{x-D_t}(h_t(x)\ne f(x));\)</span>计算分类器的错误率；</li>
+<li><span class="math inline">\(h_t = \xi(D, D_t);\)</span>基于分布<span
+class="math inline">\(D_t\)</span>从数据集中训练出分类器<span
+class="math inline">\(h_t\)</span>；</li>
+<li><span class="math inline">\(\epsilon_{t} = P_{x-D_t}(h_t(x)\ne
+f(x));\)</span>计算分类器的错误率；</li>
 <li>如果错误率比随机猜测还要差，那么意味着当前的基学习器不满足基本条件，放弃该学习器；</li>
-<li><span class="math inline">\(\alpha_t = 1/2 ln(\frac{1-\epsilon_t}{\epsilon_t})\)</span>；确定该分类器的权重；</li>
-<li><span class="math inline">\(D_{t+1}(x) = \frac{D_t(x) exp(-\alpha_tf(x)h_t(x))}{Z_t}\)</span>；更新样本的权重，其中Z是一个规范化因子，以确保<span class="math inline">\(D_{t+1}\)</span>是一个分布；每个样本的新权值是变大还是变小，取决于它是被分错还是被分正确；</li>
+<li><span class="math inline">\(\alpha_t = 1/2
+ln(\frac{1-\epsilon_t}{\epsilon_t})\)</span>；确定该分类器的权重；</li>
+<li><span class="math inline">\(D_{t+1}(x) = \frac{D_t(x)
+exp(-\alpha_tf(x)h_t(x))}{Z_t}\)</span>；更新样本的权重，其中Z是一个规范化因子，以确保<span
+class="math inline">\(D_{t+1}\)</span>是一个分布；每个样本的新权值是变大还是变小，取决于它是被分错还是被分正确；</li>
 </ul>
 <ol start="3" type="1">
-<li>输出<span class="math inline">\(H(x)=sign(\sum_{t=1}^T \alpha_th_t(x))\)</span>；</li>
+<li>输出<span class="math inline">\(H(x)=sign(\sum_{t=1}^T
+\alpha_th_t(x))\)</span>；</li>
 </ol>
-<p>若H(x)能令指数损失函数最小化，可以求偏导： <span class="math display">\[
-\frac {\alpha l_{exp}(H|D)} {\alpha H(x)} = -e^{-H(x)} P(f(x)=1|x) + e^{H(x)}P(f(x)=-1|x)
+<p>若H(x)能令指数损失函数最小化，可以求偏导： <span
+class="math display">\[
+\frac {\alpha l_{exp}(H|D)} {\alpha H(x)} = -e^{-H(x)} P(f(x)=1|x) +
+e^{H(x)}P(f(x)=-1|x)
 \]</span> 令上式为0，可求解： <span class="math display">\[
 H(x) = 1/2 ln \frac{P(f(x)=1|x)}{P(f(x)=-1|x)}
 \]</span> 依赖这个式子，我们可以求得分类器权重的更新公式。</p>
@@ -404,17 +420,23 @@ H(x) = 1/2 ln \frac{P(f(x)=1|x)}{P(f(x)=-1|x)}
 <h3 id="平均法">平均法</h3>
 <p>加权平均法： <span class="math display">\[
 H(x) = \sum_{i=1}^Tw_ih_i(w)
-\]</span> 其中，<span class="math inline">\(w_i \ge 0, \sum_{i=1}^Tw_i=1\)</span>；简单平均法，则是令<span class="math inline">\(w_i=1/T\)</span>的特例。</p>
+\]</span> 其中，<span class="math inline">\(w_i \ge 0,
+\sum_{i=1}^Tw_i=1\)</span>；简单平均法，则是令<span
+class="math inline">\(w_i=1/T\)</span>的特例。</p>
 <p>一般而言，在个体学习器性能相差较大时宜使用加权平均法，而在个体学习器性能相近时则使用简单平均法。</p>
 <h3 id="投票法">投票法</h3>
-<p>投票法有几种，假设<span class="math inline">\(h_i^j(x)\)</span>是分类器<span class="math inline">\(h_i\)</span>在类别标记<span class="math inline">\(c_j\)</span>上的输出。</p>
+<p>投票法有几种，假设<span
+class="math inline">\(h_i^j(x)\)</span>是分类器<span
+class="math inline">\(h_i\)</span>在类别标记<span
+class="math inline">\(c_j\)</span>上的输出。</p>
 <ul>
 <li>绝对多数投票法</li>
 </ul>
 <p><span class="math display">\[
 H(x)=\left\{
 \begin{array}{rcl}
-c_j       &amp;      &amp; {if \sum_{i=1}^T h_i^j(x) \ge 0.5\sum_{k=1}^T \sum_{i=1}^T h_i^k(x)}\\
+c_j       &amp;      &amp; {if \sum_{i=1}^T h_i^j(x) \ge 0.5\sum_{k=1}^T
+\sum_{i=1}^T h_i^k(x)}\\
 reject     &amp;      &amp; {otherwise}
 \end{array} \right.
 \]</span></p>
@@ -436,12 +458,25 @@ H(x) = c_{arg max _j } \sum_{i=1}^T w_ih_i^j(x)
 <h3 id="学习法">学习法</h3>
 <p>当训练数据很多时，我们可以使用另一种更为强大的结合策略——通过另一个学习器进行结合。</p>
 <p>Stacking是这类策略的代表，其先从初始数据集训练出初级学习器，然后"生成"一个新的数据集用于训练次级学习器。</p>
-<p>为了避免过拟合，一般是采用交叉验证的方式，即用训练初级学习器未使用的样本来产生次级学习器的训练样本。以k折交叉验证为例，初始训练集D被随机划分为k个大小相似的集合<span class="math inline">\(D_1,..,D_k\)</span>。令<span class="math inline">\(D_j\)</span>和<span class="math inline">\(\overline D_j = D-D_j\)</span>分别表示在第j折的测试集和训练集。</p>
+<p>为了避免过拟合，一般是采用交叉验证的方式，即用训练初级学习器未使用的样本来产生次级学习器的训练样本。以k折交叉验证为例，初始训练集D被随机划分为k个大小相似的集合<span
+class="math inline">\(D_1,..,D_k\)</span>。令<span
+class="math inline">\(D_j\)</span>和<span
+class="math inline">\(\overline D_j =
+D-D_j\)</span>分别表示在第j折的测试集和训练集。</p>
 <p>算法的具体过程如下：</p>
 <ul>
-<li>给定T个初级学习算法，初级学习器<span class="math inline">\(h_t^{(j)}\)</span>通过在<span class="math inline">\(\overline D_j\)</span>上使用第t个学习算法而得；</li>
-<li>对<span class="math inline">\(D_j\)</span>中每个样本<span class="math inline">\(x_i\)</span>，计算<span class="math inline">\(z_{it}=h_t^{(j)}(x_i)\)</span>，则由样本产生的次级训练样例为<span class="math inline">\(z_i=(z_{i1},…,z_{iT})\)</span>，标记部分为<span class="math inline">\(y_i\)</span>；</li>
-<li>交叉验证结束之后，由初级学习器产生的次级训练集<span class="math inline">\(D&#39; = \{(z_i,y_i)\}^m_{i=1}\)</span>，并由此训练次级学习器；</li>
+<li>给定T个初级学习算法，初级学习器<span
+class="math inline">\(h_t^{(j)}\)</span>通过在<span
+class="math inline">\(\overline
+D_j\)</span>上使用第t个学习算法而得；</li>
+<li>对<span class="math inline">\(D_j\)</span>中每个样本<span
+class="math inline">\(x_i\)</span>，计算<span
+class="math inline">\(z_{it}=h_t^{(j)}(x_i)\)</span>，则由样本产生的次级训练样例为<span
+class="math inline">\(z_i=(z_{i1},…,z_{iT})\)</span>，标记部分为<span
+class="math inline">\(y_i\)</span>；</li>
+<li>交叉验证结束之后，由初级学习器产生的次级训练集<span
+class="math inline">\(D&#39; =
+\{(z_i,y_i)\}^m_{i=1}\)</span>，并由此训练次级学习器；</li>
 </ul>
 <p>次级学习器的输入属性表示和次级学习算法对stacking集成的泛化性能由很大的影响。</p>
 <h2 id="多样性">多样性</h2>
@@ -450,13 +485,16 @@ H(x) = c_{arg max _j } \sum_{i=1}^T w_ih_i^j(x)
 <p>假设对于数据x，定义学习器h得分歧为： <span class="math display">\[
 A(h_i|x) = (h_i(x)-H(x))^2\\
 则集成的分歧为：\overline A(h_i|x) = \sum_{i=1}^Tw_i(h_i(x)-H(x))^2
-\]</span> 而个体学习器和集成学习器的平方误差为： <span class="math display">\[
+\]</span> 而个体学习器和集成学习器的平方误差为： <span
+class="math display">\[
 E(h_i|x) = (f(x)-h_i(x))^2 \\
 \overline E(h|x) = \sum_{i=1}^T w_i E(h_i|x) \\
 E(H|x) = (f(x)-H(x))^2
 \]</span> 则可以根据上式求得： <span class="math display">\[
 \overline A(h|x) = \overline E(h|x) -E(H|x)
-\]</span> 因此可以求得<span class="math inline">\(E = \overline E - \overline A\)</span>，即个体学习器准确性越高，多样性越好，则集成效果越好。</p>
+\]</span> 因此可以求得<span class="math inline">\(E = \overline E -
+\overline
+A\)</span>，即个体学习器准确性越高，多样性越好，则集成效果越好。</p>
 <h3 id="多样性度量">多样性度量</h3>
 <p>多样性度量其实就是度量集成个体分类器的多样性，比较典型的做法是考虑个体分类器的两两相似/不相似性，以两分类为例：</p>
 <table>
@@ -507,10 +545,12 @@ Q_{ij} = \frac{ad-bc}{ad+bc}
 <p><span class="math display">\[
 k = \frac{p1-p2}{1-p2}
 \]</span></p>
-<p>其中，p1是两个分类器取得一致的概率；p2是两个分类器偶然达成一致的概率： <span class="math display">\[
+<p>其中，p1是两个分类器取得一致的概率；p2是两个分类器偶然达成一致的概率：
+<span class="math display">\[
 p1 = \frac{a+d}{m} \\
 p2 = \frac{(a+b)(a+c)+(c+d)(b+d)}{m^2}
-\]</span> 若分类器在数据集上完全一致，则k=1；若它们仅仅是偶然性达成一致，则k=0；k通常为非负值，仅仅在分类器达成一致的概率比偶然性的情况下还低时取负值。</p>
+\]</span>
+若分类器在数据集上完全一致，则k=1；若它们仅仅是偶然性达成一致，则k=0；k通常为非负值，仅仅在分类器达成一致的概率比偶然性的情况下还低时取负值。</p>
 <h3 id="多样性增强">多样性增强</h3>
 <p>要生成多样性大的个体学习器，比较直接的方法是在学习过程引入随机性。</p>
 <ul>
@@ -745,8 +785,7 @@ p2 = \frac{(a+b)(a+c)+(c+d)(b+d)}{m^2}
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -377,7 +375,8 @@
 <p>文件对象由结构体file表示。</p>
 <p>文件操作由结构体file_operations表示，内定义了大量的函数指针。</p>
 <h2 id="和进程相关的数据结构">和进程相关的数据结构</h2>
-<p>有三个结构体将VFS和系统的进程紧密地联系在一起：file_struct, fs_struct和namespace。</p>
+<p>有三个结构体将VFS和系统的进程紧密地联系在一起：file_struct,
+fs_struct和namespace。</p>
 <h3 id="file_struct">file_struct</h3>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">atomic_t</span> count; <span class="comment">/* 共享该表的进程数 */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">rwlock_t</span> file_lock; <span class="comment">/* 保护以下的所有域,以免在tsk-&gt;alloc_lock中的嵌套*/</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> max_fds; <span class="comment">/*当前文件对象的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> max_fdset; <span class="comment">/*当前文件描述符的最大数*/</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> next_fd; ／*已分配的文件描述符加<span class="number">1</span>*/</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> ** <span class="title">fd</span>;</span> <span class="comment">/* 指向文件对象指针数组的指针 */</span></span><br><span class="line"></span><br><span class="line">    fd_set *close_on_exec; <span class="comment">/*指向执行exec( )时需要关闭的文件描述符*/</span></span><br><span class="line"></span><br><span class="line">    fd_set *open_fds; <span class="comment">/*指向打开文件描述符的指针*/</span></span><br><span class="line"></span><br><span class="line">    fd_set close_on_exec_init;<span class="comment">/* 执行exec( )时需要关闭的文件描述符的初 值集合*/</span></span><br><span class="line"></span><br><span class="line">    fd_set open_fds_init; <span class="comment">/*文件描述符的初值集合*/</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> * <span class="title">fd_array</span>[32];</span><span class="comment">/* 文件对象指针的初始化数组*/</span></span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>进程描述符的files域指向该结构体，包含了所有与单个进程相关的文件信息。</p>
@@ -603,8 +602,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

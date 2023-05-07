@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -335,7 +333,8 @@
 
       
         <h2 id="编码">编码</h2>
-<p>第一章先来看一下Rocksdb的编码情况，具体的实现在：<code>util/coding.cc, util/coding.h, util/coding_lean.h</code>。Rocksdb的编码实现与leveldb基本一致的，由于需要将Key、Value等数据按序写入到内存中，并最终flush到磁盘上，因此需要一个高效的编解码实现。这里的编解码很多会用在key size、value size的整型编码上面。</p>
+<p>第一章先来看一下Rocksdb的编码情况，具体的实现在：<code>util/coding.cc, util/coding.h, util/coding_lean.h</code>。Rocksdb的编码实现与leveldb基本一致的，由于需要将Key、Value等数据按序写入到内存中，并最终flush到磁盘上，因此需要一个高效的编解码实现。这里的编解码很多会用在key
+size、value size的整型编码上面。</p>
 <p>Rocksdb的整型编码方式很简单，主要支持两种方案：定长编码和变长编码。</p>
 <ul>
 <li>定长编码：定长编码的实现比较简单，比如可以直接将4字节/8字节的整型直接按序写入到指定的位置；</li>
@@ -351,7 +350,8 @@
 <h4 id="定长编码">定长编码</h4>
 <p>定长编码比较简单，首先判断大小端序，对于小端，value本身就是按小端排放的，可以直接拷贝；对于大端，则是将value的最低位放置在内存的最低地址端。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">EncodeFixed32</span><span class="params">(<span class="type">char</span>* buf, <span class="type">uint32_t</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (port::kLittleEndian) &#123;</span><br><span class="line">    <span class="built_in">memcpy</span>(buf, &amp;value, <span class="built_in">sizeof</span>(value));</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    buf[<span class="number">0</span>] = value &amp; <span class="number">0xff</span>;</span><br><span class="line">    buf[<span class="number">1</span>] = (value &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">    buf[<span class="number">2</span>] = (value &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">    buf[<span class="number">3</span>] = (value &gt;&gt; <span class="number">24</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>解码也一样，Rocksdb提供了三种整型编解码：<code>uint16_t,uint32_t,uint64_t</code>。解码时，gcc会优化里面的memcpy的操作，变成inline copy loops，提高效率。</p>
+<p>解码也一样，Rocksdb提供了三种整型编解码：<code>uint16_t,uint32_t,uint64_t</code>。解码时，gcc会优化里面的memcpy的操作，变成inline
+copy loops，提高效率。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">uint32_t</span> <span class="title">DecodeFixed32</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* ptr)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (port::kLittleEndian) &#123;</span><br><span class="line">    <span class="comment">// Load the raw bytes</span></span><br><span class="line">    <span class="type">uint32_t</span> result;</span><br><span class="line">    <span class="built_in">memcpy</span>(&amp;result, ptr, <span class="built_in">sizeof</span>(result));  <span class="comment">// gcc optimizes this to a plain load</span></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">return</span> ((<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">0</span>]))) |</span><br><span class="line">            (<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">1</span>])) &lt;&lt; <span class="number">8</span>) |</span><br><span class="line">            (<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">2</span>])) &lt;&lt; <span class="number">16</span>) |</span><br><span class="line">            (<span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">unsigned</span> <span class="type">char</span>&gt;(ptr[<span class="number">3</span>])) &lt;&lt; <span class="number">24</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="变长编码">变长编码</h4>
 <p>前面提到的，为了节省空间，Rocksdb使用变长的编码方式<em>varint</em>。Rocksdb使用最高位来表示编码是否结束，而低7bit则存储实际的数据。根据统计来说，小整型出现的概率更高，这样就能节省更多的空间，比如0-127的整数都可以只用一个字节来表示，而uint32较大的数字则需要5个字节。</p>
@@ -580,8 +580,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

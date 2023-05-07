@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -397,12 +395,21 @@
 <p>总结rehash的详细步骤：</p>
 <ol type="1">
 <li>为 ht[1] 分配空间， 让字典同时持有 ht[0] 和 ht[1] 两个哈希表；</li>
-<li>在字典中维持一个索引计数器变量 rehashidx ， 并将它的值设置为 0 ， 表示 rehash 工作正式开始；</li>
-<li>在 rehash 进行期间，每次对字典执行添加、删除、查找或者更新操作时，程序除了执行指定的操作以外，还会顺带将 ht[0] 哈希表在 rehashidx 索引上的所有键值对 rehash 到 ht[1] ，当 rehash 工作完成之后，程序将 rehashidx 属性的值增一。另外，每一步都会遍历至多十个节点，以找到非空节点；</li>
-<li>随着字典操作的不断执行，最终在某个时间点上，ht[0] 的所有键值对都会被 rehash 至 ht[1]，这时程序将 rehashidx 属性的值设为 -1 ，表示 rehash 操作已完成。</li>
+<li>在字典中维持一个索引计数器变量 rehashidx ， 并将它的值设置为 0 ，
+表示 rehash 工作正式开始；</li>
+<li>在 rehash
+进行期间，每次对字典执行添加、删除、查找或者更新操作时，程序除了执行指定的操作以外，还会顺带将
+ht[0] 哈希表在 rehashidx 索引上的所有键值对 rehash 到 ht[1] ，当 rehash
+工作完成之后，程序将 rehashidx
+属性的值增一。另外，每一步都会遍历至多十个节点，以找到非空节点；</li>
+<li>随着字典操作的不断执行，最终在某个时间点上，ht[0] 的所有键值对都会被
+rehash 至 ht[1]，这时程序将 rehashidx 属性的值设为 -1 ，表示 rehash
+操作已完成。</li>
 </ol>
 <p>通过将rehash键值对的计算工作分摊到增删改查的操作中，避免了对服务器性能造成影响。</p>
-<p>关于rehash，推荐一篇文章，主要讲的是线上遇到的在rehash期间，同时有两个hash表在使用，会使得redis内存使用量瞬间突增的问题：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2018/07/27/redis-rehash-practice-optimization.html">美团针对Redis Rehash机制的探索和实践</a></p>
+<p>关于rehash，推荐一篇文章，主要讲的是线上遇到的在rehash期间，同时有两个hash表在使用，会使得redis内存使用量瞬间突增的问题：<a
+target="_blank" rel="noopener" href="https://tech.meituan.com/2018/07/27/redis-rehash-practice-optimization.html">美团针对Redis
+Rehash机制的探索和实践</a></p>
 
       
     </div>
@@ -619,8 +626,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -343,30 +341,42 @@
 </ul>
 <p>形式：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X::<span class="built_in">X</span>(<span class="type">const</span> X&amp; x);</span><br><span class="line"><span class="comment">//可以是多参数模式，但第二个参数及其之后的参数都要以默认值提供</span></span><br><span class="line">Y::<span class="built_in">Y</span>(<span class="type">const</span> Y&amp; y, <span class="type">int</span> x = <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="default-memberwise-initialization">Default Memberwise Initialization</h2>
-<p>如果一个类没有显式的定义拷贝构造函数，那么在发送以其它对象进行初始化就会进行所谓的<strong>default memberwise initialization</strong>行为。也就是把内部的数据成员的值一个一个地拷贝都被初始化的类对象中，如果其中有其他类的对象成员，那么就会递归地对该类进行<strong>default memberwise initialization</strong>。</p>
-<p>而所谓的memberwise initialization分为两种：Bitwise Copy and Copy Constructor。</p>
+<h2 id="default-memberwise-initialization">Default Memberwise
+Initialization</h2>
+<p>如果一个类没有显式的定义拷贝构造函数，那么在发送以其它对象进行初始化就会进行所谓的<strong>default
+memberwise
+initialization</strong>行为。也就是把内部的数据成员的值一个一个地拷贝都被初始化的类对象中，如果其中有其他类的对象成员，那么就会递归地对该类进行<strong>default
+memberwise initialization</strong>。</p>
+<p>而所谓的memberwise initialization分为两种：Bitwise Copy and Copy
+Constructor。</p>
 <h2 id="bitwise-copy-semantics">Bitwise Copy Semantics</h2>
-<p>在C++中，默认进行的就是Bitwise Copy。例如这种情况只包含原生的数据成员，就是进行Bitwise Copy：</p>
+<p>在C++中，默认进行的就是Bitwise
+Copy。例如这种情况只包含原生的数据成员，就是进行Bitwise Copy：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Class Word &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Word</span>(<span class="type">const</span> <span class="type">char</span>* );</span><br><span class="line">    ~<span class="built_in">Word</span>()&#123;<span class="keyword">delete</span> []str;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> cnt;</span><br><span class="line">    <span class="type">char</span> *str;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>但这种情况下，会出现的问题就是：由于只是单纯地拷贝指针的值，在进行拷贝之后，会出现两个对象的内部的指针指向了同一块内存。如果某个对象被销毁了，那么指针所指向的内存也回收了。这样另外一个对象的指针就变成了野指针。</p>
 <h2 id="不要bitwise-copy-semantics">不要Bitwise Copy Semantics</h2>
 <p>在以下的情况下，一个类不表现出Bitwise Copy Semantics：</p>
 <ul>
-<li>当class内含一个member object，而后者的class声明有一个copy constructor时（不论是用户自己定义的，还是编译器生成的）</li>
-<li>当class继承自一个base class而后者存在一个copy constructor时（再次强调，不论是显示声明或编译器合成）</li>
+<li>当class内含一个member object，而后者的class声明有一个copy
+constructor时（不论是用户自己定义的，还是编译器生成的）</li>
+<li>当class继承自一个base class而后者存在一个copy
+constructor时（再次强调，不论是显示声明或编译器合成）</li>
 <li>当class声明了一个或多个virtual functions时</li>
-<li>当class派生自一个继承串链时，其中有一个或多个virtual base classes时</li>
+<li>当class派生自一个继承串链时，其中有一个或多个virtual base
+classes时</li>
 </ul>
 <p>前两种操作，必须把成员对象或者基类对象的拷贝构造代码插入到合成的拷贝构造函数中；</p>
 <p>至于后面两种情况</p>
 <h2 id="重新设定virtual-table的指针">重新设定virtual table的指针</h2>
 <p>由于如果类中有虚函数，那么需要为该类增加一个虚表，并且为该类的每个对象增加一个指针，指向虚表。</p>
 <p>这就是为什么编译器需要合成一个拷贝构造函数，主要目的就是为了为新的对象增加一个指针。</p>
-<p>这样可以避免了这种情况，子啊这种情况中，base内含的指针应该是指向基类的虚表，如果是Bitwise Copy，那就变成派生类的虚表了</p>
+<p>这样可以避免了这种情况，子啊这种情况中，base内含的指针应该是指向基类的虚表，如果是Bitwise
+Copy，那就变成派生类的虚表了</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base base = derived;</span><br></pre></td></tr></table></figure>
 <h2 id="virtual-base-class-subject">virtual base class subject</h2>
-<p>这种情况跟上面的差不多，也是为了保证virtual base class subobject的位置在编译器被确定下来，而合成拷贝构造函数。这种情况一般也是发送在用派生类对象去初始化基类，因为这样如果没有合成拷贝构造函数，将会难以确定virtual base class subobject的位置。</p>
+<p>这种情况跟上面的差不多，也是为了保证virtual base class
+subobject的位置在编译器被确定下来，而合成拷贝构造函数。这种情况一般也是发送在用派生类对象去初始化基类，因为这样如果没有合成拷贝构造函数，将会难以确定virtual
+base class subobject的位置。</p>
 
       
     </div>
@@ -541,7 +551,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#default-memberwise-initialization"><span class="nav-number">1.</span> <span class="nav-text">Default Memberwise Initialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bitwise-copy-semantics"><span class="nav-number">2.</span> <span class="nav-text">Bitwise Copy Semantics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81bitwise-copy-semantics"><span class="nav-number">3.</span> <span class="nav-text">不要Bitwise Copy Semantics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E8%AE%BE%E5%AE%9Avirtual-table%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">4.</span> <span class="nav-text">重新设定virtual table的指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtual-base-class-subject"><span class="nav-number">5.</span> <span class="nav-text">virtual base class subject</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#default-memberwise-initialization"><span class="nav-number">1.</span> <span class="nav-text">Default Memberwise
+Initialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bitwise-copy-semantics"><span class="nav-number">2.</span> <span class="nav-text">Bitwise Copy Semantics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81bitwise-copy-semantics"><span class="nav-number">3.</span> <span class="nav-text">不要Bitwise Copy Semantics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E8%AE%BE%E5%AE%9Avirtual-table%E7%9A%84%E6%8C%87%E9%92%88"><span class="nav-number">4.</span> <span class="nav-text">重新设定virtual table的指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtual-base-class-subject"><span class="nav-number">5.</span> <span class="nav-text">virtual base class subject</span></a></li></ol></div>
             
 
           </div>
@@ -583,8 +594,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

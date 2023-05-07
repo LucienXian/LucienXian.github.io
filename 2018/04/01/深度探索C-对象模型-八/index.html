@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -336,20 +334,25 @@
       
         <h1 id="member的各种调用方式">Member的各种调用方式</h1>
 <h2 id="nonstatic-member-functions">Nonstatic Member Functions</h2>
-<p>由于C++的一个设计标准就是使得nonstatic member function要有和一般的nonmember function有相同的效率；</p>
-<p>这就带来了一个变化，就是编译器内部会将nonstatic member function转换为等价的nonmember function实体；</p>
+<p>由于C++的一个设计标准就是使得nonstatic member
+function要有和一般的nonmember function有相同的效率；</p>
+<p>这就带来了一个变化，就是编译器内部会将nonstatic member
+function转换为等价的nonmember function实体；</p>
 <p>转化步骤：</p>
 <ul>
 <li>改写函数的原型，安插一个新的参数，即this指针；</li>
-<li>将每一个对nontatic data member的存取操作改写为通过this指针的操作；</li>
+<li>将每一个对nontatic data
+member的存取操作改写为通过this指针的操作；</li>
 <li>将member function改写成一个外部函数，修改函数名称；</li>
 </ul>
 <p>例如一个这样的函数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point3d <span class="title">Point3d::normalize</span><span class="params">()</span> <span class="type">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="type">float</span> mag = <span class="built_in">magnitude</span>();</span><br><span class="line">    Point3d normal;</span><br><span class="line">    normal.x = x/mag;</span><br><span class="line">    normal.y = y/mag;</span><br><span class="line">    normal.z = z/mag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>将可能会改写成：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">normalize_7Point3dFv</span><span class="params">(<span class="keyword">register</span> <span class="type">const</span> Point3d *<span class="type">const</span> <span class="keyword">this</span>, Point3d &amp;__result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="type">float</span> mag = <span class="keyword">this</span>-&gt;<span class="built_in">magnitude</span>();</span><br><span class="line">    __result.Point3d::<span class="built_in">Point3d</span>(<span class="keyword">this</span>-&gt;x/mag, <span class="keyword">this</span>-&gt;y/mag, <span class="keyword">this</span>-&gt;z/mag);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
-<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name mangling的原因。</p>
+<p>特别的，编译器内部会对名称进行mangling处理，虽然目前处理方式没有统一的标准，但一般来说会在member名称前面加上类名，甚至为了保证重载的操作，会加上函数参数的类型，当然如果声明了extern
+C，就会抑制了这种效果，这也是extern关键字的一个重要功能。</p>
+<p>有时我们看到的编译器报错，显示了非常奇怪的函数名称报错，往往就是因为name
+mangling的原因。</p>
 <h2 id="virtual-member-functions">Virtual member functions</h2>
 <p>如果normalize()是一个虚函数，那么以下调用会转化为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;<span class="built_in">normalize</span>();</span><br><span class="line">(*ptr-&gt;vptr[<span class="number">1</span>])(ptr);</span><br></pre></td></tr></table></figure>
@@ -363,9 +366,11 @@
 <ul>
 <li>不能直接存取其中class的nonstatic members；</li>
 <li>不能被声明为const, volatile或者virtual；</li>
-<li>不需要经由对象调用（但是如果static member是一个private，就很可能要依赖于对象）；</li>
+<li>不需要经由对象调用（但是如果static
+member是一个private，就很可能要依赖于对象）；</li>
 </ul>
-<p>如果要取一个static member function的地址，那么其类型会是：unsigned int (*)();</p>
+<p>如果要取一个static member function的地址，那么其类型会是：unsigned
+int (*)();</p>
 
       
     </div>
@@ -582,8 +587,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -161,9 +161,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -357,16 +355,22 @@
 <li>error productions</li>
 </ul>
 <p>分辨出已知的语法错误</p>
-<p>error correction：尝试去找出正确的接近的程序，对tokens进行插入和删除；</p>
+<p>error
+correction：尝试去找出正确的接近的程序，对tokens进行插入和删除；</p>
 <h2 id="abstract-syntax-tree">Abstract Syntax Tree</h2>
 <p>编译器需要一个数据结构去代表那个程序。</p>
-<p>考虑grammar：E-&gt;int|(E)|E+E，字符串为5+(2+3)，lexical analysis之后变成int'+'('int'+'int')'，然后parse tree为</p>
+<p>考虑grammar：E-&gt;int|(E)|E+E，字符串为5+(2+3)，lexical
+analysis之后变成int'+'('int'+'int')'，然后parse tree为</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap61.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap61.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>然后构造AST：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap62.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap62.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>强调嵌套结构，更加抽象并且没有non-terminals</p>
 <h2 id="recursive-descent-parsing">Recursive Descent Parsing</h2>
@@ -374,16 +378,20 @@
 <p>考虑grammar：</p>
 <p>E-&gt;T|T+E T-&gt;int | int * T | (E)</p>
 <p>token stream为：(int),匹配5个括号</p>
-<p>在构造过程中，按照从上到下从左到右一个一个比对，找到正确的parse tree</p>
+<p>在构造过程中，按照从上到下从左到右一个一个比对，找到正确的parse
+tree</p>
 <h2 id="recursive-descent-algorithm">Recursive Descent Algorithm</h2>
 <p>首先来看一些特别的tokens：INT,OPEN,CLOSE,PLUS,TIMES，全局的next指向下一个的输入token</p>
 <p>定义个函数来检测匹配与否：</p>
 <ul>
-<li><p>对于给定的终止符：**bool term(TOKEN tok){return *next++==tok;}**</p></li>
+<li><p>对于给定的终止符：**bool term(TOKEN tok){return
+*next++==tok;}**</p></li>
 <li><p>S中的第n个production：<strong>bool Sn(){...}</strong></p></li>
 <li><p>尝试所有的production：<strong>bool S(){...}</strong></p></li>
-<li><p>对于production：E-&gt;T: <strong>bool E1(){return T();}</strong></p></li>
-<li><p>对于production：E-&gt;T+E: <strong>bool E2(){return T()&amp;&amp;term(PLUS)&amp;&amp;E();}</strong></p></li>
+<li><p>对于production：E-&gt;T: <strong>bool E1(){return
+T();}</strong></p></li>
+<li><p>对于production：E-&gt;T+E: <strong>bool E2(){return
+T()&amp;&amp;term(PLUS)&amp;&amp;E();}</strong></p></li>
 <li><p>对于所有的productions of E(带回溯的情况):</p></li>
 </ul>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">E</span><span class="params">()</span>&#123;</span><br><span class="line">    TOKEN* save = next;</span><br><span class="line">    <span class="keyword">return</span> (next=save, E1()) || (next, save, E2()) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -391,8 +399,10 @@
 <li>non-terminal T:</li>
 </ul>
 <p><strong>bool T1(){return term(INT);}</strong></p>
-<p><strong>bool T2(){return term(INT)&amp;&amp;term(TIMES)&amp;&amp;T();}</strong></p>
-<p><strong>bool T3(){return term(OPEN)&amp;&amp;E()&amp;&amp;term(CLOSE);}</strong></p>
+<p><strong>bool T2(){return
+term(INT)&amp;&amp;term(TIMES)&amp;&amp;T();}</strong></p>
+<p><strong>bool T3(){return
+term(OPEN)&amp;&amp;E()&amp;&amp;term(CLOSE);}</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">T</span><span class="params">()</span>&#123;</span><br><span class="line">    TOKEN* save = next;</span><br><span class="line">    <span class="keyword">return</span> (next=save, T1()) || (next=save, T2()) || (next=save, T3());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>如何开始parser:</p>
 <ul>
@@ -407,7 +417,8 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">S1</span><span class="params">()</span>&#123;<span class="keyword">return</span> S()&amp;&amp;term(a);&#125;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">S</span><span class="params">()</span>&#123;<span class="keyword">return</span> S1();&#125;</span><br></pre></td></tr></table></figure>
 <p>在这种情况下，S()进入了无限递归；</p>
 <p>对于一个grammar，若存在P经过一次或者多次的递归，即推导出以P开头的式子，则称之为左递归。</p>
-<h3 id="elimination-of-left-recursion">elimination of left recursion</h3>
+<h3 id="elimination-of-left-recursion">elimination of left
+recursion</h3>
 <p>考虑这样的grammar：<strong>A→Aa1｜Aa2……｜Aan｜b1｜b2……｜bm</strong></p>
 <p>可以改写成：</p>
 <p><strong>A→b1A’｜b2A’……｜bmA’</strong></p>
@@ -586,7 +597,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#syntax-directed-translation"><span class="nav-number">1.</span> <span class="nav-text">Syntax-Directed Translation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#error-handling"><span class="nav-number">1.1.</span> <span class="nav-text">error handling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract-syntax-tree"><span class="nav-number">1.2.</span> <span class="nav-text">Abstract Syntax Tree</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#recursive-descent-parsing"><span class="nav-number">1.3.</span> <span class="nav-text">Recursive Descent Parsing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#recursive-descent-algorithm"><span class="nav-number">1.4.</span> <span class="nav-text">Recursive Descent Algorithm</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#left-recursion"><span class="nav-number">1.5.</span> <span class="nav-text">Left Recursion</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#elimination-of-left-recursion"><span class="nav-number">1.5.1.</span> <span class="nav-text">elimination of left recursion</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#syntax-directed-translation"><span class="nav-number">1.</span> <span class="nav-text">Syntax-Directed Translation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#error-handling"><span class="nav-number">1.1.</span> <span class="nav-text">error handling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract-syntax-tree"><span class="nav-number">1.2.</span> <span class="nav-text">Abstract Syntax Tree</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#recursive-descent-parsing"><span class="nav-number">1.3.</span> <span class="nav-text">Recursive Descent Parsing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#recursive-descent-algorithm"><span class="nav-number">1.4.</span> <span class="nav-text">Recursive Descent Algorithm</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#left-recursion"><span class="nav-number">1.5.</span> <span class="nav-text">Left Recursion</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#elimination-of-left-recursion"><span class="nav-number">1.5.1.</span> <span class="nav-text">elimination of left
+recursion</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -628,8 +640,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,12 +332,14 @@
       
 
       
-        <h1 id="understand-the-ins-and-outs-of-inlining">Understand the ins and outs of inlining</h1>
+        <h1 id="understand-the-ins-and-outs-of-inlining">Understand the ins and
+outs of inlining</h1>
 <p>inline函数，不是第一次接触这个概念了。编译器的最优化机制会被设计用来执行语境相关的最优化。但有利有弊，由于inline函数的主体会被插到调用处。这样一来，你的目标码会变得越来越大，有可能导致额外的paging行为。</p>
 <p><br></p>
 <p>通常来说，inline函数有两种定义方法——一是在类内定义函数，这是一种隐喻的方式；二是在定义式前加inline关键字。</p>
 <h2 id="注意">注意</h2>
-<p>inline函数尽量置于头文件内，因为大多数build environment通常会在编译时进行inlining，这是因为为了将一个“函数调用”替换为“被调用函数的本体”，编译器必须知道那个函数长什么样子。</p>
+<p>inline函数尽量置于头文件内，因为大多数build
+environment通常会在编译时进行inlining，这是因为为了将一个“函数调用”替换为“被调用函数的本体”，编译器必须知道那个函数长什么样子。</p>
 <p>template的具体化与inline无关，我们需要的考虑的是——是否希望每一个具体实现的函数都是inline的，毕竟这有可能会引发代码膨胀。</p>
 <p>关于编译器的问题，编译器不一定就真的会对inline函数进行inline行为，例如编译器通常不会对“通过函数指针而进行的函数调用”进行inline行为。另外，如果程序要调用某个inline函数，往往，编译器会生成一个outlined函数本体</p>
 <p>最后一个需要注意的问题是，<strong>inline函数无法随着程序库的升级而升级</strong>。假设f是一个inline函数，而设计者修改了这个函数f，那么所有用到f的客户端程序都必须重新编译，而对于non-inline函数，客户端只需要重新链接即可，这比重新变异的负担少。</p>
@@ -522,7 +522,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#understand-the-ins-and-outs-of-inlining"><span class="nav-number">1.</span> <span class="nav-text">Understand the ins and outs of inlining</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">1.1.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.2.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#understand-the-ins-and-outs-of-inlining"><span class="nav-number">1.</span> <span class="nav-text">Understand the ins and
+outs of inlining</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">1.1.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.2.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -564,8 +565,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

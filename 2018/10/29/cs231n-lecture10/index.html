@@ -103,14 +103,13 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="Recurrent Nerual Networks 目的 相比较于CNN，RNN能够更好地序列的信息。比如理解一句话的意思，根据视频输出行为，判断文本的情感等等。前后的输入是有关联的。 结构 RNN的结构中有一个内部状态值\(h_t\)，这个值取决于输入的x和上一次的内部状态值\(h_{t-1}\)。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值\(Y_t\) 结构">
 <meta property="og:locale">
-<meta property="og:image" content="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg">
 <meta property="og:image" content="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png">
 <meta property="article:published_time" content="2018-10-29T15:27:11.000Z">
 <meta property="article:modified_time" content="2018-10-29T15:27:42.000Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="网络课程">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg">
+<meta name="twitter:image" content="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png">
 
 
 
@@ -161,9 +160,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,25 +338,35 @@
 <h2 id="目的">目的</h2>
 <p>相比较于CNN，RNN能够更好地序列的信息。比如理解一句话的意思，根据视频输出行为，判断文本的情感等等。前后的输入是有关联的。</p>
 <h2 id="结构">结构</h2>
-<p>RNN的结构中有一个内部状态值<span class="math inline">\(h_t\)</span>，这个值取决于输入的x和上一次的内部状态值<span class="math inline">\(h_{t-1}\)</span>。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值<span class="math inline">\(Y_t\)</span></p>
+<p>RNN的结构中有一个内部状态值<span
+class="math inline">\(h_t\)</span>，这个值取决于输入的x和上一次的内部状态值<span
+class="math inline">\(h_{t-1}\)</span>。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值<span
+class="math inline">\(Y_t\)</span></p>
 <p>结构图如下：</p>
 <figure>
-<img src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>RNN的公式如下： <span class="math display">\[
 Y_t = g(V h_t) \\
 h_t = f(UX_t+Wh_{t-1})
 \]</span></p>
 <h2 id="truncated-backprop">truncated backprop</h2>
-<p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final states作为后一个序列的initial states。</p>
+<p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final
+states作为后一个序列的initial states。</p>
 <figure>
-<img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="vanilla-rnn">vanilla RNN</h2>
 <p>只有一层隐藏层的RNN</p>
 <h1 id="lstm">LSTM</h1>
 <p>用来缓解梯度消失和梯度爆炸。</p>
-<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell state，即c，让它保存长期的状态。</p>
+<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell
+state，即c，让它保存长期的状态。</p>
 <p>LSTM将隐藏状态和输入拼接在一起，然后乘以一个巨大的矩阵，得到四个门向量。</p>
 <ul>
 <li>i：input gate，whether to write to cell；</li>
@@ -385,7 +392,8 @@ o_t = \sigma (W_o [h_{t-1}, x_t] + b_o)
 <p><span class="math display">\[
 g_t = tanh(W_g [h_{t-1}, x_t] + b_g)
 \]</span></p>
-<p>cell state的计算公式为：(注意是按元素相乘) <span class="math display">\[
+<p>cell state的计算公式为：(注意是按元素相乘) <span
+class="math display">\[
 c_t = f_t \circ c_{t-1} + i_t \circ g_t
 \]</span> 至于隐藏状态： <span class="math display">\[
 h_t = o_t \circ tanh(c_t)
@@ -606,8 +614,7 @@ h_t = o_t \circ tanh(c_t)
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -342,7 +340,8 @@
 <ul>
 <li>题目描述</li>
 </ul>
-<p>给定一个字符串，要求把字符串前面的若干个字符移动到字符串的尾部，如把字符串“abcdef”前面的2个字符'a'和'b'移动到字符串的尾部，使得原字符串变成字符串“cdefab”。请写一个函数完成此功能，要求对长度为n的字符串操作的时间复杂度为 O(n)，空间复杂度为 O(1)。</p>
+<p>给定一个字符串，要求把字符串前面的若干个字符移动到字符串的尾部，如把字符串“abcdef”前面的2个字符'a'和'b'移动到字符串的尾部，使得原字符串变成字符串“cdefab”。请写一个函数完成此功能，要求对长度为n的字符串操作的时间复杂度为
+O(n)，空间复杂度为 O(1)。</p>
 <ul>
 <li>解答</li>
 </ul>
@@ -352,7 +351,9 @@
 <ul>
 <li>题目描述</li>
 </ul>
-<p>输入一个由数字组成的字符串，把它转换成整数并输出。例如：输入字符串"123"，输出整数123。 给定函数原型int StrToInt(const char *str) ，实现字符串转换成整数的功能，不能使用库函数atoi。</p>
+<p>输入一个由数字组成的字符串，把它转换成整数并输出。例如：输入字符串"123"，输出整数123。
+给定函数原型int StrToInt(const char *str)
+，实现字符串转换成整数的功能，不能使用库函数atoi。</p>
 <ul>
 <li>解答</li>
 </ul>
@@ -362,7 +363,8 @@
 <ul>
 <li>题目描述</li>
 </ul>
-<p>回文，英文palindrome，指一个顺着读和反过来读都一样的字符串，比如madam、我爱我，这样的短句在智力性、趣味性和艺术性上都颇有特色，中国历史上还有很多有趣的回文诗。 那么，我们的第一个问题就是：判断一个字串是否是回文</p>
+<p>回文，英文palindrome，指一个顺着读和反过来读都一样的字符串，比如madam、我爱我，这样的短句在智力性、趣味性和艺术性上都颇有特色，中国历史上还有很多有趣的回文诗。
+那么，我们的第一个问题就是：判断一个字串是否是回文</p>
 <ul>
 <li>解答</li>
 </ul>
@@ -372,7 +374,9 @@
 <ul>
 <li>题目描述</li>
 </ul>
-<p>输入一个字符串，打印出该字符串中字符的所有排列。 例如输入字符串abc，则输出由字符a、b、c 所能排列出来的所有字符串abc、acb、bac、bca、cab 和 cba。</p>
+<p>输入一个字符串，打印出该字符串中字符的所有排列。
+例如输入字符串abc，则输出由字符a、b、c
+所能排列出来的所有字符串abc、acb、bac、bca、cab 和 cba。</p>
 <ul>
 <li>解答</li>
 </ul>
@@ -660,14 +664,16 @@
           
             <h1 id="lexical-analysis">lexical analysis</h1>
 <h2 id="goals">goals</h2>
-<p>converts from phsical description of a program into sequence of tokens. (token: one logical piece of the source file)</p>
+<p>converts from phsical description of a program into sequence of
+tokens. (token: one logical piece of the source file)</p>
 <ul>
 <li>Each token associated with a lexeme</li>
 <li>have opitional attributes</li>
 </ul>
 <h2 id="choosing-good-tokens">choosing good tokens</h2>
 <p>依赖于不同的语言：</p>
-<p>选择关键词； 将lexeme分成不同组的id，如数字，字符串等； 丢弃无用的信息，如空格，注释等；</p>
+<p>选择关键词； 将lexeme分成不同组的id，如数字，字符串等；
+丢弃无用的信息，如空格，注释等；</p>
 <h2 id="扫描的困难">扫描的困难</h2>
 <ul>
 <li>如何判断哪一个的lexeme对应于tokens</li>
@@ -685,10 +691,14 @@
 </ul>
 <h3 id="实现正则表达式">实现正则表达式</h3>
 <p>正则表达式能通过有限自动机来实现。</p>
-<p>而有限自动机有两种： NFA(nondeterministic finite automa) DFA(deterministic finite automa)</p>
-<p>以图表示的话，圆圈表示状态，箭头表示转移，双圆圈表示结束: <img src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg" alt="img" /></p>
+<p>而有限自动机有两种： NFA(nondeterministic finite automa)
+DFA(deterministic finite automa)</p>
+<p>以图表示的话，圆圈表示状态，箭头表示转移，双圆圈表示结束: <img
+src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg"
+alt="img" /></p>
 <p>如果一个状态有多个transitions，那么多条transitions都要进行。</p>
-<p>Epsilon transition: 不消耗任何输入,但会进行transitions。 <img src="https://i.stack.imgur.com/XHuWu.png" alt="img" /></p>
+<p>Epsilon transition: 不消耗任何输入,但会进行transitions。 <img
+src="https://i.stack.imgur.com/XHuWu.png" alt="img" /></p>
 <h3 id="simulating-an-nfa">Simulating an NFA</h3>
 <ol type="1">
 <li>有限初始化，追踪开始状态和所有可以通过ε转移到达的状态；</li>
@@ -705,9 +715,13 @@
 <p>通常情况下选择最长match.</p>
 <p>具体做法是，将所有正则表达式转化为NFA，然后合并成一个状态机，扫描输入，记录上一个已知的匹配。选择更高优先级的。</p>
 <h3 id="dfa">DFA</h3>
-<p>与NFA不同，DFA的每一个状态只有一个与某个字符相关的转移，并且没有ε transitions</p>
+<p>与NFA不同，DFA的每一个状态只有一个与某个字符相关的转移，并且没有ε
+transitions</p>
 <figure>
-<img src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://www.tutorialspoint.com/automata_theory/images/dfa_graphical_representation.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>Make the DFA simulate the NFA</li>
@@ -715,8 +729,11 @@
 <p>(q0是开始状态)</p>
 <p>Step 1: Initially Q’ = ɸ.</p>
 <p>Step 2: Add q0 to Q’.</p>
-<p>Step 3: For each state in Q’, find the possible set of states for each input symbol using transition function of NFA. If this set of states is not in Q’, add it to Q’.</p>
-<p>Step 4: Final state of DFA will be all states with contain F (final states of NFA)</p>
+<p>Step 3: For each state in Q’, find the possible set of states for
+each input symbol using transition function of NFA. If this set of
+states is not in Q’, add it to Q’.</p>
+<p>Step 4: Final state of DFA will be all states with contain F (final
+states of NFA)</p>
 <p>参考资料：https://www.geeksforgeeks.org/theory-of-computation-conversion-from-nfa-to-dfa/</p>
 
           
@@ -845,10 +862,13 @@
 </ul>
 <p>five aspects</p>
 <ul>
-<li><p>lexical analysis: divides program text into "words" or "tokens"</p></li>
+<li><p>lexical analysis: divides program text into "words" or
+"tokens"</p></li>
 <li><p>parsing: understand the program structrue</p></li>
-<li><p>semantic analysis: perform limited semantic analysis to catch inconsistencies; should define strict rules to avoid ambiguties</p></li>
-<li><p>optimization: like editing, to run faster and use less memory; x = y*0 == x = 0(x is int)</p></li>
+<li><p>semantic analysis: perform limited semantic analysis to catch
+inconsistencies; should define strict rules to avoid ambiguties</p></li>
+<li><p>optimization: like editing, to run faster and use less memory; x
+= y*0 == x = 0(x is int)</p></li>
 <li><p>code generation: produces assembly code(usually)</p></li>
 </ul>
 
@@ -970,8 +990,10 @@
       
         
           
-            <h1 id="the-semantics-of-constructors">The Semantics of Constructors</h1>
-<h2 id="default-constructor的建构操作">Default Constructor的建构操作</h2>
+            <h1 id="the-semantics-of-constructors">The Semantics of
+Constructors</h1>
+<h2 id="default-constructor的建构操作">Default
+Constructor的建构操作</h2>
 <p><strong>默认构造函数会在需要的时候被编译器产生出来</strong>。这里的关键是：被谁需要，做什么事情。</p>
 <h2 id="被谁需要">被谁需要</h2>
 <p>当编译器需要的时候才会合成，但编译器不会为数据成员进行初始化，也就是不会在默认构造函数中进行初始化。考虑下面的代码：</p>
@@ -998,7 +1020,8 @@
 <li>class声明一个virtual function</li>
 <li>class派生自一个继承链，其中有一个以上的virtual base class</li>
 </ol>
-<p>这种情况是因为编译器需要为类生成virtual table和指向virtual table的指针。因此把这两个操作放在合成的构造函数中进行。</p>
+<p>这种情况是因为编译器需要为类生成virtual table和指向virtual
+table的指针。因此把这两个操作放在合成的构造函数中进行。</p>
 <ul>
 <li>带有一个virtual base class的class</li>
 </ul>
@@ -1130,7 +1153,9 @@
           
             <h1 id="unix基础知识">unix基础知识</h1>
 <h2 id="unix体系结构">unix体系结构</h2>
-<p>内核的接口称之为系统调用； 公用函数库建立在系统调用上，用户既可以调用函数库函数，也可以使用系统调用； shell是特殊的应用程序，为其它应用程序提供接口；</p>
+<p>内核的接口称之为系统调用；
+公用函数库建立在系统调用上，用户既可以调用函数库函数，也可以使用系统调用；
+shell是特殊的应用程序，为其它应用程序提供接口；</p>
 <h2 id="登录">登录</h2>
 <p>登录项通常在<strong>/etc/passwd</strong>文件中，但加密口令不在此；</p>
 <h2 id="文件和目录">文件和目录</h2>
@@ -1277,21 +1302,30 @@
 <h2 id="套接字地址结构">套接字地址结构</h2>
 <p>先看看IPV4的结构</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> &#123;</span></span><br><span class="line">    <span class="type">in_addr_t</span> s_addr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sin_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sin_family;</span><br><span class="line">    <span class="type">in_port_t</span> sin_port;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span></span><br><span class="line">    <span class="type">char</span> sin_zero[<span class="number">8</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>在sockaddr_in这个结构体，通常只需要三个字段: sin_family、sin_addr和sin_port（POSIX标准）。另外sin_zero这个字段一般不会使用，我们直接把其置为０即可</p>
-<p>通常套接字地址结构，由于我们传递给socketAPI的是指针，所以这些API通常要处理各种支持不同协议的套接字地址，又因为套接字函数出来的时候，ANSI C还没有提出，也就无法使用通常指针void *。所以我们每次传入套接字函数，都需要转为以下的结构：</p>
+<p>在sockaddr_in这个结构体，通常只需要三个字段:
+sin_family、sin_addr和sin_port（POSIX标准）。另外sin_zero这个字段一般不会使用，我们直接把其置为０即可</p>
+<p>通常套接字地址结构，由于我们传递给socketAPI的是指针，所以这些API通常要处理各种支持不同协议的套接字地址，又因为套接字函数出来的时候，ANSI
+C还没有提出，也就无法使用通常指针void
+*。所以我们每次传入套接字函数，都需要转为以下的结构：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sa_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sa_family;</span><br><span class="line">    <span class="type">char</span> sa_data[<span class="number">14</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">serv</span>;</span></span><br><span class="line">bind(sockfd, (<span class="keyword">struct</span> sockaddr *) &amp;serv, <span class="keyword">sizeof</span>(serv));</span><br></pre></td></tr></table></figure>
-<p>另外在IPv6提出之后，有了新的同样套接字地址结构，并且可以支持任何套接字结构，这里就不表了，可以搜一下：<strong>struct sockaddr_storage</strong></p>
+<p>另外在IPv6提出之后，有了新的同样套接字地址结构，并且可以支持任何套接字结构，这里就不表了，可以搜一下：<strong>struct
+sockaddr_storage</strong></p>
 <h2 id="值结果参数">值——结果参数</h2>
 <ul>
-<li><p>从进程到内核传递套接字地址的函数有３个：bind, connect和sendto，参数是指向结构的指针，和结构的大小；</p></li>
-<li><p>从内核到进程传递套接字的函数有４个：accept, recvfrom, getsockname, getpeername，参数是指向结构的指针和直线结构大小变量的指针；</p></li>
+<li><p>从进程到内核传递套接字地址的函数有３个：bind,
+connect和sendto，参数是指向结构的指针，和结构的大小；</p></li>
+<li><p>从内核到进程传递套接字的函数有４个：accept, recvfrom,
+getsockname,
+getpeername，参数是指向结构的指针和直线结构大小变量的指针；</p></li>
 </ul>
 <h2 id="字节排序函数">字节排序函数</h2>
 <p>这个是因为在不同的主机系统中，采用大小端模式是不同的，比如linux中是小端序，而apple中是大端序。这两种字节序转换用以下４个函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">htons</span><span class="params">(<span class="type">uint16_t</span> host16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">htonl</span><span class="params">(<span class="type">uint32_t</span> host32bitvalue)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">ntohs</span><span class="params">(<span class="type">uint16_t</span> net16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ntohl</span><span class="params">(<span class="type">uint32_t</span> net32bitvalue)</span>;</span><br></pre></td></tr></table></figure>
 <h2 id="字节操作函数">字节操作函数</h2>
 <p>没什么好说的，主要关注bzero，memset，memcpy等几个函数</p>
-<h2 id="inet_aton-inet_addr-inet_ntoa函数和inet_ptoninet_ntop函数">inet_aton, inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</h2>
+<h2
+id="inet_aton-inet_addr-inet_ntoa函数和inet_ptoninet_ntop函数">inet_aton,
+inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</h2>
 <p>这些函数，是用来在ASCII字符串中和网络字节序的二进制值进行转换的。这两个函数——inet_pton，inet_ntop，针对IPv6和IPv4都是适用的。</p>
 
           
@@ -1430,11 +1464,15 @@
 <li>由于alignment而需要进行padding的大小，有可能在数据成员上填补，也可能在集合体上进行填补；</li>
 <li>为了支持virtual function而带来的额外负担；</li>
 </ul>
-<p>指针的类型，例如一个指向对象的指针和一个指向整数的指针，一个指向template array的指针有什么区别？关键不在于指针内容的不同，而是通过指针寻址出来的对象不同，也就是指针类型告诉了编译器应该如何解释特定内存地址的内容和大小。</p>
+<p>指针的类型，例如一个指向对象的指针和一个指向整数的指针，一个指向template
+array的指针有什么区别？关键不在于指针内容的不同，而是通过指针寻址出来的对象不同，也就是指针类型告诉了编译器应该如何解释特定内存地址的内容和大小。</p>
 <p>而一个指针类型为void*的指针，其仅仅代表一个地址，通过转型cast，使得编译器能够解释指出内存的大小和位置。</p>
 <p>考虑这种情况：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Bear b;</span><br><span class="line">ZooAnimal *pz = &amp;b;</span><br><span class="line">Bear *pb = &amp;b;</span><br></pre></td></tr></table></figure>
-<p>上面的两个指针都执行了Bear object的第一个字节，但不同的是，pz涵盖的只有Bear object的ZooAnimal部分。而pb则涵盖了整个Bear object;也就是你无法通过pz去使用Bear的任何members。除非使用虚函数机制；</p>
+<p>上面的两个指针都执行了Bear
+object的第一个字节，但不同的是，pz涵盖的只有Bear
+object的ZooAnimal部分。而pb则涵盖了整个Bear
+object;也就是你无法通过pz去使用Bear的任何members。除非使用虚函数机制；</p>
 <p>也就是通过pz所指向的类型去调用某个函数，这里的关键是类型信息并不是存储在pz里，而是存储pz所指向的对象的虚指针和虚指针所指向的虚表里。</p>
 <p>而如果直接把派生类的对象塞进基类的对象里，派生类对象会被切割，也就是失去了多态的功能，</p>
 
@@ -1564,7 +1602,8 @@
 <ol type="1">
 <li><p>首先当然是自我介绍啦。</p></li>
 <li><p>然后因为我的简历上有一些图形学的项目，所以面试官叫我说一下自己的项目内容，遇到的问题等等。紧接着，就是针对我的项目提出了一些关于游戏优化的问题（不得不说，面试官能在我乱七八糟的语言组织下发现我的问题真是厉害啊），我大概讲了一些（也不知道对不对），面试官就点了点头；还有就是，让我画了一下整个项目架构，我画的很烂。。。另外还有的是，问了一些图形流水线的问题，包括比较了一下老版opengl和新版opengl的区别，各种shader的使用等待</p></li>
-<li><p>然后问了一下另外一个项目，一个解析器，用python写的，所以就提问了一下python的一些magic method，还有就是装饰器的意义作用（这个问题是我引出的，所以回答时注意不要回答到自己不会的东西），当然我都有所准备啦。</p></li>
+<li><p>然后问了一下另外一个项目，一个解析器，用python写的，所以就提问了一下python的一些magic
+method，还有就是装饰器的意义作用（这个问题是我引出的，所以回答时注意不要回答到自己不会的东西），当然我都有所准备啦。</p></li>
 <li><p>然后就是各种排序算法的分析，手写了一下快排，解释了一下几种选择pivot的优缺点。</p></li>
 <li><p>紧接着，还是针对我的项目问的，问了一些数据库的问题，然后还问了一下B+树，我就回答了一下B+树定义作用应用，比较了一下B+树和B树，还有红黑树。</p></li>
 <li><p>最后就是问我有时间实习吗，还有问我有什么问题不</p></li>
@@ -1711,11 +1750,15 @@
 <ul>
 <li>假如有１TB的数据，内存只有32GB</li>
 </ul>
-<p>第一步是将１TB的数据分成40组，每组25GB； 然后分别读取40组数据，进行内部排序（可以用快排或者归并），然后写回磁盘； 接着从这40组数据中分别读取25GB/40=0.625GB，放在40个缓冲区里； 最后进行多路归并，可以每次将归并结果写满4GB就写回磁盘；并且一旦有缓冲区已经读完了，就从该缓冲区对应的组里读入新的0.625GB；</p>
+<p>第一步是将１TB的数据分成40组，每组25GB；
+然后分别读取40组数据，进行内部排序（可以用快排或者归并），然后写回磁盘；
+接着从这40组数据中分别读取25GB/40=0.625GB，放在40个缓冲区里；
+最后进行多路归并，可以每次将归并结果写满4GB就写回磁盘；并且一旦有缓冲区已经读完了，就从该缓冲区对应的组里读入新的0.625GB；</p>
 <ol start="2" type="1">
 <li>海量数据中选出最大的前k个数</li>
 </ol>
-<p>一种方法：通过哈希将海量数据分成n个小文件（如果不够小，继续细分，直到文件大小小于内存）。然后为每个小文件建立一个小顶堆，这样就能选出n个topK，进行归并，选出最后的topK； 另外的方法：是直接建立一个k大小的大顶堆，然后依次读入数据，与堆顶元素比较，调整堆。当所有数据读完之后，得到最终的堆就是topK个数；</p>
+<p>一种方法：通过哈希将海量数据分成n个小文件（如果不够小，继续细分，直到文件大小小于内存）。然后为每个小文件建立一个小顶堆，这样就能选出n个topK，进行归并，选出最后的topK；
+另外的方法：是直接建立一个k大小的大顶堆，然后依次读入数据，与堆顶元素比较，调整堆。当所有数据读完之后，得到最终的堆就是topK个数；</p>
 <ol start="3" type="1">
 <li>海量数据中选出频率最高的几个元素</li>
 </ol>
@@ -1731,9 +1774,11 @@
 <ol start="6" type="1">
 <li>判断一个数是否在海量数据中</li>
 </ol>
-<p>一种方法是采用位图法，1个bit代表一个数，扫描一遍海量数据，得到扫描结果。之后进行判断； 另外的方法则是，把海量数据按照每个bit为0或者1分成两类，然后又按照次高位分成2类。。一次下去。这样，每次判断数是否存在于海量数据中花费时间为logN</p>
+<p>一种方法是采用位图法，1个bit代表一个数，扫描一遍海量数据，得到扫描结果。之后进行判断；
+另外的方法则是，把海量数据按照每个bit为0或者1分成两类，然后又按照次高位分成2类。。一次下去。这样，每次判断数是否存在于海量数据中花费时间为logN</p>
 <h1 id="参考">参考</h1>
-<p>http://blog.csdn.net/FX677588/article/details/72471357 https://kb.cnblogs.com/page/95701/</p>
+<p>http://blog.csdn.net/FX677588/article/details/72471357
+https://kb.cnblogs.com/page/95701/</p>
 
           
         
@@ -1900,8 +1945,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

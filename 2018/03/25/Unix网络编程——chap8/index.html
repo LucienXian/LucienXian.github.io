@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -336,7 +334,8 @@
       
         <p>#基本UDP套接字编程</p>
 <h2 id="概述">概述</h2>
-<p>与TCP不一样，UDP是无连接不可靠的数据报协议。在有些应用程序上会用到UDP，比如DNS, NFS, SNMP。</p>
+<p>与TCP不一样，UDP是无连接不可靠的数据报协议。在有些应用程序上会用到UDP，比如DNS,
+NFS, SNMP。</p>
 <p>由于UDP不等待连接，所以客户端只管调用sendto函数，而服务端也只管调用recvfrom函数。</p>
 <h2 id="recvfrom和sendto函数">recvfrom和sendto函数</h2>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">recvfrom</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buff, <span class="type">size_t</span> nbytes, <span class="type">int</span> flags, <span class="keyword">struct</span> sockaddr *from, <span class="type">socklen_t</span> *addrlen)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendto</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buff, <span class="type">size_t</span> nbytes, <span class="type">int</span> flags, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *to, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
@@ -355,7 +354,8 @@
 <p>之前我们提到过，除非UDP的套接字已连接，否则异步错误是不会返回到UDP的套接字的。</p>
 <p>我们可以在UDP的套接字上使用connect，但与TCP不同的是，这里没有三次握手的过程，只是检测是否存在立即可以感知的错误，记录对端的IP地址和端口号，并返回调用进程。</p>
 <p>对于使用了connect的UDP套接字，接受和发送数据不能再使用sendto和recvfrom，而是read、write等。一个以连接的套接字仅仅与一个IP地址交换数据报。</p>
-<h2 id="给一个udp套接字多次使用connect">给一个UDP套接字多次使用connect</h2>
+<h2
+id="给一个udp套接字多次使用connect">给一个UDP套接字多次使用connect</h2>
 <p>这样做有两个目的：</p>
 <ul>
 <li>指定新的IP地址和端口号;</li>
@@ -595,8 +595,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

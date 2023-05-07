@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,9 +338,12 @@
 <h2 id="建议">建议</h2>
 <p>一旦类实现了Comparable接口，它可以跟许多泛型算法进行协作。在Java平台类库中的所有值类都实现了Comparable接口。</p>
 <ol type="1">
-<li>实现者必须确保所有的x和y都满足sgn(x.compareTo(y)) == -sgn(y.compareTo(x))；</li>
-<li>确保比较关系可传递：x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z) &gt; 0，那么x.compareTo(z)&gt;0为true；</li>
-<li>x.compareTo(y) ==0 意味着所有z都满足sgn(x.compareTo(z)) == sgn(y.compareTo(z))</li>
+<li>实现者必须确保所有的x和y都满足sgn(x.compareTo(y)) ==
+-sgn(y.compareTo(x))；</li>
+<li>确保比较关系可传递：x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z)
+&gt; 0，那么x.compareTo(z)&gt;0为true；</li>
+<li>x.compareTo(y) ==0 意味着所有z都满足sgn(x.compareTo(z)) ==
+sgn(y.compareTo(z))</li>
 </ol>
 <p>另外，强烈建议：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x.compareTo(y)==<span class="number">0</span>) == (x.equals(y))</span><br></pre></td></tr></table></figure>
@@ -562,8 +563,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

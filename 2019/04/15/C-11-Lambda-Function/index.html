@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -350,7 +348,8 @@
 </ul>
 <p>利用lambda函数改写：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    std::for_each(arr, arr + <span class="built_in">sizeof</span>(arr) / <span class="built_in">sizeof</span>(<span class="type">int</span>), [](<span class="type">int</span> x) &#123;</span><br><span class="line">            std::cout&lt;&lt;x&lt;&lt;<span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="how-to-pass-outer-scope-elements-inside-lambda-functions">How to pass outer scope elements inside lambda functions</h2>
+<h2 id="how-to-pass-outer-scope-elements-inside-lambda-functions">How to
+pass outer scope elements inside lambda functions</h2>
 <h3 id="case-1-使用">case 1: 使用[=]</h3>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[=](<span class="type">int</span> &amp;x) &#123;</span><br><span class="line">    <span class="comment">// All outer scope elements has been passed by value</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="case-1-使用-1">case 1: 使用[&amp;]</h3>
@@ -529,7 +528,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-lambda-function"><span class="nav-number">1.</span> <span class="nav-text">C++11 Lambda Function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-a-lambda-function"><span class="nav-number">1.1.</span> <span class="nav-text">What is a Lambda Function?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#need-of-lambda-functions"><span class="nav-number">1.2.</span> <span class="nav-text">Need of Lambda functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rise-of-lambda-functions"><span class="nav-number">1.3.</span> <span class="nav-text">Rise of Lambda functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-pass-outer-scope-elements-inside-lambda-functions"><span class="nav-number">1.4.</span> <span class="nav-text">How to pass outer scope elements inside lambda functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-%E4%BD%BF%E7%94%A8"><span class="nav-number">1.4.1.</span> <span class="nav-text">case 1: 使用[&#x3D;]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-%E4%BD%BF%E7%94%A8-1"><span class="nav-number">1.4.2.</span> <span class="nav-text">case 1: 使用[&amp;]</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-lambda-function"><span class="nav-number">1.</span> <span class="nav-text">C++11 Lambda Function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-a-lambda-function"><span class="nav-number">1.1.</span> <span class="nav-text">What is a Lambda Function?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#need-of-lambda-functions"><span class="nav-number">1.2.</span> <span class="nav-text">Need of Lambda functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rise-of-lambda-functions"><span class="nav-number">1.3.</span> <span class="nav-text">Rise of Lambda functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-pass-outer-scope-elements-inside-lambda-functions"><span class="nav-number">1.4.</span> <span class="nav-text">How to
+pass outer scope elements inside lambda functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-%E4%BD%BF%E7%94%A8"><span class="nav-number">1.4.1.</span> <span class="nav-text">case 1: 使用[&#x3D;]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-%E4%BD%BF%E7%94%A8-1"><span class="nav-number">1.4.2.</span> <span class="nav-text">case 1: 使用[&amp;]</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -571,8 +571,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

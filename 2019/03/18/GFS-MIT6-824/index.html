@@ -103,15 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="The Google File System  论文《The Google File System》  INTRODUCTION Google File System (GFS)是谷歌提出的一种快速处理数据的文件系统，与传统的分布式文件系统一样，对于性能，可扩展性，可靠性和可用性都有一定的需求。但通过与传统的分布式文件系统相比较，Google认为：  组件故障是常态的而非例外； 传统标准意义的文件">
 <meta property="og:locale">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_Architecture.png">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_file_region_state_after_mut.png">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_F2.png">
 <meta property="article:published_time" content="2019-03-18T04:03:39.000Z">
 <meta property="article:modified_time" content="2019-03-18T04:05:15.590Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="分布式">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_Architecture.png">
 
 
 
@@ -162,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,12 +332,16 @@
       
 
       
-        <h1 id="the-google-file-system"><strong>The Google File System</strong></h1>
+        <h1 id="the-google-file-system"><strong>The Google File
+System</strong></h1>
 <blockquote>
-<p><a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/zh-CN//archive/gfs-sosp2003.pdf">论文《The Google File System》</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/zh-CN//archive/gfs-sosp2003.pdf">论文《The
+Google File System》</a></p>
 </blockquote>
 <h2 id="introduction">INTRODUCTION</h2>
-<p>Google File System (GFS)是谷歌提出的一种快速处理数据的文件系统，与传统的分布式文件系统一样，对于性能，可扩展性，可靠性和可用性都有一定的需求。但通过与传统的分布式文件系统相比较，Google认为：</p>
+<p>Google File System
+(GFS)是谷歌提出的一种快速处理数据的文件系统，与传统的分布式文件系统一样，对于性能，可扩展性，可靠性和可用性都有一定的需求。但通过与传统的分布式文件系统相比较，Google认为：</p>
 <ul>
 <li>组件故障是常态的而非例外；</li>
 <li>传统标准意义的文件很大；</li>
@@ -363,19 +361,27 @@
 </ul>
 <h3 id="interface">Interface</h3>
 <p>GFS提供了熟悉的文件系统接口，但它没有实现POSIX等标准API。</p>
-<p>此外，GFS还实现了快照和记录追加操作，Record append允许多个客户端同时将数据追加到同一文件，同时保证每个客户端追加的原子性。</p>
+<p>此外，GFS还实现了快照和记录追加操作，Record
+append允许多个客户端同时将数据追加到同一文件，同时保证每个客户端追加的原子性。</p>
 <h3 id="architecture">Architecture</h3>
 <p>一个GFS集群包含了一个master服务器和多个被client访问的chunk服务器，每个chunk服务器都是跑着用户级进程的Linux主机。文件被分成固定大小的块存储在chunkserver上，拥有一个唯一的、由master分配的64位ID。为了可靠性，每个chunkserver都做了多重备份，如三备份。</p>
 <p>master存储着所有的文件元数据信息，并且与chunkserver通过心跳机制进行沟通。</p>
 <p>client和chunkserver都不对文件进行缓存，而是有Linux本身的文件、内存机制进行管理，因为文件太大了。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_Architecture.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_Architecture.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="single-master">Single Master</h3>
-<p>单个master对于我们的设计非常有帮助，为了不使master成为系统的瓶颈，我们需要减少master的IO。因此client不会直接通过master会读写数据，而是向master发送(file name, chunk index)请求，master返回(chunk handle, chunk locations)，这样client就可以通过这个handle和byte range向最近的chunk server获取数据。</p>
+<p>单个master对于我们的设计非常有帮助，为了不使master成为系统的瓶颈，我们需要减少master的IO。因此client不会直接通过master会读写数据，而是向master发送(file
+name, chunk index)请求，master返回(chunk handle, chunk
+locations)，这样client就可以通过这个handle和byte range向最近的chunk
+server获取数据。</p>
 <p>对于相同的chunk的读取，client不会再向master做请求，而是到了cache的信息过期了，或者相关文件重新被打开了，才会去与master交互。</p>
 <h3 id="chunk-size">Chunk Size</h3>
-<p>chunk size是关键的设计参数，在这里选定了64MB大小，比一般的文件系统的block略大。</p>
+<p>chunk
+size是关键的设计参数，在这里选定了64MB大小，比一般的文件系统的block略大。</p>
 <p>优点：</p>
 <ul>
 <li>减少了与master交互，因为只需要一次初始的请求得知chunk的位置即可；</li>
@@ -384,30 +390,43 @@
 </ul>
 <p>缺点：</p>
 <ul>
-<li>对于一个小文件，可能只有一个chunk，这很可能因为client都访问同一个文件，造成hot spot的问题；</li>
+<li>对于一个小文件，可能只有一个chunk，这很可能因为client都访问同一个文件，造成hot
+spot的问题；</li>
 </ul>
 <h3 id="metedata">Metedata</h3>
 <p>master会保存三种元数据类型：文件和块的命名空间，文件到块的映射，块的位置，所有这些元数据都在master的内存中。</p>
-<h4 id="in-memory-data-structures"><em>In-Memory Data Structures</em></h4>
-<p>把元数据存储在内存中，提高了master的操作速度，并使得master定期扫描元数据状态变得更加方便。另外，虽然这种方式受制于机器内存，但由于每个文件都会有少数的块是部分满的，对于64MB大小的chunk size，我们会采用64个字节去存储元信息。因此可以用来存储这些小于64个字节的元数据信息。除此之外，必要地增加内存也不是很麻烦的事情。</p>
+<h4 id="in-memory-data-structures"><em>In-Memory Data
+Structures</em></h4>
+<p>把元数据存储在内存中，提高了master的操作速度，并使得master定期扫描元数据状态变得更加方便。另外，虽然这种方式受制于机器内存，但由于每个文件都会有少数的块是部分满的，对于64MB大小的chunk
+size，我们会采用64个字节去存储元信息。因此可以用来存储这些小于64个字节的元数据信息。除此之外，必要地增加内存也不是很麻烦的事情。</p>
 <h4 id="chunk-locations"><em>Chunk Locations</em></h4>
-<p>master不会拥有chunkserver中关于某个块位置的持久化记录，而是在启动后定期轮询chunkserver（或者有新的GFS chunkserver加入时），获取该信息。因为GFS chunkserver很容易出现宕机，重启等行为，这样GFS master在每次发生这些事件的时候，都要修改持久化存储里面的位置信息的数据。</p>
+<p>master不会拥有chunkserver中关于某个块位置的持久化记录，而是在启动后定期轮询chunkserver（或者有新的GFS
+chunkserver加入时），获取该信息。因为GFS
+chunkserver很容易出现宕机，重启等行为，这样GFS
+master在每次发生这些事件的时候，都要修改持久化存储里面的位置信息的数据。</p>
 <h4 id="operation-log"><em>Operation Log</em></h4>
-<p>操作日志包含关键元数据更改的历史记录。 它是GFS的核心。它不仅是元数据的唯一持久记录，而且还充当定义并发操作顺序的逻辑时间线。</p>
+<p>操作日志包含关键元数据更改的历史记录。
+它是GFS的核心。它不仅是元数据的唯一持久记录，而且还充当定义并发操作顺序的逻辑时间线。</p>
 <p>在存储时，只有当操作日志被写入到本地master和远程时，master才会对client返回成功。并且，为了提高IO吞吐，master会对日志记录进行批处理。</p>
-<p>关于操作日志，master只有在操作日志达到一定大小时才会进行checkpoint，并且checkpoint以B树的结构在内存中存在，之后则可以通过加载最新的checkpoint来重放这之后的操作日志。因为build checkpoint需要一定的时间，所以master会新开一个线程做checkpoint，从而避免影响到来的请求。</p>
+<p>关于操作日志，master只有在操作日志达到一定大小时才会进行checkpoint，并且checkpoint以B树的结构在内存中存在，之后则可以通过加载最新的checkpoint来重放这之后的操作日志。因为build
+checkpoint需要一定的时间，所以master会新开一个线程做checkpoint，从而避免影响到来的请求。</p>
 <h3 id="consistency-model">Consistency Model</h3>
 <h4 id="guarantees-by-gfs"><em>Guarantees by GFS</em></h4>
 <p>文件命名空间的修改，比如创建文件，都是由master进行的院子操作，master的操作日志定义了一个全局的执行顺序。</p>
 <p>数据修改后，文件区域的状态取决于修改类型，如下图：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_file_region_state_after_mut.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_file_region_state_after_mut.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>consistent: 所有的client都能看到相同的数据；</li>
-<li>defined: 在文件被修改后，该区域时consistent的并且client能够看到其修改了什么；</li>
+<li>defined:
+在文件被修改后，该区域时consistent的并且client能够看到其修改了什么；</li>
 </ul>
-<h4 id="implications-for-applications"><em>Implications for Applications</em></h4>
+<h4 id="implications-for-applications"><em>Implications for
+Applications</em></h4>
 <p>事实上，应用在修改文件时往往是追加而不是覆盖，典型的，一个writer创建文件后从头到尾追加。追加文件的操作相对于随机写，其效率更高，并且更容易应对应用失败，只需要使用checkpoint重启增量写即可，还可以避免reader读到不完整的数据。</p>
 <p>除此之外，还会经常出现的场景是，多个writers并发地追加到一个文件，以作归并输出。readers通过辨识writer留下的检验信息，可以认出并去除额外的对齐和记录碎片，还可以用唯一的ID去除重复的记录。</p>
 <h2 id="system-interactions">SYSTEM INTERACTIONS</h2>
@@ -415,11 +434,16 @@
 <p>所有的操作都应该尽量减少与master的交互</p>
 </blockquote>
 <h3 id="leases-and-mutation-order">Leases and Mutation Order</h3>
-<p>由于master对于后续的数据流操作是不作控制的，因此需要一种机制保证，多副本以相同的操作顺序写入。GFS会从chunk选定一个chunk server，发送lease，称作primary。由这个primary chunkServer控制写入的顺序。</p>
+<p>由于master对于后续的数据流操作是不作控制的，因此需要一种机制保证，多副本以相同的操作顺序写入。GFS会从chunk选定一个chunk
+server，发送lease，称作primary。由这个primary
+chunkServer控制写入的顺序。</p>
 <p>lease的初始超时为60秒，这些lease是搭载在HeartBeat信息上的，当master与primary失去连接，也可以在旧lease过期重新选择primary。</p>
 <p>下图为该控制流程：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_F2.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/GFS_F2.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ol type="1">
 <li>client向master请求当前lease是哪个chunk，和所有的相关副本。如果还没有lease，master则分配一个；</li>
@@ -432,10 +456,14 @@
 </ol>
 <h3 id="data-flow">Data Flow</h3>
 <p>为了尽可能避免网络瓶颈和链路延迟，每台机器都将数据转发到尚未接收到它的网络拓扑中的“最近”的机器，可以通过IP地址估算距离。</p>
-<p>在没有网络拥塞的情况下，将B字节传输到R副本的理想经过时间是<strong>B / T + RL</strong>，其中T是网络吞吐量，L是在两台机器之间传输字节的延迟。</p>
+<p>在没有网络拥塞的情况下，将B字节传输到R副本的理想经过时间是<strong>B /
+T +
+RL</strong>，其中T是网络吞吐量，L是在两台机器之间传输字节的延迟。</p>
 <h3 id="atomic-record-appends">Atomic Record Appends</h3>
-<p>GFS提供了一个名为record append的原子追加操作，客户端仅指定数据，GFS选择偏移量，然后以原子方式将其附加到文件至少一次，并将该偏移量返回给客户端。</p>
-<p>记录追加与上面的流程有一个额外的逻辑：客户端将数据推送到文件最后一个块的所有副本之后，将其请求发送给primary。primary检查是否将记录附加到当前块将会导致块的大小超过限制（64 MB）。如果是，会把当前的chunk的剩余空间pad起来，然后告诉其他的副本也这么干，最后告诉client这个chunk满了，写入下个chunk。</p>
+<p>GFS提供了一个名为record
+append的原子追加操作，客户端仅指定数据，GFS选择偏移量，然后以原子方式将其附加到文件至少一次，并将该偏移量返回给客户端。</p>
+<p>记录追加与上面的流程有一个额外的逻辑：客户端将数据推送到文件最后一个块的所有副本之后，将其请求发送给primary。primary检查是否将记录附加到当前块将会导致块的大小超过限制（64
+MB）。如果是，会把当前的chunk的剩余空间pad起来，然后告诉其他的副本也这么干，最后告诉client这个chunk满了，写入下个chunk。</p>
 <p>如果任何副本上的记录追加失败，则客户端将重试该操作。因此，同一块的副本可能包含不同的数据，但副本必须要与primary对齐，使得下次再追加时，无论哪个副本成为了primary，都能保证所有的操作都从同样的偏移开始追加。</p>
 <h3 id="snapshot">Snapshot</h3>
 <p>我们采用写时拷贝的方法来完成快照操作：</p>
@@ -455,17 +483,23 @@
 <blockquote>
 <p>The master executes all namespace operations.</p>
 </blockquote>
-<h3 id="namespace-management-and-locking">Namespace Management and Locking</h3>
+<h3 id="namespace-management-and-locking">Namespace Management and
+Locking</h3>
 <p>由于很多master操作会花费很多时间，为了避免master阻塞，允许多种master操作同时running，我们使用锁保证序列化。</p>
 <p>GFS逻辑上将namespace表示为<strong>完整路径名映射到元数据的查找表</strong>，并且通过前缀压缩保证了其在内存中的使用，namespace树中的每个节点都有一个读写锁。</p>
-<p>每个master操作前都会获取一组锁，如果设计了路径<strong>/d1/d2/.../dn/leaf</strong>，那么就会获得一组关于/d1, /d1/d2, ..., /d1/d2/…/dn， /d1/d2/.../dn/leaf的锁。</p>
-<p>举个例子，当/home/user被快照到/save/user的时候，/home/user/foo的创建是被禁止的。因为快照操作获取/home和/save上的读锁，以及/home/user和/save/user上的写锁。文件创建需要/home和/home/user上的读锁，以及/home/user /foo上的写锁。其中，/home/user的锁产生冲突。</p>
+<p>每个master操作前都会获取一组锁，如果设计了路径<strong>/d1/d2/.../dn/leaf</strong>，那么就会获得一组关于/d1,
+/d1/d2, ..., /d1/d2/…/dn， /d1/d2/.../dn/leaf的锁。</p>
+<p>举个例子，当/home/user被快照到/save/user的时候，/home/user/foo的创建是被禁止的。因为快照操作获取/home和/save上的读锁，以及/home/user和/save/user上的写锁。文件创建需要/home和/home/user上的读锁，以及/home/user
+/foo上的写锁。其中，/home/user的锁产生冲突。</p>
 <p>这种方案的一个好处是保障其可以在同一个文件目录并发执行多个文件创建。</p>
 <h3 id="replica-placement">Replica Placement</h3>
-<p>在GFS集群中，通常有数百个chunk server分布在许多rack上。副本的放置策略有两个目的：最大化数据可靠行和可用性，并最大化网络带宽的利用率。我们必须把chunk的副本分发到不同的rack，这样即使整个rack故障了，这些副本仍然可以存活可用。而且这样在读取的时候也可以利用多个rack的聚合带宽。</p>
-<h3 id="creation-re-replication-rebalancing">Creation, Re-replication, Rebalancing</h3>
+<p>在GFS集群中，通常有数百个chunk
+server分布在许多rack上。副本的放置策略有两个目的：最大化数据可靠行和可用性，并最大化网络带宽的利用率。我们必须把chunk的副本分发到不同的rack，这样即使整个rack故障了，这些副本仍然可以存活可用。而且这样在读取的时候也可以利用多个rack的聚合带宽。</p>
+<h3 id="creation-re-replication-rebalancing">Creation, Re-replication,
+Rebalancing</h3>
 <blockquote>
-<p>Chunk replicas are created for three reasons: chunk creation, re-replication, and rebalancing.</p>
+<p>Chunk replicas are created for three reasons: chunk creation,
+re-replication, and rebalancing.</p>
 </blockquote>
 <ol type="1">
 <li>创建chunk</li>
@@ -473,7 +507,8 @@
 <p>当chunk server要创建一个chunk时，会考虑以下几种因素：</p>
 <ul>
 <li>希望chunk server低于平均磁盘空间利用率；</li>
-<li>限制每个chunk server最近创建的数量，因为创建chunk往往意味着后续会有大量写入；</li>
+<li>限制每个chunk
+server最近创建的数量，因为创建chunk往往意味着后续会有大量写入；</li>
 <li>希望在rack上分散chunk的副本；</li>
 </ul>
 <ol start="2" type="1">
@@ -483,9 +518,11 @@
 <ol start="3" type="1">
 <li>重新平衡</li>
 </ol>
-<p>master会定期重新平衡副本，通过检查当前的副本分发并移动副本来获得更好的磁盘空间和负载平衡。同样，对于新加入的的chunk server，master会逐渐填满，而不是用大量的写入流量将其打挂。</p>
+<p>master会定期重新平衡副本，通过检查当前的副本分发并移动副本来获得更好的磁盘空间和负载平衡。同样，对于新加入的的chunk
+server，master会逐渐填满，而不是用大量的写入流量将其打挂。</p>
 <h3 id="garbage-collection">Garbage Collection</h3>
-<p>文件会删除后，GFS不会立即GC，而且在常规GC时，也只是做了lazy delete。</p>
+<p>文件会删除后，GFS不会立即GC，而且在常规GC时，也只是做了lazy
+delete。</p>
 <h4 id="mechanism"><em>Mechanism</em></h4>
 <p>当应用程序删除文件时，master会立即记录删除，并将文件重命名为包含删除时间戳的隐藏名称。在master定期扫描文件系统的期间，如果发现其存在已经超过一定间隔（三天），它将删除此类隐藏文件。在此之前，我们可以通过重命名的方式取消删除。从命名空间中删除隐藏文件时，将删除其内存中的元数据。在与master定期交换的HeartBeat消息中，每个chunkserver报告它具有的块的子集，并且主服务器回复主服务器元数据中不再存在的所有块的标识。这样chunkserver就可以自由删除了。</p>
 <h4 id="discussion"><em>Discussion</em></h4>
@@ -499,9 +536,11 @@
 <p>当chunkserver失败并且此时错过了chunk的写入变化时，chunk副本很可能会变得过时。</p>
 <p>每当master给chunk授予lease时，它会增加chunk的版本号并作持久化，然后其他副本也会做对应更新，这些操作会在返回给客户端之前完成。当失败的chunkserver重启后，其版本号还是落后的，它会向master汇报版本号和chunk。</p>
 <p>master在其常规垃圾回收中会删除过时的副本，并且当有客户端作请求时，它会认为落后副本不存在。</p>
-<h2 id="fault-tolerance-and-diagnosis">FAULT TOLERANCE AND DIAGNOSIS</h2>
+<h2 id="fault-tolerance-and-diagnosis">FAULT TOLERANCE AND
+DIAGNOSIS</h2>
 <blockquote>
-<p>One of our greatest challenges in designing the system is dealing with frequent component failures.</p>
+<p>One of our greatest challenges in designing the system is dealing
+with frequent component failures.</p>
 </blockquote>
 <h3 id="high-availability">High Availability</h3>
 <p>我们通过两种简单而有效的策略保持整个系统的高可用性：快速恢复和复制。</p>
@@ -512,7 +551,9 @@
 <h4 id="master-replication"><em>Master Replication</em></h4>
 <p>master的操作日志和checkpoint会在多台计算机上进行复制，只有在其日志记录在本地和所有主副本上刷新到磁盘后，才会认为状态变化已提交。其中，一个master进程仍然在复制所有的修改变化和后台活动。</p>
 <p>当master失败时可以立即重启，而当master所在机器故障时，则在其他位置使用复制的操作日志启动新的主进程。</p>
-<p>新启动的“shadow” masters只提供读服务，因为可能在挂掉的一瞬间，有些日志记录到primary master上，而没有记录到secondary master上。</p>
+<p>新启动的“shadow”
+masters只提供读服务，因为可能在挂掉的一瞬间，有些日志记录到primary
+master上，而没有记录到secondary master上。</p>
 <h3 id="data-integrity">Data Integrity</h3>
 <p>每个chunkserver都使用校验和来检测存储数据是否损坏。</p>
 <p>一个chunk被分成64kb大小的块，每个块都有32位的校验和被存在内存和持久化到日志。</p>
@@ -693,7 +734,13 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#the-google-file-system"><span class="nav-number">1.</span> <span class="nav-text">The Google File System</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#design-overview"><span class="nav-number">1.2.</span> <span class="nav-text">DESIGN OVERVIEW</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#assumptions"><span class="nav-number">1.2.1.</span> <span class="nav-text">Assumptions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interface"><span class="nav-number">1.2.2.</span> <span class="nav-text">Interface</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#architecture"><span class="nav-number">1.2.3.</span> <span class="nav-text">Architecture</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#single-master"><span class="nav-number">1.2.4.</span> <span class="nav-text">Single Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chunk-size"><span class="nav-number">1.2.5.</span> <span class="nav-text">Chunk Size</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#metedata"><span class="nav-number">1.2.6.</span> <span class="nav-text">Metedata</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#in-memory-data-structures"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">In-Memory Data Structures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chunk-locations"><span class="nav-number">1.2.6.2.</span> <span class="nav-text">Chunk Locations</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#operation-log"><span class="nav-number">1.2.6.3.</span> <span class="nav-text">Operation Log</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#consistency-model"><span class="nav-number">1.2.7.</span> <span class="nav-text">Consistency Model</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#guarantees-by-gfs"><span class="nav-number">1.2.7.1.</span> <span class="nav-text">Guarantees by GFS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#implications-for-applications"><span class="nav-number">1.2.7.2.</span> <span class="nav-text">Implications for Applications</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#system-interactions"><span class="nav-number">1.3.</span> <span class="nav-text">SYSTEM INTERACTIONS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#leases-and-mutation-order"><span class="nav-number">1.3.1.</span> <span class="nav-text">Leases and Mutation Order</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-flow"><span class="nav-number">1.3.2.</span> <span class="nav-text">Data Flow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#atomic-record-appends"><span class="nav-number">1.3.3.</span> <span class="nav-text">Atomic Record Appends</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#snapshot"><span class="nav-number">1.3.4.</span> <span class="nav-text">Snapshot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#master-operation"><span class="nav-number">1.4.</span> <span class="nav-text">MASTER OPERATION</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#namespace-management-and-locking"><span class="nav-number">1.4.1.</span> <span class="nav-text">Namespace Management and Locking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replica-placement"><span class="nav-number">1.4.2.</span> <span class="nav-text">Replica Placement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#creation-re-replication-rebalancing"><span class="nav-number">1.4.3.</span> <span class="nav-text">Creation, Re-replication, Rebalancing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#garbage-collection"><span class="nav-number">1.4.4.</span> <span class="nav-text">Garbage Collection</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mechanism"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">Mechanism</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#discussion"><span class="nav-number">1.4.4.2.</span> <span class="nav-text">Discussion</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stale-replica-detection"><span class="nav-number">1.4.5.</span> <span class="nav-text">Stale Replica Detection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fault-tolerance-and-diagnosis"><span class="nav-number">1.5.</span> <span class="nav-text">FAULT TOLERANCE AND DIAGNOSIS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#high-availability"><span class="nav-number">1.5.1.</span> <span class="nav-text">High Availability</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#fast-recovery"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">Fast Recovery</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chunk-replication"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">Chunk Replication</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#master-replication"><span class="nav-number">1.5.1.3.</span> <span class="nav-text">Master Replication</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-integrity"><span class="nav-number">1.5.2.</span> <span class="nav-text">Data Integrity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#diagnostic-tools"><span class="nav-number">1.5.3.</span> <span class="nav-text">Diagnostic Tools</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#the-google-file-system"><span class="nav-number">1.</span> <span class="nav-text">The Google File
+System</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#design-overview"><span class="nav-number">1.2.</span> <span class="nav-text">DESIGN OVERVIEW</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#assumptions"><span class="nav-number">1.2.1.</span> <span class="nav-text">Assumptions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interface"><span class="nav-number">1.2.2.</span> <span class="nav-text">Interface</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#architecture"><span class="nav-number">1.2.3.</span> <span class="nav-text">Architecture</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#single-master"><span class="nav-number">1.2.4.</span> <span class="nav-text">Single Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chunk-size"><span class="nav-number">1.2.5.</span> <span class="nav-text">Chunk Size</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#metedata"><span class="nav-number">1.2.6.</span> <span class="nav-text">Metedata</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#in-memory-data-structures"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">In-Memory Data
+Structures</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chunk-locations"><span class="nav-number">1.2.6.2.</span> <span class="nav-text">Chunk Locations</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#operation-log"><span class="nav-number">1.2.6.3.</span> <span class="nav-text">Operation Log</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#consistency-model"><span class="nav-number">1.2.7.</span> <span class="nav-text">Consistency Model</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#guarantees-by-gfs"><span class="nav-number">1.2.7.1.</span> <span class="nav-text">Guarantees by GFS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#implications-for-applications"><span class="nav-number">1.2.7.2.</span> <span class="nav-text">Implications for
+Applications</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#system-interactions"><span class="nav-number">1.3.</span> <span class="nav-text">SYSTEM INTERACTIONS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#leases-and-mutation-order"><span class="nav-number">1.3.1.</span> <span class="nav-text">Leases and Mutation Order</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-flow"><span class="nav-number">1.3.2.</span> <span class="nav-text">Data Flow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#atomic-record-appends"><span class="nav-number">1.3.3.</span> <span class="nav-text">Atomic Record Appends</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#snapshot"><span class="nav-number">1.3.4.</span> <span class="nav-text">Snapshot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#master-operation"><span class="nav-number">1.4.</span> <span class="nav-text">MASTER OPERATION</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#namespace-management-and-locking"><span class="nav-number">1.4.1.</span> <span class="nav-text">Namespace Management and
+Locking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replica-placement"><span class="nav-number">1.4.2.</span> <span class="nav-text">Replica Placement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#creation-re-replication-rebalancing"><span class="nav-number">1.4.3.</span> <span class="nav-text">Creation, Re-replication,
+Rebalancing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#garbage-collection"><span class="nav-number">1.4.4.</span> <span class="nav-text">Garbage Collection</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mechanism"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">Mechanism</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#discussion"><span class="nav-number">1.4.4.2.</span> <span class="nav-text">Discussion</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stale-replica-detection"><span class="nav-number">1.4.5.</span> <span class="nav-text">Stale Replica Detection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fault-tolerance-and-diagnosis"><span class="nav-number">1.5.</span> <span class="nav-text">FAULT TOLERANCE AND
+DIAGNOSIS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#high-availability"><span class="nav-number">1.5.1.</span> <span class="nav-text">High Availability</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#fast-recovery"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">Fast Recovery</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chunk-replication"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">Chunk Replication</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#master-replication"><span class="nav-number">1.5.1.3.</span> <span class="nav-text">Master Replication</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-integrity"><span class="nav-number">1.5.2.</span> <span class="nav-text">Data Integrity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#diagnostic-tools"><span class="nav-number">1.5.3.</span> <span class="nav-text">Diagnostic Tools</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -735,8 +782,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

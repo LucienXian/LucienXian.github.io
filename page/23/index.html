@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -337,7 +335,9 @@
       
         
           
-            <h1 id="provide-access-to-raw-resources-in-resource-managing-classes">provide access to raw resources in resource-managing classes</h1>
+            <h1
+id="provide-access-to-raw-resources-in-resource-managing-classes">provide
+access to raw resources in resource-managing classes</h1>
 <h2 id="动机">动机</h2>
 <p>在条款13中，我们使用智能指针去保存一个原始资源，但有些时候AP需要绕过诸如智能指针这类资源管理对象去获得原始资源，因此我们需要留下一个途径让API有机会去使用原始资源</p>
 <h2 id="方法">方法</h2>
@@ -484,15 +484,18 @@
 <li>limit register：存着可用范围</li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_1.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
-<li>address binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行</li>
+<li>address
+binding：用户程序的相对地址被绑定到物理地址上，可以在编译期、加载期和运行期进行</li>
 <li>logical address：由CPU定义的，用户程序生成</li>
 <li>physical address：真实的物理地址</li>
 <li>memory-management unit(MMU)：负责将逻辑地址映射到物理地址</li>
 <li>dynamic loading：为了更好地管理内存，使得进程不受物理内存的限制</li>
-<li>dynamically linked libraries：通常是系统库，在执行前动态链接进来，避免占用太多内存</li>
+<li>dynamically linked
+libraries：通常是系统库，在执行前动态链接进来，避免占用太多内存</li>
 </ul>
 <h2 id="swapping">swapping</h2>
 <p>进程可以在内存和后台存储区（通常是磁盘）中交换。把需要的进程换进来，把暂时不用的进程替换出去</p>
@@ -502,7 +505,8 @@
 <h2 id="contiguous-memory-allocation">contiguous memory allocation</h2>
 <p>通常而言，贮存会被分为两部分，一部分是给操作系统，另一部分给用户空间。</p>
 <ul>
-<li>内存保护：limit register有一个地址空间范围，在进程被CPU执行时，这个范围会被加载进去，由操作系统进行验证；</li>
+<li>内存保护：limit
+register有一个地址空间范围，在进程被CPU执行时，这个范围会被加载进去，由操作系统进行验证；</li>
 <li>multiple-partition allocation：给每个进程分一个分区</li>
 <li>fixed partition（固定分区）
 <ul>
@@ -529,12 +533,15 @@
 <li>frames：将物理内存分成帧</li>
 <li>pages：将逻辑地址分为页
 <ul>
-<li>每个地址被分为了page number(代表着页表的项数)和page offset（代表着页的大小）</li>
-<li>page number构成了page table的索引表，表中存着frame number，对应着内存中的frame</li>
+<li>每个地址被分为了page number(代表着页表的项数)和page
+offset（代表着页的大小）</li>
+<li>page number构成了page table的索引表，表中存着frame
+number，对应着内存中的frame</li>
 </ul></li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_2.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_2.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>分页不会产生外部碎片，但有可能产生内部碎片，即每一页中的缺失</li>
@@ -544,10 +551,12 @@
 <ul>
 <li>传统上需要访问物理内存两次，一次是访问获取页表的内容，另外一次是根据页表的指引去访问内存</li>
 <li>TLB是页表的一部分，只存有页表的部分条目，但不同于页表，TLB一般是存在cache，这样满足快速读取。</li>
-<li>在进程被加载进来时，TLB会被填充，寻找frame时，CPU同时在TLB和page table中寻找。找到则返回frame，找不到则在page table中寻找</li>
+<li>在进程被加载进来时，TLB会被填充，寻找frame时，CPU同时在TLB和page
+table中寻找。找到则返回frame，找不到则在page table中寻找</li>
 </ul>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_3.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_3.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>有效访问时间
@@ -567,7 +576,8 @@
 </blockquote>
 <p>因此，我们可以使用二级页表，将页表分页。一个地址将会如下图所示：页目录是页表的索引，页表是进程物理空间本身的索引。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_4.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_4.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>(P1是外部表的索引，P2是二级表的索引)</p>
 <h3 id="hashed-page-tables">hashed page tables</h3>
@@ -575,7 +585,8 @@
 <p>哈希页表的每一条目都包括一个链表的元素，每个元素有三个域：虚拟页码，物理帧号，指向下一个元素的指针。</p>
 <p>通过页码途径哈希函数得到对应的条目，从而获得物理帧号。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/os_8_5.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/os_8_5.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="inverted-page-tables">inverted page tables</h3>
 <p>真正被使用的帧才会记录到在反向表的条目中。整个系统只有一张页表，对每个物理内存帧都只有一个条目，包括了逻辑地址和进程号。</p>
@@ -698,14 +709,17 @@
       
         
           
-            <h1 id="think-carefully-about-copying-behavior-in-resource-managing-classes">Think carefully about copying behavior in resource-managing classes</h1>
+            <h1
+id="think-carefully-about-copying-behavior-in-resource-managing-classes">Think
+carefully about copying behavior in resource-managing classes</h1>
 <h2 id="动机">动机</h2>
 <p>这是接上一个条款讲述的，当我们用一个对象去管理资源类的时候，我们需要注意该资源是否应该被复制。比如，一个互斥锁，是不应该拥有副本的。因此我们需要某些方法来保证管理这个锁的对象不会被复制，或者我们希望RAII对象被复制时追踪它的使用。</p>
 <h2 id="管理方法">管理方法</h2>
 <ul>
 <li>禁止复制</li>
 </ul>
-<p>使用条款6的方法，即继承一个uncopyable的类。具体可以看<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/24/Effective-cpp-6/">条款6</a></p>
+<p>使用条款6的方法，即继承一个uncopyable的类。具体可以看<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/24/Effective-cpp-6/">条款6</a></p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Lock</span>: <span class="keyword">private</span> Uncopyable&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">   ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>对底层资源进行“reference-count”（引用计数）</li>
@@ -720,7 +734,8 @@
 <h2 id="建议">建议</h2>
 <ul>
 <li>复制RAII对象时，必须一并复制它所管理的资源</li>
-<li>RAII class copying的行为通常有：禁止复制，使用引用计数，转移资源的控制</li>
+<li>RAII class
+copying的行为通常有：禁止复制，使用引用计数，转移资源的控制</li>
 </ul>
 
           
@@ -853,7 +868,8 @@
 <li>资源分配</li>
 <li>安全</li>
 </ul>
-<h2 id="user-operating-system-interface">User Operating System Interface</h2>
+<h2 id="user-operating-system-interface">User Operating System
+Interface</h2>
 <ul>
 <li>command interface
 <ul>
@@ -881,11 +897,13 @@
 <h2 id="operating-system-structure">Operating system structure</h2>
 <ul>
 <li>simple structure: MS-DOS</li>
-<li>Microkernel system structure: 由“微”内核和若个个服务组成，基本功能由中央内核提供，其它功能由独立进程提供
+<li>Microkernel system structure:
+由“微”内核和若个个服务组成，基本功能由中央内核提供，其它功能由独立进程提供
 <ul>
 <li>windows、Macos</li>
 </ul></li>
-<li>Monolithic Kernels: 内核的所有代码，包括子系统都被打包进一个文件中，内核中的每个函数都可以访问内核中所有部分
+<li>Monolithic Kernels:
+内核的所有代码，包括子系统都被打包进一个文件中，内核中的每个函数都可以访问内核中所有部分
 <ul>
 <li>linux</li>
 </ul></li>
@@ -1182,7 +1200,8 @@
       
         
           
-            <h1 id="use-objects-to-manage-resources">Use objects to manage resources</h1>
+            <h1 id="use-objects-to-manage-resources">Use objects to manage
+resources</h1>
 <h2 id="动机">动机</h2>
 <p>内存管理在C++中是非常重要而且常见的，往往会因为管理不当而出现灾难性的内存泄漏情况。首先来看一个例子：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Investment</span>;</span><br><span class="line"><span class="function">Investment* <span class="title">createInvestment</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Investment* pInv = <span class="built_in">createInvestment</span>();</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">delete</span> pInv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1482,7 +1501,8 @@
 <h2 id="动机">动机</h2>
 <ul>
 <li>局部的拷贝，编译器是允许的。假如你自定义了一个拷贝构造函数或者拷贝复制函数，但函数内部只复制了部分的成员变量，那么编译器并不会报错。</li>
-<li>另一个问题是在继承时，由于子类无法访问基类的私有变量，那么拷贝构造函数可能会没有拷贝所有成员变量，而是由基类的default constructor初始化成员变量；</li>
+<li>另一个问题是在继承时，由于子类无法访问基类的私有变量，那么拷贝构造函数可能会没有拷贝所有成员变量，而是由基类的default
+constructor初始化成员变量；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Customer</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	...</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  std::string name;</span><br><span class="line">  Date last;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PriorityCustomer</span>: <span class="keyword">public</span> Customer&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">PriorityCustomer</span>(<span class="type">const</span> PriorityCustomer&amp; rhs):<span class="built_in">priority</span>(rhs.prioruty)&#123;&#125;</span><br><span class="line">  <span class="comment">//在这种情况，基类成员的初始化是在default constructor中完成的</span></span><br><span class="line">  PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="type">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">    priority = rhs.priority;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="type">int</span> priority;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h2 id="解决方法">解决方法</h2>
@@ -1493,8 +1513,10 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PriorityCustomer</span>(<span class="type">const</span> PriorityCustomer&amp; rhs):<span class="built_in">Customer</span>(rhs) ,<span class="built_in">priority</span>(rhs.prioruty)&#123;&#125;</span><br><span class="line"><span class="comment">//分别调用基类的copy函数</span></span><br><span class="line">PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="type">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">	Customer::<span class="keyword">operator</span>=(rhs);</span><br><span class="line">  priority = rhs.priority;</span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="注意问题">注意问题</h2>
 <ul>
-<li>不应该在copy assignment操作符函数中调用copy构造函数，因为这相当于初始化一个已经存在存在的对象，这没意义，并且增加复杂度；</li>
-<li>也不应该在copy构造函数中调用copy assignment操作符，这相当于在一个尚未初始化的对象身上做“对已经初始化的对象的操作”；</li>
+<li>不应该在copy
+assignment操作符函数中调用copy构造函数，因为这相当于初始化一个已经存在存在的对象，这没意义，并且增加复杂度；</li>
+<li>也不应该在copy构造函数中调用copy
+assignment操作符，这相当于在一个尚未初始化的对象身上做“对已经初始化的对象的操作”；</li>
 <li>往往以上两种操作都很有可能造成循环调用；</li>
 </ul>
 
@@ -1619,7 +1641,8 @@
             <h1 id="deadlock">deadlock</h1>
 <h2 id="定义">定义</h2>
 <p>一个进程在得不到资源之后进入等待状态，而这个状态永远不会改变，这种情况就叫做死锁。</p>
-<p>死锁主要发生的情况就在于资源的请求与释放不合理，而这些资源包括了physical resource和logical resource（锁，信号量，文件等）</p>
+<p>死锁主要发生的情况就在于资源的请求与释放不合理，而这些资源包括了physical
+resource和logical resource（锁，信号量，文件等）</p>
 <h2 id="特点">特点</h2>
 <h3 id="发生死锁的必要不充分条件">发生死锁的必要不充分条件</h3>
 <blockquote>
@@ -1627,20 +1650,26 @@
 </blockquote>
 <ul>
 <li>mutual exclusion：在同一时间内只有一个进程能访问该资源</li>
-<li>hold and wait：一个进程必须同时拥有一个资源，并且在请求另一份被别的进程拥有着的资源</li>
+<li>hold and
+wait：一个进程必须同时拥有一个资源，并且在请求另一份被别的进程拥有着的资源</li>
 <li>no preemption：资源不能被抢占</li>
-<li>circular wait：一系列的进程在循环等待，比如p1在等待p2的资源，p2在等待p3的资源，p3在等待p1的资源</li>
+<li>circular
+wait：一系列的进程在循环等待，比如p1在等待p2的资源，p2在等待p3的资源，p3在等待p1的资源</li>
 </ul>
-<h3 id="利用资源分配图可以检测是否发生了死锁">利用资源分配图可以检测是否发生了死锁</h3>
+<h3
+id="利用资源分配图可以检测是否发生了死锁">利用资源分配图可以检测是否发生了死锁</h3>
 <p>在资源分配图中，顶点分为resource(R)和process(P)两种，由R指向P的称为分配边（即P已经获得R的资源），由P指向R的称为请求边（即P在请求R的资源），而边是可以动态变化的。一旦分配成功，即从请求边转化为分配边。</p>
 <p>如下图：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>那么如何检测死锁呢？</p>
 <p>一旦成环并且环中的每种资源只有一个实例(即没有多余的资源可用时)，就会发生死锁。如下图有两个环，其中没有多余资源。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics1.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="解决办法">解决办法</h2>
 <p>目前有三种：</p>
@@ -1655,17 +1684,23 @@
 <p>使得前面提到的那四个死锁发生的必要不充分条件之一不成立，即可以避免死锁</p>
 </blockquote>
 <ul>
-<li>mutual exclusion：某些资源可以允许多个进程访问，比如read-only file。但互斥锁不能允许多个进程访问，因此这个方法不能采用。</li>
-<li>hold and wait：一个方法是实现一个协议使得进程应该一次性获得所有资源；另一种方法则是要求实现一个协议使得进程在释放所有资源之前，不能请求资源；但这两个方法有很多缺点：一是资源的调度效率很低，有些不用的资源却一直hold住。二是有可能发生饥饿，有可能想要的资源因为其它进程hold住而一直等待。</li>
-<li>no preemption：实现抢占式。一般应用在那些保存方便，易于重新加载的资源（比如寄存器）。但不能用在互斥锁和信号量。</li>
-<li>circular wait：举个例子，可以实现一个协议使得进程在请求资源时，按照资源id，从大到小去请求（也就是设置一个资源请求顺序）</li>
+<li>mutual exclusion：某些资源可以允许多个进程访问，比如read-only
+file。但互斥锁不能允许多个进程访问，因此这个方法不能采用。</li>
+<li>hold and
+wait：一个方法是实现一个协议使得进程应该一次性获得所有资源；另一种方法则是要求实现一个协议使得进程在释放所有资源之前，不能请求资源；但这两个方法有很多缺点：一是资源的调度效率很低，有些不用的资源却一直hold住。二是有可能发生饥饿，有可能想要的资源因为其它进程hold住而一直等待。</li>
+<li>no
+preemption：实现抢占式。一般应用在那些保存方便，易于重新加载的资源（比如寄存器）。但不能用在互斥锁和信号量。</li>
+<li>circular
+wait：举个例子，可以实现一个协议使得进程在请求资源时，按照资源id，从大到小去请求（也就是设置一个资源请求顺序）</li>
 </ul>
 <h3 id="deadlock-avoidance">deadlock avoidance</h3>
 <blockquote>
 <p>了解额外信息，决定资源如何分配</p>
 </blockquote>
 <ul>
-<li>safe state：系统以某些分配顺序去分配资源，不会发生死锁。这个顺序也叫safe sequence</li>
+<li>safe
+state：系统以某些分配顺序去分配资源，不会发生死锁。这个顺序也叫safe
+sequence</li>
 <li>算法一：resource-allocation-graph algorithm
 <ul>
 <li>还是利用资源分配图表示，但此时由p指向r的虚线表示p请求资源；</li>
@@ -1674,7 +1709,8 @@
 <li>算法二：banker's algorithm
 <ul>
 <li>算法一 只适合于某种资源只有一个实例的情况；</li>
-<li>数据结构：available(某种资源的可用数量)、max(nxm的矩阵，某个进程Pi需要Ri资源的最大数量)、allocation(nxm的矩阵，某个进程Pi已经得到Ri资源的数量)、need(还需要多少资源)；need = max - allocation</li>
+<li>数据结构：available(某种资源的可用数量)、max(nxm的矩阵，某个进程Pi需要Ri资源的最大数量)、allocation(nxm的矩阵，某个进程Pi已经得到Ri资源的数量)、need(还需要多少资源)；need
+= max - allocation</li>
 <li>safety algorithm：</li>
 </ul></li>
 </ul>
@@ -1686,7 +1722,8 @@
 <p>如果系统没有采用以上两种死锁避免方法，就必须要有算法检测系统是否发生了死锁，并且使得系统从死锁中恢复</p>
 </blockquote>
 <ul>
-<li>假如每种资源只有一个实例，可以采用wait-for 图来检测死锁是否发生（Pi指向Pj意味着Pi在等待Pj释放资源）。如果改图含有环，则意味着死锁发生了</li>
+<li>假如每种资源只有一个实例，可以采用wait-for
+图来检测死锁是否发生（Pi指向Pj意味着Pi在等待Pj释放资源）。如果改图含有环，则意味着死锁发生了</li>
 <li>假如每种资源含有多个实例，那么可以采用以上的safety算法，只要在最后检查每个finish是否都是true即可</li>
 </ul>
 <h3 id="recovery-from-deadlock">recovery from deadlock</h3>
@@ -1816,7 +1853,8 @@
       
         
           
-            <h1 id="have-assignment-operators-return-a-reference-to-this">Have assignment operators return a reference to *this</h1>
+            <h1 id="have-assignment-operators-return-a-reference-to-this">Have
+assignment operators return a reference to *this</h1>
 <h2 id="为什么">为什么</h2>
 <p>其实返回void，返回对象本身等都是可以的，返回引用是为了一下两个原因：</p>
 <ul>
@@ -1832,7 +1870,8 @@
 <li>有些场景下，必须返回指向自身的引用</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	...</span><br><span class="line">	Widget&amp; <span class="keyword">operator</span>+=(<span class="type">const</span> Widget&amp; rhs)&#123;<span class="comment">//此举是因为该操作符本身的意义就是自增，然后返回自身值</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	Widget&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="handle-assignment-to-self-in-operator">Handle assignment to self in operator=</h1>
+<h1 id="handle-assignment-to-self-in-operator">Handle assignment to self
+in operator=</h1>
 <h2 id="动机">动机</h2>
 <p>client在操作时很可能会出现，自我赋值的情况，比如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a[i] = a[j]; <span class="comment">// i == j时</span></span><br><span class="line">*px = *py; <span class="comment">//px与py恰好指向同一对象时</span></span><br></pre></td></tr></table></figure>
@@ -2025,8 +2064,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

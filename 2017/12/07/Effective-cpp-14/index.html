@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,14 +332,17 @@
       
 
       
-        <h1 id="think-carefully-about-copying-behavior-in-resource-managing-classes">Think carefully about copying behavior in resource-managing classes</h1>
+        <h1
+id="think-carefully-about-copying-behavior-in-resource-managing-classes">Think
+carefully about copying behavior in resource-managing classes</h1>
 <h2 id="动机">动机</h2>
 <p>这是接上一个条款讲述的，当我们用一个对象去管理资源类的时候，我们需要注意该资源是否应该被复制。比如，一个互斥锁，是不应该拥有副本的。因此我们需要某些方法来保证管理这个锁的对象不会被复制，或者我们希望RAII对象被复制时追踪它的使用。</p>
 <h2 id="管理方法">管理方法</h2>
 <ul>
 <li>禁止复制</li>
 </ul>
-<p>使用条款6的方法，即继承一个uncopyable的类。具体可以看<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/24/Effective-cpp-6/">条款6</a></p>
+<p>使用条款6的方法，即继承一个uncopyable的类。具体可以看<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/24/Effective-cpp-6/">条款6</a></p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Lock</span>: <span class="keyword">private</span> Uncopyable&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">   ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>对底层资源进行“reference-count”（引用计数）</li>
@@ -356,7 +357,8 @@
 <h2 id="建议">建议</h2>
 <ul>
 <li>复制RAII对象时，必须一并复制它所管理的资源</li>
-<li>RAII class copying的行为通常有：禁止复制，使用引用计数，转移资源的控制</li>
+<li>RAII class
+copying的行为通常有：禁止复制，使用引用计数，转移资源的控制</li>
 </ul>
 
       
@@ -532,7 +534,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#think-carefully-about-copying-behavior-in-resource-managing-classes"><span class="nav-number">1.</span> <span class="nav-text">Think carefully about copying behavior in resource-managing classes</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">管理方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#think-carefully-about-copying-behavior-in-resource-managing-classes"><span class="nav-number">1.</span> <span class="nav-text">Think
+carefully about copying behavior in resource-managing classes</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">管理方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -574,8 +577,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

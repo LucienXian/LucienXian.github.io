@@ -103,17 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="SuRF  本文介绍了一种SuRF的数据结构实现，用以替代传统的布隆过滤器，支持单点查询和范围查询使用。  INTRODUCTION LSM树是市面上数据库常用的底层存储引擎，能提供快速写和一定速度的读取。但该设计的一个问题是由于SSTable的多层设计导致大量磁盘IO读取，由此引入了布隆过滤器作为内存数据结构来帮助查询。布隆过滤器对于单点查询很有用，但并不能处理范围查找，尽管也有一些类似的设计（">
 <meta property="og:locale">
-<meta property="og:image" content="https://pic.imgdb.cn/item/60f447735132923bf826bdba.png">
-<meta property="og:image" content="https://pic.imgdb.cn/item/60f447735132923bf826bdda.png">
-<meta property="og:image" content="https://pic.imgdb.cn/item/60f447735132923bf826be06.png">
-<meta property="og:image" content="https://pic.imgdb.cn/item/60f447735132923bf826be2f.png">
-<meta property="og:image" content="https://pic.imgdb.cn/item/60f447735132923bf826be57.png">
 <meta property="article:published_time" content="2021-07-18T15:26:19.000Z">
 <meta property="article:modified_time" content="2021-07-18T15:27:01.007Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="数据库">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pic.imgdb.cn/item/60f447735132923bf826bdba.png">
 
 
 
@@ -164,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -346,12 +338,19 @@
 </blockquote>
 <h2 id="introduction">INTRODUCTION</h2>
 <p>LSM树是市面上数据库常用的底层存储引擎，能提供快速写和一定速度的读取。但该设计的一个问题是由于SSTable的多层设计导致大量磁盘IO读取，由此引入了布隆过滤器作为内存数据结构来帮助查询。布隆过滤器对于单点查询很有用，但并不能处理范围查找，尽管也有一些类似的设计（如前缀布隆过滤器）做了优化，但总体不够灵活通用。</p>
-<p>因此本文提出了Succinct Range Filter（下文简称SuRF），这是一种快速紧凑的过滤器，提供了精确匹配过滤、范围过滤和近似范围计数等功能。SuRF是建立在Fast Succinct Trie（FST）这一新型空间高效简洁的数据结构上，FST每个trie节点仅需要10bit。文章使用SuRF替代了RocksDB的布隆过滤器，这将范围查询的速度提高了1.5倍到5倍，但极端情况下会导致单点查询变慢40%。</p>
+<p>因此本文提出了Succinct Range
+Filter（下文简称SuRF），这是一种快速紧凑的过滤器，提供了精确匹配过滤、范围过滤和近似范围计数等功能。SuRF是建立在Fast
+Succinct
+Trie（FST）这一新型空间高效简洁的数据结构上，FST每个trie节点仅需要10bit。文章使用SuRF替代了RocksDB的布隆过滤器，这将范围查询的速度提高了1.5倍到5倍，但极端情况下会导致单点查询变慢40%。</p>
 <h2 id="fast-succinct-tries">FAST SUCCINCT TRIES</h2>
 <p>SuRF的核心数据结构是FST，这是一种空间优化的静态tire，可以做单点查询和范围查询，其设计基于以下的思路：一个tire的上层节点较少，但访问量很大；下层节点虽多，但访问不算频繁。因此FST使用了基于位图的快速编码方案（LOUDS-Dense）来对上层节点编码，下层则用LOUDS-Sparse方案来编码，节省空间。</p>
 <h3 id="background">Background</h3>
-<p>如果一颗树所占用的空间接近于信息论的下限，则该树可以认为是succinct。论文使用的是一种叫Level-Ordered Unary Degree Sequence的技术，LOUDS以广度优先的顺序遍历节点，并使用一元编码Unary coding对每个节点的度进行编码，例如下图节点3有三个字节点，因此被编码成"1110"。</p>
-<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826bdba.png" /></p>
+<p>如果一颗树所占用的空间接近于信息论的下限，则该树可以认为是succinct。论文使用的是一种叫Level-Ordered
+Unary Degree
+Sequence的技术，LOUDS以广度优先的顺序遍历节点，并使用一元编码Unary
+coding对每个节点的度进行编码，例如下图节点3有三个字节点，因此被编码成"1110"。</p>
+<p><img
+src="https://pic.imgdb.cn/item/60f447735132923bf826bdba.png" /></p>
 <p>编码完成后，该树会变成一组bit序列，需要访问节点时，则使用rank＆select两种操作：</p>
 <ul>
 <li>rank1(i): 返回[0, i]位置区间中, 1的个数；</li>
@@ -364,11 +363,14 @@
 <li>在bit序列中从p开始的节点的第k个子节点：<code>select0 (rank1 (p + k)) + 1</code>；</li>
 <li>始于p的节点的父节点位置：<code>select1 (rank0 (p))</code>；</li>
 </ul>
-<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826bdda.png" /></p>
+<p><img
+src="https://pic.imgdb.cn/item/60f447735132923bf826bdda.png" /></p>
 <h3 id="louds-dense">LOUDS-Dense</h3>
-<p>LOUDS-Dense使用三个bit map和一个value的字节序列对每个trie节点按层级进行编码：</p>
+<p>LOUDS-Dense使用三个bit
+map和一个value的字节序列对每个trie节点按层级进行编码：</p>
 <ul>
-<li>D-Labels：记录每个节点的分支标签；上图中根节点具有标记为f，s和t的三个分支。 D-Labels位图设置第102位（f），115位（s）和116位（t）并清除其余位；</li>
+<li>D-Labels：记录每个节点的分支标签；上图中根节点具有标记为f，s和t的三个分支。
+D-Labels位图设置第102位（f），115位（s）和116位（t）并清除其余位；</li>
 <li>D-HasChild：表示节点是叶子节点还是中间节点，以上图根节点为例，f和t都有子节点，但s没有，所以102和106两个bit会设置为1；</li>
 <li>D-IsPrefixKey：标记当前前缀是否为有效key；以上图根节点为例，f既作为前缀，同时也是trie里的有效key；</li>
 <li>D-Values : 存储的是固定大小的 value，本文中则是三种后缀的指针；</li>
@@ -381,7 +383,8 @@
 <h3 id="louds-sparse">LOUDS-Sparse</h3>
 <p>如上图所示，LOUDS-Sparse使用四个字节或者bit序列对trie节点进行编码，然后将编码的节点按层次顺序进行串联。</p>
 <ul>
-<li>S-Labels：记录分支标签，按level order顺序记录所有节点的label，并且使用0xFF($)来标记该key同时也是key节点；</li>
+<li>S-Labels：记录分支标签，按level
+order顺序记录所有节点的label，并且使用0xFF($)来标记该key同时也是key节点；</li>
 <li>S-HasChild：使用一个bit记录节点的label是否含有分支子节点；</li>
 <li>S-LOUDS：使用一个bit记录每个label是否为该节点的第一个label；</li>
 <li>S-Values：与上面类似；</li>
@@ -397,20 +400,26 @@
 <p>LOUDS-DS支持三个基本操作：</p>
 <ul>
 <li>ExactKeySearch(key)：如果key存在，则返回key的值（否则返回NULL）；</li>
-<li>LowerBound(key)：返回一个迭代器，该迭代器指向的键-值对(k, v)，其中k是按字典顺序的满足k≥key的最小的键；</li>
+<li>LowerBound(key)：返回一个迭代器，该迭代器指向的键-值对(k,
+v)，其中k是按字典顺序的满足k≥key的最小的键；</li>
 <li>MoveToNext(iter)：将迭代器移至下一个键值；</li>
 </ul>
 <p>对于点查询，则是先在LOUDS-Dense上查询，查不到即到LOUDS-Sparse查询。对于范围查询，则是执行LowerBound，找到最小的满足k≥key的键后，则光标将从当前的叶子标签位置开始并向前移动，就是正常的tree搜索方式。</p>
-<h3 id="space-and-performance-analysis">Space and Performance Analysis</h3>
+<h3 id="space-and-performance-analysis">Space and Performance
+Analysis</h3>
 <p>考虑到在LOUDS-DS中LOUDS-Sparse的节点更多，假设这是一个具备n个节点的trie，其中会有8n位用于S标签，2n位用于S-HasChild和S-LOUDS，总共10n位。</p>
-<p>对于点查询，在每个LOUDS-Dense级别上进行搜索都需要两次数组查找，以及对位向量D-HasChild的rank操作。因此，主要操作是对所有位向量进行rank和 select，并在LOUDS-Sparse层进行标签搜索。</p>
+<p>对于点查询，在每个LOUDS-Dense级别上进行搜索都需要两次数组查找，以及对位向量D-HasChild的rank操作。因此，主要操作是对所有位向量进行rank和
+select，并在LOUDS-Sparse层进行标签搜索。</p>
 <h3 id="optimizations">Optimizations</h3>
-<p>论文针对LOUDS-DS中的三个关键操作：rank、select和label search进行了优化。</p>
-<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826be06.png" /></p>
+<p>论文针对LOUDS-DS中的三个关键操作：rank、select和label
+search进行了优化。</p>
+<p><img
+src="https://pic.imgdb.cn/item/60f447735132923bf826be06.png" /></p>
 <ul>
 <li>Rank</li>
 </ul>
-<p>上图展示了一个简洁的Rank结构，将bit vector分割成B bits大小的块，每个块用32bits的字段预先计算好的到这个block的rank值。对于一个pos来说，就有<code>rank1(pos) = LUT[i / B] + popcount[i / B * B, i]</code>。popcount是内置的CPU指令，可以快速计算出某一段区间1的个数。</p>
+<p>上图展示了一个简洁的Rank结构，将bit vector分割成B
+bits大小的块，每个块用32bits的字段预先计算好的到这个block的rank值。对于一个pos来说，就有<code>rank1(pos) = LUT[i / B] + popcount[i / B * B, i]</code>。popcount是内置的CPU指令，可以快速计算出某一段区间1的个数。</p>
 <ul>
 <li>Select</li>
 </ul>
@@ -424,39 +433,54 @@
 </ul>
 <p>在切换到LOUDS-DS中的不同位/字节序列之前进行预取。</p>
 <h2 id="succinct-range-filters">SUCCINCT RANGE FILTERS</h2>
-<p>基于FST构建SuRF，最重要的是在false positive rate和filter所需要的内存使用之间取得平衡。论文的做法是使用裁剪trie，通过截断低层次的trie，并使用从key获得的后缀位（key本身或者key的哈希值）做替代。论文介绍了4种不同的trie树裁剪方式。</p>
-<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826be2f.png" /></p>
+<p>基于FST构建SuRF，最重要的是在false positive
+rate和filter所需要的内存使用之间取得平衡。论文的做法是使用裁剪trie，通过截断低层次的trie，并使用从key获得的后缀位（key本身或者key的哈希值）做替代。论文介绍了4种不同的trie树裁剪方式。</p>
+<p><img
+src="https://pic.imgdb.cn/item/60f447735132923bf826be2f.png" /></p>
 <ol type="1">
 <li>Basic SuRF</li>
 </ol>
-<p>Basic SuRF的基本思路就是只存储key的共有前缀和一个额外的byte，裁剪掉树的部分叶节点。Basic SuRF的FPR与key的分布有关。</p>
+<p>Basic
+SuRF的基本思路就是只存储key的共有前缀和一个额外的byte，裁剪掉树的部分叶节点。Basic
+SuRF的FPR与key的分布有关。</p>
 <ol start="2" type="1">
 <li>SuRF with Hashed Key Suffixes</li>
 </ol>
-<p>在Basic SuRF基础上，通过对key进行哈希计算，将hash值的n个bits存储到value中，这种方法可以降低FPR，但对范围查询没有帮助。</p>
+<p>在Basic
+SuRF基础上，通过对key进行哈希计算，将hash值的n个bits存储到value中，这种方法可以降低FPR，但对范围查询没有帮助。</p>
 <ol start="3" type="1">
 <li>SuRF with Real Key Suffixes</li>
 </ol>
-<p>SuRF-Real存储n个bits的真实key，这样同时增强了Point query和Range query，但其FPR还是要比SuRF-Hash高。</p>
+<p>SuRF-Real存储n个bits的真实key，这样同时增强了Point query和Range
+query，但其FPR还是要比SuRF-Hash高。</p>
 <ol start="4" type="1">
 <li>SuRF with Mixed Key Suffixes</li>
 </ol>
-<p>SuRF-Mixed的做法是混合使用2和3两种方式，一部分是real key，另一部分是hashed key。</p>
+<p>SuRF-Mixed的做法是混合使用2和3两种方式，一部分是real
+key，另一部分是hashed key。</p>
 <h3 id="operations">Operations</h3>
 <p>论文总结了如何使用FST实现SuRF的基本操作。</p>
 <ul>
 <li>build(keyList)：根据给定的key构建fitter；</li>
-<li>result = lookup(k)：对k执行点查询，返回true意味着k可能存储。以上面SuRF为例，首先搜寻key，直到叶子结点。如果未到叶节点就终止了则返回false；否则计算k的相关bits与叶节点的相关bits做比较；</li>
-<li>iter, fp_flag = moveToNext(k)：这个操作实际上是LowerBound执行，返回满足&gt;=k的最小key的双向迭代器；</li>
-<li>count, low_fp_flag, high_fp_flag = count(lowKey, highKey)：返回在[lowKey, highKey]范围内的key个数；</li>
+<li>result =
+lookup(k)：对k执行点查询，返回true意味着k可能存储。以上面SuRF为例，首先搜寻key，直到叶子结点。如果未到叶节点就终止了则返回false；否则计算k的相关bits与叶节点的相关bits做比较；</li>
+<li>iter, fp_flag =
+moveToNext(k)：这个操作实际上是LowerBound执行，返回满足&gt;=k的最小key的双向迭代器；</li>
+<li>count, low_fp_flag, high_fp_flag = count(lowKey,
+highKey)：返回在[lowKey, highKey]范围内的key个数；</li>
 </ul>
 <h2 id="example-application-rocksdb">EXAMPLE APPLICATION: ROCKSDB</h2>
 <p>论文将SuRF与RocksDB集成在一起，以替代其Bloom过滤器。下图显示了RocksDB中Get，Seek和Count查询的执行路径。Next的核心算法类似于Seek。过滤器操作在红色框中。如果该框为虚线，则可能由于误报需要检查边界key。</p>
-<p><img src="https://pic.imgdb.cn/item/60f447735132923bf826be57.png" /></p>
+<p><img
+src="https://pic.imgdb.cn/item/60f447735132923bf826be57.png" /></p>
 <p>对于Get(key)，SuRF的用法与Bloom过滤器完全相同。</p>
-<p>对于Seek(lk, hk)，RocksDB首先通过在块索引中搜索lk来决定所有级别的候选SSTable。在没有SuRF的情况下，RocksDB会检查每个候选SSTable并获取满足&gt;=lk的最小的块。 RocksDB然后比较候选key，找到全局最小key。使用SuRF，则无需获取实际的块，RocksDB可以通过在其SuRF上执行moveToNext(lk)查询来避免每个SSTable都进行IO，从而获取每个SSTable的候选key。如果查询成功（例如，是Open Seek或K≤hk），RocksDB将从选定的SSTable中精确地获取一个包含全局最小值K的块。如果查询失败（即，K&gt;hk），则不没有读盘IO。</p>
+<p>对于Seek(lk,
+hk)，RocksDB首先通过在块索引中搜索lk来决定所有级别的候选SSTable。在没有SuRF的情况下，RocksDB会检查每个候选SSTable并获取满足&gt;=lk的最小的块。
+RocksDB然后比较候选key，找到全局最小key。使用SuRF，则无需获取实际的块，RocksDB可以通过在其SuRF上执行moveToNext(lk)查询来避免每个SSTable都进行IO，从而获取每个SSTable的候选key。如果查询成功（例如，是Open
+Seek或K≤hk），RocksDB将从选定的SSTable中精确地获取一个包含全局最小值K的块。如果查询失败（即，K&gt;hk），则不没有读盘IO。</p>
 <h2 id="conclusion">CONCLUSION</h2>
-<p>本文介绍了SuRF，该filter支持单点查询、范围查询和计数查询，SuRF建立在一个新的succinct数据结构上，即FST。FST的性能极高，并且SuRF本身的内存使用也是较为搞笑的，其空间使用与FPR的权衡可以通过不同数量的后缀位来调整。通过在RocksDB上替换了bloom filter的测试，显著地减少了IO并提高了范围查询的吞吐量。</p>
+<p>本文介绍了SuRF，该filter支持单点查询、范围查询和计数查询，SuRF建立在一个新的succinct数据结构上，即FST。FST的性能极高，并且SuRF本身的内存使用也是较为搞笑的，其空间使用与FPR的权衡可以通过不同数量的后缀位来调整。通过在RocksDB上替换了bloom
+filter的测试，显著地减少了IO并提高了范围查询的吞吐量。</p>
 
       
     </div>
@@ -631,7 +655,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#surf"><span class="nav-number">1.</span> <span class="nav-text">SuRF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fast-succinct-tries"><span class="nav-number">1.2.</span> <span class="nav-text">FAST SUCCINCT TRIES</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#background"><span class="nav-number">1.2.1.</span> <span class="nav-text">Background</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#louds-dense"><span class="nav-number">1.2.2.</span> <span class="nav-text">LOUDS-Dense</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#louds-sparse"><span class="nav-number">1.2.3.</span> <span class="nav-text">LOUDS-Sparse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#louds-ds-and-operations"><span class="nav-number">1.2.4.</span> <span class="nav-text">LOUDS-DS and Operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#space-and-performance-analysis"><span class="nav-number">1.2.5.</span> <span class="nav-text">Space and Performance Analysis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#optimizations"><span class="nav-number">1.2.6.</span> <span class="nav-text">Optimizations</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#succinct-range-filters"><span class="nav-number">1.3.</span> <span class="nav-text">SUCCINCT RANGE FILTERS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#operations"><span class="nav-number">1.3.1.</span> <span class="nav-text">Operations</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-application-rocksdb"><span class="nav-number">1.4.</span> <span class="nav-text">EXAMPLE APPLICATION: ROCKSDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion"><span class="nav-number">1.5.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#surf"><span class="nav-number">1.</span> <span class="nav-text">SuRF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fast-succinct-tries"><span class="nav-number">1.2.</span> <span class="nav-text">FAST SUCCINCT TRIES</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#background"><span class="nav-number">1.2.1.</span> <span class="nav-text">Background</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#louds-dense"><span class="nav-number">1.2.2.</span> <span class="nav-text">LOUDS-Dense</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#louds-sparse"><span class="nav-number">1.2.3.</span> <span class="nav-text">LOUDS-Sparse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#louds-ds-and-operations"><span class="nav-number">1.2.4.</span> <span class="nav-text">LOUDS-DS and Operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#space-and-performance-analysis"><span class="nav-number">1.2.5.</span> <span class="nav-text">Space and Performance
+Analysis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#optimizations"><span class="nav-number">1.2.6.</span> <span class="nav-text">Optimizations</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#succinct-range-filters"><span class="nav-number">1.3.</span> <span class="nav-text">SUCCINCT RANGE FILTERS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#operations"><span class="nav-number">1.3.1.</span> <span class="nav-text">Operations</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-application-rocksdb"><span class="nav-number">1.4.</span> <span class="nav-text">EXAMPLE APPLICATION: ROCKSDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion"><span class="nav-number">1.5.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -673,8 +698,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

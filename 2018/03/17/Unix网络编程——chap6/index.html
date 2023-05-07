@@ -165,9 +165,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -357,27 +355,32 @@
 <p>套接字上的输入分为两步：首先是等待数据从网络中到达。到达后会先将数据复制到内核缓冲区，接着复制到应用进程缓冲区。</p>
 <h3 id="阻塞式io模型">阻塞式I/O模型</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>进程在调用recvfrom()之后，一直阻塞直到数据复制到应用进程缓冲区或者返回错误</p>
 <h3 id="非阻塞式io模型">非阻塞式I/O模型</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>应用进程持续的轮询，查看操作是否就绪。如果没有就绪就会返回一个错误。这种做法会耗费大量的CPU时间</p>
 <h3 id="io复用模型">I/O复用模型</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>对于这种模型，我们可以使用select或者poll来完成我们的需求。通过select这个系统调用（阻塞于此），让内核在IO就绪的情况下通知应用进程，然后应用进程再调用recvfrom。这里使用了两个系统调用，但好处是可以等待多个描述符就绪。</p>
 <h3 id="信号驱动式io">信号驱动式I/O</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>对于这种模型，首先是安装一个信号驱动函数，并马上返回。在内核发现描述符就绪后，通过信号通知应用进程。这样，在等待数据到达的期间进程不会被阻塞。</p>
 <h3 id="异步io">异步I/O</h3>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>这种模型比之信号驱动式I/O更绝，它是内核完成IO操作之后才会通知应用进程</p>
 <p>前面四种模型都是同步I/O模型，因为进程都会因为IO请求而阻塞，知道IO操作完成</p>
@@ -463,7 +466,8 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">short</span> events;</span><br><span class="line">    <span class="type">short</span> revents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>需要测试的条件由events指定，函数会在revents成员中返回描述符的测试结果。具体表现如下图：</p>
 <figure>
-<img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img" /><figcaption>img</figcaption>
+<img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>从这个表可以看到，我们可以测试读写和异常三种操作，另外还能识别三类数据：普通数据，优先级带，高优先级带。至于怎么区分这些数据的类型，就有些争议了，这里就不写了。</p>
 <p>timeout参数跟select的类似，也是指定poll函数返回前等待多长时间。</p>
@@ -690,8 +694,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

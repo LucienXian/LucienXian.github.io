@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,18 +332,27 @@
       
 
       
-        <h1 id="avoid-returning-handles-to-object-internals">Avoid returning "handles" to object internals</h1>
+        <h1 id="avoid-returning-handles-to-object-internals">Avoid returning
+"handles" to object internals</h1>
 <h2 id="动机">动机</h2>
 <p>先来看一个例子： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span>&#123;...&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">RectData</span>&#123;</span><br><span class="line">    Point ulhc;</span><br><span class="line">    Point lrhc;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::trl::shared_ptr&lt;RectData&gt; pData;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="type">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function">Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
 <p>使用： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">const</span> Rectangle <span class="title">rec</span><span class="params">(point1, point2)</span></span>;</span><br><span class="line">rec.<span class="built_in">upperLeft</span>().<span class="built_in">setX</span>(<span class="number">50</span>);</span><br></pre></td></tr></table></figure></p>
-<p>其实，这样使用编译器是不会报错的，但其出现了矛盾的情况，原因是我们在该函数后面指定了const，则希望rec是不变的。但我们可以看到，由于我们返回的是一个引用，则可以通过引用去修改对象内部的成员。 <br> 同理，返回指针或者迭代器这些<strong>handles</strong>，也会出现这种情况。 <br></p>
+<p>其实，这样使用编译器是不会报错的，但其出现了矛盾的情况，原因是我们在该函数后面指定了const，则希望rec是不变的。但我们可以看到，由于我们返回的是一个引用，则可以通过引用去修改对象内部的成员。
+<br>
+同理，返回指针或者迭代器这些<strong>handles</strong>，也会出现这种情况。
+<br></p>
 <h2 id="解决方法">解决方法</h2>
-<p>为了解决这个问题，我们可以这样： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="type">const</span> Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="type">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function"><span class="type">const</span> Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure> 通过这种做法，用户可以读取对象的points，但不能修改它们。</p>
-<p>但这种用法同样会有一些问题，那就是有可能会出现<strong>dangling handles</strong>。 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GUIObj</span>&#123;...&#125;;</span><br><span class="line"><span class="function"><span class="type">const</span> Rectangle <span class="title">boudingBox</span><span class="params">(<span class="type">const</span> GUIObj&amp; obj)</span></span>;</span><br><span class="line"></span><br><span class="line">GUIObj* obj;</span><br><span class="line">...</span><br><span class="line"><span class="type">const</span> Point* p = &amp;(<span class="built_in">boudingBox</span>(*p).<span class="built_in">upperLeft</span>());</span><br></pre></td></tr></table></figure> 这里的问题是，由于这里够早的是一个临时Rectangle对象，也就是说，当这个语句结束时候临时对象就会被销毁，那么p所指向的Point也会被析构。也就是会发生<strong>dangling handles</strong>。</p>
+<p>为了解决这个问题，我们可以这样： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="type">const</span> Point&amp; <span class="title">upperLeft</span><span class="params">()</span> <span class="type">const</span></span>&#123;<span class="keyword">return</span> pData-&gt;ulhc;&#125;</span><br><span class="line">    <span class="function"><span class="type">const</span> Point&amp; <span class="title">lowerRight</span><span class="params">()</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> pData-&gt;lhrc;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+通过这种做法，用户可以读取对象的points，但不能修改它们。</p>
+<p>但这种用法同样会有一些问题，那就是有可能会出现<strong>dangling
+handles</strong>。 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GUIObj</span>&#123;...&#125;;</span><br><span class="line"><span class="function"><span class="type">const</span> Rectangle <span class="title">boudingBox</span><span class="params">(<span class="type">const</span> GUIObj&amp; obj)</span></span>;</span><br><span class="line"></span><br><span class="line">GUIObj* obj;</span><br><span class="line">...</span><br><span class="line"><span class="type">const</span> Point* p = &amp;(<span class="built_in">boudingBox</span>(*p).<span class="built_in">upperLeft</span>());</span><br></pre></td></tr></table></figure>
+这里的问题是，由于这里够早的是一个临时Rectangle对象，也就是说，当这个语句结束时候临时对象就会被销毁，那么p所指向的Point也会被析构。也就是会发生<strong>dangling
+handles</strong>。</p>
 <p>这是因为<strong>返回一个handle代表对象内部成员</strong>的话，不管这个handle是指针还是引用，也不管是不是const，这里的关键是一旦这个handle传出去了，你就得承受一个风险——handle可能会比其所指向的对象有着更长的声明周期。</p>
 <h2 id="建议">建议</h2>
 <ul>
-<li>避免返回任何handles指向对象的内部。另外，还要使得const成员函数的行为像个const，并且尽量避免发生<em>dangling handles</em>。</li>
+<li>避免返回任何handles指向对象的内部。另外，还要使得const成员函数的行为像个const，并且尽量避免发生<em>dangling
+handles</em>。</li>
 </ul>
 
       
@@ -521,7 +528,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#avoid-returning-handles-to-object-internals"><span class="nav-number">1.</span> <span class="nav-text">Avoid returning &quot;handles&quot; to object internals</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#avoid-returning-handles-to-object-internals"><span class="nav-number">1.</span> <span class="nav-text">Avoid returning
+&quot;handles&quot; to object internals</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -563,8 +571,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -103,17 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="Generative Models 概述  Given training data, generate new samples from same distribution.  这是非监督学习的一种，目标是学习生成一个模型。使用Generative Models，我们可以构造一些艺术工作的真实样式，通过时间序列的数据去仿真，还有就是Generative Models可以用来推荐潜在的表示模式。 G">
 <meta property="og:locale">
-<meta property="og:image" content="https://static.leiphone.com/uploads/new/article/740_740/201702/589978abeec64.png?imageMogr2/format/jpg/quality/90">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelRNN.png">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelCNN.png">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/autoencoders1.png">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/gan1.png">
 <meta property="article:published_time" content="2019-01-30T08:24:51.000Z">
 <meta property="article:modified_time" content="2019-01-30T08:25:13.418Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="Deep Learning">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://static.leiphone.com/uploads/new/article/740_740/201702/589978abeec64.png?imageMogr2/format/jpg/quality/90">
 
 
 
@@ -164,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -345,14 +337,23 @@
 <blockquote>
 <p>Given training data, generate new samples from same distribution.</p>
 </blockquote>
-<p>这是非监督学习的一种，目标是学习生成一个模型。使用Generative Models，我们可以构造一些艺术工作的真实样式，通过时间序列的数据去仿真，还有就是Generative Models可以用来推荐潜在的表示模式。</p>
-<p>Generative Models有两种：Explicit density模型和implicit density模型。</p>
+<p>这是非监督学习的一种，目标是学习生成一个模型。使用Generative
+Models，我们可以构造一些艺术工作的真实样式，通过时间序列的数据去仿真，还有就是Generative
+Models可以用来推荐潜在的表示模式。</p>
+<p>Generative Models有两种：Explicit density模型和implicit
+density模型。</p>
 <p>生成模型族谱：</p>
 <figure>
-<img src="https://static.leiphone.com/uploads/new/article/740_740/201702/589978abeec64.png?imageMogr2/format/jpg/quality/90" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://static.leiphone.com/uploads/new/article/740_740/201702/589978abeec64.png?imageMogr2/format/jpg/quality/90"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="pixel-rnn-pixel-cnn">Pixel Rnn &amp; Pixel Cnn</h2>
-<p>在讨论具体的显式密度模型之前，我们先来看一下<strong>完全可见置信网络 Fully visible belief networks</strong>。该模型通过使用概率的链式规则来将一个n维的向量x的概率分布分解为一个一维的概率分布： <span class="math display">\[
+<p>在讨论具体的显式密度模型之前，我们先来看一下<strong>完全可见置信网络
+Fully visible belief
+networks</strong>。该模型通过使用概率的链式规则来将一个n维的向量x的概率分布分解为一个一维的概率分布：
+<span class="math display">\[
 P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,...,x_{i-1})
 \]</span></p>
 <ul>
@@ -360,33 +361,51 @@ P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,...,x_{i-1})
 </ul>
 <p>从Corner开始生成图像像素，然后往周边序列化地生成像素，一般可以通过RNN或者LSTN去生成周边的像素。缺点就是序列化生成非常慢。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelRNN.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelRNN.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <ul>
 <li>Pixel Cnn</li>
 </ul>
-<p>跟前面一样，从Corner开始生成图像像素。但不同的是，下一个像素的生成是利用上一个像素丢入CNN后生成的。相对pixel rnn会更快，但是总体来说还是比较慢的。</p>
+<p>跟前面一样，从Corner开始生成图像像素。但不同的是，下一个像素的生成是利用上一个像素丢入CNN后生成的。相对pixel
+rnn会更快，但是总体来说还是比较慢的。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelCNN.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/PixelCNN.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="autoencoders">Autoencoders</h2>
 <p>这是非监督学习的一种方法，可以从没有标记过的数据中学习到一些低维度的特征。z是比x维度更低的数据，z包含了重要的信息，并且z应该能够学习到可以被抓取的特征。z能够通过decoder重建输入数据。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/autoencoders1.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/autoencoders1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="gan">GAN</h2>
 <p>GAN的提出是为了解决从一个复杂的、高维的训练分布数据中进行采样的问题，我们可以从一个简单分布进行采样，例如随机噪声，然后去学习transformation到训练的分布。我们使用神经网络去表示这个复杂的transformation。</p>
 <h3 id="two-player-game">Two player game</h3>
 <ul>
-<li>Generator network: try to fool the discriminator by generating real-looking images;</li>
-<li>Discriminator network: try to distinguish between real and fake images;</li>
+<li>Generator network: try to fool the discriminator by generating
+real-looking images;</li>
+<li>Discriminator network: try to distinguish between real and fake
+images;</li>
 </ul>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/gan1.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/gan1.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>目标函数： <span class="math display">\[
-\underset{\theta_g}{min}\ \underset{\theta_d}{max} [E_{x-p_{data} }logD_{\theta_d(x)} + E_{x-p_z }log(1-D_{\theta_d}(G_{\theta_g}(z)))]
-\]</span> 其中，<span class="math inline">\(D_{\theta_d(x)}\)</span>是真实数据x的Discriminator的输出，<span class="math inline">\(D_{\theta_d}(G_{\theta_g}(z))\)</span>是假数据的输出。Discriminator想要最大化目标函数，使得D(x)接近1，并且D(G(z))接近0；而Generator则是最小化目标函数，使得D(G(z))接近1。</p>
+\underset{\theta_g}{min}\ \underset{\theta_d}{max} [E_{x-p_{data}
+}logD_{\theta_d(x)} + E_{x-p_z }log(1-D_{\theta_d}(G_{\theta_g}(z)))]
+\]</span> 其中，<span
+class="math inline">\(D_{\theta_d(x)}\)</span>是真实数据x的Discriminator的输出，<span
+class="math inline">\(D_{\theta_d}(G_{\theta_g}(z))\)</span>是假数据的输出。Discriminator想要最大化目标函数，使得D(x)接近1，并且D(G(z))接近0；而Generator则是最小化目标函数，使得D(G(z))接近1。</p>
 
       
     </div>
@@ -603,8 +622,7 @@ P_{model}(x) = \prod_{i=1}^{n}P_{model}(x_i|x_1,...,x_{i-1})
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

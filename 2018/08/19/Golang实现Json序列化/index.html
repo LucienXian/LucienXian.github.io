@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -349,7 +347,8 @@
 <li>字符串值编码为有效的UTF-8的JSON字符串，并且会用Unicode替换无效字节</li>
 </ul>
 <blockquote>
-为了防止某些浏览器会将JSON输出解析为HTML，尖括号<和>被转义为**
+<p>为了防止某些浏览器会将JSON输出解析为HTML，尖括号<和>被转义为<strong>03c</strong>和<strong>03e</strong>。基于相同的原因，符号<strong>&amp;</strong>会被转义为<strong>026</strong></p>
+<p>可以使用调用了SetEscapeHTML(false)的编码器禁止此转义</p>
 </blockquote>
 <ul>
 <li>数组和切片值编码为JSON数组，但了[]字节会被编码为base64编码的字符串，而nil切片编码为空JSON值</li>
@@ -359,7 +358,9 @@
 <p>在golang的结构体中，每个成员变量都可以附带一个Tag说明，因此每个struct字段的编码可以通过存储在以Json为key的tag进行定制化。比如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    UserId   <span class="type">int</span>    <span class="string">`json:&quot;user_id,omitempty&quot; bson:&quot;user_id&quot;`</span></span><br><span class="line">    UserName <span class="type">string</span> <span class="string">`json:&quot;user_name&quot; bson:&quot;user_name&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这些格式化字符串给出了字符的名称，还可以通过逗号在后面加上一系列的选项。tag中如果带有”omitempty”选项，那么如果该字段值为空，就不会输出到JSON串中。</p>
-<p>还有一种特别的情况，如果字段标记为“ - ”，则始终省略该字段。请注意，比较特别的是仍然可以使用标记“ - ，”生成名称为“ - ”的字段。比如：</p>
+<p>还有一种特别的情况，如果字段标记为“ -
+”，则始终省略该字段。请注意，比较特别的是仍然可以使用标记“ -
+，”生成名称为“ - ”的字段。比如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Field is ignored by this package.</span></span><br><span class="line">Field <span class="type">int</span> <span class="string">`json:&quot;-&quot;`</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Field appears in JSON as key &quot;-&quot;.</span></span><br><span class="line">Field <span class="type">int</span> <span class="string">`json:&quot;-,&quot;`</span></span><br></pre></td></tr></table></figure>
 <p>“string”选项表示字段在JSON编码的字符串中存储为JSON。它仅适用于字符串，浮点，整数或布尔类型的字段。在与JavaScript程序通信时，有时会使用这种额外的编码级别。</p>
 <h2 id="其它">其它</h2>
@@ -374,7 +375,9 @@
 <p>接口会被编码为接口中包含的值，nil接口值则被编码为null JSON值</p>
 <p>另外：</p>
 <blockquote>
-<p>Channel, complex, and function values cannot be encoded in JSON. Attempting to encode such a value causes Marshal to return an UnsupportedTypeError.</p>
+<p>Channel, complex, and function values cannot be encoded in JSON.
+Attempting to encode such a value causes Marshal to return an
+UnsupportedTypeError.</p>
 </blockquote>
 <h2 id="例子">例子</h2>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">type</span> ColorGroup <span class="keyword">struct</span> &#123;</span><br><span class="line">		ID     <span class="type">int</span></span><br><span class="line">		Name   <span class="type">string</span></span><br><span class="line">		Colors []<span class="type">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	group := ColorGroup&#123;</span><br><span class="line">		ID:     <span class="number">1</span>,</span><br><span class="line">		Name:   <span class="string">&quot;Reds&quot;</span>,</span><br><span class="line">		Colors: []<span class="type">string</span>&#123;<span class="string">&quot;Crimson&quot;</span>, <span class="string">&quot;Red&quot;</span>, <span class="string">&quot;Ruby&quot;</span>, <span class="string">&quot;Maroon&quot;</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	b, err := json.Marshal(group)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">&quot;error:&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	os.Stdout.Write(b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -594,8 +597,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

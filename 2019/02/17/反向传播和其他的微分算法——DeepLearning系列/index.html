@@ -103,15 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="反向传播和其他的微分算法 概述 在训练过程中，前向传播可以向前直到它产生一个标量代价函数\(J(\theta)\)，而反向传播会计算代价函数关于参数的梯度，即\(\nabla_\theta J(\theta)\)。 计算图 我们将计算形式转化为图形，形成计算图。那么我们每一个结点代表一个变量，操作则是一个或者多个变量的简单函数，我们定义一个操作仅仅返回单个输出变量。 如果变量 y 是变量 x 通过">
 <meta property="og:locale">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/compute_graph_dl6_8.png">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deeploearning_6_9.png">
-<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deaplearning_6_10.png">
 <meta property="article:published_time" content="2019-02-16T17:53:16.000Z">
 <meta property="article:modified_time" content="2019-02-16T17:54:11.000Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="Deep Learning">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/compute_graph_dl6_8.png">
 
 
 
@@ -162,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,45 +334,70 @@
       
         <h2 id="反向传播和其他的微分算法">反向传播和其他的微分算法</h2>
 <h2 id="概述">概述</h2>
-<p>在训练过程中，前向传播可以向前直到它产生一个标量代价函数<span class="math inline">\(J(\theta)\)</span>，而反向传播会计算代价函数关于参数的梯度，即<span class="math inline">\(\nabla_\theta J(\theta)\)</span>。</p>
+<p>在训练过程中，前向传播可以向前直到它产生一个标量代价函数<span
+class="math inline">\(J(\theta)\)</span>，而反向传播会计算代价函数关于参数的梯度，即<span
+class="math inline">\(\nabla_\theta J(\theta)\)</span>。</p>
 <h2 id="计算图">计算图</h2>
 <p>我们将计算形式转化为图形，形成计算图。那么我们每一个结点代表一个变量，操作则是一个或者多个变量的简单函数，我们定义一个操作仅仅返回单个输出变量。</p>
-<p>如果变量 y 是变量 x 通过一个操作计算得到的,那么我们画一条从 x 到 y 的有向边。</p>
+<p>如果变量 y 是变量 x 通过一个操作计算得到的,那么我们画一条从 x 到 y
+的有向边。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/compute_graph_dl6_8.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/compute_graph_dl6_8.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="微积分中的链式法则">微积分中的链式法则</h2>
 <p>微积分中的链式法则用于计算符合函数的导数。</p>
-<p>假设x是实数，f和g是从实数映射到实数的函数。假设y=g(x)并且z=f(g(x))=f(y)。那么就有： <span class="math display">\[
+<p>假设x是实数，f和g是从实数映射到实数的函数。假设y=g(x)并且z=f(g(x))=f(y)。那么就有：
+<span class="math display">\[
 \frac{dz}{dx} = \frac{dz}{dy} \frac{dy}{dx}
 \]</span> 如果向向量的情况扩展： <span class="math display">\[
-\frac{\alpha z}{\alpha x_i} = \sum_j \frac{\alpha z}{\alpha y_i} \frac{\alpha y_i}{\alpha x} \\
+\frac{\alpha z}{\alpha x_i} = \sum_j \frac{\alpha z}{\alpha y_i}
+\frac{\alpha y_i}{\alpha x} \\
 \nabla_x{^z} = (\frac {\alpha y} {\alpha x})^T \nabla_y{^z}
-\]</span> 这个$  {x}$是g的Jacobian矩阵。</p>
+\]</span> 这个$ {x}$是g的Jacobian矩阵。</p>
 <p>当然，也可以将反向传播应用到任意维度的张量，在我们运行反向传播之前,将每个张量变平为一个向量，计算一个向量值梯度,然后将该梯度重新构造成一个张量。</p>
-<h2 id="递归地使用链式法则来实现反向传播">递归地使用链式法则来实现反向传播</h2>
-<p>使用链式法则，我们可以直接写出某个标量关于计算图中任何产生该标量的梯度的代数表达式，但一般计算机在计算时会引入一些额外的考虑。 <span class="math display">\[
-\frac{\alpha u^{(n)} }{\alpha x^{(j)} } = \sum_{i:j  \in Pa(u^{(i)})} \frac{\alpha u^{(n)} }{\alpha u^{(i)} } \frac{\alpha u^{(i)} }{\alpha u^{(j)} }
+<h2
+id="递归地使用链式法则来实现反向传播">递归地使用链式法则来实现反向传播</h2>
+<p>使用链式法则，我们可以直接写出某个标量关于计算图中任何产生该标量的梯度的代数表达式，但一般计算机在计算时会引入一些额外的考虑。
+<span class="math display">\[
+\frac{\alpha u^{(n)} }{\alpha x^{(j)} } = \sum_{i:j  \in Pa(u^{(i)})}
+\frac{\alpha u^{(n)} }{\alpha u^{(i)} } \frac{\alpha u^{(i)} }{\alpha
+u^{(j)} }
 \]</span> 考虑这种计算图，在计算梯度时导致子表达式重复计算：</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deeploearning_6_9.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deeploearning_6_9.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>为了计算z对w的梯度： <span class="math display">\[
 \frac{\alpha z}{\alpha w} \\
-=\frac{\alpha z}{\alpha y} \frac{\alpha y}{\alpha x} \frac{\alpha x}{\alpha w} \\
+=\frac{\alpha z}{\alpha y} \frac{\alpha y}{\alpha x} \frac{\alpha
+x}{\alpha w} \\
 =f&#39;(y)f&#39;(x)f&#39;(w) .............1\\
 =f&#39;(f(fw)) f&#39;(f(w)) f&#39;(w) .............2
-\]</span> 对于1式，我们采用的实现方式是仅仅计算f(w)一次，并存储起来，这种方式减少了运行时间；</p>
+\]</span>
+对于1式，我们采用的实现方式是仅仅计算f(w)一次，并存储起来，这种方式减少了运行时间；</p>
 <p>而对于2式，每次只在需要时重新计算f(w)，在存储受限时它是有用的。</p>
 <h2 id="符号到符号的导数">符号到符号的导数</h2>
-<p>代数表达式和计算图都对符号或不具有特定值的变量进行操作，这些代数或者基于图的表达式就是符号表示。一些反向传播的方法采用计算图和一组用于图的输入的数值，然后返回在这些输入值处梯度的一组数值。我们将这种方法称为 符号到数值的微分。这是Torch和Caffe使用的方法；</p>
+<p>代数表达式和计算图都对符号或不具有特定值的变量进行操作，这些代数或者基于图的表达式就是符号表示。一些反向传播的方法采用计算图和一组用于图的输入的数值，然后返回在这些输入值处梯度的一组数值。我们将这种方法称为
+符号到数值的微分。这是Torch和Caffe使用的方法；</p>
 <p>另一种方法则是采用计算图以及添加额外的结点到计算图中，其提供了我们需要导数的符号描述，这是Theano和TensorFlow采用的方法。</p>
 <figure>
-<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deaplearning_6_10.png" alt="img" /><figcaption>img</figcaption>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/deaplearning_6_10.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h2 id="一般化的反向传播">一般化的反向传播</h2>
 <p>反向传播算法比较容易理解，其实就是为了计算某个标量z关于图中它的一个祖先x的梯度，我们首先观察到它关于z的梯度由1给出，然后，我们对图中z的每个父节点的梯度进行计算，通过现有的梯度乘以产生z的操作的Jacobian。如果从z触发经过多条路径到达父结点，我们应该对不同路径上的梯度进行求和。</p>
-<p>求解这种表达式<span class="math inline">\(\frac{\alpha u^{(i)} }{\alpha u^{(j)} }\)</span>的时候，相同的计算可能会重复多次，为了避免重复计算，我们利用存储的中间结果<span class="math inline">\(\frac{\alpha u^{(n)} }{\alpha u^{(i)} }\)</span>来进行补充计算。</p>
+<p>求解这种表达式<span class="math inline">\(\frac{\alpha u^{(i)}
+}{\alpha u^{(j)}
+}\)</span>的时候，相同的计算可能会重复多次，为了避免重复计算，我们利用存储的中间结果<span
+class="math inline">\(\frac{\alpha u^{(n)} }{\alpha u^{(i)}
+}\)</span>来进行补充计算。</p>
 
       
     </div>
@@ -595,8 +614,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

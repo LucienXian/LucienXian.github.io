@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,21 +338,30 @@
 <h2 id="套接字地址结构">套接字地址结构</h2>
 <p>先看看IPV4的结构</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> &#123;</span></span><br><span class="line">    <span class="type">in_addr_t</span> s_addr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sin_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sin_family;</span><br><span class="line">    <span class="type">in_port_t</span> sin_port;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span></span><br><span class="line">    <span class="type">char</span> sin_zero[<span class="number">8</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>在sockaddr_in这个结构体，通常只需要三个字段: sin_family、sin_addr和sin_port（POSIX标准）。另外sin_zero这个字段一般不会使用，我们直接把其置为０即可</p>
-<p>通常套接字地址结构，由于我们传递给socketAPI的是指针，所以这些API通常要处理各种支持不同协议的套接字地址，又因为套接字函数出来的时候，ANSI C还没有提出，也就无法使用通常指针void *。所以我们每次传入套接字函数，都需要转为以下的结构：</p>
+<p>在sockaddr_in这个结构体，通常只需要三个字段:
+sin_family、sin_addr和sin_port（POSIX标准）。另外sin_zero这个字段一般不会使用，我们直接把其置为０即可</p>
+<p>通常套接字地址结构，由于我们传递给socketAPI的是指针，所以这些API通常要处理各种支持不同协议的套接字地址，又因为套接字函数出来的时候，ANSI
+C还没有提出，也就无法使用通常指针void
+*。所以我们每次传入套接字函数，都需要转为以下的结构：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sa_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sa_family;</span><br><span class="line">    <span class="type">char</span> sa_data[<span class="number">14</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">serv</span>;</span></span><br><span class="line">bind(sockfd, (<span class="keyword">struct</span> sockaddr *) &amp;serv, <span class="keyword">sizeof</span>(serv));</span><br></pre></td></tr></table></figure>
-<p>另外在IPv6提出之后，有了新的同样套接字地址结构，并且可以支持任何套接字结构，这里就不表了，可以搜一下：<strong>struct sockaddr_storage</strong></p>
+<p>另外在IPv6提出之后，有了新的同样套接字地址结构，并且可以支持任何套接字结构，这里就不表了，可以搜一下：<strong>struct
+sockaddr_storage</strong></p>
 <h2 id="值结果参数">值——结果参数</h2>
 <ul>
-<li><p>从进程到内核传递套接字地址的函数有３个：bind, connect和sendto，参数是指向结构的指针，和结构的大小；</p></li>
-<li><p>从内核到进程传递套接字的函数有４个：accept, recvfrom, getsockname, getpeername，参数是指向结构的指针和直线结构大小变量的指针；</p></li>
+<li><p>从进程到内核传递套接字地址的函数有３个：bind,
+connect和sendto，参数是指向结构的指针，和结构的大小；</p></li>
+<li><p>从内核到进程传递套接字的函数有４个：accept, recvfrom,
+getsockname,
+getpeername，参数是指向结构的指针和直线结构大小变量的指针；</p></li>
 </ul>
 <h2 id="字节排序函数">字节排序函数</h2>
 <p>这个是因为在不同的主机系统中，采用大小端模式是不同的，比如linux中是小端序，而apple中是大端序。这两种字节序转换用以下４个函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">htons</span><span class="params">(<span class="type">uint16_t</span> host16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">htonl</span><span class="params">(<span class="type">uint32_t</span> host32bitvalue)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">ntohs</span><span class="params">(<span class="type">uint16_t</span> net16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ntohl</span><span class="params">(<span class="type">uint32_t</span> net32bitvalue)</span>;</span><br></pre></td></tr></table></figure>
 <h2 id="字节操作函数">字节操作函数</h2>
 <p>没什么好说的，主要关注bzero，memset，memcpy等几个函数</p>
-<h2 id="inet_aton-inet_addr-inet_ntoa函数和inet_ptoninet_ntop函数">inet_aton, inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</h2>
+<h2
+id="inet_aton-inet_addr-inet_ntoa函数和inet_ptoninet_ntop函数">inet_aton,
+inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</h2>
 <p>这些函数，是用来在ASCII字符串中和网络字节序的二进制值进行转换的。这两个函数——inet_pton，inet_ntop，针对IPv6和IPv4都是适用的。</p>
 
       
@@ -530,7 +537,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">套接字编程简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">套接字地址结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%BC%E7%BB%93%E6%9E%9C%E5%8F%82%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">值——结果参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%8E%92%E5%BA%8F%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">字节排序函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%93%8D%E4%BD%9C%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.</span> <span class="nav-text">字节操作函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inet_aton-inet_addr-inet_ntoa%E5%87%BD%E6%95%B0%E5%92%8Cinet_ptoninet_ntop%E5%87%BD%E6%95%B0"><span class="nav-number">1.6.</span> <span class="nav-text">inet_aton, inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">套接字编程简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">套接字地址结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%BC%E7%BB%93%E6%9E%9C%E5%8F%82%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">值——结果参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%8E%92%E5%BA%8F%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">字节排序函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%93%8D%E4%BD%9C%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.</span> <span class="nav-text">字节操作函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inet_aton-inet_addr-inet_ntoa%E5%87%BD%E6%95%B0%E5%92%8Cinet_ptoninet_ntop%E5%87%BD%E6%95%B0"><span class="nav-number">1.6.</span> <span class="nav-text">inet_aton,
+inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -572,8 +580,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

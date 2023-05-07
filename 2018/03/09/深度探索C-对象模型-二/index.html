@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -352,11 +350,15 @@
 <li>由于alignment而需要进行padding的大小，有可能在数据成员上填补，也可能在集合体上进行填补；</li>
 <li>为了支持virtual function而带来的额外负担；</li>
 </ul>
-<p>指针的类型，例如一个指向对象的指针和一个指向整数的指针，一个指向template array的指针有什么区别？关键不在于指针内容的不同，而是通过指针寻址出来的对象不同，也就是指针类型告诉了编译器应该如何解释特定内存地址的内容和大小。</p>
+<p>指针的类型，例如一个指向对象的指针和一个指向整数的指针，一个指向template
+array的指针有什么区别？关键不在于指针内容的不同，而是通过指针寻址出来的对象不同，也就是指针类型告诉了编译器应该如何解释特定内存地址的内容和大小。</p>
 <p>而一个指针类型为void*的指针，其仅仅代表一个地址，通过转型cast，使得编译器能够解释指出内存的大小和位置。</p>
 <p>考虑这种情况：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Bear b;</span><br><span class="line">ZooAnimal *pz = &amp;b;</span><br><span class="line">Bear *pb = &amp;b;</span><br></pre></td></tr></table></figure>
-<p>上面的两个指针都执行了Bear object的第一个字节，但不同的是，pz涵盖的只有Bear object的ZooAnimal部分。而pb则涵盖了整个Bear object;也就是你无法通过pz去使用Bear的任何members。除非使用虚函数机制；</p>
+<p>上面的两个指针都执行了Bear
+object的第一个字节，但不同的是，pz涵盖的只有Bear
+object的ZooAnimal部分。而pb则涵盖了整个Bear
+object;也就是你无法通过pz去使用Bear的任何members。除非使用虚函数机制；</p>
 <p>也就是通过pz所指向的类型去调用某个函数，这里的关键是类型信息并不是存储在pz里，而是存储pz所指向的对象的虚指针和虚指针所指向的虚表里。</p>
 <p>而如果直接把派生类的对象塞进基类的对象里，派生类对象会被切割，也就是失去了多态的功能，</p>
 
@@ -575,8 +577,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

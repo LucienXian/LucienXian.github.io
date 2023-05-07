@@ -96,12 +96,12 @@
 
 
 
-<meta name="description" content="先附上一张早上刚刚“新鲜出炉”的chaincode生命周期的流程图，欢迎指教；  img   四种声明周期 Chaincode 的生命周期有四种：package、install、instantiate、upgrade Package   CDS根据代码和其他属性（名字和版本）定义chaincode包   实例化政策能在endorsement政策中描述 拥有chaincode的实体进行签名  签名目">
+<meta name="description" content="先附上一张早上刚刚“新鲜出炉”的chaincode生命周期的流程图，欢迎指教；   img   四种声明周期 Chaincode 的生命周期有四种：package、install、instantiate、upgrade Package   CDS根据代码和其他属性（名字和版本）定义chaincode包   实例化政策能在endorsement政策中描述 拥有chaincode的实体进行签名  签名">
 <meta property="og:type" content="article">
 <meta property="og:title" content="chaincode_lifecycle">
 <meta property="og:url" content="http://yoursite.com/2017/10/28/chaincode-lifecycle/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="先附上一张早上刚刚“新鲜出炉”的chaincode生命周期的流程图，欢迎指教；  img   四种声明周期 Chaincode 的生命周期有四种：package、install、instantiate、upgrade Package   CDS根据代码和其他属性（名字和版本）定义chaincode包   实例化政策能在endorsement政策中描述 拥有chaincode的实体进行签名  签名目">
+<meta property="og:description" content="先附上一张早上刚刚“新鲜出炉”的chaincode生命周期的流程图，欢迎指教；   img   四种声明周期 Chaincode 的生命周期有四种：package、install、instantiate、upgrade Package   CDS根据代码和其他属性（名字和版本）定义chaincode包   实例化政策能在endorsement政策中描述 拥有chaincode的实体进行签名  签名">
 <meta property="og:locale">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/chaincode_life_image.png">
 <meta property="article:published_time" content="2017-10-28T02:29:10.000Z">
@@ -160,9 +160,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -338,11 +336,14 @@
       
         <p>先附上一张早上刚刚“新鲜出炉”的<strong>chaincode</strong>生命周期的流程图，欢迎指教；</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/chaincode_life_image.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/chaincode_life_image.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p><br></p>
 <h1 id="四种声明周期">四种声明周期</h1>
-<p>Chaincode 的生命周期有四种：package、install、instantiate、upgrade</p>
+<p>Chaincode
+的生命周期有四种：package、install、instantiate、upgrade</p>
 <h2 id="package">Package</h2>
 <ul>
 <li><ul>
@@ -375,7 +376,8 @@
 <ul>
 <li>安装事务将源码组装成CDS的格式，然后install到运行该chaincode的结点上；</li>
 <li>只有chaincode的拥有者拥有的结点能执行chaincode，其它的结点可以验证和提交；</li>
-<li>安装chaincode的时候，会发送一个signer protocol到lifecycle system chaincode（LSCC）；</li>
+<li>安装chaincode的时候，会发送一个signer protocol到lifecycle system
+chaincode（LSCC）；</li>
 </ul>
 <p><br></p>
 <h2 id="instantiate">Instantiate</h2>
@@ -385,7 +387,8 @@
 <li>默认的实例化策略：链码实例化事物的创建者必须是channel管理员的成员；</li>
 <li>实例化事物的创建者必须满足signedCDS中的实例化策略，并且还是channel的writer；否则，会有可能出现恶意实体部署chaincode到未绑定的channel上或者欺骗成员在未绑定的channel上执行链码；</li>
 <li>transaction到达endorser时，endorser根据实例化策略来验证创建者的签名；在提交大账本前，也会再做一次验证；</li>
-<li>实例化事物也会设立一个endorsement policy，这个策略用来被channel其它成员去接受，认可；</li>
+<li>实例化事物也会设立一个endorsement
+policy，这个策略用来被channel其它成员去接受，认可；</li>
 </ul>
 <p><br></p>
 <blockquote>
@@ -625,8 +628,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

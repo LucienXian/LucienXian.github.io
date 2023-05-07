@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -348,7 +346,8 @@
 <li>纯右值，则会返回T；</li>
 </ul></li>
 </ul>
-<p>需要注意的是，如果对象的名字带有括号，则它被当做通常的左值表达式，从而 decltype(x) 和 decltype((x)) 通常是不同的类型。</p>
+<p>需要注意的是，如果对象的名字带有括号，则它被当做通常的左值表达式，从而
+decltype(x) 和 decltype((x)) 通常是不同的类型。</p>
 <p>举个简单的例子：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> &#123; <span class="type">double</span> x; &#125;;</span><br><span class="line"><span class="type">const</span> A* a;</span><br><span class="line"><span class="type">int</span> i=<span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(a-&gt;x) y;       <span class="comment">// y 的类型是 double（其声明类型）</span></span><br><span class="line"><span class="keyword">decltype</span>((a-&gt;x)) z = y; <span class="comment">// z 的类型是 const double&amp;（被当作左值表达式）</span></span><br><span class="line"><span class="keyword">decltype</span>((i))b = i;   	<span class="comment">// b 的类型是 int&amp;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者用在无名函数的类型推导上</span></span><br><span class="line"><span class="keyword">auto</span> f = [](<span class="type">int</span> a, <span class="type">int</span> b) -&gt; <span class="type">int</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> a * b;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(f) g = f; </span><br><span class="line">i = <span class="built_in">f</span>(<span class="number">2</span>, <span class="number">2</span>);</span><br><span class="line">j = <span class="built_in">g</span>(<span class="number">3</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
 <p>在日常编程中，用到decltype的情况还是比较少的，我们一般用在模版中，结合auto和尾返回类型，我们可以写出语言级别支持的简洁代码：</p>
@@ -571,8 +570,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -339,7 +337,8 @@
 <p>Java有两种机制允许定义一个多实现的类型——接口和抽象类。从Java8起，接口引入了默认方法。因此这两种机制都能让用户为一些实例方法提供实现。</p>
 <h2 id="优点">优点</h2>
 <p><strong>现有类可以很容易被改造以实现一个新的接口</strong>。对于一个想要实现新接口的类来说，它只需要添加需要的方法即可。若是使用了抽象类，如果你想要让两个类扩展同一个抽象类，这样就强迫了所有的后带来都要扩展这个父类，而不管这个扩展是否合适。</p>
-<p><strong>接口是定义混合类型的理想选择</strong>。混合类型：一个类除了实现它的"primary type"之外，还可以声明其提供一些额外的行为。比如Complarable接口，它允许一个类声明其实例可以与其它可相互比较的对象进行排序。因为它在主要功能之外提供了一些额外的行为。而抽象类无法被改造到现有的类当中。</p>
+<p><strong>接口是定义混合类型的理想选择</strong>。混合类型：一个类除了实现它的"primary
+type"之外，还可以声明其提供一些额外的行为。比如Complarable接口，它允许一个类声明其实例可以与其它可相互比较的对象进行排序。因为它在主要功能之外提供了一些额外的行为。而抽象类无法被改造到现有的类当中。</p>
 <p><strong>接口构造非层次结构的框架</strong>。类层次结构不一定适合一些其它的层次结构中，但接口可以，假设我们有一个接口，这个接口代表了一个歌手（singer），同时还有另一个代表作曲人（songwriter）的接口。我们就可以同时扩展这两个接口。</p>
 
       
@@ -557,8 +556,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

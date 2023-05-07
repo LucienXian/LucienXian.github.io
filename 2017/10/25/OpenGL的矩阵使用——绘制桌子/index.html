@@ -96,12 +96,12 @@
 
 
 
-<meta name="description" content="要求 其中最左边的桌子循环上移（即匀速上移到一定位置后回到原点继续匀速上移），中间的桌子不断旋转(即绕自身中间轴旋转)，最右边的桌子循环缩小（即不断缩小到一定大小后回归原来大小继续缩小）。  img  桌子的模型尺寸如下：  img   操作方法和实验步骤 绘制桌子 根据题目要求，主要实现的是桌子的移动、旋转和缩放，因此首先需要绘制出桌子的形状。 由于题目要求的桌子主要由五个立法体组成，分别是一个">
+<meta name="description" content="要求 其中最左边的桌子循环上移（即匀速上移到一定位置后回到原点继续匀速上移），中间的桌子不断旋转(即绕自身中间轴旋转)，最右边的桌子循环缩小（即不断缩小到一定大小后回归原来大小继续缩小）。   img  桌子的模型尺寸如下：   img   操作方法和实验步骤 绘制桌子 根据题目要求，主要实现的是桌子的移动、旋转和缩放，因此首先需要绘制出桌子的形状。 由于题目要求的桌子主要由五个立法体组成，分别是">
 <meta property="og:type" content="article">
 <meta property="og:title" content="OpenGL的矩阵使用——绘制桌子">
 <meta property="og:url" content="http://yoursite.com/2017/10/25/OpenGL%E7%9A%84%E7%9F%A9%E9%98%B5%E4%BD%BF%E7%94%A8%E2%80%94%E2%80%94%E7%BB%98%E5%88%B6%E6%A1%8C%E5%AD%90/index.html">
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
-<meta property="og:description" content="要求 其中最左边的桌子循环上移（即匀速上移到一定位置后回到原点继续匀速上移），中间的桌子不断旋转(即绕自身中间轴旋转)，最右边的桌子循环缩小（即不断缩小到一定大小后回归原来大小继续缩小）。  img  桌子的模型尺寸如下：  img   操作方法和实验步骤 绘制桌子 根据题目要求，主要实现的是桌子的移动、旋转和缩放，因此首先需要绘制出桌子的形状。 由于题目要求的桌子主要由五个立法体组成，分别是一个">
+<meta property="og:description" content="要求 其中最左边的桌子循环上移（即匀速上移到一定位置后回到原点继续匀速上移），中间的桌子不断旋转(即绕自身中间轴旋转)，最右边的桌子循环缩小（即不断缩小到一定大小后回归原来大小继续缩小）。   img  桌子的模型尺寸如下：   img   操作方法和实验步骤 绘制桌子 根据题目要求，主要实现的是桌子的移动、旋转和缩放，因此首先需要绘制出桌子的形状。 由于题目要求的桌子主要由五个立法体组成，分别是">
 <meta property="og:locale">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/desk1.png">
 <meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/desk2.png">
@@ -166,9 +166,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -345,11 +343,13 @@
         <h1 id="要求">要求</h1>
 <p>其中最左边的桌子循环上移（即匀速上移到一定位置后回到原点继续匀速上移），中间的桌子不断旋转(即绕自身中间轴旋转)，最右边的桌子循环缩小（即不断缩小到一定大小后回归原来大小继续缩小）。</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/desk1.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/desk1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>桌子的模型尺寸如下：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/desk2.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/desk2.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p><br></p>
 <h1 id="操作方法和实验步骤">操作方法和实验步骤</h1>
@@ -357,7 +357,8 @@
 <p>根据题目要求，主要实现的是桌子的移动、旋转和缩放，因此首先需要绘制出桌子的形状。</p>
 <p>由于题目要求的桌子主要由五个立法体组成，分别是一个桌面和四个桌脚，而立方体又是由6个面组成的，因此通过绘制模式<strong>GL_QUAD</strong>绘制所有的面即可；如图：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/desk3.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/desk3.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>一个立方体的大小和位置有中心点位置和长宽高决定（假设中点位置坐标为x、y、z），因此我们可以得到四个面、二十四个点的位置为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123; x + width,y + depth,z &#125;,&#123; x + width,y - depth,z &#125;,&#123; x - width,y - depth,z &#125;,&#123; x - width,y + depth,z &#125;,</span><br><span class="line"></span><br><span class="line">&#123; x - width,y + depth,z &#125;,&#123; x - width,y - depth,z &#125;,&#123; x - width,y - depth,z - height &#125;,&#123; x - width,y + depth,z - height &#125;,</span><br><span class="line"></span><br><span class="line">&#123; x - width,y + depth,z - height &#125;,&#123; x - width,y - depth,z - height &#125;,&#123; x + width,y - depth,z - height &#125;,&#123; x + width,y + depth,z - height &#125;,</span><br><span class="line"></span><br><span class="line">&#123; x + width,y + depth,z - height &#125;,&#123; x + width,y - depth,z - height &#125;,&#123; x + width,y - depth,z &#125;,&#123; x + width,y + depth,z &#125;,</span><br><span class="line"></span><br><span class="line">&#123; x + width,y + depth,z &#125;,&#123; x - width,y + depth,z &#125;,&#123; x - width,y + depth,z - height &#125;,&#123; x + width,y + depth,z - height &#125;,</span><br><span class="line"></span><br><span class="line">&#123; x + width,y - depth,z &#125;,&#123; x - width,y - depth,z &#125;,&#123; x - width,y - depth,z - height &#125;,&#123; x + width,y - depth,z - height &#125;</span><br></pre></td></tr></table></figure>
@@ -376,7 +377,8 @@
 <p>​ 沿Z轴正方向平移z个单位</p>
 </blockquote>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/desk4.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/desk4.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <h3 id="旋转">旋转</h3>
 <blockquote>
@@ -384,7 +386,8 @@
 <p>函数功能：以点(0,0,0)到点(x,y,z)为轴，旋转angle角度；</p>
 </blockquote>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/desk5.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/desk5.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>根据题目要求，绕着y轴旋转，即用右手握住这条y轴向量，大拇指指向向量的正方向，四指环绕的方向就是旋转的方向；</p>
 <h3 id="缩放">缩放</h3>
@@ -393,7 +396,8 @@
 <p>函数功能：Sx,Sy,Sz分别为模型在x,y,z轴方向的缩放比；</p>
 </blockquote>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/desk6.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/desk6.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p><br></p>
 <h1 id="源代码">源代码</h1>
@@ -401,7 +405,8 @@
 <p><br></p>
 <h1 id="效果">效果</h1>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/desk7.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/desk7.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 
       
@@ -619,8 +624,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

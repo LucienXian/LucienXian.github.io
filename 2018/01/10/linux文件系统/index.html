@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -355,7 +353,8 @@
 <p>为了使得各种物理文件系统能够转换成具有统一共性的文件系统，对各种文件系统进行抽象，linux使用了一种虚拟文件系统。</p>
 <p>另外VFS其实不是一种实际的文件系统，因为它不是存在于外存的，VFS是仅仅存在于内存。</p>
 <h3 id="作用">作用</h3>
-<p>假如用户输入 cp /floopy/TEST /tmp/test，其中前者是MS-DOS磁盘的挂载点，后者是ext2文件系统的一个目录，但因为VFS提供了系统调用接口，使得cp不用理会两者的文件系统而进行文件操作</p>
+<p>假如用户输入 cp /floopy/TEST
+/tmp/test，其中前者是MS-DOS磁盘的挂载点，后者是ext2文件系统的一个目录，但因为VFS提供了系统调用接口，使得cp不用理会两者的文件系统而进行文件操作</p>
 <h3 id="vfs文件系统的结构">VFS文件系统的结构</h3>
 <p>文件模型：</p>
 <ul>
@@ -416,7 +415,8 @@
 </ul>
 <h3 id="文件的read操作">文件的read操作</h3>
 <ul>
-<li>page cache：由于需要减少IO的次数，linux在读写文件时采用了页缓冲，对文件的读写需要经过页缓冲</li>
+<li>page
+cache：由于需要减少IO的次数，linux在读写文件时采用了页缓冲，对文件的读写需要经过页缓冲</li>
 </ul>
 <h2 id="ext2文件系统">ext2文件系统</h2>
 <ul>
@@ -639,8 +639,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

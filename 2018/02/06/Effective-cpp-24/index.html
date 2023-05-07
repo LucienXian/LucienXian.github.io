@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,7 +332,10 @@
       
 
       
-        <h1 id="declare-non-member-functions-when-type-conversions-should-apply-to-all-parameters">Declare non-member functions when type conversions should apply to all parameters</h1>
+        <h1
+id="declare-non-member-functions-when-type-conversions-should-apply-to-all-parameters">Declare
+non-member functions when type conversions should apply to all
+parameters</h1>
 <h2 id="动机">动机</h2>
 <p>通常来说，让一个类支持隐式是一个糟糕的设计，它会使得程序变得复杂。但在某些时候，我们需要隐式的转换，考虑一个有理数的类：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Rational</span>(<span class="type">int</span> numerator=<span class="number">0</span>, <span class="type">int</span> denominator=<span class="number">1</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
@@ -342,7 +343,10 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="type">const</span> Rational <span class="keyword">operator</span>* (<span class="type">const</span> Rational&amp; rhs) <span class="type">const</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>但这种设计有个问题: <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational <span class="title">oneEighth</span><span class="params">(<span class="number">1</span>, <span class="number">8</span>)</span></span>;</span><br><span class="line"><span class="function">Rational <span class="title">oneHalf</span><span class="params">(<span class="number">1</span>, <span class="number">2</span>)</span></span>;</span><br><span class="line">Rational result = oneHalf * oneEighth; <span class="comment">//可以通过</span></span><br><span class="line"></span><br><span class="line">result = oneHalf * <span class="number">2</span>; <span class="comment">//也可以通过，等同于</span></span><br><span class="line">result = oneHalf.<span class="keyword">operator</span>*(<span class="number">2</span>);</span><br><span class="line"><span class="comment">//通过的原因，编译器构造了临时对象</span></span><br><span class="line"><span class="function"><span class="type">const</span> Rational <span class="title">temp</span><span class="params">(<span class="number">2</span>)</span></span>;</span><br><span class="line">result = oneHalf*temp；</span><br><span class="line"></span><br><span class="line"><span class="comment">//而如果是想要满足乘法交换律，则会失败：</span></span><br><span class="line">result = <span class="number">2</span> * oneHalf;</span><br><span class="line"><span class="comment">//因为2没有相应的class，也就没有operator*函数。当然编译器会尝试在命名空间内或者在global作用域内调用non-member operator*,而这也找不到</span></span><br></pre></td></tr></table></figure></p>
 <h2 id="解决方法">解决方法</h2>
-<p>当然，可以声明explicit 构造函数，这也就保证了一致性，但就无法满足了乘法运算。 <br> <br> 为了解决这个问题，也满足了四则运算，我们可以构造一个non-member函数： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//构造一个non-member函数</span></span><br><span class="line"><span class="type">const</span> Rational <span class="keyword">operator</span>*(<span class="type">const</span> Rational&amp; lhs,</span><br><span class="line">                        <span class="type">const</span> Rational&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Rational</span>(lhs.<span class="built_in">numerator</span>()*rhs.<span class="built_in">numerator</span>(),</span><br><span class="line">                    lhs.<span class="built_in">denominator</span>()*lhs.<span class="built_in">denominator</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这样，就都可以通过了</span></span><br><span class="line">Rational result;</span><br><span class="line">result = oneFourth * <span class="number">2</span>;</span><br><span class="line">result = <span class="number">2</span> * oneFourth;</span><br></pre></td></tr></table></figure> <br> 这样，就基本解决问题了。。。。 <br></p>
+<p>当然，可以声明explicit
+构造函数，这也就保证了一致性，但就无法满足了乘法运算。 <br> <br>
+为了解决这个问题，也满足了四则运算，我们可以构造一个non-member函数：
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//构造一个non-member函数</span></span><br><span class="line"><span class="type">const</span> Rational <span class="keyword">operator</span>*(<span class="type">const</span> Rational&amp; lhs,</span><br><span class="line">                        <span class="type">const</span> Rational&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Rational</span>(lhs.<span class="built_in">numerator</span>()*rhs.<span class="built_in">numerator</span>(),</span><br><span class="line">                    lhs.<span class="built_in">denominator</span>()*lhs.<span class="built_in">denominator</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这样，就都可以通过了</span></span><br><span class="line">Rational result;</span><br><span class="line">result = oneFourth * <span class="number">2</span>;</span><br><span class="line">result = <span class="number">2</span> * oneFourth;</span><br></pre></td></tr></table></figure> <br> 这样，就基本解决问题了。。。。 <br></p>
 <h2 id="建议">建议</h2>
 <ul>
 <li>如果你需要为某个函数的所有参数（包括被this指针所指的那个隐喻参数）进行类型转换，那么这个函数必须是一个non-member</li>
@@ -521,7 +525,9 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#declare-non-member-functions-when-type-conversions-should-apply-to-all-parameters"><span class="nav-number">1.</span> <span class="nav-text">Declare non-member functions when type conversions should apply to all parameters</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#declare-non-member-functions-when-type-conversions-should-apply-to-all-parameters"><span class="nav-number">1.</span> <span class="nav-text">Declare
+non-member functions when type conversions should apply to all
+parameters</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -563,8 +569,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

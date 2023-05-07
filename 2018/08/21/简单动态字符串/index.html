@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -335,7 +333,8 @@
 
       
         <h1 id="简单动态字符串">简单动态字符串</h1>
-<p>redis的字符串表示不是使用的像C语言那种以空字符结尾的字符数组，而是自己构建了一种简单动态字符串（simple dynamic string）——<strong>SDS</strong>。</p>
+<p>redis的字符串表示不是使用的像C语言那种以空字符结尾的字符数组，而是自己构建了一种简单动态字符串（simple
+dynamic string）——<strong>SDS</strong>。</p>
 <p>而一般来说，redis只会在字符串字面量被用在一些无需对字符串进行更改的地方使用C风格的字符串，比如打印日志。</p>
 <h2 id="sds的定义">SDS的定义</h2>
 <p>sds定义在sds.h的sdshdr的结构体中：</p>
@@ -350,7 +349,8 @@
 <h3 id="杜绝缓冲区溢出">杜绝缓冲区溢出</h3>
 <p>这个也比较好理解。对于一些字符串拼接的操作，如果没有记录字符串长度，无法得知字符串剩余的内存，这样在拼接的时候就可能发生缓冲区溢出。</p>
 <p>而SDS的API在使用sdscat函数进行字符串拼接的时候，会先检查SDS的空间是否足够，不足的话，会使用某种分配策略扩展空间。</p>
-<h3 id="减少修改字符串带来内存重分配次数">减少修改字符串带来内存重分配次数</h3>
+<h3
+id="减少修改字符串带来内存重分配次数">减少修改字符串带来内存重分配次数</h3>
 <p>对于C字符串来说，每次增长或者缩短一个字符串，程序都需要对保存该字符串的数组进行一次重新分配内存的工作，一旦没有重新分配，就可能造成内存泄露或者产生缓冲区溢出。而且因为内存重分配涉及到了复杂的算法，并且有可能会执行系统调用，所以通常是比较耗时的操作。</p>
 <p>为了避免C字符串的这种缺陷，redis的SDS实现了空间预分配和惰性空间释放两种优化策略。</p>
 <ol type="1">
@@ -583,8 +583,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

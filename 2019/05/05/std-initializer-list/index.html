@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -343,13 +341,17 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::initialzer_list&lt;<span class="type">int</span>&gt; data = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
 <p>当编译器看到这样的形式时<strong>{a,b,c}</strong>，它会自动创建一个这样的对象<strong>std::initialzer_list&lt;T&gt;</strong>，另外像vector或者list之类的容器，也实现了一个参数化的构造器：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;T&gt;::<span class="built_in">vector</span>&lt;T&gt;(initializer_list&lt;T&gt;  elements)</span><br><span class="line">&#123;</span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="using-stdinitializer_list-in-constructors-to-initialize-member-variables">Using std::initializer_list in constructors to initialize member variables</h2>
+<h2
+id="using-stdinitializer_list-in-constructors-to-initialize-member-variables">Using
+std::initializer_list in constructors to initialize member
+variables</h2>
 <p>我们也可以用<strong>std::initializer_list&lt;T&gt;</strong>去初始化成员变量，假设我们有一个这样的类：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span> &#123;</span><br><span class="line">    <span class="type">int</span> mX;</span><br><span class="line">    <span class="type">int</span> mY;</span><br><span class="line">    <span class="type">int</span> mZ;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Point</span>(<span class="type">int</span> a, <span class="type">int</span> b, <span class="type">int</span> c) :</span><br><span class="line">        <span class="built_in">mX</span>(a), <span class="built_in">mY</span>(b), <span class="built_in">mZ</span>(c) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      	std::cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; mX &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; mY &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; mZ &lt;&lt; <span class="string">&quot;)\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>我们可以直接传递一个<strong>initializer_list</strong>作为参数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point <span class="title">pointobj</span><span class="params">(&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]&#125;)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>但如果我们有一个构造器，其参数恰好就是std::initializer_list&lt;<strong>T</strong>&gt;，那么它就会调用该构造起，而不是调用以上三参数形式的构造起。</p>
-<h2 id="how-to-initialize-a-map-in-one-line-using-initialzer_list">How to Initialize a map in one line using initialzer_list ?</h2>
+<h2 id="how-to-initialize-a-map-in-one-line-using-initialzer_list">How
+to Initialize a map in one line using initialzer_list ?</h2>
 <p>同样的，我们也可以用<strong>std::initialzer_list&lt;T&gt;</strong>初始化一个map：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">std::map&lt;std::string, <span class="type">int</span>&gt; mapOfMarks = &#123;</span><br><span class="line">		&#123;<span class="string">&quot;Riti&quot;</span>,<span class="number">2</span>&#125;,</span><br><span class="line">		&#123;<span class="string">&quot;Jack&quot;</span>,<span class="number">4</span>&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>相对应的，编译器会在内部创建这样的一个对象：</p>
@@ -528,7 +530,10 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdinitializer_list"><span class="nav-number">1.</span> <span class="nav-text">std::initializer_list</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#using-stdinitializer_list-in-constructors-to-initialize-member-variables"><span class="nav-number">1.1.</span> <span class="nav-text">Using std::initializer_list in constructors to initialize member variables</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-initialize-a-map-in-one-line-using-initialzer_list"><span class="nav-number">1.2.</span> <span class="nav-text">How to Initialize a map in one line using initialzer_list ?</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdinitializer_list"><span class="nav-number">1.</span> <span class="nav-text">std::initializer_list</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#using-stdinitializer_list-in-constructors-to-initialize-member-variables"><span class="nav-number">1.1.</span> <span class="nav-text">Using
+std::initializer_list in constructors to initialize member
+variables</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-initialize-a-map-in-one-line-using-initialzer_list"><span class="nav-number">1.2.</span> <span class="nav-text">How
+to Initialize a map in one line using initialzer_list ?</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -570,8 +575,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

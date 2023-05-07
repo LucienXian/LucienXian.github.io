@@ -155,9 +155,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -478,7 +476,9 @@
       
         
           
-            <h1 id="never-call-virtual-functions-during-constructions-or-destructions">Never call virtual functions during constructions or destructions</h1>
+            <h1
+id="never-call-virtual-functions-during-constructions-or-destructions">Never
+call virtual functions during constructions or destructions</h1>
 <p>声明结论：不应该在构造函数和析构函数执行期间调用虚函数</p>
 <h2 id="动机">动机</h2>
 <p>如果基类中定义了一个虚函数，那么在派生类中</p>
@@ -618,7 +618,8 @@
       
         
           
-            <h1 id="prevent-exceptions-from-leaving-destructions">Prevent exceptions from leaving destructions</h1>
+            <h1 id="prevent-exceptions-from-leaving-destructions">Prevent exceptions
+from leaving destructions</h1>
 <h2 id="动机">动机</h2>
 <ul>
 <li>一种情况下，如果析构函数抛出了异常，则该异常点后面的程序将无法执行，而如果这些对象不能正常释放，则有可能造成内存泄漏的情况；</li>
@@ -781,7 +782,8 @@
 <li>客户为了创建一个product，往往需要创建一个具体的creator；</li>
 </ul>
 <blockquote>
-<p>与abstract factory不同的是，factory method的工厂仅仅是一个方法，而抽象工厂里的工厂是一个类。因此抽象工厂里，客户在使用时，产品本身是固定死的；而工厂方法则需要使用到产品本身（接口）。总结就是，抽象工厂看不到产品，因此需要使用客户端和更换工程，而工厂方法直接使用产品，从而生产产品；</p>
+<p>与abstract factory不同的是，factory
+method的工厂仅仅是一个方法，而抽象工厂里的工厂是一个类。因此抽象工厂里，客户在使用时，产品本身是固定死的；而工厂方法则需要使用到产品本身（接口）。总结就是，抽象工厂看不到产品，因此需要使用客户端和更换工程，而工厂方法直接使用产品，从而生产产品；</p>
 </blockquote>
 <h2 id="代码示范">代码示范</h2>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Factory_method.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Product</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Product</span>() &#123; cout &lt;&lt; <span class="string">&quot;Product...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;partA...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;partB...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">derivedPro</span> : <span class="keyword">public</span> Product &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">derivedPro</span>() &#123; cout &lt;&lt; <span class="string">&quot;derived Product...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;derived partA...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;derived partB...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Creator</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">getProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (_product == <span class="number">0</span>) &#123;</span><br><span class="line">			_product = <span class="built_in">createProduct</span>();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> _product;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Product* _product;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">TheProduct</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">standardCreator</span> :<span class="keyword">public</span> Creator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">TheProduct</span>&gt;</span><br><span class="line">Product* standardCreator&lt;TheProduct&gt;::<span class="built_in">createProduct</span>() &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> TheProduct;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	standardCreator&lt;Product&gt; myCreator1;</span><br><span class="line">	Product* p = myCreator1.<span class="built_in">getProduct</span>();</span><br><span class="line">	p-&gt;<span class="built_in">partA</span>();</span><br><span class="line">	p-&gt;<span class="built_in">partB</span>();</span><br><span class="line"></span><br><span class="line">	standardCreator&lt;derivedPro&gt; myCreator2;</span><br><span class="line">	Product* q = myCreator2.<span class="built_in">getProduct</span>();</span><br><span class="line">	q-&gt;<span class="built_in">partA</span>();</span><br><span class="line">	q-&gt;<span class="built_in">partB</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
@@ -904,18 +906,24 @@
       
         
           
-            <h1 id="declare-destructions-virtual-in-polymorphic-base-classes">Declare destructions virtual in polymorphic base classes</h1>
+            <h1
+id="declare-destructions-virtual-in-polymorphic-base-classes">Declare
+destructions virtual in polymorphic base classes</h1>
 <h2 id="动机">动机</h2>
-<p>在某些情况下，当一个derived class对象是经由一个base class指针被删除时，而base class着一个non-virtual 的析构函数。此时实际执行的效果是，对象的derived成分并有被销毁，销毁的是base成分。这种局部销毁会造成资源泄漏。</p>
+<p>在某些情况下，当一个derived class对象是经由一个base
+class指针被删除时，而base class着一个non-virtual
+的析构函数。此时实际执行的效果是，对象的derived成分并有被销毁，销毁的是base成分。这种局部销毁会造成资源泄漏。</p>
 <h2 id="方法">方法</h2>
 <ul>
 <li>一个意图被用作base class的class，应该令其析构函数为virtual。</li>
 </ul>
 <blockquote>
-<p>具体用法和原因参考：<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/15/%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0-2-%E2%80%94%E2%80%94CPP/">虚函数的学习</a></p>
+<p>具体用法和原因参考：<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/15/%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0-2-%E2%80%94%E2%80%94CPP/">虚函数的学习</a></p>
 </blockquote>
 <ul>
-<li>另外需要注意的是，一个不打算被用作base class的class，不应该令其析构函数为virtual。原因是：
+<li>另外需要注意的是，一个不打算被用作base
+class的class，不应该令其析构函数为virtual。原因是：
 <ul>
 <li>实现virtual函数的类的体积往往会增大50%到100%，这就造成一个问题是，该类的对象不能被塞到一个预先定义好的缓冲器里面，并传给其它语言的函数，也不能和其他语言（如C）的相同声明有着同样的结构；</li>
 <li>因此往往是只有当class内至少包含一个virtual函数，才为其声明virtual析构函数；</li>
@@ -1045,7 +1053,9 @@
       
         
           
-            <h1 id="explicitly-disallow-the-use-of-complier-generated-functions-you-do-not-want">Explicitly disallow the use of complier-generated functions you do not want</h1>
+            <h1
+id="explicitly-disallow-the-use-of-complier-generated-functions-you-do-not-want">Explicitly
+disallow the use of complier-generated functions you do not want</h1>
 <h2 id="动机">动机</h2>
 <p>在某些时候，我们不希望某个对象能被拷贝或者赋值，因此我们需要某些方法来阻止对象被拷贝或复制。</p>
 <h2 id="方法">方法</h2>
@@ -1207,7 +1217,8 @@
 <ul>
 <li>可以根据蓝图（director）随机修改产品的<strong>内部表示</strong>；</li>
 <li>director可以<strong>复用</strong>builder封装的接口去生成product；</li>
-<li>精装控制product的构造，这也是与abstract factor不同的地方，后者着重在生成一系列统一风格的product，前者可以一步一步地控制product的生成；</li>
+<li>精装控制product的构造，这也是与abstract
+factor不同的地方，后者着重在生成一系列统一风格的product，前者可以一步一步地控制product的生成；</li>
 </ul>
 <h2 id="代码示范">代码示范</h2>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Builder.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Product</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Product</span>() &#123; cout &lt;&lt; <span class="string">&quot;A product...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Builder</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Builder</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">BuildA</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">BuildB</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">BuildC</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">buildPro</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">GetProduct</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="literal">NULL</span>; &#125;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">concreteBuilder</span> : <span class="keyword">public</span> Builder&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">concreteBuilder</span>() &#123; product = <span class="number">0</span>; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">buildPro</span><span class="params">()</span> </span>&#123; product = <span class="keyword">new</span> Product; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">BuildA</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;build a&quot;</span> &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">BuildB</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;build b&quot;</span> &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">BuildC</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;build c&quot;</span> &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">GetProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> product;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Product* product;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Director</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">create</span><span class="params">(Builder&amp; builder)</span> </span>&#123;</span><br><span class="line">		builder.<span class="built_in">buildPro</span>();</span><br><span class="line">		builder.<span class="built_in">BuildA</span>();</span><br><span class="line">		builder.<span class="built_in">BuildA</span>();</span><br><span class="line">		builder.<span class="built_in">BuildB</span>();</span><br><span class="line">		builder.<span class="built_in">BuildC</span>();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> builder.<span class="built_in">GetProduct</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">Director</span>()&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Director director;</span><br><span class="line">	concreteBuilder concretebuilder;</span><br><span class="line">	director.<span class="built_in">create</span>(concretebuilder);</span><br><span class="line">	Product* pro = concretebuilder.<span class="built_in">GetProduct</span>();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">delete</span> pro;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
@@ -1330,8 +1341,10 @@
       
         
           
-            <h1 id="know-what-functions-c-silently-writes-and-calls">Know what functions C++ silently writes and calls</h1>
-<h2 id="关于类的构造析构和拷贝构造拷贝赋值函数">关于类的构造、析构、和拷贝构造、拷贝赋值函数</h2>
+            <h1 id="know-what-functions-c-silently-writes-and-calls">Know what
+functions C++ silently writes and calls</h1>
+<h2
+id="关于类的构造析构和拷贝构造拷贝赋值函数">关于类的构造、析构、和拷贝构造、拷贝赋值函数</h2>
 <ul>
 <li><p>如果自定义类时没有创建构造函数、析构函数、拷贝构造函数和拷贝赋值函数，编译器会默认为类创建；</p></li>
 <li><p>copy构造函数和copy赋值函数，编译器创建的版本只是简单地将类中每一个non-static对象拷贝到目标对象；</p></li>
@@ -1472,14 +1485,18 @@
       
         
           
-            <h1 id="make-sure-that-objects-are-initialized-before-theyre-used">Make sure that objects are initialized before they're used</h1>
-<h2 id="尽量使用member-initialization-list">尽量使用member initialization list</h2>
+            <h1 id="make-sure-that-objects-are-initialized-before-theyre-used">Make
+sure that objects are initialized before they're used</h1>
+<h2 id="尽量使用member-initialization-list">尽量使用member
+initialization list</h2>
 <ul>
 <li>如果只是在构造函数体内进行赋值，非内置类型会在<strong>default</strong>构造函数中先被初始化</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">myClass</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="built_in">myClass</span>(std::string&amp; address, std::list&lt;myClass&gt;&amp; l)&#123;</span><br><span class="line">      addr = address;<span class="comment">//只是赋值，早在默认构造函数已经被初始化</span></span><br><span class="line">      list = l;</span><br><span class="line">  	&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	std::string addr;</span><br><span class="line">  	std::list&lt;myClass&gt; list;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>如果使用member initialization list，会更加高效，避免了内置类型进行结果相同的初始化和赋值；而且member initialization list也能通过默认构造函数初始化成员变量；</li>
+<li>如果使用member initialization
+list，会更加高效，避免了内置类型进行结果相同的初始化和赋值；而且member
+initialization list也能通过默认构造函数初始化成员变量；</li>
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">myClass::<span class="built_in">myClass</span>()</span><br><span class="line">	:<span class="built_in">addr</span>(),</span><br><span class="line">	 <span class="built_in">list</span>()</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
 <ul>
@@ -1489,7 +1506,8 @@
 <li>class的成员变量按照声明次序初始化；</li>
 </ul></li>
 </ul>
-<h2 id="不同编译单元的non-local-static对象">不同编译单元的non-local static对象</h2>
+<h2 id="不同编译单元的non-local-static对象">不同编译单元的non-local
+static对象</h2>
 <ul>
 <li>这个问题的起源是C++不保证不同的编译单元的初始化次序。</li>
 <li>例如</li>
@@ -1498,12 +1516,16 @@
 <ul>
 <li>在这种情况，倘若tfs在tempDir初始化并没有完成初始化，这样就会出现问题；</li>
 </ul>
-<p>为了解决这个问题，我们采取singleton模式，把每个non-local static放到专属函数中。以local static对象替代non-local static对象。因为C++保证一个local static对象会在函数调用期间/首次遇到该对象被定义时进行初始化。</p>
+<p>为了解决这个问题，我们采取singleton模式，把每个non-local
+static放到专属函数中。以local static对象替代non-local
+static对象。因为C++保证一个local
+static对象会在函数调用期间/首次遇到该对象被定义时进行初始化。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">FileSystem&amp; <span class="title">tfs</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="type">static</span> FileSystem fs;</span><br><span class="line">  <span class="keyword">return</span> fs;</span><br><span class="line">&#125;<span class="comment">//第一行是定义并初始化一个对象，第二行是返回该对象的引用。</span></span><br><span class="line"><span class="comment">//而且如果函数被反复调用，可以声明为inline</span></span><br></pre></td></tr></table></figure>
 <h2 id="建议">建议</h2>
 <ul>
 <li>构造函数最好使用member initialization list；</li>
-<li>以local static对象替代non-local static对象，保证跨编译单元的对象初始化；</li>
+<li>以local static对象替代non-local
+static对象，保证跨编译单元的对象初始化；</li>
 </ul>
 
           
@@ -1625,7 +1647,8 @@
         
           
             <h1 id="use-const-whenever-possible">use const whenever possible</h1>
-<p>关于const的使用，之前的文章里也做过相似的介绍，但《effective C++》里还是做了一些规则推荐，那就来学习一下。</p>
+<p>关于const的使用，之前的文章里也做过相似的介绍，但《effective
+C++》里还是做了一些规则推荐，那就来学习一下。</p>
 <h2 id="函数声明">函数声明</h2>
 <p>讲道理，之前对这种用法并不熟悉，但书上做了很详细的介绍。令函数返回一个常量值在某些情况下是非常有用的。举个例子，考虑有理数：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span> &#123;&#125;;</span><br><span class="line"><span class="type">const</span> Rational <span class="keyword">operator</span>* (<span class="type">const</span> Rational&amp; lhs, <span class="type">const</span> Rational&amp; rhs);</span><br></pre></td></tr></table></figure>
@@ -1639,7 +1662,8 @@
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TextBlock</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="type">const</span> <span class="type">char</span>&amp; <span class="keyword">operator</span>[](std::<span class="type">size_t</span> position) <span class="type">const</span>&#123;... <span class="keyword">return</span> text[position];&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	<span class="type">char</span>&amp; <span class="keyword">operator</span>[](std::<span class="type">size_t</span> position)&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">const_char</span>&lt;<span class="type">char</span>&amp;&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">const</span> TextBlock&gt;(*<span class="keyword">this</span>)[position]);</span><br><span class="line">  	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>通过在non-const operator[]经过两次转换，即可以减少代码量，也可以返回non-const值；
+<li>通过在non-const
+operator[]经过两次转换，即可以减少代码量，也可以返回non-const值；
 <ul>
 <li>non-const转换成const是安全转换；</li>
 </ul></li>
@@ -1815,8 +1839,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

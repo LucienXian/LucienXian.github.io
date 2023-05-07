@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,20 +332,32 @@
       
 
       
-        <h1 id="c11-multithreading-part-2-joining-and-detaching-threads">C++11 Multithreading – Part 2: Joining and Detaching Threads</h1>
-<h2 id="joining-threads-with-stdthreadjoin">Joining Threads with std::thread::join()</h2>
+        <h1 id="c11-multithreading-part-2-joining-and-detaching-threads">C++11
+Multithreading – Part 2: Joining and Detaching Threads</h1>
+<h2 id="joining-threads-with-stdthreadjoin">Joining Threads with
+std::thread::join()</h2>
 <p>一个线程启动后，另一个线程可以等待该线程完成。这个特别的需求可以用join来实现：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">th</span><span class="params">(funcPtr)</span></span>;</span><br><span class="line">th.<span class="built_in">join</span>();</span><br></pre></td></tr></table></figure>
-<h2 id="detaching-threads-using-stdthreaddetach">Detaching Threads using std::thread::detach()</h2>
+<h2 id="detaching-threads-using-stdthreaddetach">Detaching Threads using
+std::thread::detach()</h2>
 <p>被分离的线程也叫守护(daemon)/后台(background)线程，这个需求可以调用std::function来完成：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">th</span><span class="params">(funcPtr)</span></span>;</span><br><span class="line">th.<span class="built_in">detach</span>();</span><br></pre></td></tr></table></figure>
-<h2 id="be-careful-with-calling-detach-and-join-on-thread-handles">Be careful with calling detach() and join() on Thread Handles</h2>
-<h3 id="case-1-never-call-join-or-detach-on-stdthread-object-with-no-associated-executing-thread-stdthread-threadobj-workerthread-threadobj.join-threadobj.join-it-will-cause-program-to-terminate">Case 1: Never call join() or detach() on std::thread object with no associated executing thread std::thread threadObj( (WorkerThread()) ); threadObj.join(); threadObj.join(); // It will cause Program to Terminate</h3>
+<h2 id="be-careful-with-calling-detach-and-join-on-thread-handles">Be
+careful with calling detach() and join() on Thread Handles</h2>
+<h3
+id="case-1-never-call-join-or-detach-on-stdthread-object-with-no-associated-executing-thread-stdthread-threadobj-workerthread-threadobj.join-threadobj.join-it-will-cause-program-to-terminate">Case
+1: Never call join() or detach() on std::thread object with no
+associated executing thread std::thread threadObj( (WorkerThread()) );
+threadObj.join(); threadObj.join(); // It will cause Program to
+Terminate</h3>
 <p>比如在一个没有相关线程的线程上执行join或者detach都会导致程序终止：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">threadObj.<span class="built_in">join</span>();</span><br><span class="line">threadObj.<span class="built_in">join</span>(); <span class="comment">// It will cause Program to Terminate</span></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="function">std::thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">threadObj.<span class="built_in">detach</span>();</span><br><span class="line">threadObj.<span class="built_in">detach</span>(); <span class="comment">// It will cause Program to Terminate</span></span><br></pre></td></tr></table></figure>
 <p>为了避免这个问题，每次调用join()或者detach()之前都应该检查线程状态：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line"><span class="keyword">if</span>(threadObj.<span class="built_in">joinable</span>())</span><br><span class="line">&#123;</span><br><span class="line">    std::cout&lt;&lt;<span class="string">&quot;Detaching Thread &quot;</span>&lt;&lt;std::endl;</span><br><span class="line">    threadObj.<span class="built_in">detach</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(threadObj.<span class="built_in">joinable</span>())    </span><br><span class="line">&#123;</span><br><span class="line">    std::cout&lt;&lt;<span class="string">&quot;Detaching Thread &quot;</span>&lt;&lt;std::endl;</span><br><span class="line">    threadObj.<span class="built_in">detach</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">std::thread <span class="title">threadObj2</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line"><span class="keyword">if</span>(threadObj2.<span class="built_in">joinable</span>())</span><br><span class="line">&#123;</span><br><span class="line">    std::cout&lt;&lt;<span class="string">&quot;Joining Thread &quot;</span>&lt;&lt;std::endl;</span><br><span class="line">    threadObj2.<span class="built_in">join</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(threadObj2.<span class="built_in">joinable</span>())    </span><br><span class="line">&#123;</span><br><span class="line">    std::cout&lt;&lt;<span class="string">&quot;Joining Thread &quot;</span>&lt;&lt;std::endl;</span><br><span class="line">    threadObj2.<span class="built_in">join</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="case-2-never-forget-to-call-either-join-or-detach-on-a-stdthread-object-with-associated-executing-thread"><strong>Case 2 : Never forget to call either join or detach on a std::thread object with associated executing thread</strong></h3>
+<h3
+id="case-2-never-forget-to-call-either-join-or-detach-on-a-stdthread-object-with-associated-executing-thread"><strong>Case
+2 : Never forget to call either join or detach on a std::thread object
+with associated executing thread</strong></h3>
 <p>如果一个线程还有相关联的在执行的线程，但却没有对此执行join()或者detach()，那么在destructor中会终止该程序。因为destructor会检查线程是否joinable。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WorkerThread</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">()</span>     </span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        std::cout&lt;&lt;<span class="string">&quot;Worker Thread &quot;</span>&lt;&lt;std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">threadObj</span><span class="params">( (WorkerThread()) )</span></span>;</span><br><span class="line">    <span class="comment">// Program will terminate as we have&#x27;t called either join or detach with the std::thread object.</span></span><br><span class="line">    <span class="comment">// Hence std::thread&#x27;s object destructor will terminate the program</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -524,7 +534,17 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-multithreading-part-2-joining-and-detaching-threads"><span class="nav-number">1.</span> <span class="nav-text">C++11 Multithreading – Part 2: Joining and Detaching Threads</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#joining-threads-with-stdthreadjoin"><span class="nav-number">1.1.</span> <span class="nav-text">Joining Threads with std::thread::join()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#detaching-threads-using-stdthreaddetach"><span class="nav-number">1.2.</span> <span class="nav-text">Detaching Threads using std::thread::detach()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#be-careful-with-calling-detach-and-join-on-thread-handles"><span class="nav-number">1.3.</span> <span class="nav-text">Be careful with calling detach() and join() on Thread Handles</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-never-call-join-or-detach-on-stdthread-object-with-no-associated-executing-thread-stdthread-threadobj-workerthread-threadobj.join-threadobj.join-it-will-cause-program-to-terminate"><span class="nav-number">1.3.1.</span> <span class="nav-text">Case 1: Never call join() or detach() on std::thread object with no associated executing thread std::thread threadObj( (WorkerThread()) ); threadObj.join(); threadObj.join(); &#x2F;&#x2F; It will cause Program to Terminate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#case-2-never-forget-to-call-either-join-or-detach-on-a-stdthread-object-with-associated-executing-thread"><span class="nav-number">1.3.2.</span> <span class="nav-text">Case 2 : Never forget to call either join or detach on a std::thread object with associated executing thread</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-multithreading-part-2-joining-and-detaching-threads"><span class="nav-number">1.</span> <span class="nav-text">C++11
+Multithreading – Part 2: Joining and Detaching Threads</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#joining-threads-with-stdthreadjoin"><span class="nav-number">1.1.</span> <span class="nav-text">Joining Threads with
+std::thread::join()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#detaching-threads-using-stdthreaddetach"><span class="nav-number">1.2.</span> <span class="nav-text">Detaching Threads using
+std::thread::detach()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#be-careful-with-calling-detach-and-join-on-thread-handles"><span class="nav-number">1.3.</span> <span class="nav-text">Be
+careful with calling detach() and join() on Thread Handles</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#case-1-never-call-join-or-detach-on-stdthread-object-with-no-associated-executing-thread-stdthread-threadobj-workerthread-threadobj.join-threadobj.join-it-will-cause-program-to-terminate"><span class="nav-number">1.3.1.</span> <span class="nav-text">Case
+1: Never call join() or detach() on std::thread object with no
+associated executing thread std::thread threadObj( (WorkerThread()) );
+threadObj.join(); threadObj.join(); &#x2F;&#x2F; It will cause Program to
+Terminate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#case-2-never-forget-to-call-either-join-or-detach-on-a-stdthread-object-with-associated-executing-thread"><span class="nav-number">1.3.2.</span> <span class="nav-text">Case
+2 : Never forget to call either join or detach on a std::thread object
+with associated executing thread</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -566,8 +586,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,7 +332,8 @@
       
 
       
-        <p>在看c++ primer的时候，了解到了一个c++11的新标准，故记录一下自己的见解。</p>
+        <p>在看c++
+primer的时候，了解到了一个c++11的新标准，故记录一下自己的见解。</p>
 <h1 id="stdmove对象移动">std::move（对象移动）</h1>
 <h2 id="需求">需求</h2>
 <p>首先，这是C++为了避免copy的一种新做法。</p>
@@ -343,14 +342,17 @@
 <li>另一个原因则是，像<strong>IO类</strong>或者<strong>unique_ptr类</strong>是不允许共享资源的，因此这些类不可以被copy。由此引发的一个是，在旧标准里面，容器只能保存可以被拷贝的类。而新标准里，可以保存不被拷贝的类，只要该类能被移动即可。</li>
 </ul>
 <h2 id="含义">含义</h2>
-<p>举个例子，通过copy constructor，容器vector能将内部指向数据的指针copy起来，原指针则使其为null，这样就避免了对数据内容的copy。</p>
-<p>简单说明一下，copy constructor就是分配新的资源，而move constructor则是接管了原来的资源，获得使用了原来资源的权利。</p>
+<p>举个例子，通过copy
+constructor，容器vector能将内部指向数据的指针copy起来，原指针则使其为null，这样就避免了对数据内容的copy。</p>
+<p>简单说明一下，copy constructor就是分配新的资源，而move
+constructor则是接管了原来的资源，获得使用了原来资源的权利。</p>
 <blockquote>
 <p>用c++ primer的说法是“窃取”了资源</p>
 </blockquote>
 <h1 id="rvalue-reference右值引用">rvalue reference（右值引用）</h1>
 <h2 id="需求-1">需求</h2>
-<p>为了支持move操作，c++11新标准引进了一个新的引用类型——<strong>rvalue reference</strong>。</p>
+<p>为了支持move操作，c++11新标准引进了一个新的引用类型——<strong>rvalue
+reference</strong>。</p>
 <h2 id="含义-1">含义</h2>
 <p>顾名思义，右值引用则是绑定到右值得引用，这其中就涉及到了一个非常有用的性质——右值引用只能绑定到一个将要销毁的对象。只有这样，我们才能将原对象资源move到新的对象当中去。</p>
 <ul>
@@ -366,7 +368,8 @@
 <h1 id="使用">使用</h1>
 <p>这里先借用一下stackoverflow某位答主的话：</p>
 <blockquote>
-<p><code>std::move()</code> is a cast that produces an rvalue-reference to an object, to enable moving from it</p>
+<p><code>std::move()</code> is a cast that produces an rvalue-reference
+to an object, to enable moving from it</p>
 </blockquote>
 <p>为了我们可以将右值引用直接绑定到左值上，我们可以利用<strong>std::move</strong>这个标准库函数来获得绑定到左值上的右值引用。该函数定义在头文件<strong>utility</strong>中。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> &amp;&amp;rr2 = std::<span class="built_in">move</span>(rr1); <span class="comment">// ok</span></span><br></pre></td></tr></table></figure>
@@ -589,8 +592,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

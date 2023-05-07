@@ -103,13 +103,11 @@
 <meta property="og:site_name" content="LucienXian&#39;s Blog">
 <meta property="og:description" content="Backpropagation and Neural Networks 计算图：每个节点表示一个计算步骤 反向传播：链式法则的递归调用 用微积分可能无法求解 可以组合某些结点成更复杂的结点，只要能求解导数即可 add gate, max gate 如果有一个结点连接到了多个结点 雅克比矩阵  方向转播：利用链式法则递归计算表达式的梯度的方法  简单理解 其实学过微积分的同学应该都能理解导数的含义，">
 <meta property="og:locale">
-<meta property="og:image" content="https://pic4.zhimg.com/80/213da7f66594510b45989bd134fc2d8b_hd.jpg">
 <meta property="article:published_time" content="2018-06-17T15:05:45.000Z">
 <meta property="article:modified_time" content="2018-06-17T15:07:36.077Z">
 <meta property="article:author" content="LucienXian">
 <meta property="article:tag" content="网络课程">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pic4.zhimg.com/80/213da7f66594510b45989bd134fc2d8b_hd.jpg">
 
 
 
@@ -160,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -336,7 +332,8 @@
       
 
       
-        <h1 id="backpropagation-and-neural-networks">Backpropagation and Neural Networks</h1>
+        <h1 id="backpropagation-and-neural-networks">Backpropagation and Neural
+Networks</h1>
 <p>计算图：每个节点表示一个计算步骤</p>
 <p>反向传播：链式法则的递归调用</p>
 <p>用微积分可能无法求解</p>
@@ -348,19 +345,29 @@
 <p>方向转播：利用链式法则递归计算表达式的梯度的方法</p>
 </blockquote>
 <h2 id="简单理解">简单理解</h2>
-<p>其实学过微积分的同学应该都能理解导数的含义，简单概括就是<strong>变量变化导致的函数在该变量方向上的变化率</strong>，指明了整个表达式对于该变量的敏感度。 <span class="math display">\[
+<p>其实学过微积分的同学应该都能理解导数的含义，简单概括就是<strong>变量变化导致的函数在该变量方向上的变化率</strong>，指明了整个表达式对于该变量的敏感度。
+<span class="math display">\[
 f(x, y) = x + y -&gt; \frac{df}{dx} = \frac{df}{dy} = 1
 \]</span> 同样对于取最大值的操作： <span class="math display">\[
-f(x, y) = max(x, y) -&gt; \frac{df}{dx} = 1(x&gt;=y) \frac{df}{dy} = 1(y&gt;=x)
+f(x, y) = max(x, y) -&gt; \frac{df}{dx} = 1(x&gt;=y) \frac{df}{dy} =
+1(y&gt;=x)
 \]</span></p>
 <h2 id="使用链式法则计算符合表达式">使用链式法则计算符合表达式</h2>
-<p>考虑这样的一个符合函数<span class="math inline">\(f(x, y, z)=(x+y)z\)</span>，将其分为两个部分<span class="math inline">\(q=x+y和f=qz\)</span>。根据链式法则，将梯度表达式连起来的方式就是相乘： <span class="math display">\[
-\frac{\alpha f}{\alpha x} = \frac{\alpha f}{\alpha q} \frac{\alpha q}{\alpha x} 
-\]</span> <img src="https://pic4.zhimg.com/80/213da7f66594510b45989bd134fc2d8b_hd.jpg" alt="img" /></p>
+<p>考虑这样的一个符合函数<span class="math inline">\(f(x, y,
+z)=(x+y)z\)</span>，将其分为两个部分<span
+class="math inline">\(q=x+y和f=qz\)</span>。根据链式法则，将梯度表达式连起来的方式就是相乘：
+<span class="math display">\[
+\frac{\alpha f}{\alpha x} = \frac{\alpha f}{\alpha q} \frac{\alpha
+q}{\alpha x}
+\]</span> <img
+src="https://pic4.zhimg.com/80/213da7f66594510b45989bd134fc2d8b_hd.jpg"
+alt="img" /></p>
 <p>这个计算线路图展示了计算的视觉化过程，前向传播从输入计算到输出（绿色），后向传播从尾部开始。</p>
 <h2 id="反向传播的理解">反向传播的理解</h2>
 <p>在前向传播过程中计算两个东西：输出和局部梯度。这样在反向传播的时候，就可以将上游回传的梯度乘以局部梯度。</p>
-<p>至于常见的几种单元，诸如加法门单元、取最大值门单元、乘法门单元都比较好理解。例如在线性分类器中，权重和输入进行点积<span class="math inline">\(w^T x_i\)</span>，假设所有的输入样本都乘以1000，那么权重的梯度将会增大1000倍，这样就必须降低学习率来弥补。</p>
+<p>至于常见的几种单元，诸如加法门单元、取最大值门单元、乘法门单元都比较好理解。例如在线性分类器中，权重和输入进行点积<span
+class="math inline">\(w^T
+x_i\)</span>，假设所有的输入样本都乘以1000，那么权重的梯度将会增大1000倍，这样就必须降低学习率来弥补。</p>
 <h2 id="小结">小结</h2>
 <p>反向传播，简单的理解就是复合函数的链式法则。</p>
 <h2 id="参考资料">参考资料</h2>
@@ -539,7 +546,8 @@ f(x, y) = max(x, y) -&gt; \frac{df}{dx} = 1(x&gt;=y) \frac{df}{dy} = 1(y&gt;=x)
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#backpropagation-and-neural-networks"><span class="nav-number">1.</span> <span class="nav-text">Backpropagation and Neural Networks</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%90%86%E8%A7%A3"><span class="nav-number">1.1.</span> <span class="nav-text">简单理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%93%BE%E5%BC%8F%E6%B3%95%E5%88%99%E8%AE%A1%E7%AE%97%E7%AC%A6%E5%90%88%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">使用链式法则计算符合表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">1.3.</span> <span class="nav-text">反向传播的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">1.5.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#backpropagation-and-neural-networks"><span class="nav-number">1.</span> <span class="nav-text">Backpropagation and Neural
+Networks</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%90%86%E8%A7%A3"><span class="nav-number">1.1.</span> <span class="nav-text">简单理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%93%BE%E5%BC%8F%E6%B3%95%E5%88%99%E8%AE%A1%E7%AE%97%E7%AC%A6%E5%90%88%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">使用链式法则计算符合表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">1.3.</span> <span class="nav-text">反向传播的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">1.5.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -581,8 +589,7 @@ f(x, y) = max(x, y) -&gt; \frac{df}{dx} = 1(x&gt;=y) \frac{df}{dy} = 1(y&gt;=x)
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

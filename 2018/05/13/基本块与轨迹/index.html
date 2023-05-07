@@ -160,9 +160,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -359,23 +357,29 @@
 <p>消除ESEQ的方法是，在树中一级一级地将它们提升，直至它们可以变成SEQ节点。</p>
 <p>下面，介绍四种情况，其中三四两种情况的不同在于s1与e能否交换：</p>
 <figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compiler8-1.png" alt="img" /><figcaption>img</figcaption>
+<img src="http://ou7boskhm.bkt.clouddn.com/compiler8-1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
 </figure>
 <p>一般，常数和空语句可以与任何语句交换，其它假定不能交换。</p>
 <h3 id="一般重写规则">一般重写规则</h3>
 <p>一般而言，对于每一种tree语言或者表达式，都会有等价的子表达式。</p>
-<p>例如对于[e1, e2, ESEQ(s, e3)]，需要将s抽取出来放到e2和e1的左边。如果可以交换，则得到(s; [e1,e2,e3])，如果不能交换，则是上图中第三种情况。</p>
+<p>例如对于[e1, e2, ESEQ(s,
+e3)]，需要将s抽取出来放到e2和e1的左边。如果可以交换，则得到(s;
+[e1,e2,e3])，如果不能交换，则是上图中第三种情况。</p>
 <p>利用函数reorder接收一个表达式，并返回由(语句，表达式表)组成的一个偶对。其中语句必须包含所有在表达式表之前执行的操作。传入reorder的是一个链表，它会抽出所有的ESEQ。reorder对参数的链表中的每一个表达式都调用de_exp，而do_exp的实现又只是对除了ESEQ之外的任何类型的表达式建立其子表达式的地址表并调用reorder。</p>
 <h3 id="将call移到顶层">将call移到顶层</h3>
 <p>由于在tree语言允许call节点作为子表达式，但实际中call的实现是，每一个函数将它的结果返回到同一个规定的返回值寄存器中，那么后面的调用就可能把前面的调用给覆盖掉了。</p>
 <p>因此，我们可以重写：</p>
-<p>CALL(func, args)---&gt;ESEQ(MOVE(TEMP t, CALL(func, args)), TEMP t)</p>
+<p>CALL(func, args)---&gt;ESEQ(MOVE(TEMP t, CALL(func, args)), TEMP
+t)</p>
 <p>在这种情况中，do_stm不会调用reorder去处理CALL节点，而是把f和args看做MOVE节点的儿子</p>
 <h3 id="线性语句表">线性语句表</h3>
-<p>一旦整个函数体都已经用do_stm处理完毕之后，所有的SEQ节点都集中在树的顶部。函数linearize重复施加规则，使得<strong>SEQ(SEQ(a,b),c)</strong> ==&gt; <strong>SEQ(a, SEQ(b,c))</strong></p>
+<p>一旦整个函数体都已经用do_stm处理完毕之后，所有的SEQ节点都集中在树的顶部。函数linearize重复施加规则，使得<strong>SEQ(SEQ(a,b),c)</strong>
+==&gt; <strong>SEQ(a, SEQ(b,c))</strong></p>
 <p>但SEQ节点不提供任何结构性信息，只是简单列表。</p>
 <h2 id="处理条件分支">处理条件分支</h2>
-<p>tree语言与多数机器指令集不一样的是，它具有两路分支CJUMP指令。为了便于将tree转换为机器指令，我们需要重新安排CJUMP，使得CJUMP(cond, lt, lf)后面跟随的LABEL(lf)。</p>
+<p>tree语言与多数机器指令集不一样的是，它具有两路分支CJUMP指令。为了便于将tree转换为机器指令，我们需要重新安排CJUMP，使得CJUMP(cond,
+lt, lf)后面跟随的LABEL(lf)。</p>
 <p>我们分两步实现这一目的：取一颗规范树，并由它们形成基本块；对这些基本块进行排序，形成trace轨迹。</p>
 <h3 id="基本块">基本块</h3>
 <p>在分析程序的控制流时，任何非分支指令的程序语句对分析都没有意义，因此可以将非分支指令的序列集中到基本块中。</p>
@@ -617,8 +621,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

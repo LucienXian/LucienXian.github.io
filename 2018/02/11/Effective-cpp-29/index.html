@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,7 +332,8 @@
       
 
       
-        <h1 id="strive-for-exception-safe-code">Strive for exception-safe code</h1>
+        <h1 id="strive-for-exception-safe-code">Strive for exception-safe
+code</h1>
 <h2 id="动机">动机</h2>
 <p>我们常说的<strong>异常安全</strong>需要满足两个条件：</p>
 <ul>
@@ -343,17 +342,20 @@
 </ul>
 <p>考虑这样一段代码：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">PrettyMenu::changeBackground</span><span class="params">(std::istream&amp; imgSrc)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">lock</span>(&amp;mutex);</span><br><span class="line">    <span class="keyword">delete</span> bgImage;</span><br><span class="line">    ++imageChanges;</span><br><span class="line">    bgImage = <span class="keyword">new</span> <span class="built_in">Image</span>(imgSrc);</span><br><span class="line">    <span class="built_in">unlock</span>(&amp;mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这段代码的问题就是，一旦“new Image(imgSrc)”出现了异常，那么unlock就不能执行了，互斥器就永远锁住了，则泄露了资源；另外就是这样bgImage会指向一个被删除的对象，而imageChanges被破坏了</p>
+<p>这段代码的问题就是，一旦“new
+Image(imgSrc)”出现了异常，那么unlock就不能执行了，互斥器就永远锁住了，则泄露了资源；另外就是这样bgImage会指向一个被删除的对象，而imageChanges被破坏了</p>
 <h2 id="解决方法">解决方法</h2>
 <p>解决方法其实很简单，则使用之前提及过的条例：以对象去接管资源：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">PrettyMenu::changeBackground</span><span class="params">(std::istream&amp; imgSrc)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Lock <span class="title">m1</span><span class="params">(&amp;mutex)</span></span>;</span><br><span class="line">    <span class="keyword">delete</span> bgImage;</span><br><span class="line">    ++imageChanges;</span><br><span class="line">    bgImage = <span class="keyword">new</span> <span class="built_in">Image</span>(imgSrc);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>一般来说，一个异常安全函数（Exception-safe function）必须提供以下的三个保证之一：</p>
+<p>一般来说，一个异常安全函数（Exception-safe
+function）必须提供以下的三个保证之一：</p>
 <ul>
 <li><p>基本承诺：如果异常被抛出了，那么程序的成员应该要保持有效的状态，则没有数据被破坏了。以上面的函数为例，我们可以修改程序，在函数抛出异常时，bgImage指向一个默认的对象；</p></li>
 <li><p>强烈保证：保证程序只有两个状态：异常抛出，状态改变；否则就回到程序调用函数之前的状态；</p></li>
 <li><p>nothrow保证：承诺永远不会抛出异常；</p></li>
 </ul>
-<p><br> 另外一个保证异常安全的方法是——<strong>copy&amp;swap</strong>，则为你希望修改的对象构造一个副本，然后在那个副本上做一切修改，若有任何修改操作发生异常，那么原对象不受影响。待修改成功后，在交换指针。</p>
+<p><br>
+另外一个保证异常安全的方法是——<strong>copy&amp;swap</strong>，则为你希望修改的对象构造一个副本，然后在那个副本上做一切修改，若有任何修改操作发生异常，那么原对象不受影响。待修改成功后，在交换指针。</p>
 <h2 id="建议">建议</h2>
 <ul>
 <li>异常安全函数即使发生异常也不会泄露资源或者允许任何数据结构被破坏；</li>
@@ -534,7 +536,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#strive-for-exception-safe-code"><span class="nav-number">1.</span> <span class="nav-text">Strive for exception-safe code</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#strive-for-exception-safe-code"><span class="nav-number">1.</span> <span class="nav-text">Strive for exception-safe
+code</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -576,8 +579,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

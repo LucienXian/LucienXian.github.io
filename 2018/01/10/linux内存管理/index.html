@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -360,7 +358,8 @@
 <h3 id="进程用户空间">进程用户空间</h3>
 <p>linux把进程的用户空间划分成一个个区间。</p>
 <ul>
-<li>一个进程的用户进程空间由mm_struct结构描述（对进行的整个用户空间进行描述，memory descriptor）</li>
+<li>一个进程的用户进程空间由mm_struct结构描述（对进行的整个用户空间进行描述，memory
+descriptor）</li>
 <li>vm_area_struct结构是虚存空间的一个连续区域，所有的该结构体组成一个单链表，在这个区域里的信息具有相同的操作和访问特性。vm_mm指针指向mm_struct结构体；vm_strart和vm_end是虚拟区域的开始和终止地址</li>
 </ul>
 <p>创建进程用户空间</p>
@@ -643,8 +642,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

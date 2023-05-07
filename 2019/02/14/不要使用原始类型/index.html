@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -346,7 +344,8 @@
 <p><strong>你使用了原始类型，你将会失去泛型所带来的安全性和可读性。</strong>以原始类型List和参数化类型List&lt;Object&gt;之间的区别为例，前者不接受类型系统的检查，而后者则显示地告诉编译器它可以接受任意类型的对象。</p>
 <p>如果使用参数化类型以允许插入任意对象，我们应该使用List&lt;Object&gt;；而对于元素类型未知而且不在乎元素类型的集合，更安全的方式是使用无限制通配符类型List&lt;?&gt;。无法将任意元素（null除外）放入一个Collection&lt;?&gt;。试图这么做的化将产生编译时错误。</p>
 <h2 id="例外">例外</h2>
-<p>对于不能使用原始类型这个规则，有两个例外：一是在类字面值中使用原始类型，例如List.class, int.class；二是与instanceof有关，因为泛型类型信息在运行时是被擦除了的，所以在参数化类型而不是无限制通配符类型上用instanceof操作符是非法的。</p>
+<p>对于不能使用原始类型这个规则，有两个例外：一是在类字面值中使用原始类型，例如List.class,
+int.class；二是与instanceof有关，因为泛型类型信息在运行时是被擦除了的，所以在参数化类型而不是无限制通配符类型上用instanceof操作符是非法的。</p>
 
       
     </div>
@@ -563,8 +562,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

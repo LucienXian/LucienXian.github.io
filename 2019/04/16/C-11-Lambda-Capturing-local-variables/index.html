@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,22 +332,29 @@
       
 
       
-        <h1 id="c11-lambda-how-to-capture-local-variables-inside-lambda">C++11 Lambda : How to capture local variables inside Lambda ?</h1>
+        <h1 id="c11-lambda-how-to-capture-local-variables-inside-lambda">C++11
+Lambda : How to capture local variables inside Lambda ?</h1>
 <p>本文将介绍如何在lambda中从外部域捕获变量，同样的，我们可以以值传递或引用传递的方式捕获变量，以下是语法：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Captured variables](paameters) &#123; function code &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="capturing-local-variables-by-value-inside-lambda-function">Capturing Local Variables by value inside Lambda Function</h2>
+<h2
+id="capturing-local-variables-by-value-inside-lambda-function">Capturing
+Local Variables by value inside Lambda Function</h2>
 <p>以下是以值传递捕获变量的方式：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables</span></span><br><span class="line">std::string msg = <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line"><span class="type">int</span> counter = <span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Defining Lambda function and</span></span><br><span class="line"><span class="comment">// Capturing Local variables by Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [msg, counter] () &#123;</span><br><span class="line">                          <span class="comment">//...</span></span><br><span class="line">                          &#125;;</span><br></pre></td></tr></table></figure>
 <p>msg和counter都是const变量，只读不改。要想修改，可以加入关键字mutable：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> func = [msg, counter] () <span class="keyword">mutable</span> &#123; &#125;;</span><br></pre></td></tr></table></figure>
-<h2 id="capturing-local-variables-by-reference-inside-lambda">Capturing Local Variables by Reference inside Lambda</h2>
+<h2 id="capturing-local-variables-by-reference-inside-lambda">Capturing
+Local Variables by Reference inside Lambda</h2>
 <p>要实现引用传递，只需要加上前缀<strong>&amp;</strong>即可。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables</span></span><br><span class="line">std::string msg = <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line"><span class="type">int</span> counter = <span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Defining Lambda function and</span></span><br><span class="line"><span class="comment">// Capturing Local variables by Reference</span></span><br><span class="line"><span class="keyword">auto</span> func = [&amp;msg, &amp;counter] () &#123;</span><br><span class="line">                       <span class="comment">//...</span></span><br><span class="line">                       &#125;;</span><br></pre></td></tr></table></figure>
 <p>这样在lambda中就可以通过修改该引用从而修改外部值。</p>
-<h2 id="capture-all-local-variables-from-outer-scope-by-value">Capture All Local Variables from outer scope by Value</h2>
+<h2 id="capture-all-local-variables-from-outer-scope-by-value">Capture
+All Local Variables from outer scope by Value</h2>
 <p>正如前面的文章提到过的，我们也可以把外部变量全部捕获，或值传递或引用传递，甚至可以混合使用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Capturing all Local variables by Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [=] () &#123;</span><br><span class="line">                   <span class="comment">//...</span></span><br><span class="line">                   &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Capturing all Local variables by Reference</span></span><br><span class="line"><span class="keyword">auto</span> func = [&amp;] () &#123;</span><br><span class="line">                   <span class="comment">//...</span></span><br><span class="line">                   &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Capturing all Local variables by Reference and Value</span></span><br><span class="line"><span class="keyword">auto</span> func = [=, &amp;counter] () <span class="keyword">mutable</span> &#123;&#125;;</span><br></pre></td></tr></table></figure>
-<h3 id="be-aware-of-capturing-local-variables-by-reference-in-lambda">Be-aware of capturing local variables by Reference in Lambda</h3>
+<h3
+id="be-aware-of-capturing-local-variables-by-reference-in-lambda">Be-aware
+of capturing local variables by Reference in Lambda</h3>
 <p>如果在lambda中我们通过引用捕获局部变量，那么我们需要确保在访问或调用lambda函数时，所有引用捕获的局部变量仍然在作用域内。</p>
 <p>如果该变量已经被回收或者从stack中移除，会导致undefined behavior。</p>
 
@@ -526,7 +531,12 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-lambda-how-to-capture-local-variables-inside-lambda"><span class="nav-number">1.</span> <span class="nav-text">C++11 Lambda : How to capture local variables inside Lambda ?</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#capturing-local-variables-by-value-inside-lambda-function"><span class="nav-number">1.1.</span> <span class="nav-text">Capturing Local Variables by value inside Lambda Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#capturing-local-variables-by-reference-inside-lambda"><span class="nav-number">1.2.</span> <span class="nav-text">Capturing Local Variables by Reference inside Lambda</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#capture-all-local-variables-from-outer-scope-by-value"><span class="nav-number">1.3.</span> <span class="nav-text">Capture All Local Variables from outer scope by Value</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#be-aware-of-capturing-local-variables-by-reference-in-lambda"><span class="nav-number">1.3.1.</span> <span class="nav-text">Be-aware of capturing local variables by Reference in Lambda</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-lambda-how-to-capture-local-variables-inside-lambda"><span class="nav-number">1.</span> <span class="nav-text">C++11
+Lambda : How to capture local variables inside Lambda ?</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#capturing-local-variables-by-value-inside-lambda-function"><span class="nav-number">1.1.</span> <span class="nav-text">Capturing
+Local Variables by value inside Lambda Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#capturing-local-variables-by-reference-inside-lambda"><span class="nav-number">1.2.</span> <span class="nav-text">Capturing
+Local Variables by Reference inside Lambda</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#capture-all-local-variables-from-outer-scope-by-value"><span class="nav-number">1.3.</span> <span class="nav-text">Capture
+All Local Variables from outer scope by Value</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#be-aware-of-capturing-local-variables-by-reference-in-lambda"><span class="nav-number">1.3.1.</span> <span class="nav-text">Be-aware
+of capturing local variables by Reference in Lambda</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -568,8 +578,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

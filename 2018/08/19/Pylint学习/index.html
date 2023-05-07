@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -343,7 +341,9 @@
 <h2 id="invoking-pylint">Invoking pylint</h2>
 <p>pylint可以在命令行使用，具体用法为：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint [options] modules_or_packages</span><br></pre></td></tr></table></figure>
-<p>从上面的用法可以得知，我们应该提供pylint要检查的python包或者模块的名称。而Pylint不会导入这些包，而是利用Python internals去进行定位。因此我们需要关注<a target="_blank" rel="noopener" href="https://docs.python.org/2/using/cmdline.html#envvar-PYTHONPATH">PYTHONPATH</a>，防止它去检查已安装的模块版本，而不是开发版本。</p>
+<p>从上面的用法可以得知，我们应该提供pylint要检查的python包或者模块的名称。而Pylint不会导入这些包，而是利用Python
+internals去进行定位。因此我们需要关注<a
+target="_blank" rel="noopener" href="https://docs.python.org/2/using/cmdline.html#envvar-PYTHONPATH">PYTHONPATH</a>，防止它去检查已安装的模块版本，而不是开发版本。</p>
 <p>如果传给pylint一个单文件，例如这样：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint mymodules.py</span><br></pre></td></tr></table></figure>
 <p>就要保证当前的工作目录为一个package（即目录下有__init__.py）。</p>
@@ -366,14 +366,18 @@
 </tbody>
 </table>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(venv) ➜  py pylint --version</span><br><span class="line">No config file found, using default configuration</span><br><span class="line">pylint 1.9.3,</span><br><span class="line">astroid 1.6.5</span><br><span class="line">Python 2.7.10 (default, Jul 15 2017, 17:16:57)</span><br><span class="line">[GCC 4.2.1 Compatible Apple LLVM 9.0.0 (clang-900.0.31)]</span><br></pre></td></tr></table></figure>
-<p>接下来介绍一个message control的命令后选项：<strong>--disable</strong>和<strong>--enable</strong>，如果我们只是希望启动某些checker，可以先用--disable = all然后使用--enable = &lt;symbol&gt;，其中&lt;symbol&gt;是逗号分隔的检查器名称和消息符号列表。这样的使用方式对于仅仅希望启动少数的checkers非常有用。</p>
+<p>接下来介绍一个message
+control的命令后选项：<strong>--disable</strong>和<strong>--enable</strong>，如果我们只是希望启动某些checker，可以先用--disable
+= all然后使用--enable =
+&lt;symbol&gt;，其中&lt;symbol&gt;是逗号分隔的检查器名称和消息符号列表。这样的使用方式对于仅仅希望启动少数的checkers非常有用。</p>
 <p>举个例子，假如你只想启动相似性检查，可以增加选项：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">–-disable=all –-enable=similarities</span><br></pre></td></tr></table></figure>
 <p>pylint提供的symbol，可以参考：https://docs.pylint.org/en/1.6.0/features.html#messages-control-options</p>
 <h2 id="parallel-execution">Parallel execution</h2>
 <p>如果主机的CPU数量超过1个，可以使用<strong>-j</strong>选项加速pylint的运行，比如：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint -j 4 mymodule1.py mymodule2.py mymodule3.py mymodule4.py</span><br></pre></td></tr></table></figure>
-<p>这样就会产生4个子进程，其中每个提供的模块将被并行检查。checkers发现的问题不会立即显示。 完成检查模块后才会立即显示它们。当提供的参数为0时，将会使用主机上所有CPU的数量。</p>
+<p>这样就会产生4个子进程，其中每个提供的模块将被并行检查。checkers发现的问题不会立即显示。
+完成检查模块后才会立即显示它们。当提供的参数为0时，将会使用主机上所有CPU的数量。</p>
 
       
     </div>
@@ -590,8 +594,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -341,7 +339,8 @@
 <p>Golang的内存模型描述了这样的一种场景：在一个goroutine中对一个变量的读取能保证是由不同gorountine写入相同变量所产生的。</p>
 <h2 id="happens-before">Happens Before</h2>
 <p>在单个goroutine中，只有在满足不改变语言规范所定义的行为时，编译器才能对单个goroutine所执行的读写进行重新排序。但由于重新排序，一个goroutine所观察到的执行顺序可能与另一个goroutine察觉到的执行顺序不同。</p>
-<p>为了指定读写要求，在go程序中定义了一个叫Happens Before的偏序关系——如果事件e1发生在事件e2之前，那么我们说e2发生在e1之后。同样，如果e1不在e2之前发生并且在e2之后也没有发生，那么我们说e1和e2同时发生。</p>
+<p>为了指定读写要求，在go程序中定义了一个叫Happens
+Before的偏序关系——如果事件e1发生在事件e2之前，那么我们说e2发生在e1之后。同样，如果e1不在e2之前发生并且在e2之后也没有发生，那么我们说e1和e2同时发生。</p>
 <p>在单个goroutine中，Happens Before的顺序就是程序所表现出来的顺序。</p>
 <p>为了保证对变量的读取R可以读取到由特定的对变量的写入W，即W是R可以观察到的唯一写入，必须要满足以下两个条件：</p>
 <ol type="1">
@@ -366,14 +365,18 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>, <span class="number">10</span>)</span><br><span class="line"><span class="keyword">var</span> a <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">&quot;hello, world&quot;</span></span><br><span class="line">	c &lt;- <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	&lt;-c</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这样就能保证打印出hello, world。</p>
 <p>另外，channel的关闭会发生在返回零值的接收之前，这样用close(c)替代c&lt;-0也可以产生相同的保证行为。</p>
-<p>而对于缺乏buffer的channel，其接收会发生在该channel的发送完成之前，例如这样也可以保证打印出正确的hello world，这里的发送和接收顺序与上面的例子相反。</p>
+<p>而对于缺乏buffer的channel，其接收会发生在该channel的发送完成之前，例如这样也可以保证打印出正确的hello
+world，这里的发送和接收顺序与上面的例子相反。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>)</span><br><span class="line"><span class="keyword">var</span> a <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">&quot;hello, world&quot;</span></span><br><span class="line">	&lt;-c</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	c &lt;- <span class="number">0</span></span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>但如果channel是带有buffer，就无法保证打印出hello world了。</p>
-<p>在容量为C的通道上的第k个接收发生在该通道的第k + C个发送完成之前，因为不从channel接收数据就无法继续写入。</p>
-<p>该规则将前一个规则推广到缓冲通道。 它允许通过缓冲的通道对计数信号量进行建模：channel中的项目数量对应于活动使用的数量，channel的容量对应于同时使用的最大数量，发送一个项目获取信号量，接收项目则会释放信号量。通过这种操作就可以限制其并发。</p>
+<p>在容量为C的通道上的第k个接收发生在该通道的第k +
+C个发送完成之前，因为不从channel接收数据就无法继续写入。</p>
+<p>该规则将前一个规则推广到缓冲通道。
+它允许通过缓冲的通道对计数信号量进行建模：channel中的项目数量对应于活动使用的数量，channel的容量对应于同时使用的最大数量，发送一个项目获取信号量，接收项目则会释放信号量。通过这种操作就可以限制其并发。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> limit = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> work &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(w <span class="keyword">func</span>()</span></span>) &#123;</span><br><span class="line">			limit &lt;- <span class="number">1</span></span><br><span class="line">			w() <span class="comment">// 不处理完成，无法释放该信号量</span></span><br><span class="line">			&lt;-limit</span><br><span class="line">		&#125;(w)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">select</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="locks">Locks</h3>
-<p>sync包里实现了两种锁相关的数据类型：sync.Mutex和sync.RWMutex。通过锁的使用，我们可以在goroutine中保证同步。这样的一个程序就可以顺利打印出hello world。</p>
+<p>sync包里实现了两种锁相关的数据类型：sync.Mutex和sync.RWMutex。通过锁的使用，我们可以在goroutine中保证同步。这样的一个程序就可以顺利打印出hello
+world。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> l sync.Mutex</span><br><span class="line"><span class="keyword">var</span> a <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">()</span></span> &#123;</span><br><span class="line">	a = <span class="string">&quot;hello, world&quot;</span></span><br><span class="line">	l.Unlock()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	l.Lock()</span><br><span class="line">	<span class="keyword">go</span> f()</span><br><span class="line">	l.Lock()</span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="once">Once</h3>
 <p>sync包还提供了一种初始化的安全机制，通过使用Once数据类型，多个线程都可以执行once.Do(f)，但只有一个会运行f()，其他的调用将会block直接f()返回。</p>
@@ -605,8 +608,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -340,7 +338,8 @@
 <h2 id="so_debug套接字选项">SO_DEBUG套接字选项</h2>
 <p>这是一个仅仅由TCP支持的选项，开启该选项之后，内核将为TCP在该套接字上的所有分组保留详细的追踪信息，保存在内核的环形缓冲区。</p>
 <h2 id="so_error套接字选项">SO_ERROR套接字选项</h2>
-<p>当一个套接字发送错误时，内核会将套接字的名为so_error的变量设为标准Unix Exxx值的一个，称为待处理的错误。一般会以以下两种方式之一立即通知进程这个错误。</p>
+<p>当一个套接字发送错误时，内核会将套接字的名为so_error的变量设为标准Unix
+Exxx值的一个，称为待处理的错误。一般会以以下两种方式之一立即通知进程这个错误。</p>
 <ol type="1">
 <li><p>进程阻塞在对该套接字的select调用上，那么无论是检查可读条件还是可写条件，select均返回并设置其中一个或所有两个条件；</p></li>
 <li><p>如果进程使用信号驱动式IO模型，那就给进程产生一个SIGIO信号；</p></li>
@@ -359,10 +358,12 @@
 <p>因此设置该选项时就会出现三种情况：</p>
 <ol type="1">
 <li><p>l_onoff为0，关闭本选项，忽略l_lnlinger。即默认操作，close立即返回；</p></li>
-<li><p>l_onoff 非0，l_linger为0，这时调用close，会丢弃发送缓冲区的数据，并发送一个RST给对端，跳过TIME_WAIT的状态。当然这也会带来一个问题是，创建该连接的另一个化身时，有可能会导致刚刚被终止连接的旧分节被重复传递到新的化身上；</p></li>
+<li><p>l_onoff
+非0，l_linger为0，这时调用close，会丢弃发送缓冲区的数据，并发送一个RST给对端，跳过TIME_WAIT的状态。当然这也会带来一个问题是，创建该连接的另一个化身时，有可能会导致刚刚被终止连接的旧分节被重复传递到新的化身上；</p></li>
 <li><p>两个都为非0时，调用close后，套接字发送缓存区如果还有残留数据，那么进程会进入睡眠，直到所有数据都已经发送完并且被对方确认或延滞时间到（如果是这种情况会返回EWOULDBLOCK错误）；</p></li>
 </ol>
-<h2 id="so_rectimeo和so_sndtimeo套接字选项">SO_RECTIMEO和SO_SNDTIMEO套接字选项</h2>
+<h2
+id="so_rectimeo和so_sndtimeo套接字选项">SO_RECTIMEO和SO_SNDTIMEO套接字选项</h2>
 <p>这两个选项允许我们给套接字的接收和发送设置一个超时值。</p>
 <h1 id="tcp套接字选项">TCP套接字选项</h1>
 <p>TCP有两个套接字选项：</p>
@@ -590,8 +591,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

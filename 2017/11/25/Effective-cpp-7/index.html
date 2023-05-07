@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -334,18 +332,24 @@
       
 
       
-        <h1 id="declare-destructions-virtual-in-polymorphic-base-classes">Declare destructions virtual in polymorphic base classes</h1>
+        <h1
+id="declare-destructions-virtual-in-polymorphic-base-classes">Declare
+destructions virtual in polymorphic base classes</h1>
 <h2 id="动机">动机</h2>
-<p>在某些情况下，当一个derived class对象是经由一个base class指针被删除时，而base class着一个non-virtual 的析构函数。此时实际执行的效果是，对象的derived成分并有被销毁，销毁的是base成分。这种局部销毁会造成资源泄漏。</p>
+<p>在某些情况下，当一个derived class对象是经由一个base
+class指针被删除时，而base class着一个non-virtual
+的析构函数。此时实际执行的效果是，对象的derived成分并有被销毁，销毁的是base成分。这种局部销毁会造成资源泄漏。</p>
 <h2 id="方法">方法</h2>
 <ul>
 <li>一个意图被用作base class的class，应该令其析构函数为virtual。</li>
 </ul>
 <blockquote>
-<p>具体用法和原因参考：<a target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/15/%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0-2-%E2%80%94%E2%80%94CPP/">虚函数的学习</a></p>
+<p>具体用法和原因参考：<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2017/11/15/%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0-2-%E2%80%94%E2%80%94CPP/">虚函数的学习</a></p>
 </blockquote>
 <ul>
-<li>另外需要注意的是，一个不打算被用作base class的class，不应该令其析构函数为virtual。原因是：
+<li>另外需要注意的是，一个不打算被用作base
+class的class，不应该令其析构函数为virtual。原因是：
 <ul>
 <li>实现virtual函数的类的体积往往会增大50%到100%，这就造成一个问题是，该类的对象不能被塞到一个预先定义好的缓冲器里面，并传给其它语言的函数，也不能和其他语言（如C）的相同声明有着同样的结构；</li>
 <li>因此往往是只有当class内至少包含一个virtual函数，才为其声明virtual析构函数；</li>
@@ -530,7 +534,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#declare-destructions-virtual-in-polymorphic-base-classes"><span class="nav-number">1.</span> <span class="nav-text">Declare destructions virtual in polymorphic base classes</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#declare-destructions-virtual-in-polymorphic-base-classes"><span class="nav-number">1.</span> <span class="nav-text">Declare
+destructions virtual in polymorphic base classes</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.3.</span> <span class="nav-text">建议</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -572,8 +577,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         

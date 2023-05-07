@@ -158,9 +158,7 @@
 
 
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -335,16 +333,22 @@
 
       
         <h1 id="问题起源">问题起源</h1>
-<p>在刷<a target="_blank" rel="noopener" href="https://leetcode.com/problems/mini-parser/description/">leetcode</a>的时候，看到了discuss里面有一位大佬提出很有意思的<a target="_blank" rel="noopener" href="https://discuss.leetcode.com/topic/54258/python-c-solutions/10">解法</a>。</p>
+<p>在刷<a
+target="_blank" rel="noopener" href="https://leetcode.com/problems/mini-parser/description/">leetcode</a>的时候，看到了discuss里面有一位大佬提出很有意思的<a
+target="_blank" rel="noopener" href="https://discuss.leetcode.com/topic/54258/python-c-solutions/10">解法</a>。</p>
 <p>这是一道mini parser的题，题目描述如下：</p>
 <blockquote>
-<p>Given a nested list of integers represented as a string, implement a parser to deserialize it.</p>
-<p>Each element is either an integer, or a list -- whose elements may also be integers or other lists.</p>
-<p><strong>Note:</strong> You may assume that the string is well-formed:</p>
+<p>Given a nested list of integers represented as a string, implement a
+parser to deserialize it.</p>
+<p>Each element is either an integer, or a list -- whose elements may
+also be integers or other lists.</p>
+<p><strong>Note:</strong> You may assume that the string is
+well-formed:</p>
 <ul>
 <li>String is non-empty.</li>
 <li>String does not contain white spaces.</li>
-<li>String contains only digits <code>0-9</code>, <code>[</code>, <code>-</code> <code>,</code>, `]</li>
+<li>String contains only digits <code>0-9</code>, <code>[</code>,
+<code>-</code> <code>,</code>, `]</li>
 </ul>
 </blockquote>
 <p>他的解法是：</p>
@@ -360,7 +364,8 @@
 <h2 id="基于空格提取字符串">基于空格提取字符串</h2>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> std::string;</span><br><span class="line"><span class="keyword">using</span> std::istringstream;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">string <span class="title">a</span><span class="params">(<span class="string">&quot;123a 456 [789]]]&quot;</span>)</span></span>;</span><br><span class="line">	<span class="function">istringstream <span class="title">in</span><span class="params">(a)</span></span>;</span><br><span class="line">	string s1, s2, s3;</span><br><span class="line">  	in &gt;&gt; s1 &gt;&gt; s2 &gt;&gt; s3; <span class="comment">//s1:&quot;123a&quot;, s2:&quot;456&quot;, s3:&quot;[789]]]&quot;;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><br></p>
-<h2 id="从字符串转化成数字int-double">从字符串转化成数字（int / double）</h2>
+<h2 id="从字符串转化成数字int-double">从字符串转化成数字（int /
+double）</h2>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> std::string;</span><br><span class="line"><span class="keyword">using</span> std::istringstream;</span><br><span class="line"><span class="keyword">using</span> std::cout;</span><br><span class="line"><span class="keyword">using</span> std::endl;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">string <span class="title">a</span><span class="params">(<span class="string">&quot;123a ,[456,[789]]]&quot;</span>)</span></span>;</span><br><span class="line">	<span class="function">istringstream <span class="title">in</span><span class="params">(a)</span></span>;</span><br><span class="line">	<span class="type">int</span> i1, i2;</span><br><span class="line">	string s1, s2;</span><br><span class="line">	in &gt;&gt; i1;</span><br><span class="line">	<span class="comment">//in.clear();</span></span><br><span class="line">	in &gt;&gt; s1 &gt;&gt; s2;</span><br><span class="line">	cout &lt;&lt; i1 &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; s1 &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; s2 &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>这里的i1为123，s1为“a”，s2为“,[456,[789]]]”；</li>
@@ -369,10 +374,20 @@
 <p><br></p>
 <h2 id="低层的io操作">低层的I/O操作</h2>
 <p>首先引入几个流状态：</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 19%" />
+<col style="width: 14%" />
+<col style="width: 3%" />
+<col style="width: 19%" />
+<col style="width: 3%" />
+<col style="width: 19%" />
+</colgroup>
 <thead>
 <tr class="header">
-<th><a target="_blank" rel="noopener" href="http://www.cplusplus.com/ios_base::iostate">iostate</a> value(member constant)</th>
+<th><a target="_blank" rel="noopener" href="http://www.cplusplus.com/ios_base::iostate">iostate</a>
+value(member constant)</th>
 <th>indicates</th>
 <th>functions to check state flags</th>
 <th></th>
@@ -393,7 +408,8 @@
 </tr>
 <tr class="even">
 <td>goodbit</td>
-<td>No errors (zero value <a target="_blank" rel="noopener" href="http://www.cplusplus.com/ios_base::iostate">iostate</a>)</td>
+<td>No errors (zero value <a
+target="_blank" rel="noopener" href="http://www.cplusplus.com/ios_base::iostate">iostate</a>)</td>
 <td><code>true</code></td>
 <td><code>false</code></td>
 <td><code>false</code></td>
@@ -622,7 +638,8 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%B5%B7%E6%BA%90"><span class="nav-number">1.</span> <span class="nav-text">问题起源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8Eistringstream"><span class="nav-number">2.</span> <span class="nav-text">关于istringstream</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%A9%BA%E6%A0%BC%E6%8F%90%E5%8F%96%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">2.1.</span> <span class="nav-text">基于空格提取字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E5%8C%96%E6%88%90%E6%95%B0%E5%AD%97int-double"><span class="nav-number">2.2.</span> <span class="nav-text">从字符串转化成数字（int &#x2F; double）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%8E%E5%B1%82%E7%9A%84io%E6%93%8D%E4%BD%9C"><span class="nav-number">2.3.</span> <span class="nav-text">低层的I&#x2F;O操作</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%B5%B7%E6%BA%90"><span class="nav-number">1.</span> <span class="nav-text">问题起源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8Eistringstream"><span class="nav-number">2.</span> <span class="nav-text">关于istringstream</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%A9%BA%E6%A0%BC%E6%8F%90%E5%8F%96%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">2.1.</span> <span class="nav-text">基于空格提取字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E5%8C%96%E6%88%90%E6%95%B0%E5%AD%97int-double"><span class="nav-number">2.2.</span> <span class="nav-text">从字符串转化成数字（int &#x2F;
+double）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%8E%E5%B1%82%E7%9A%84io%E6%93%8D%E4%BD%9C"><span class="nav-number">2.3.</span> <span class="nav-text">低层的I&#x2F;O操作</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -664,8 +681,7 @@
   </a>
 </div>
 
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         
 
         
