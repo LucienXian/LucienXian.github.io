@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="分布式," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Paxos Made Simple Introduction Paxos——一个用于实现容错的分布式系统算法，核心是一个一致性算法——“synod”算法。基本上是根据一个一致性算法所必需满足的条件而呈现出来的，完整的Paxos算法会通过作为应用到使用状态机的分布式系统中的一致性实现部分来得出。 The Consensus Algorithm The Problem 假设存在一个多进程集合，里面每个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paxos Made Simple——论文阅读">
+<meta property="og:url" content="http://yoursite.com/2021/03/20/Paxos-Made-Simple%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Paxos Made Simple Introduction Paxos——一个用于实现容错的分布式系统算法，核心是一个一致性算法——“synod”算法。基本上是根据一个一致性算法所必需满足的条件而呈现出来的，完整的Paxos算法会通过作为应用到使用状态机的分布式系统中的一致性实现部分来得出。 The Consensus Algorithm The Problem 假设存在一个多进程集合，里面每个">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-03-20T15:36:18.000Z">
+<meta property="article:modified_time" content="2021-03-20T15:36:48.577Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/03/20/Paxos-Made-Simple——论文阅读/"/>
+
+
+
+
+
+  <title>Paxos Made Simple——论文阅读 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/20/Paxos-Made-Simple%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Paxos Made Simple——论文阅读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-20T23:36:18+08:00">
+                2021-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="paxos-made-simple">Paxos Made Simple</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Paxos——一个用于实现容错的分布式系统算法，核心是一个一致性算法——“synod”算法。基本上是根据一个一致性算法所必需满足的条件而呈现出来的，完整的Paxos算法会通过作为应用到使用状态机的分布式系统中的一致性实现部分来得出。</p>
+<h2 id="the-consensus-algorithm">The Consensus Algorithm</h2>
+<h3 id="the-problem">The Problem</h3>
+<p>假设存在一个多进程集合，里面每个进程都可以发出提案，那么一致性算法需要保证一个值能够被选定，而且一旦一个值被选定，所有进程都需要能够获知选定值。</p>
+<p>一致性safety的要求就是：</p>
+<ul>
+<li>只有被提出的值能够被选定；</li>
+<li>只能有一个选定值；</li>
+<li>只有一致同意该值，才能周知给集合里的所有进程；</li>
+</ul>
+<p>这里主要关注算法的safety，而不会明确要求liveness。</p>
+<p>在该一致性算法中，有三种角色：proposers，acceptors和learners，实际实现中，一个独立的进程可以充当不止一种角色。论文的假设是基于传统的异步模型，而不是拜占庭问题模型。</p>
+<h3 id="choosing-a-value">Choosing a Value</h3>
+<p>该算法在提案过程主要包括下面几个步骤</p>
+<p>对于proposer：</p>
+<ul>
+<li>proposer选择一个新的提案编号n，然后向acceptors集合的每个成员发送请求，要求acceptors对请求作出响应：
+<ul>
+<li><ol type="a">
+<li>一个承诺，保证不再通过任何编号小于n的提案；</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>如果接受过其他提案的话，需要返回当前通过的编号小于n的最大编号提案；</li>
+</ol></li>
+</ul></li>
+<li>如果proposer从大多数acceptors收到期待的响应，则可以接着提议一个编号为n并且值为v的提案，这里的v要么是自由选择一个值（所有的响应都没接收过任何的提案），要么是从上面b响应中选出最大编号的提案的值；</li>
+</ul>
+<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求， acceptor就可以接受编号为n的提案。</p>
+<p>总结起来，acceptor和proposer的算法操作可以分为两个阶段：</p>
+<ul>
+<li>阶段一</li>
+</ul>
+<ol type="a">
+<li><p>proposer提出一个编号为n的提案，向大多数acceptors发送一个带有编号为n的prepare请求；</p></li>
+<li><p>如果acceptors收到了该请求，并且n比它之前响应过的prepare请求编号都大，那么它就会对该请求作出响应，返回一个保证不再通过任何编号小于n的提案的承诺，以及如果存在的话，接受过的最大编号的提案；</p></li>
+</ol>
+<ul>
+<li>阶段二</li>
+</ul>
+<ol type="a">
+<li><p>如果proposer从大多数acceptors收到响应，则会提出一个accept请求，内容包括了编号n和值为v，其中v要么是自由选择一个的值，要么是从响应中选出最大编号的提案的值；</p></li>
+<li><p>如果acceptors收到该accept请求，并且之前没有响应过大于编号n的prepare请求，那么它就会对接受该请求；</p></li>
+</ol>
+<h3 id="learning-a-chosen-value">Learning a Chosen Value</h3>
+<p>为了获取到选定的值，learner必须要找出某个以及被大多数acceptors接受的提案。如果是每个acceptors都将通过的提案告知所有的learners，那么通信次数等于两者个数乘积；如果是只告诉一个特定learner，虽然通信次数减少了，但可靠行也降低了；更一般情况是，将它们的通过提案信息发送给一个特定的learners集合，其中的每个learner都可以将该信息告知所有的learners。</p>
+<p>由于信息的丢失，learners可能无法确定一个值是否有一个大多数的acceptors通过了，为了确定选定的值，必须重新发起一次新的提案。</p>
+<h3 id="progress">Progress</h3>
+<p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
+<p>为了保证progress的进行，必须选择一个特定proposer来作为唯一一个提议提案的。如果这个proposer可以和半数以上的acceptors通信，同时使用一个比现有通过编号都大的编号作为提案的话，就可以产生一个成功通过的提案。</p>
+<blockquote>
+<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that a reliable algorithm for electing a proposer must use either randomness or real time—for example, by using timeouts. However, safety is ensured regardless of the success or failure of the election.</p>
+</blockquote>
+<p>无论选举是否成功，proposer选举算法的安全性都是可以得到保证的。</p>
+<h3 id="the-implementation">The Implementation</h3>
+<p>Paxos算法假设了一个多进程网络，在该算法里，每个进程都扮演了proposer，acceptor及learner的角色。Paxos算法通过选定一个leader来扮演上面提到的特定learner和proposer。Paxos一致性算法就是上述所描述的，其中请求和响应都作为普通消息发送。acceptor在发出响应消息之前，会需要可靠性存储来记录信息。</p>
+<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase 1。</p>
+<h2 id="implementing-a-state-machine">Implementing a State Machine</h2>
+<p>实现分布式系统的一种简单方式是由一组客户端向一个中央服务器发出命令请求，该服务器可以看作是一个按顺序执行客户端命令的状态机。但使用单个服务器的可用性较低，因此想到了可以使用一组服务器，每个服务器独立地实现同样的状态机，只要所有服务器都产生一致的状态和输出，那么发出命令的客户端就可以采用任意一个服务器的输出了。</p>
+<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i 个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
+<p>假设服务器的集合是固定的，一般情况下一个独立的服务器被选为了leader，它就会扮演特定的proposer角色，多个客户端发送命令到leader，leader会决定每个命令的顺序。假设存在某条命令的序号为135，那么它就会通过一致性算法的第135个实例来选定一个提案，这里的命令就是提案的值。这个提案可能成功也可能失败，失败的原因可能来自机器故障，或者是存在另一个服务器认为自己是leader，从而判断了135实例存在其他值。但该算法能够保证最多只有一个命令被选定。</p>
+<p>这个策略的关键在于，Paxos算法中被提出的值只有phase 2才能被选定。前面说过的，phase 1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
+<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase 1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase 2，选定135和140的命令。</p>
+<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的"noop"命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140 号命令就可以被执行了。</p>
+<p>由此1-140命令都被选定了，leader就可以继续往下推进所有大于140的实例了。</p>
+<p>接下来讲讲空缺的产生，leader可以在提出命令141被选定之前，先提出命令142，但发送的关于141的信息可能会全部丢失，因此其他服务器可能先知道了142命令的选定，而不知道选择了什么作为命令141。这就产生了空缺。</p>
+<p>由于 leader 的故障以及新 leader 的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase 2的成本。在所有的一致性算法中， paxos一致性算法的phase 2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
+<p>特殊情况下，leader选举失败，导致出现多个“疑似”的leader，但paxos算法的安全性仍然可以保证不会同时有两个命令被选为第i个状态机命令。</p>
+<p>如果服务器的集合是变化的，那么也存在某种方式来决定哪些服务器可以作为这个一致性算法的实力，论文提到的方式是通过状态机自身来实现，即当前的服务器集合作为状态的一部分，比如将在执行完第i个状态机命令后标识的服务器集合，作为一致性算法执行实例i+a的服务器集合。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/03/07/Better-I-O-Through-Byte-Addressable-Persistent-Memory%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/" rel="next" title="Better I/O Through Byte-Addressable, Persistent Memory——论文学习">
+                <i class="fa fa-chevron-left"></i> Better I/O Through Byte-Addressable, Persistent Memory——论文学习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/04/14/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-2/" rel="prev" title="《UCB cs294》Required Reading 2">
+                《UCB cs294》Required Reading 2 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#paxos-made-simple"><span class="nav-number">1.</span> <span class="nav-text">Paxos Made Simple</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#the-consensus-algorithm"><span class="nav-number">1.2.</span> <span class="nav-text">The Consensus Algorithm</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#the-problem"><span class="nav-number">1.2.1.</span> <span class="nav-text">The Problem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#choosing-a-value"><span class="nav-number">1.2.2.</span> <span class="nav-text">Choosing a Value</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#learning-a-chosen-value"><span class="nav-number">1.2.3.</span> <span class="nav-text">Learning a Chosen Value</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#progress"><span class="nav-number">1.2.4.</span> <span class="nav-text">Progress</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#the-implementation"><span class="nav-number">1.2.5.</span> <span class="nav-text">The Implementation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#implementing-a-state-machine"><span class="nav-number">1.3.</span> <span class="nav-text">Implementing a State Machine</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

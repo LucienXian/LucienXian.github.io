@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="DeepLearning," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network 本文提出了一种直观的方法，可以同时完成3D人脸结构的重建和人脸对齐。作者设计了一种称为UV位置图的2D表示方法，它记录了UV空间中完整面部的3D形状。该方法并不依赖任何的先验脸部模型，而是直接重建完整的人脸几何与语义。 Intr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network》阅读">
+<meta property="og:url" content="http://yoursite.com/2019/04/24/%E3%80%8AJoint-3D-Face-Reconstruction-and-Dense-Alignment-with-Position-Map-Regression-Network%E3%80%8B%E9%98%85%E8%AF%BB/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network 本文提出了一种直观的方法，可以同时完成3D人脸结构的重建和人脸对齐。作者设计了一种称为UV位置图的2D表示方法，它记录了UV空间中完整面部的3D形状。该方法并不依赖任何的先验脸部模型，而是直接重建完整的人脸几何与语义。 Intr">
+<meta property="og:locale">
+<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig2.png">
+<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig3.png">
+<meta property="og:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig4.png">
+<meta property="article:published_time" content="2019-04-24T02:47:57.000Z">
+<meta property="article:modified_time" content="2019-04-24T02:49:21.690Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="DeepLearning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/24/《Joint-3D-Face-Reconstruction-and-Dense-Alignment-with-Position-Map-Regression-Network》阅读/"/>
+
+
+
+
+
+  <title>《Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network》阅读 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/24/%E3%80%8AJoint-3D-Face-Reconstruction-and-Dense-Alignment-with-Position-Map-Regression-Network%E3%80%8B%E9%98%85%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network》阅读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-24T10:47:57+08:00">
+                2019-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="joint-3d-face-reconstruction-and-dense-alignment-with-position-map-regression-network">Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network</h1>
+<p>本文提出了一种直观的方法，可以同时完成3D人脸结构的重建和人脸对齐。作者设计了一种称为UV位置图的2D表示方法，它记录了UV空间中完整面部的3D形状。该方法并不依赖任何的先验脸部模型，而是直接重建完整的人脸几何与语义。</p>
+<h2 id="introduction">Introduction</h2>
+<p>在早期，2D基准点的人脸检测通常作为其它一些人脸研究任务的基础条件。随着深度学习的发展，一些任务开始用CNN去估计3D可变模型（3DMM）的系数或3D模型变形函数，以此来从2D面部图像恢复相应的3D信息。然而，由于面部模型或模板定义的3D空间的限制，这些方法的性能受到限制。包括透视投影或3D Thin Plate Spline（TPS）转换在内的所需操作也增加了整个过程的复杂性。</p>
+<p>最近有一些基于端到端的方法绕开了模型的限制，实现了很好的性能，但却丢失了点的语义。</p>
+<p>本文提出了一种称为位置映射回归网络（PRN）的端到端方法，以预测人脸密集对齐并重建3D人脸形状。具体来说，作者设计了一个UV位置图，它是一个2D图像，记录了完整的面部点云的3D坐标，同时保持每个UV位置的语义。然后，文中训练一个带有加权损失的简单编码器 - 解码器网络，该网络更多地关注重要区域，以从单个2D面部图像回归UV位置图。</p>
+<h2 id="proposed-method">Proposed Method</h2>
+<h3 id="d-face-representation">3D Face Representation</h3>
+<p>本文的目标是从单个2D图像中回归3D人脸几何体以及起对齐信息，因此需要一个可以通过深度网络来进行预测的适当表示。为了解决一些以前的工作留下的弊端，本文提出了UV位置图作为具有人脸对齐信息的3D人脸结构呈现，UV位置图记录了UV空间中所有点的3D位置。</p>
+<p>与传统UV坐标不同，本文使用UV空间来存储与2D图像相对应的3D人脸模型点的空间位置，其中<span class="math inline">\(Pos(u_i, v_i)=(x_i, y_i, z_i)\)</span>，其中<span class="math inline">\((u_i, v_i)\)</span>表示的是人脸第i个点的UV坐标，因此<span class="math inline">\((u_i, v_i)\)</span>与<span class="math inline">\((x_i, y_i)\)</span>表示相同的人脸位置。如下图：</p>
+<figure>
+<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig2.png" alt="img" /><figcaption>img</figcaption>
+</figure>
+<p>因此，该位置图以其语义含义记录了3D人脸的密集点集，通过使用CNN直接从无约束的3D图像中回归位置图，就能够同时获得3D人脸结构以及密集对齐的结果。</p>
+<p>由于要直接从2D图像回归3D完整结构，因此端到端训练需要无约束的2D面部图像及其相应的3D形状。300W-LP是一个大型数据集，包含超过60K的无约束图像和3DMM参数，适合形成训练集。</p>
+<h3 id="network-architecture-and-loss-function">Network Architecture and Loss Function</h3>
+<p>论文的网络结构通过将输入的RGB图像转为位置图图像，采用了编码器-解码器的结构来学校变换函数。网络的编码器以一个卷积层开始，后面紧跟10个残差块，这样就可以将图像(256x256x3)转变为特征图(8x8x512)。解码器部分使用了17个转置卷积层，kernel大小为4，并使用ReLU层进行激活。架构如下：</p>
+<figure>
+<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig3.png" alt="img" /><figcaption>img</figcaption>
+</figure>
+<p>为了学习网络参数，论文使用了MSE作为损失函数，但这里做了一些改动。因为MSE平等对待所有的点，而图像中人脸的中心区域比其它区域具备更多辨别特征，因此作者使用了权重掩码来构造损失函数。如下图所示，权重掩码记录了图中每个点的权重。按照设计目的，论文将点分为四个类别，分别是68个关键点、眼睛鼻子嘴巴、其它脸部区域和脖子区域，而脖子区域因为容易被毛发或者衣服遮盖，所以分配了0权重。</p>
+<figure>
+<img src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig4.png" alt="img" /><figcaption>img</figcaption>
+</figure>
+<p>因此损失函数的公式为： <span class="math display">\[
+Loss = \sum || Pos(u,v) - \overline{Pos}(w,v)|| \cdot W(u,v)
+\]</span></p>
+<h3 id="training-details">Training Details</h3>
+<p>论文使用了300W-LP的数据集来构造训练集，这是一个包含了不同角度人脸的图像和预测的3DMM系数，从中可以生成3D点云。具体实现上，首先根据ground-truth边框来裁剪图像，然后缩放到256x256大小，然后利用带注释的3DMM参数生成相应的3D位置，并将它们渲染到UV空间中以获得地面实况位置图。</p>
+<p>另外，论文还推荐通过在2D图像平面中随机旋转和平移目标面来扰乱训练集。论文使用了Adam优化器，学习率从0.00001开始，并在每5个epochs后衰减一半，batch size设为16。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/DeepLearning/" rel="tag"># DeepLearning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/23/Need-of-Event-Handling/" rel="next" title="Need of Event Handling">
+                <i class="fa fa-chevron-left"></i> Need of Event Handling
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/29/Condition-Variables-Explained/" rel="prev" title="Condition Variables Explained">
+                Condition Variables Explained <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#joint-3d-face-reconstruction-and-dense-alignment-with-position-map-regression-network"><span class="nav-number">1.</span> <span class="nav-text">Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proposed-method"><span class="nav-number">1.2.</span> <span class="nav-text">Proposed Method</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#d-face-representation"><span class="nav-number">1.2.1.</span> <span class="nav-text">3D Face Representation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#network-architecture-and-loss-function"><span class="nav-number">1.2.2.</span> <span class="nav-text">Network Architecture and Loss Function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#training-details"><span class="nav-number">1.2.3.</span> <span class="nav-text">Training Details</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

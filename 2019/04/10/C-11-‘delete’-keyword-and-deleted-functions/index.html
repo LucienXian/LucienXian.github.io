@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="C++11 &#x2F; C++14 : ‘delete’ keyword and deleted functions 本文将介绍C++11的一个新特性——delete，通过将delete应用到函数来限制其调用： 1void someFunction() &#x3D; delete ; 它通常用在以下的地方：  delete编译器生成的函数，如拷贝构造函数、赋值运算符、移动拷贝函数、移动赋值运算符和默认构造函数； d">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++11 ‘delete’ keyword and deleted functions">
+<meta property="og:url" content="http://yoursite.com/2019/04/10/C-11-%E2%80%98delete%E2%80%99-keyword-and-deleted-functions/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="C++11 &#x2F; C++14 : ‘delete’ keyword and deleted functions 本文将介绍C++11的一个新特性——delete，通过将delete应用到函数来限制其调用： 1void someFunction() &#x3D; delete ; 它通常用在以下的地方：  delete编译器生成的函数，如拷贝构造函数、赋值运算符、移动拷贝函数、移动赋值运算符和默认构造函数； d">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-04-10T11:54:47.000Z">
+<meta property="article:modified_time" content="2019-04-10T12:07:07.156Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/10/C-11-‘delete’-keyword-and-deleted-functions/"/>
+
+
+
+
+
+  <title>C++11 ‘delete’ keyword and deleted functions | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/10/C-11-%E2%80%98delete%E2%80%99-keyword-and-deleted-functions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C++11 ‘delete’ keyword and deleted functions</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-10T19:54:47+08:00">
+                2019-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="c11-c14-delete-keyword-and-deleted-functions">C++11 / C++14 : ‘delete’ keyword and deleted functions</h1>
+<p>本文将介绍C++11的一个新特性——delete，通过将delete应用到函数来限制其调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>= <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
+<p>它通常用在以下的地方：</p>
+<ul>
+<li>delete编译器生成的函数，如拷贝构造函数、赋值运算符、移动拷贝函数、移动赋值运算符和默认构造函数；</li>
+<li>delete成员函数，以避免数据丢失；</li>
+<li>delete类的new运算符，以限制堆的对象创建；</li>
+<li>delete特定的模版特化；</li>
+</ul>
+<h2 id="deleting-copy-constructor-and-assignment-operator">Deleting Copy Constructor and Assignment Operator</h2>
+<p>假设存在这样的一个类，拷贝构造函数和赋值运算符都被delete了：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span></span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line">	<span class="type">int</span> id;</span><br><span class="line">	std::string name;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)</span><br><span class="line">	&#123;&#125;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Copy Constructor is deleted</span></span><br><span class="line">	<span class="built_in">User</span>(<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line">	<span class="comment">// Assignment operator is deleted</span></span><br><span class="line">	User &amp; <span class="keyword">operator</span> = (<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;id &lt;&lt; <span class="string">&quot; ::: &quot;</span>&lt;&lt;name&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如果调用这赋值运算符：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">User obj = userObj;</span><br></pre></td></tr></table></figure>
+<p>编译时报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:30:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User obj = userObj;</span><br><span class="line">         ^     ~~~~~~~</span><br><span class="line">delete.cpp:15:2: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">        User(const User &amp; obj) = delete;</span><br><span class="line">        ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
+<h2 id="deleting-member-functions-to-prevent-data-loss-conversions">Deleting member functions to prevent data loss conversions</h2>
+<p>由于类型的隐式转换，有可能会在调用函数时传递了错误的参数，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 这样调用会被cast</span></span><br><span class="line"><span class="function">User <span class="title">obj4</span><span class="params">(<span class="number">5.5</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br><span class="line"> </span><br><span class="line"><span class="function">User <span class="title">obj5</span><span class="params">(<span class="string">&#x27;a&#x27;</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>通过利用delete来避免类型转换：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent narrowing conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">double</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent invalid type conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">char</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
+<p>报错如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">elete.cpp:32:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj1(5.5, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:14:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(double userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">delete.cpp:33:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj2(&#x27;a&#x27;, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:15:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(char userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">2 errors generated.</span><br></pre></td></tr></table></figure>
+<h2 id="restrict-object-creation-on-heap-by-deleting-new-operator-for-class">Restrict Object creation on Heap by deleting new operator for class</h2>
+<p>我们也可以限制new运算符的使用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> * <span class="keyword">operator</span> <span class="title">new</span> <span class="params">(<span class="type">size_t</span>)</span> </span>= <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line">User * ptr = <span class="keyword">new</span> <span class="built_in">User</span>(<span class="number">1</span>, <span class="string">&quot;Riti&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>报错如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:34:17: error: call to deleted function &#x27;operator new&#x27;</span><br><span class="line">    User *ptr = new User(1, &quot;Rziti&quot;);</span><br><span class="line">                ^</span><br><span class="line">delete.cpp:17:12: note: candidate function has been explicitly deleted</span><br><span class="line">    void * operator new (size_t) = delete;</span><br><span class="line">           ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
+<h2 id="delete-specific-template-specialisation">Delete specific template specialisation</h2>
+<p>使用delete关键字，我们可以限制模板类或函数的某些模板特化。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ComplexNumber</span></span><br><span class="line">&#123;</span><br><span class="line">	T x;</span><br><span class="line">	T y;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">ComplexNumber</span>(T a, T b) : <span class="built_in">x</span>(a) , <span class="built_in">y</span>(b)</span><br><span class="line">	&#123;&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;x &lt;&lt; <span class="string">&quot; + i&quot;</span>&lt;&lt;y&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line">        <span class="comment">// Deleted template specialisation </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">char</span> a, <span class="type">char</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="comment">// Deleted template specialisation  </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">double</span> a, <span class="type">double</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>原来该模版类可以接收char参数和double参数，通过delete，我们可以限制其特化。</p>
+<h2 id="different-between-deleted-function-and-private-functions">Different between deleted function and private functions</h2>
+<p>相比private成员函数，delete有两个优点：</p>
+<ul>
+<li>避免被其它成员函数调用；</li>
+<li>delete函数在name lookup中，如果函数delete了，那么它就不会根据该类型去查找其它匹配函数；</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/08/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%BA%8C-%E2%80%94%E2%80%94MIT6-824/" rel="next" title="In Search of an Understandable Consensus Algorithm<二>——MIT6.824">
+                <i class="fa fa-chevron-left"></i> In Search of an Understandable Consensus Algorithm<二>——MIT6.824
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/11/std-bind/" rel="prev" title="std::bind">
+                std::bind <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#c11-c14-delete-keyword-and-deleted-functions"><span class="nav-number">1.</span> <span class="nav-text">C++11 &#x2F; C++14 : ‘delete’ keyword and deleted functions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#deleting-copy-constructor-and-assignment-operator"><span class="nav-number">1.1.</span> <span class="nav-text">Deleting Copy Constructor and Assignment Operator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#deleting-member-functions-to-prevent-data-loss-conversions"><span class="nav-number">1.2.</span> <span class="nav-text">Deleting member functions to prevent data loss conversions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#restrict-object-creation-on-heap-by-deleting-new-operator-for-class"><span class="nav-number">1.3.</span> <span class="nav-text">Restrict Object creation on Heap by deleting new operator for class</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#delete-specific-template-specialisation"><span class="nav-number">1.4.</span> <span class="nav-text">Delete specific template specialisation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#different-between-deleted-function-and-private-functions"><span class="nav-number">1.5.</span> <span class="nav-text">Different between deleted function and private functions</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

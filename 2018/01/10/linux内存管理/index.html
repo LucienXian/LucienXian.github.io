@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Linux," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="linux内存管理 虚拟内存空间的管理  linux操作系统采用的是请求式分页虚拟内存管理 每个进程有独立的4GB的虚拟内存空间   IA32体系结构具有两种内存管理模式： 实模式 保护模式   逻辑地址到物理地址的转换：  逻辑地址——&gt;线性地址（虚拟地址）——&gt;物理地址  内核空间到物理内存的映射  内核空间由所有进程共享，存放着内核代码和数据 内核空间映射到物理内存总是从最低地址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux内存管理">
+<meta property="og:url" content="http://yoursite.com/2018/01/10/linux%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="linux内存管理 虚拟内存空间的管理  linux操作系统采用的是请求式分页虚拟内存管理 每个进程有独立的4GB的虚拟内存空间   IA32体系结构具有两种内存管理模式： 实模式 保护模式   逻辑地址到物理地址的转换：  逻辑地址——&gt;线性地址（虚拟地址）——&gt;物理地址  内核空间到物理内存的映射  内核空间由所有进程共享，存放着内核代码和数据 内核空间映射到物理内存总是从最低地址">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-01-10T15:07:45.000Z">
+<meta property="article:modified_time" content="2018-01-10T15:12:21.038Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/10/linux内存管理/"/>
+
+
+
+
+
+  <title>linux内存管理 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/linux%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">linux内存管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T23:07:45+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="linux内存管理">linux内存管理</h1>
+<h2 id="虚拟内存空间的管理">虚拟内存空间的管理</h2>
+<ul>
+<li>linux操作系统采用的是<strong>请求式分页虚拟内存管理</strong></li>
+<li>每个进程有独立的4GB的虚拟内存空间</li>
+</ul>
+<blockquote>
+<p>IA32体系结构具有两种内存管理模式：</p>
+<p>实模式</p>
+<p>保护模式</p>
+</blockquote>
+<ul>
+<li>逻辑地址到物理地址的转换：
+<ul>
+<li>逻辑地址——&gt;线性地址（虚拟地址）——&gt;物理地址</li>
+</ul></li>
+<li>内核空间到物理内存的映射
+<ul>
+<li>内核空间由所有进程共享，存放着内核代码和数据</li>
+<li>内核空间映射到物理内存总是从最低地址开始，建立线性关系</li>
+<li>系统启动时，内核映像被装载到物理地址1MB开始的地方</li>
+</ul></li>
+</ul>
+<h3 id="进程用户空间">进程用户空间</h3>
+<p>linux把进程的用户空间划分成一个个区间。</p>
+<ul>
+<li>一个进程的用户进程空间由mm_struct结构描述（对进行的整个用户空间进行描述，memory descriptor）</li>
+<li>vm_area_struct结构是虚存空间的一个连续区域，所有的该结构体组成一个单链表，在这个区域里的信息具有相同的操作和访问特性。vm_mm指针指向mm_struct结构体；vm_strart和vm_end是虚拟区域的开始和终止地址</li>
+</ul>
+<p>创建进程用户空间</p>
+<ul>
+<li>通过fork()系统调用，在创建新进程的同时，也为该进程创建完整的用户空间</li>
+<li>新进程的用户空间——copy_mm()，通过写时复制技术创建的</li>
+</ul>
+<h2 id="linux的分页内存管理机制">linux的分页内存管理机制</h2>
+<p>linux总是假定处理器支持三级页表结构（对于IA32，把PGD和PMD合二为一）：</p>
+<ul>
+<li>页目录PGD</li>
+<li>页中间目录PMD</li>
+<li>页表PTE</li>
+</ul>
+<blockquote>
+<p>内核2.6.11之后采用四级页表模型</p>
+</blockquote>
+<ul>
+<li>线性地址到物理地址映射（以IA32为例）
+<ul>
+<li>页目录：高10位</li>
+<li>页表：中间10位</li>
+<li>偏移：低12位，用来表示在一个页帧中的偏移</li>
+<li>每个进程都有一个页目录。由寄存器CR3指向该页目录的基地址</li>
+</ul></li>
+<li>缺页异常：
+<ul>
+<li>编程错误</li>
+<li>操作系统故意引发的异常</li>
+<li>缺页异常的处理程序是do_page_fault()函数：该函数有两个参数：一个是发送异常地址；一个是错误码；</li>
+<li>do_page_fault()执行过程：从CR2得到发送异常的线性地址；使用LRU去换页，为每个页面设置一个age，年纪越大，越容易被换</li>
+</ul></li>
+<li>交换机制：当物理内存小于一个固定的极限时，就会执行换出操作</li>
+</ul>
+<h2 id="物理内存的管理">物理内存的管理</h2>
+<h3 id="定义">定义</h3>
+<p>页帧：物理内存是以页帧为基本单位的，IA32为4kb</p>
+<p>结点：访问速度相同的一个内存区域，与处理器相关联</p>
+<p>zone：根据用途不同，将不同结点的物理内存分成不同的zone</p>
+<blockquote>
+<p>linux对于zone曹勇buddy system管理</p>
+</blockquote>
+<h3 id="page结构">page结构</h3>
+<p>页帧是由page结构体表示的。</p>
+<h3 id="物理内存的分配和回收">物理内存的分配和回收</h3>
+<ul>
+<li>buddy分配</li>
+</ul>
+<p>物理内存采用的是buddy分配算法，最小的分配单位是页帧，目的是分配一组连续的物理页帧。</p>
+<p>buddy：两组连续的页帧，满足——大小相同；物理地址连续；第2个页块后面的页帧必须是2n的倍数。</p>
+<p>buddy算法把内存中的所有页帧按照2^n划分，分成1，2，4，8.。。。。1024一共11种页块，每个页块组用一个双向循环链表进行管理，也就是一共有11个链表</p>
+<blockquote>
+<p>比如free_area[0]指向1页帧块的链表</p>
+<p>比如free_area[2]指向4页帧块的链表</p>
+</blockquote>
+<ul>
+<li>内存回收
+<ul>
+<li>回收时需要检查与该页帧相邻的空闲页块，若存在则需要合成一个连续的空闲区，按buddy算法重新分组</li>
+</ul></li>
+<li>slab分配器
+<ul>
+<li>为了解决buddy算法以页帧为基本分配单位可能造成的内部碎片</li>
+<li>基本思想：为经常使用的小对象建立缓冲，小对象的申请和释放由slab分配器管理，不与buddy系统打交道</li>
+</ul></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/10/linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="next" title="linux文件系统">
+                <i class="fa fa-chevron-left"></i> linux文件系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/10/linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/" rel="prev" title="linux进程管理">
+                linux进程管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#linux%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">linux内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E7%AE%A1%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">虚拟内存空间的管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4"><span class="nav-number">1.1.1.</span> <span class="nav-text">进程用户空间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux%E7%9A%84%E5%88%86%E9%A1%B5%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.</span> <span class="nav-text">linux的分页内存管理机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E7%9A%84%E7%AE%A1%E7%90%86"><span class="nav-number">1.3.</span> <span class="nav-text">物理内存的管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">1.3.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#page%E7%BB%93%E6%9E%84"><span class="nav-number">1.3.2.</span> <span class="nav-text">page结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E7%9A%84%E5%88%86%E9%85%8D%E5%92%8C%E5%9B%9E%E6%94%B6"><span class="nav-number">1.3.3.</span> <span class="nav-text">物理内存的分配和回收</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

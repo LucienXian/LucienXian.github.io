@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="关于虚函数的学习二 纯虚函数 定义 纯虚函数是在基类中声明的基函数，它没有定义，并且要求任何派生类都必须实现自己的定义方法，否则该派生类不能实例化。 使用方法是在函数原型后面加“&#x3D;0” 1virtual void func()&#x3D;0; 引入原因  为了多态性，我们需要在基类中实现虚函数； 某些情况下，基类不应该生成对象。例如，一个动物的基类可以派生出兔子、老虎等类，但动物基类不应该实例化。  抽象类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚函数的学习(2)——CPP">
+<meta property="og:url" content="http://yoursite.com/2017/11/15/%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0-2-%E2%80%94%E2%80%94CPP/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="关于虚函数的学习二 纯虚函数 定义 纯虚函数是在基类中声明的基函数，它没有定义，并且要求任何派生类都必须实现自己的定义方法，否则该派生类不能实例化。 使用方法是在函数原型后面加“&#x3D;0” 1virtual void func()&#x3D;0; 引入原因  为了多态性，我们需要在基类中实现虚函数； 某些情况下，基类不应该生成对象。例如，一个动物的基类可以派生出兔子、老虎等类，但动物基类不应该实例化。  抽象类">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-11-15T05:19:02.000Z">
+<meta property="article:modified_time" content="2017-11-15T05:19:27.906Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/15/虚函数的学习-2-——CPP/"/>
+
+
+
+
+
+  <title>虚函数的学习(2)——CPP | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0-2-%E2%80%94%E2%80%94CPP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">虚函数的学习(2)——CPP</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T13:19:02+08:00">
+                2017-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="关于虚函数的学习二">关于虚函数的学习二</h1>
+<h2 id="纯虚函数">纯虚函数</h2>
+<h3 id="定义">定义</h3>
+<p>纯虚函数是在基类中声明的基函数，它没有定义，并且要求任何派生类都必须实现自己的定义方法，否则该派生类不能实例化。</p>
+<p>使用方法是在函数原型后面加<strong>“=0”</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span></span>=<span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="引入原因">引入原因</h3>
+<ul>
+<li>为了多态性，我们需要在基类中实现虚函数；</li>
+<li>某些情况下，基类不应该生成对象。例如，一个动物的基类可以派生出兔子、老虎等类，但动物基类不应该实例化。</li>
+</ul>
+<h2 id="抽象类">抽象类</h2>
+<ul>
+<li>带有纯虚函数的类为抽象类；</li>
+<li>抽象类的作用是为派生类提供一个公共的根，要求派生类实现抽象类描述的操作操作。</li>
+<li>如果派生类没有自定义抽象类中的虚函数，则该派生类仍然是一个抽象类。</li>
+</ul>
+<h2 id="虚析构函数">虚析构函数</h2>
+<h3 id="引入原因-1">引入原因</h3>
+<p>当我们去delete一个动态分配的对象指针的时候将执行析构函数，该指针有可能指向继承体系中的某一个对象，出现指针的静态类型和所指对象的动态类型不符合的情况。因此，为了让编译器清楚执行哪个版本的析构函数，我们需要在基类中将析构函数定义为虚函数。</p>
+<blockquote>
+<p>如果基类的析构函数不是虚函数，那么delete一个指向派生类对象的基类指针将会产生未定义行为。</p>
+</blockquote>
+<h2 id="构造函数中调用虚函数">构造函数中调用虚函数</h2>
+<p><strong>先说结论，尽量不要这样使用</strong></p>
+<p>因为在构造函数中调用虚函数，会使得虚函数的机制失效。在构造函数中调用虚函数，由于构造顺序是先构造父类再构造子类，如果构造父类的时候调用了虚函数，这时查询的将是父类的虚函数表地址。然后再构造子类，此时查询的将是子类的虚函数表地址。</p>
+<p>这是为了避免出现bug。因为如果构造父类时查询的是子类的虚函数表地址，而子类的虚函数又用到了子类自定义的数据成员，此时该数据成员还没完成初始化，这样做就会出现错误。</p>
+<h2 id="析构函数中调用虚函数">析构函数中调用虚函数</h2>
+<p>与上原因，同理。但析构函数的析构顺序与构造函数的构造顺序相反。当基类的析构函数执行时，派生类的析构函数已经执行完成，派生类的数据成员已经失效，如果基类还要调用派生类的虚函数，则可能会出错。</p>
+<h2 id="析构函数抛出异常">析构函数抛出异常</h2>
+<p>总结;</p>
+<ul>
+<li>析构函数尽量不要抛出异常；</li>
+<li>如果真的要抛，则在析构函数里面解决，但这种方法不好，因为不能及时地知道异常出现在什么地方；</li>
+</ul>
+<p>因为类对象分配的资源由对象的析构函数执行，如果在释放资源之前，异常发生，那么分配的资源将无法被释放。所以我们必须要在类中控制资源的释放。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/15/%E5%A4%9A%E6%80%81%E4%B8%8E%E8%99%9A%E5%87%BD%E6%95%B0%E2%80%94%E2%80%94CPP/" rel="next" title="多态与虚函数——CPP">
+                <i class="fa fa-chevron-left"></i> 多态与虚函数——CPP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/16/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E7%9A%84%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94CPP/" rel="prev" title="智能指针的学习——CPP">
+                智能指针的学习——CPP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E8%99%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%AD%A6%E4%B9%A0%E4%BA%8C"><span class="nav-number">1.</span> <span class="nav-text">关于虚函数的学习二</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%AF%E8%99%9A%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">纯虚函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">1.1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E5%85%A5%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.1.2.</span> <span class="nav-text">引入原因</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB"><span class="nav-number">1.2.</span> <span class="nav-text">抽象类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">虚析构函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E5%85%A5%E5%8E%9F%E5%9B%A0-1"><span class="nav-number">1.3.1.</span> <span class="nav-text">引入原因</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E4%B8%AD%E8%B0%83%E7%94%A8%E8%99%9A%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">构造函数中调用虚函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%AD%E8%B0%83%E7%94%A8%E8%99%9A%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.</span> <span class="nav-text">析构函数中调用虚函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8"><span class="nav-number">1.6.</span> <span class="nav-text">析构函数抛出异常</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

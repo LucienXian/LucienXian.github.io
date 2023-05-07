@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数据库," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Building a Fast and Efficient LSM-tree Store by Integrating Local Storage with Cloud Storage  本文提出了一个叫RocksMash的LSM存储，使用本地存储来存放经常访问的数据和元数据，云存储保存其他数据以降低成本效益。  INTRODUCTION LSM KV存储像RocksDB、LevelDB、Dyna">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Building a Fast and Efficient LSM-tree Store by Integrating Local Storage with Cloud Storage">
+<meta property="og:url" content="http://yoursite.com/2022/11/16/Building-a-Fast-and-Efficient-LSM-tree-Store-by-Integrating-Local-Storage-with-Cloud-Storage/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Building a Fast and Efficient LSM-tree Store by Integrating Local Storage with Cloud Storage  本文提出了一个叫RocksMash的LSM存储，使用本地存储来存放经常访问的数据和元数据，云存储保存其他数据以降低成本效益。  INTRODUCTION LSM KV存储像RocksDB、LevelDB、Dyna">
+<meta property="og:locale">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97211d64b070663375f5.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97211d64b070663375fe.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97211d64b0706633760b.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97211d64b0706633761f.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97211d64b07066337616.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97671d64b0706633ce0b.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97671d64b0706633ce1c.png">
+<meta property="og:image" content="https://pic.imgdb.cn/item/62bc97671d64b0706633ce26.png">
+<meta property="article:published_time" content="2022-11-15T17:29:26.000Z">
+<meta property="article:modified_time" content="2022-11-15T17:29:53.387Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/62bc97211d64b070663375f5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2022/11/16/Building-a-Fast-and-Efficient-LSM-tree-Store-by-Integrating-Local-Storage-with-Cloud-Storage/"/>
+
+
+
+
+
+  <title>Building a Fast and Efficient LSM-tree Store by Integrating Local Storage with Cloud Storage | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/11/16/Building-a-Fast-and-Efficient-LSM-tree-Store-by-Integrating-Local-Storage-with-Cloud-Storage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Building a Fast and Efficient LSM-tree Store by Integrating Local Storage with Cloud Storage</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-11-16T01:29:26+08:00">
+                2022-11-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="building-a-fast-and-efficient-lsm-tree-store-by-integrating-local-storage-with-cloud-storage">Building a Fast and Efficient LSM-tree Store by Integrating Local Storage with Cloud Storage</h1>
+<blockquote>
+<p>本文提出了一个叫RocksMash的LSM存储，使用本地存储来存放经常访问的数据和元数据，云存储保存其他数据以降低成本效益。</p>
+</blockquote>
+<h2 id="introduction">INTRODUCTION</h2>
+<p>LSM KV存储像RocksDB、LevelDB、Dynamo等已经被广泛应用到了数据库存储系统中。随着云存储的出现，提高效率，出灾速度越来越受到关注，如何设计一个本地存储和云存储混合的存储系统也成为了一个关注的重要话题。然而构建这样的一个存储服务仍然具备不少的挑战：首先是性能和成本，虽然云存储的成本更低数据可靠性更高，但其读写性能都会有严重的下滑；其次是需要开发一种有效的缓存来弥补内存空间不足的局限从而提高性能；最后是可用性的问题，需要尽可能快地从远程存储完成数据的恢复。</p>
+<p>本文提出了一个叫RocksMash的系统，结合本地和云存储同时实现高性能和低成本，并保证一定的可用性。RocksMash包含了一个读取优先的数据布局，高效的LSM持久缓存LAP、节省空间且快速的元数据MashMeta以及并行恢复技术。RocksMash是基于RocksDb实现的，通过使用节点的NVMe SSD作为本地存储和AWS Elastic Block Store (EBS) gp2作为云存储。</p>
+<h2 id="background-and-motivation">BACKGROUND AND MOTIVATION</h2>
+<h3 id="background">Background</h3>
+<p>这一章主要讲述LSM的存储架构，如下图所示主要由多层的sstable组成，从L0到Ln逐层变大。</p>
+<p><img src="https://pic.imgdb.cn/item/62bc97211d64b070663375f5.png" /></p>
+<h3 id="motivating-observations">Motivating Observations</h3>
+<p><img src="https://pic.imgdb.cn/item/62bc97211d64b070663375fe.png" /></p>
+<ul>
+<li>Imbalanced Cost and Performance between Local and Cloud Storage</li>
+</ul>
+<p>本地存储和云存储表现出不同的性能和成本，文中提到了云存储能降低八成的成本，但基于本地存储的Rocksdb其读取性能和写入吞吐量都要比云存储高出80倍和4成，因此使用本地存储和云存储的高效LSM存储变成了优先考虑的事。</p>
+<ul>
+<li>Similar Prefixes among Keys</li>
+</ul>
+<p>为了减少对云存储的读取IO，其重要的避免对sstable元数据的访问。如下图所示，在将SQL表数据映射到各种数据库中的键值存储时，这些复合键的公共前缀是很常见的。此外，LSM存储压缩操作进一步巩固了sstable中键之间的前缀相似性，因此这使得底层sstable中的键倾向于共享更长的前缀。在这种情况下，sstable中的索引键本质上是索引具有高相似性的排序字符串，并且越底层的sstable共享了更多前缀。</p>
+<p><img src="https://pic.imgdb.cn/item/62bc97211d64b0706633760b.png" /></p>
+<ul>
+<li>Slow Recovery</li>
+</ul>
+<p>由于原生WAL不会记录各层的所有数据，如果云实例失败然后走正常的恢复流程，则存储在本地存储中的从L0到Li的sstable将丢失。简单地扩展WAL以包含从L0到Li sstables的数据非常低效的，一是耗时很久，二是replay导致重复compaction进一步加大写放大，因此论文提到的做法是直接构建sstables，而不是通过WAL间接恢复。</p>
+<h2 id="design">DESIGN</h2>
+<h3 id="overview">Overview</h3>
+<p>RocksMash将LSM的上面i层放在更快成本更高的本地存储，其余部分则由云存储维护。由于上层比下层数据更少访问更热，LSM的顶层放在本地存储进一步降低了操作的耗时。</p>
+<p>下图是RocksMash的存储架构，内存用仍然保留了原始的LSM MemTable，此外还使用了细粒度的LAP缓存来进一步减少对云存储的访问。LAP缓存分为MetaCache和DataCache， 由于元数据相比LSM的访问频率更高，因此MetaCache会存储云上sstable的元数据块，而DataCache则将精彩访问的数据块缓存起来。</p>
+<p><img src="https://pic.imgdb.cn/item/62bc97211d64b0706633761f.png" /></p>
+<p>下图描述了写入和读取的请求处理，写入请求基本与常规的LSM处理流程一样，但在触发compaction的过程中，RocksMash会讲sstable的元数据插入到本地存储的LAP MetaCache中。而对于读请求，从依次从L0层到LN层搜索候选sstable，如果要读取的sstable在云存储上，则将block读到LAP DataCache以供访问。</p>
+<p><img src="https://pic.imgdb.cn/item/62bc97211d64b07066337616.png" /></p>
+<h3 id="lsm-aware-persistent-cache">LSM-Aware Persistent Cache</h3>
+<p>LSM存储支持使用SSD来作为持久化缓存，以此在内存不够时尽可能提高读性能。如上图所示，rocksdb的持久化缓存包含了多个缓存文件，这些文件以LRU的形式组织，一个kv对在读不到的情况会从磁盘加载到rocksdb的持久化缓存中，即append到CacheFile i+1中。如果可写的缓存文件满了，则通过LRU的策略逐出。这个实现存在一个文件，即持久化缓存并未感知compaction，比如上图，sst被压缩后kv3和kv1已经无效了，但仍存留在文件中导致大量的浪费和所需键被过早逐出。</p>
+<p>RocksMash的解决方法是在本地存储上使用LSM-tree- aware持久化缓存LAP。LAP分为MetaCache和DataCache。MetaCache存粗云上sstable的所有元数据块，避免远程的元数据访问，MetaCache将这些元数据分组并使用哈希表去做管理。DataCache则是一种能感知compaction的缓存，用于存储热数据块来加速读请求。如上图所示，存储在DataCache的kv对被组织称LRU列表，无效的kv对则通过位图标记失效，而加载数据到DataCache则可以直接覆盖那些无效的kv对。</p>
+<h3 id="space-efficient-and-fast-indexing-and-filtering-mashmeta">Space-Efficient and Fast Indexing and Filtering (MashMeta)</h3>
+<p>这一章主要是介绍为了提高缓存空间效率，RocksMash使用了一种叫MashMeta的succinct tree的技术，从而为每一个云存储的sstable构建一个压缩前缀树。这种trie能以深度优先的一元度序列进行编码，下图就是一个样例。本质是为了以最小的空间消耗避免filter的误报，提高对每个key的精准查询速度。 <img src="https://pic.imgdb.cn/item/62bc97671d64b0706633ce0b.png" /></p>
+<h3 id="parallel-recovery">Parallel Recovery</h3>
+<p>基于RocksMash的布局设计，快速恢复对存储在鼓掌节点本地存储上的sstable访问是非常重要。这里假设云存储的sstable是可靠的，WAL文件则存储在快速且专用的云存储上，然而由于本地存储的sstable数据相对WAL来说较小，从大量WAL文件快速恢复会使得这个设计变得更加困难。</p>
+<p>一般的恢复方法如下图所示，按顺序重做写入操作，但这种逻辑对于大型数据集的效率很低，因为WAL的每一个kv对都会写入一次，并经过memtable一步一步flush下来，产生更多的写放大。</p>
+<p><img src="https://pic.imgdb.cn/item/62bc97671d64b0706633ce1c.png" /></p>
+<p>因此RocksMash提出通过并行化恢复L0到Li的sstables来解决效率问题，这里仍然存在两个挑战：</p>
+<ul>
+<li>如何并行构建sstables：因为WAL的kv对和manifest记录的有效sstable列表并不存在联系，需要漫长的compaction操作才能匹配两者；</li>
+<li>有了上面的连接，如何确保在读操作于恢复后能读到正确的kv对时能实现最大的并行化：如果按照时间顺序去搜索WAL文件，那很有可能会读取到大量的过时kv对，但这些数据最终会被compaction删除，因此RocksMash需要提高它对sstables的扫描效率；</li>
+</ul>
+<p>如上图所示，RocksMash扩展了WAL以包含从L0到Li的所有sstable数据，当生成这些sstable时，RocksMash会讲更改记录到MANIFESY，然后将其key列表同时记录到WAL以便能连接到sstable。因为除非所有新的sstable都成功持久化，否则compaction不会被认为是完整的，所以RocksMash可以批处理新sstable的键列表以减少写入它们的I/O数量。这样，RocksMash可以确保安全回滚到与 MANIFEST 和key列表一致的最新状态，并且不会丢失任何有效数据，</p>
+<p>逆时间顺序搜索：RocksMash为每个需要恢复sstable分配一个worker，每个worker由新到旧搜索WAL，这种方式能LSM存储的读取路径首先读到key的最新版本。通过逆顺序搜索WAL，RocksMash进一步减少WAL的读取数量。</p>
+<p>并行构建sstable：当实例节点发生故障时，RocksMash使用新实例将恢复原来存储在故障实例中的L0-Li sstables。 RocksMash读取MANIFEST和扩展的WAL以获取最后一致状态的sstable文件列表。 RocksMash然后借助key列表从扩展的WAL中并行重建这些sstables。下图是具体的步骤</p>
+<p><img src="https://pic.imgdb.cn/item/62bc97671d64b0706633ce26.png" /></p>
+<ul>
+<li>第一步是读取WAL：RocksMash将L0-Li sstable的key列表和所有WAL文件拉到新的实例节点。</li>
+<li>第二步是查找key- values：在获取到有效sstable的键列表后，RocksMash为每个sstable分配一个worker来扫描 WAL 文件并获取其列表中的key。扫描应该从较新的WAL文件开始到较旧的文件，以确保worker首先读到最新的key。至于存在key range重叠的L0 stables，则控制L0旧sstable对应的worker不允许超过新sstable对应worker去扫描；</li>
+<li>第三步是构建stables：worker在获得所有键值对后开始构建sstable。恢复的sstable会在重建后加载到RocksMash；</li>
+<li>第四步是构建MemTable：恢复sstables 后，RocksMash开始恢复MemTable和不可变的MemTables。 RocksMash利用最新的L0 sstable的信息来减少要重放的WAL记录的大小。由于每个更改都按时间顺序记录到WAL中，因此最新L0 sstable中的最新key表示一个分水岭的位置，其中早于该时间的key保存在sstables中，而较新的key仍在MemTable或不可变 MemTables中。</li>
+</ul>
+<p>经过以上步骤，RocksMash就完成了将故障实例的内存和本地存储中的数据恢复到最新的一致状态，并大幅度减少了恢复重建的时间。</p>
+<h2 id="conclusion">CONCLUSION</h2>
+<p>本文集中研究了集成云存储会如何影响LSM存储的性能，由于存储成本的问题，云存储的性能上限严重影响了读取性能，因此提出了一种快速高效的LSM存储RocksMash。RocksMash可以将LSM tree在本地存储和云存储之间进行拆分，从而在成本和性能之间达到平衡。此外，为了减少元数据的内存占用并提高读取性能，RocksMash使用能感知LSM结构的持久缓存，并以节省空间的方式（succinct tree）存储元数据，并使用了能感知压缩情况的缓存来存储热数据块。为了实现快速并行的数据恢复，RocksMash还扩展了WAL的使用。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/04/03/The-RocksDB-Experience/" rel="next" title="The RocksDB Experience">
+                <i class="fa fa-chevron-left"></i> The RocksDB Experience
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/03/06/Cloud-Native-Transactions-and-Analytics-in-SingleStore/" rel="prev" title="Cloud-Native Transactions and Analytics in SingleStore">
+                Cloud-Native Transactions and Analytics in SingleStore <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#building-a-fast-and-efficient-lsm-tree-store-by-integrating-local-storage-with-cloud-storage"><span class="nav-number">1.</span> <span class="nav-text">Building a Fast and Efficient LSM-tree Store by Integrating Local Storage with Cloud Storage</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#background-and-motivation"><span class="nav-number">1.2.</span> <span class="nav-text">BACKGROUND AND MOTIVATION</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#background"><span class="nav-number">1.2.1.</span> <span class="nav-text">Background</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#motivating-observations"><span class="nav-number">1.2.2.</span> <span class="nav-text">Motivating Observations</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#design"><span class="nav-number">1.3.</span> <span class="nav-text">DESIGN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#overview"><span class="nav-number">1.3.1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lsm-aware-persistent-cache"><span class="nav-number">1.3.2.</span> <span class="nav-text">LSM-Aware Persistent Cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#space-efficient-and-fast-indexing-and-filtering-mashmeta"><span class="nav-number">1.3.3.</span> <span class="nav-text">Space-Efficient and Fast Indexing and Filtering (MashMeta)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parallel-recovery"><span class="nav-number">1.3.4.</span> <span class="nav-text">Parallel Recovery</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion"><span class="nav-number">1.4.</span> <span class="nav-text">CONCLUSION</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

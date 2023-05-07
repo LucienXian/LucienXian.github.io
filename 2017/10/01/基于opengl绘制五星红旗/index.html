@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="computer graphics," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="基于opengl绘制五星红旗  趁着今天是国庆，就更新一下绘制五星红旗的博文吧~祖国万岁   flag  操作步骤 确定绘制方法 这个实验分为两步，第一步是画出旗面，第二则是根据五角星的位置，画出大小、角度不同的三角形；根据《国旗法》要求，国旗长宽比为3:2，这个画起来难度不大，我们将旗面四个点的位置坐标设置为(-0.9,0.6)，(0.9, 0.6)，(0.9,-0.6)，(-0.9, -0.6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于opengl绘制五星红旗">
+<meta property="og:url" content="http://yoursite.com/2017/10/01/%E5%9F%BA%E4%BA%8Eopengl%E7%BB%98%E5%88%B6%E4%BA%94%E6%98%9F%E7%BA%A2%E6%97%97/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="基于opengl绘制五星红旗  趁着今天是国庆，就更新一下绘制五星红旗的博文吧~祖国万岁   flag  操作步骤 确定绘制方法 这个实验分为两步，第一步是画出旗面，第二则是根据五角星的位置，画出大小、角度不同的三角形；根据《国旗法》要求，国旗长宽比为3:2，这个画起来难度不大，我们将旗面四个点的位置坐标设置为(-0.9,0.6)，(0.9, 0.6)，(0.9,-0.6)，(-0.9, -0.6">
+<meta property="og:locale">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/flag.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/star1.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/xy1.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/t.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/star2.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/consin1.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/sincos.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/nwdd.png">
+<meta property="og:image" content="http://ou7boskhm.bkt.clouddn.com/res.png">
+<meta property="article:published_time" content="2017-10-01T09:16:05.000Z">
+<meta property="article:modified_time" content="2017-10-01T09:45:49.749Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="computer graphics">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ou7boskhm.bkt.clouddn.com/flag.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/10/01/基于opengl绘制五星红旗/"/>
+
+
+
+
+
+  <title>基于opengl绘制五星红旗 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/01/%E5%9F%BA%E4%BA%8Eopengl%E7%BB%98%E5%88%B6%E4%BA%94%E6%98%9F%E7%BA%A2%E6%97%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于opengl绘制五星红旗</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-01T17:16:05+08:00">
+                2017-10-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="基于opengl绘制五星红旗">基于opengl绘制五星红旗</h1>
+<blockquote>
+<p>趁着今天是国庆，就更新一下绘制五星红旗的博文吧~祖国万岁</p>
+</blockquote>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/flag.png" alt="flag" /><figcaption>flag</figcaption>
+</figure>
+<h2 id="操作步骤">操作步骤</h2>
+<h3 id="确定绘制方法">确定绘制方法</h3>
+<p>这个实验分为两步，第一步是画出旗面，第二则是根据五角星的位置，画出大小、角度不同的三角形；根据《国旗法》要求，国旗长宽比为3:2，这个画起来难度不大，我们将旗面四个点的位置坐标设置为<strong>(-0.9,0.6)，(0.9, 0.6)，(0.9,-0.6)，(-0.9, -0.6)</strong>。接下来关键是画五角星。</p>
+<p>我们来看一下，绘制图形所使用的函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">WINGDIAPI <span class="type">void</span> APIENTRY <span class="title">glVertex3f</span> <span class="params">(GLfloat x, GLfloat y, GLfloat z)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>由于该函数只能绘制凸多边形，因此我们选择的绘制方法是，将五角星分成多个扇形三角形，然后顺时针逐个绘制三角形，这样能方便我们循环完成，如图：</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/star1.png" alt="star1" /><figcaption>star1</figcaption>
+</figure>
+<h3 id="计算相关参数">计算相关参数</h3>
+<p>首先是得到各五角星中点的位置，首先是将国旗分为四个小长方形，大五角星的位置为<strong>左五右十，上五下五</strong>，其它各个中心点如图：</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/xy1.png" alt="xy" /><figcaption>xy</figcaption>
+</figure>
+<h3 id="绘制三角形">绘制三角形</h3>
+<p>根据上面确定的绘制方法，我们需要将五角星分为十个扇形三角形，因此要绘制每个三角形，我们只需要三个参数——中心点，长半径的顶点，短半径的顶点，如图：</p>
+<p>根据几何计算，这两个角大小分别为18°和36°</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/t.png" alt="tan" /><figcaption>tan</figcaption>
+</figure>
+<p>因此要画出某一个的三角形，必须要得知中心点和其中的一个顶点。然后根据这两个点计算出长半径和短半径，如图，黑线代表长半径R，蓝线代表短半径r；</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/star2.png" alt="star2" /><figcaption>star2</figcaption>
+</figure>
+<ul>
+<li>首先根据两点之间的距离公式计算出长半径R；</li>
+<li>由以上的角度可以计算出：</li>
+</ul>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/consin1.png" alt="sincos" /><figcaption>sincos</figcaption>
+</figure>
+<p>接下来，由于我们每个三角形已知的参数中心点和长半径顶点的坐标（也就是已知第一条长半径的旋转角度），因此我们需要据此计算出短半径的坐标位置:</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/sincos.png" alt="sincos" /><figcaption>sincos</figcaption>
+</figure>
+<p>而我们又可以得知两边的夹角为36°，因此只需要将将36°带入β中即可求出下一条边的旋转角，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tempC = cos1*cos36 - sin1*sin36;</span><br><span class="line">tempS = sin1*cos36 + cos1*sin36;</span><br></pre></td></tr></table></figure>
+<p>再根据旋转角和长度利用级坐标公式求出x和y的坐标值<strong>(其中midx和midy是五角星中点坐标)</strong> ：</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/nwdd.png" alt="nwdd" /><figcaption>nwdd</figcaption>
+</figure>
+<p>代码如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">0</span>) &#123; <span class="comment">//偶数下标是外顶点</span></span><br><span class="line">	point[i][<span class="number">0</span>] = l_length*tempC + midx;</span><br><span class="line">	point[i][<span class="number">1</span>] = l_length*tempS + midy;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123; <span class="comment">//奇数下标是内顶点</span></span><br><span class="line">	point[i][<span class="number">0</span>] = s_length*tempC + midx;</span><br><span class="line">	point[i][<span class="number">1</span>] = s_length*tempS + midy;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="绘制红旗和五角星">绘制红旗和五角星</h3>
+<p>样例代码已经可以绘制出红旗，因此只需要将绘制五角星的过程封装成函数，并传入相关参数即可：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.60</span>, <span class="number">0.30</span>, <span class="number">-0.60</span>, <span class="number">0.48</span>); </span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.48</span>, <span class="number">-0.24</span>, <span class="number">0.48</span>);</span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.36</span>, <span class="number">-0.24</span>, <span class="number">0.36</span>);</span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.18</span>, <span class="number">-0.18</span>, <span class="number">0.24</span>);</span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.06</span>, <span class="number">-0.24</span>, <span class="number">0.06</span>);</span><br></pre></td></tr></table></figure>
+<p>并且，在函数中确定绘制颜色为黄色，绘制形状为三角形；</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">glColor3f</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">glBegin</span>(GL_TRIANGLE_FAN);</span><br></pre></td></tr></table></figure>
+<h2 id="实验数据记录和处理">实验数据记录和处理</h2>
+<p>五星红旗的四个坐标点分别为(-0.9,0.6)，(0.9, 0.6)，(0.9,-0.6)，(-0.9, -0.6)；</p>
+<p>五角星中最大的一个坐标为(-0.60, 0.30)，其余四个分别为(-0.30, 0.48),(-0.18, 0.36), (-0.18, 0.18), (-0.30, 0.06)</p>
+<h2 id="实验结果与分析">实验结果与分析</h2>
+<h3 id="绘制结果">绘制结果</h3>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/res.png" alt="res" /><figcaption>res</figcaption>
+</figure>
+<h3 id="完整代码">完整代码</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;gl/glut.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;math.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> GLfloat PI = <span class="number">3.1415926f</span>;</span><br><span class="line"><span class="type">const</span> GLfloat cos36 = <span class="built_in">cos</span>(PI*<span class="number">0.2</span>);</span><br><span class="line"><span class="type">const</span> GLfloat sin36 = <span class="built_in">sin</span>(PI*<span class="number">0.2</span>);</span><br><span class="line"><span class="type">const</span> GLfloat cos72 = <span class="built_in">cos</span>(PI*<span class="number">0.4</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">DrawStar</span><span class="params">(GLfloat midx, GLfloat midy, GLfloat vx, GLfloat vy)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	GLfloat point[<span class="number">11</span>][<span class="number">2</span>]; <span class="comment">//存下所有顶点的位置</span></span><br><span class="line">	GLfloat l_length = <span class="built_in">sqrt</span>((midx - vx)*(midx - vx) + (midy - vy)*(midy - vy));<span class="comment">//计算出顶点长半径的长度</span></span><br><span class="line">	GLfloat s_length = l_length * cos72 / cos36;<span class="comment">//计算出顶点短半径的长度</span></span><br><span class="line">	GLfloat cos1 = (vx - midx) / l_length; <span class="comment">//计算出第一个外接顶点与中心点的三角函数值</span></span><br><span class="line">	GLfloat sin1 = (vy - midy) / l_length;</span><br><span class="line"></span><br><span class="line">	GLfloat tempC, tempS;</span><br><span class="line">	point[<span class="number">0</span>][<span class="number">0</span>] = vx, point[<span class="number">0</span>][<span class="number">1</span>] = vy;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; <span class="number">11</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		tempC = cos1*cos36 - sin1*sin36;</span><br><span class="line">		tempS = sin1*cos36 + cos1*sin36;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">0</span>) &#123; <span class="comment">//偶数下标是外顶点</span></span><br><span class="line">			point[i][<span class="number">0</span>] = l_length*tempC + midx;</span><br><span class="line">			point[i][<span class="number">1</span>] = l_length*tempS + midy;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123; <span class="comment">//奇数下标是内顶点</span></span><br><span class="line">			point[i][<span class="number">0</span>] = s_length*tempC + midx;</span><br><span class="line">			point[i][<span class="number">1</span>] = s_length*tempS + midy;</span><br><span class="line">		&#125;</span><br><span class="line">		cos1 = tempC;</span><br><span class="line">		sin1 = tempS;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glColor3f</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="built_in">glBegin</span>(GL_TRIANGLE_FAN);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(midx, midy, <span class="number">0.5</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">11</span>; i++)</span><br><span class="line">		<span class="built_in">glVertex3f</span>(point[i][<span class="number">0</span>], point[i][<span class="number">1</span>], <span class="number">0.5</span>); <span class="comment">//绘制三角形</span></span><br><span class="line">	<span class="built_in">glEnd</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">glClear</span>(GL_COLOR_BUFFER_BIT);</span><br><span class="line">	<span class="built_in">glColor3f</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="built_in">glBegin</span>(GL_QUADS);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">-0.9</span>, <span class="number">0.6</span>, <span class="number">0.5</span>);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">0.9</span>, <span class="number">0.6</span>, <span class="number">0.5</span>);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">0.9</span>, <span class="number">-0.6</span>, <span class="number">0.5</span>);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">-0.9</span>, <span class="number">-0.6</span>, <span class="number">0.5</span>); <span class="comment">//旗面长宽比为3：2</span></span><br><span class="line">	<span class="built_in">glEnd</span>();</span><br><span class="line"></span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.60</span>, <span class="number">0.30</span>, <span class="number">-0.60</span>, <span class="number">0.48</span>); </span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.48</span>, <span class="number">-0.24</span>, <span class="number">0.48</span>);</span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.36</span>, <span class="number">-0.24</span>, <span class="number">0.36</span>);</span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.18</span>, <span class="number">-0.18</span>, <span class="number">0.24</span>);</span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.06</span>, <span class="number">-0.24</span>, <span class="number">0.06</span>);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glutSwapBuffers</span>(); <span class="comment">//交换缓冲区</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span> <span class="params">(<span class="type">int</span> argc,  <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">glutInit</span>(&amp;argc,argv);</span><br><span class="line">	<span class="built_in">glutInitDisplayMode</span>(GLUT_RGB | GLUT_DOUBLE);</span><br><span class="line">	<span class="built_in">glutInitWindowPosition</span>(<span class="number">10</span>, <span class="number">10</span>);</span><br><span class="line">	<span class="built_in">glutInitWindowSize</span>(<span class="number">400</span>, <span class="number">300</span>);</span><br><span class="line">	<span class="built_in">glutCreateWindow</span>(<span class="string">&quot;National Flag&quot;</span>);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glutDisplayFunc</span>(display);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glutMainLoop</span>();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="心得">心得</h2>
+<p>这是第一个图形学实验，让我好好回顾了一下三角函数的公式，总体花的时间不是特别多。其中犯的比较大的错误是在计算下一个顶点的旋转角的三角函数时，我没有替代原来的变量，而是在一次循环中直接在计算出正弦角后马上将新的正弦角带入计算余弦角，最后画出了一个不成形的五角星。好在最后找到了这个bug并成功修复。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/computer-graphics/" rel="tag"># computer graphics</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/25/Bresenham-s-line-algorithm/" rel="next" title="Bresenham's line algorithm">
+                <i class="fa fa-chevron-left"></i> Bresenham's line algorithm
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/25/OpenGL%E7%9A%84%E7%9F%A9%E9%98%B5%E4%BD%BF%E7%94%A8%E2%80%94%E2%80%94%E7%BB%98%E5%88%B6%E6%A1%8C%E5%AD%90/" rel="prev" title="OpenGL的矩阵使用——绘制桌子">
+                OpenGL的矩阵使用——绘制桌子 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Eopengl%E7%BB%98%E5%88%B6%E4%BA%94%E6%98%9F%E7%BA%A2%E6%97%97"><span class="nav-number">1.</span> <span class="nav-text">基于opengl绘制五星红旗</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.1.</span> <span class="nav-text">操作步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A1%AE%E5%AE%9A%E7%BB%98%E5%88%B6%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.1.</span> <span class="nav-text">确定绘制方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E7%9B%B8%E5%85%B3%E5%8F%82%E6%95%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">计算相关参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%98%E5%88%B6%E4%B8%89%E8%A7%92%E5%BD%A2"><span class="nav-number">1.1.3.</span> <span class="nav-text">绘制三角形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%98%E5%88%B6%E7%BA%A2%E6%97%97%E5%92%8C%E4%BA%94%E8%A7%92%E6%98%9F"><span class="nav-number">1.1.4.</span> <span class="nav-text">绘制红旗和五角星</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E6%95%B0%E6%8D%AE%E8%AE%B0%E5%BD%95%E5%92%8C%E5%A4%84%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">实验数据记录和处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">实验结果与分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%98%E5%88%B6%E7%BB%93%E6%9E%9C"><span class="nav-number">1.3.1.</span> <span class="nav-text">绘制结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">1.3.2.</span> <span class="nav-text">完整代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%83%E5%BE%97"><span class="nav-number">1.4.</span> <span class="nav-text">心得</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

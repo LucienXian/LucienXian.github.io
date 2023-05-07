@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Linux," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="页高速缓存和页回写 从访问速度来看，内存访问速度高于磁盘访问，而缓存访问速度又高于内存。 缓存手段 页高速缓存是由内存中的物理页面组成，对应的是磁盘上的物理块，可以动态扩大缩小。当内核开始读操作时，会先检查数据是否子啊缓存中，不命中采取磁盘找。  现在的缓存一般焊接在CPU上  写缓存 Linux在调用写操作时，使用的策略是——回写。这种策略是直接写到缓存中，而存储不是立刻更新，而是将页高速缓存中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux内核分析——页高速缓存和页回写">
+<meta property="og:url" content="http://yoursite.com/2018/08/11/linux%E5%86%85%E6%A0%B8%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%92%8C%E9%A1%B5%E5%9B%9E%E5%86%99/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="页高速缓存和页回写 从访问速度来看，内存访问速度高于磁盘访问，而缓存访问速度又高于内存。 缓存手段 页高速缓存是由内存中的物理页面组成，对应的是磁盘上的物理块，可以动态扩大缩小。当内核开始读操作时，会先检查数据是否子啊缓存中，不命中采取磁盘找。  现在的缓存一般焊接在CPU上  写缓存 Linux在调用写操作时，使用的策略是——回写。这种策略是直接写到缓存中，而存储不是立刻更新，而是将页高速缓存中">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-08-11T08:47:22.000Z">
+<meta property="article:modified_time" content="2018-08-11T08:48:04.712Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/08/11/linux内核分析——页高速缓存和页回写/"/>
+
+
+
+
+
+  <title>linux内核分析——页高速缓存和页回写 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/11/linux%E5%86%85%E6%A0%B8%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%92%8C%E9%A1%B5%E5%9B%9E%E5%86%99/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">linux内核分析——页高速缓存和页回写</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T16:47:22+08:00">
+                2018-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="页高速缓存和页回写">页高速缓存和页回写</h1>
+<p>从访问速度来看，内存访问速度高于磁盘访问，而缓存访问速度又高于内存。</p>
+<h2 id="缓存手段">缓存手段</h2>
+<p>页高速缓存是由内存中的物理页面组成，对应的是磁盘上的物理块，可以动态扩大缩小。当内核开始读操作时，会先检查数据是否子啊缓存中，不命中采取磁盘找。</p>
+<blockquote>
+<p>现在的缓存一般焊接在CPU上</p>
+</blockquote>
+<h3 id="写缓存">写缓存</h3>
+<p>Linux在调用写操作时，使用的策略是——<strong>回写</strong>。这种策略是直接写到缓存中，而存储不是立刻更新，而是将页高速缓存中被写入的页面标记成<strong>脏页</strong>，表示缓存与磁盘不同步。延迟写磁盘，能方便后续对该页面的操作。</p>
+<h3 id="缓存回收">缓存回收</h3>
+<p>Linux实现的是一种改良LRU算法，则使用双链。Linux维护的是两个链表——活跃链表和非活跃链表，非活跃链表的页面是可以被换出的，而两个链表要保持数量平衡。</p>
+<h2 id="linux页高速缓存">Linux页高速缓存</h2>
+<p>由于页高速缓存中的页可能包含多个不连续的物理磁盘块。Linux页高速缓存使用一个新的结构来管理缓存项和页面io操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">inode</span>            *<span class="title">host</span>;</span>              <span class="comment">/* owning inode */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">radix_tree_root</span>  <span class="title">page_tree</span>;</span>          <span class="comment">/* radix tree of all pages */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              tree_lock;          <span class="comment">/* page_tree lock */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">int</span>            i_mmap_writable;    <span class="comment">/* VM_SHARED ma count */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">prio_tree_root</span>   <span class="title">i_mmap</span>;</span>             <span class="comment">/* list of all mappings */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">i_mmap_nonlinear</span>;</span>   <span class="comment">/* VM_NONLINEAR ma list */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              i_mmap_lock;        <span class="comment">/* i_mmap lock */</span></span><br><span class="line">        <span class="type">atomic_t</span>                truncate_count;     <span class="comment">/* truncate re count */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span>           nrpages;            <span class="comment">/* total number of pages */</span></span><br><span class="line">        <span class="type">pgoff_t</span>                 writeback_index;    <span class="comment">/* writeback start offset */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span>   *<span class="title">a_ops</span>;</span>   <span class="comment">/* operations table */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span>           flags;              <span class="comment">/* gfp_mask and error flags */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">backing_dev_info</span> *<span class="title">backing_dev_info</span>;</span>  <span class="comment">/* read-ahead information */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              private_lock;       <span class="comment">/* private lock */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">private_list</span>;</span>       <span class="comment">/* private list */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span>    *<span class="title">assoc_mapping</span>;</span>     <span class="comment">/* associated buffers */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中i_mmap字段是一个优先搜索树，它包含了在该结构体中所有共享的与私有的映射页面。</p>
+<h3 id="address_space-操作">address_space 操作</h3>
+<p>a_ops域指向地址空间对象中的操作函数表，由adress_space_operations结构体表示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span> &#123;</span></span><br><span class="line">        <span class="type">int</span> (*writepage)(<span class="keyword">struct</span> page *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*readpage) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*sync_page) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*writepages) (<span class="keyword">struct</span> address_space *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*set_page_dirty) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*readpages) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> address_space *,<span class="keyword">struct</span> list_head *, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*prepare_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*commit_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">sector_t</span> (*bmap)(<span class="keyword">struct</span> address_space *, <span class="type">sector_t</span>);</span><br><span class="line">        <span class="type">int</span> (*invalidatepage) (<span class="keyword">struct</span> page *, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">        <span class="type">int</span> (*releasepage) (<span class="keyword">struct</span> page *, <span class="type">int</span>);</span><br><span class="line">        <span class="type">int</span> (*direct_IO) (<span class="type">int</span>, <span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *,<span class="type">loff_t</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这里面最重要的是读写——readpage()和writepage()。</p>
+<p>对于readpage，Linux内核试图在页高速缓存中使用<strong>find_get_page(mapping, index)</strong>找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
+<p>对于writepage，首先在cache中搜索需要的页，如果需要的页不在，则新分配一个空闲项；下一步，内核会创建一个写请求，接着数据被从用户空间拷贝到内核缓冲，最后写入磁盘。</p>
+<h3 id="基树">基树</h3>
+<p>每个address_page对象都有唯一的基树，保存在page_tree结构体中。只要指定了文件偏移量，就可以在基树中迅速检索到希望的页面。</p>
+<h2 id="flusher线程">flusher线程</h2>
+<p>在内存中累积起来的脏页最终会被写回磁盘，当下列3种情况发生时，脏页被写回磁盘：</p>
+<ul>
+<li>当空闲内存低于阈值时；</li>
+<li>当脏页在内存中驻留时间过长；</li>
+<li>当用户进程调用sync()和fsync()时；</li>
+</ul>
+<p>在Linux内核中由一群flusher线程执行这三种工作，flusher线程会被周期性唤醒，或者因为空闲内存过低被唤醒。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/07/Golang%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/" rel="next" title="Golang测试覆盖率">
+                <i class="fa fa-chevron-left"></i> Golang测试覆盖率
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/19/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/" rel="prev" title="支持向量机">
+                支持向量机 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%92%8C%E9%A1%B5%E5%9B%9E%E5%86%99"><span class="nav-number">1.</span> <span class="nav-text">页高速缓存和页回写</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%89%8B%E6%AE%B5"><span class="nav-number">1.1.</span> <span class="nav-text">缓存手段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E7%BC%93%E5%AD%98"><span class="nav-number">1.1.1.</span> <span class="nav-text">写缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E5%9B%9E%E6%94%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">缓存回收</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">1.2.</span> <span class="nav-text">Linux页高速缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#address_space-%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.1.</span> <span class="nav-text">address_space 操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%A0%91"><span class="nav-number">1.2.2.</span> <span class="nav-text">基树</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flusher%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.3.</span> <span class="nav-text">flusher线程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

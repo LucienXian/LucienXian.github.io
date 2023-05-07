@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="OS," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="CPU调度  一般来说，CPU调度&#x3D;&#x3D;处理机调度&#x3D;&#x3D;进程调度  发生时刻  running to waiting running to ready waiting to ready terminates  调度方式  抢占式：一旦给某个进程分配完cpu就让该进程进行下去； 非抢占式：当一个进程在运行中，系统基于某种原则，剥夺分配给该进程的CPU；  调度策略 先来看几个指标，这几个指标可以用来判断">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CPU调度">
+<meta property="og:url" content="http://yoursite.com/2017/11/14/CPU%E8%B0%83%E5%BA%A6/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="CPU调度  一般来说，CPU调度&#x3D;&#x3D;处理机调度&#x3D;&#x3D;进程调度  发生时刻  running to waiting running to ready waiting to ready terminates  调度方式  抢占式：一旦给某个进程分配完cpu就让该进程进行下去； 非抢占式：当一个进程在运行中，系统基于某种原则，剥夺分配给该进程的CPU；  调度策略 先来看几个指标，这几个指标可以用来判断">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-11-14T03:37:40.000Z">
+<meta property="article:modified_time" content="2017-11-14T03:38:40.786Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="OS">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/14/CPU调度/"/>
+
+
+
+
+
+  <title>CPU调度 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/CPU%E8%B0%83%E5%BA%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CPU调度</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T11:37:40+08:00">
+                2017-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="cpu调度">CPU调度</h1>
+<blockquote>
+<p>一般来说，CPU调度==处理机调度==进程调度</p>
+</blockquote>
+<h2 id="发生时刻">发生时刻</h2>
+<ul>
+<li>running to waiting</li>
+<li>running to ready</li>
+<li>waiting to ready</li>
+<li>terminates</li>
+</ul>
+<h2 id="调度方式">调度方式</h2>
+<ul>
+<li>抢占式：一旦给某个进程分配完cpu就让该进程进行下去；</li>
+<li>非抢占式：当一个进程在运行中，系统基于某种原则，剥夺分配给该进程的CPU；</li>
+</ul>
+<h2 id="调度策略">调度策略</h2>
+<p>先来看几个指标，这几个指标可以用来判断调度策略优劣的：</p>
+<blockquote>
+<p>Throughput(吞吐量)：单位时间内进程完成的数量；</p>
+<p>Turnaround time(周转时间)：执行一个进程花费的时间(从进入就绪队列到完成 Termination time - Arrival time)；</p>
+<p>Waiting time：一个进程在ready队列中等待的时间；</p>
+<p>Response time：从进程提出请求道首次被响应的时间（不包括执行完成）；</p>
+</blockquote>
+<h2 id="first-come-first-served">First come, First served</h2>
+<p>非抢占式的，根据它们的到达时间，系统维一个FIFO的进程列表；</p>
+<h2 id="shortest-job-first">Shortest-Job-First</h2>
+<p>系统在ready queue中，优先选择那些CPU burst time最少的进程。</p>
+<p>这种调度策略分为抢占式和非抢占式两种，抢占式的没什么好说，非抢占式的：当一个新的需要更少CPU burst time的进程到达时，CPU便会重新分配。</p>
+<p>SJF还有一种变形，即highest response ration next（等待时间+要求执行时间/要求执行时间）</p>
+<h2 id="priority">Priority</h2>
+<p>同样，优先级策略也分为抢占式和非抢占式两种。</p>
+<p>这种调度策略会导致一个非常严重的问题——<strong>starvation</strong>，优先级低的进程可能一直无法被执行。为了解决这个问题，我们可以采取动态优先级的策略，随着时间推移，我们提升某些进程的优先级。</p>
+<h3 id="优先级范围">优先级范围</h3>
+<ul>
+<li>windows的线程
+<ul>
+<li>windows的每一个线程都有优先级，范围是0-31，0最低，31最高；</li>
+</ul></li>
+<li>linux的进程
+<ul>
+<li>linux的进程范围是-20-19，值越小，优先级越高。通常情况下，linux的进程优先级是由父进程继承而来，通常是0；</li>
+<li>nice值反映了进程优先级；</li>
+<li>我们可以通过<strong>nice</strong>命令来对一个将要执行的命令进程nice值；通过<strong>renice</strong>重新设置nice值；</li>
+</ul></li>
+</ul>
+<h2 id="round-robin">Round Robin</h2>
+<p>这是一种抢占式的策略，给队列里的每个进程分配相同的时间片，无论进程是否执行完，当时间懂啊了都切换到下一个进程。</p>
+<blockquote>
+<p>当时间片Q太大时，就变成了FIFO；</p>
+<p>当Q太小，但不能小到切换上下文的花费比Q还小时；</p>
+</blockquote>
+<p>这种策略的turnaround time会比SJF更高，因为SJF选择的是更低burst time，避免等待时间增多；但response time会更少，因为它的切换频率更快，使得响应更快；</p>
+<h2 id="multilevel-queue">Multilevel Queue</h2>
+<p>分配进程到多个队列中，每个队列使用不同的调度算法：</p>
+<p>前台交互式(foreground)——RR</p>
+<p>后台批处理(background)——FCFS</p>
+<h2 id="multilevel-feedback">Multilevel Feedback</h2>
+<p>这是一种动态的调度策略，该策略需要定义以下这些部分：</p>
+<blockquote>
+<p>队列个数；</p>
+<p>每个队列的调度算法；</p>
+<p>更新队列所属队列的方法；</p>
+<p>提升或降低进程优先级的方法；</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OS/" rel="tag"># OS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/13/volatile%E9%99%90%E5%AE%9A%E7%AC%A6%E2%80%94%E2%80%94CPP/" rel="next" title="volatile限定符——CPP">
+                <i class="fa fa-chevron-left"></i> volatile限定符——CPP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/14/const%E9%99%90%E5%AE%9A%E7%AC%A6%E2%80%94%E2%80%94CPP/" rel="prev" title="const限定符——CPP">
+                const限定符——CPP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#cpu%E8%B0%83%E5%BA%A6"><span class="nav-number">1.</span> <span class="nav-text">CPU调度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E7%94%9F%E6%97%B6%E5%88%BB"><span class="nav-number">1.1.</span> <span class="nav-text">发生时刻</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">调度方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5"><span class="nav-number">1.3.</span> <span class="nav-text">调度策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#first-come-first-served"><span class="nav-number">1.4.</span> <span class="nav-text">First come, First served</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shortest-job-first"><span class="nav-number">1.5.</span> <span class="nav-text">Shortest-Job-First</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#priority"><span class="nav-number">1.6.</span> <span class="nav-text">Priority</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E7%BA%A7%E8%8C%83%E5%9B%B4"><span class="nav-number">1.6.1.</span> <span class="nav-text">优先级范围</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#round-robin"><span class="nav-number">1.7.</span> <span class="nav-text">Round Robin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multilevel-queue"><span class="nav-number">1.8.</span> <span class="nav-text">Multilevel Queue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multilevel-feedback"><span class="nav-number">1.9.</span> <span class="nav-text">Multilevel Feedback</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

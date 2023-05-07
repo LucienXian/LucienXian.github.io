@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="AiSys," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="《UCB AI-Sys cs294》Required Reading 2 论文一 课程推荐的第一篇文章《SysML: The New Frontier of Machine Learning Systems》，这其实一个会议的白皮书，主要的研究方向是设计实现一类系统，来满足支持部署机器学习模型，这是一个计算机系统和机器学习交叉的会议。 白皮书里将机器学习系统遇到的问题分为两种：一种是高层次的问题，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《UCB cs294》Required Reading 2">
+<meta property="og:url" content="http://yoursite.com/2021/04/14/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-2/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="《UCB AI-Sys cs294》Required Reading 2 论文一 课程推荐的第一篇文章《SysML: The New Frontier of Machine Learning Systems》，这其实一个会议的白皮书，主要的研究方向是设计实现一类系统，来满足支持部署机器学习模型，这是一个计算机系统和机器学习交叉的会议。 白皮书里将机器学习系统遇到的问题分为两种：一种是高层次的问题，">
+<meta property="og:locale">
+<meta property="og:image" content="https://img.imgdb.cn/item/6075c41e8322e6675cebd742.png">
+<meta property="article:published_time" content="2021-04-13T16:16:18.000Z">
+<meta property="article:modified_time" content="2021-04-13T16:17:45.360Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="AiSys">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.imgdb.cn/item/6075c41e8322e6675cebd742.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/04/14/《UCB-cs294》Required-Reading-2/"/>
+
+
+
+
+
+  <title>《UCB cs294》Required Reading 2 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/14/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《UCB cs294》Required Reading 2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-14T00:16:18+08:00">
+                2021-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ucb-ai-sys-cs294required-reading-2">《UCB AI-Sys cs294》Required Reading 2</h1>
+<h2 id="论文一">论文一</h2>
+<p>课程推荐的第一篇文章《SysML: The New Frontier of Machine Learning Systems》，这其实一个会议的白皮书，主要的研究方向是设计实现一类系统，来满足支持部署机器学习模型，这是一个计算机系统和机器学习交叉的会议。</p>
+<p>白皮书里将机器学习系统遇到的问题分为两种：一种是高层次的问题，主要解决的是算法、接口的设计实现；另一种则是低层次问题，主要关注的是硬件、调度等底层优化。该文也仔细分析了机器学习系统中遇到的瓶颈，比如部署相关的设计、成本问题以及实用性是否合适。</p>
+<h2 id="论文二">论文二</h2>
+<p>第二篇论文是《A Few Useful Things to Know About Machine Learning》，这是一片机器学习领域的经典论文，总结了机器学习相关的12个重点实践，并以分类器来举例。</p>
+<ol type="1">
+<li>Learning = Representation + Evaluation + Optimization</li>
+</ol>
+<p>所有的机器学习算法都是由三个部分组成：</p>
+<ul>
+<li>Representation：表现数据的方式，比如用距离表现数据的knn、svm，用数表现数据的决策树；</li>
+<li>Evaluation：用来评估分类器好坏的函数；</li>
+<li>Optimization：用来搜索得分最高分类器的方法；</li>
+</ul>
+<ol start="2" type="1">
+<li>It’s Generalization that Counts</li>
+</ol>
+<p>泛化能力是很重要的，在使用分类器数据时，需要留出部分数据来做测试，避免过拟合。</p>
+<ol start="3" type="1">
+<li>Data Alone Is Not Enough</li>
+</ol>
+<p>将泛化能力作为一个指标，仅仅有数据是不够的，还需要大量的编程工作，例如选择合适的模型，合适的评估函数、损失函数。</p>
+<ol start="4" type="1">
+<li>Overfitting Has Many Faces</li>
+</ol>
+<p>过拟合有很多种，主要需要关注的是偏差和方差，偏差是指模型往着相同的错误方向训练，方差则是模型有学习随机信号的倾向。解决过拟合的方法一般有交叉验证、增加正则化项、进行类似卡方检验的统计显著性检验。</p>
+<ol start="5" type="1">
+<li>Intuition Fails in High Dimensions</li>
+</ol>
+<p>一般来说，特征维度越高，就更好表达数据，但也可以引发curse of dimensionality，即样本数量相对不足，难以覆盖其输入空间，并且也难以从直觉上找出不同类别样本之间的合理边界，最终导致bias和variance的增加。</p>
+<ol start="6" type="1">
+<li>Theoretical Guarantees Are Not What They Seem</li>
+</ol>
+<p>机器学习论文中充斥着理论保证，其存在的意义不仅在于作为评断实际决策的标准，还是设计算法的来源动力。但机器学习是一个复杂的工程，理论上可行不代表实践也是可行的。</p>
+<ol start="7" type="1">
+<li>Feature Engineering Is The Key</li>
+</ol>
+<p>这一点主要是将特征工程的重要性，机器学习不单单是构建数据跑一次就足够了，还需要有分析结果、根据结果修改数据集的迭代过程。</p>
+<ol start="8" type="1">
+<li>More Data Beats a Cleverer Algorithm</li>
+</ol>
+<p>数据量非常重要，数据量的增多会导致某些模型的表征能力也随之增强。</p>
+<ol start="9" type="1">
+<li>Learn Many Models, Not Just One</li>
+</ol>
+<p>机器学习中每个模型都有其适用范围，因此模型的集成如bagging、boosting、stacking等算法就会得到很好的结果。</p>
+<ol start="10" type="1">
+<li>Simplicity Does Not Imply Accuracy</li>
+</ol>
+<p>这里主要是Occam’s razor的一个修正，即简单的模型不一定就能很好避免过拟合或者得到很好的效果。</p>
+<ol start="11" type="1">
+<li>Representable Does Not Imply Learnable</li>
+</ol>
+<p>机器学习具备局限性，不是所有的模型都可以学习的。另外，如果评估函数在假设空间内具备多个局部最优点，模型可能会找不到最优函数。</p>
+<ol start="12" type="1">
+<li>Correlation Does Not Imply Causation</li>
+</ol>
+<p>机器学习只能发觉特征的相关性，但相关性并不等于因果性。</p>
+<h2 id="论文三">论文三</h2>
+<p>第三篇文章《A Berkeley View of Systems Challenges for AI》是伯克利从计算机系统对机器学习的支持中，总结出来的一篇文章。</p>
+<p>该文章将AI飞速发展的原因归结为：大数据、高扩展性的计算机系统和开源软件技术的流行。</p>
+<p>文章还提出了机器学习相关的趋势与挑战：</p>
+<ol type="1">
+<li>Mission-critical AI：人工智能开始设计一些与人类生命安全相关的领域，需要为这些机器学习任务设计更加稳定安全的决策；</li>
+<li>Personalized AI：提供更加个性化的人工智能系统，同时需要注意用户隐私安全；</li>
+<li>AI across organizations：每个机构、企业都有自己独特的数据，如何提供数据共享的机制，支持跨组织的人工智能系统，也是一个需要注意的挑战；</li>
+<li>AI demands outpacing the Moore’s Law：后摩尔定律时期的AI发展需要更加关注与人工智能适配的硬件架构与系统；</li>
+</ol>
+<p>接下来的介绍就是关于解决上述挑战亟需深入研究的方向：</p>
+<ol type="1">
+<li>Acting in dynamic environments：动态环境下的技术表现，人工智能需要在复杂性动态性更强的环境工作，能够应对突发的、不可预测的事件，并快速做出响应。这包括了Continual learning、Reinforcement learninig等系统的构建；作出更鲁棒的决策（Robust decisions）和可解释的决策（Explainable decisions）</li>
+<li>Secure AI：这里的安全分为两个部分，一是攻击影响系统作出决策的正确性、而是攻击者获取AI训练的影响数据、破解AI加密模型。这种方向包括了构建 Secure enclaves，提供一个安全的硬件执行环境；进行对抗学习避免推理阶段和训练阶段引入了恶意的数据；构建更安全的共享数据系统；</li>
+<li>AI-specic architectures：随着AI的发展，硬件系统架构的迭代显得越来越来重要。这包括了 Domain specic hardware，设计专用的硬件架构来提升系统性能和安全能力；Composable AI systems，为AI系统做定制的的模块化、组件化，进行模型的组合、操作行为的组合；Cloud-edge systems，设计合适的连接云端与边缘设备的AI系统，降低边缘设备的延时，充分利用云端的能力来提供更复杂的计算模型和高效的决策。</li>
+</ol>
+<p>下图就是上面四大趋势与九大研究方向的关联关系：</p>
+<p><img src="https://img.imgdb.cn/item/6075c41e8322e6675cebd742.png" /></p>
+<h2 id="总结">总结</h2>
+<p>这是这个课程的week2内容，主要是介绍了一些机器学习系统的研究方法和关注的趋势挑战。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AiSys/" rel="tag"># AiSys</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/03/20/Paxos-Made-Simple%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="next" title="Paxos Made Simple——论文阅读">
+                <i class="fa fa-chevron-left"></i> Paxos Made Simple——论文阅读
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/04/19/Macro-Free-in-C/" rel="prev" title="Macro Free in C++">
+                Macro Free in C++ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ucb-ai-sys-cs294required-reading-2"><span class="nav-number">1.</span> <span class="nav-text">《UCB AI-Sys cs294》Required Reading 2</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%B8%80"><span class="nav-number">1.1.</span> <span class="nav-text">论文一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%BA%8C"><span class="nav-number">1.2.</span> <span class="nav-text">论文二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%B8%89"><span class="nav-number">1.3.</span> <span class="nav-text">论文三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

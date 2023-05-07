@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Rvalue in C++ lvalue vs rvalue 在C中，判断是左值还是右值比较容易，赋值运算符的左边就是左值，右边就是右值。但在C++中不能这样一概而论。 What is lvalue 左值意味着其地址是可以访问的，即我们可以使用&amp;运算符去访问地址。例如： 1234int x &#x3D; 1;int *ptr &#x3D; &amp;x;int *ptr2 &#x3D; &amp;(x+1); &#x2F;&#x2F;Co">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rvalue in C++">
+<meta property="og:url" content="http://yoursite.com/2019/05/03/Rvalue-in-C/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Rvalue in C++ lvalue vs rvalue 在C中，判断是左值还是右值比较容易，赋值运算符的左边就是左值，右边就是右值。但在C++中不能这样一概而论。 What is lvalue 左值意味着其地址是可以访问的，即我们可以使用&amp;运算符去访问地址。例如： 1234int x &#x3D; 1;int *ptr &#x3D; &amp;x;int *ptr2 &#x3D; &amp;(x+1); &#x2F;&#x2F;Co">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-05-03T03:28:31.000Z">
+<meta property="article:modified_time" content="2019-05-03T03:28:47.814Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/03/Rvalue-in-C/"/>
+
+
+
+
+
+  <title>Rvalue in C++ | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/03/Rvalue-in-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Rvalue in C++</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-03T11:28:31+08:00">
+                2019-05-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="rvalue-in-c">Rvalue in C++</h1>
+<h2 id="lvalue-vs-rvalue">lvalue vs rvalue</h2>
+<p>在C中，判断是左值还是右值比较容易，赋值运算符的左边就是左值，右边就是右值。但在C++中不能这样一概而论。</p>
+<h3 id="what-is-lvalue">What is lvalue</h3>
+<p>左值意味着其地址是可以访问的，即我们可以使用&amp;运算符去访问地址。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="type">int</span> *ptr = &amp;x;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> *ptr2 = &amp;(x+<span class="number">1</span>); <span class="comment">//Compiler Error</span></span><br></pre></td></tr></table></figure>
+<p>因为(x+1)在这个表达式之后不能再生效，因此这不是左值而是一个右值。</p>
+<h3 id="what-is-rvalue">What is rvalue</h3>
+<p>非左值即为右值，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *ptr = &amp;(<span class="number">1</span>); <span class="comment">//Compiler Error, 1 is rvalue</span></span><br><span class="line"><span class="type">int</span> *ptr2 = &amp;(x+<span class="number">1</span>); <span class="comment">//Compiler Error, x+1 is rvalue</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">getData</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> *ptr = &amp;<span class="built_in">getData</span>(); <span class="comment">//Compiler Error</span></span><br></pre></td></tr></table></figure>
+<p>getData()是一个右值，在赋值之后这个临时值就失效了，里面的data是拷贝出来的，因此我们不能取其地址。</p>
+<h2 id="is-rvalue-immutable-in-c">Is rvalue immutable in C++</h2>
+<p>虽然我们不能获取右值的地址，但我们能根据右值的数据类型去修改其。</p>
+<h3 id="rvalues-of-builtin-data-type-is-immutable">rvalues of builtin data type is Immutable</h3>
+<p>我们无法修改内置的数据类型，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(x+<span class="number">7</span>) = <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">getData</span>() = <span class="number">9</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Both Compile Error</span></span><br></pre></td></tr></table></figure>
+<h3 id="rvalue-of-user-defined-data-type-is-not-immutable">rvalue of User Defined data type is not Immutable</h3>
+<p>如果右值是用户定义的数据类型，我们可以在同一个表达式中使用成员函数去修改右值：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">		<span class="type">int</span> mAge;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Person</span>() &#123;</span><br><span class="line">      	mAge = <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">incrementAge</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      	mAge = mAge + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="function">Person <span class="title">getPerson</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">Person</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">getPerson</span>().<span class="built_in">incrementAge</span>(); <span class="comment">// persist in single expression</span></span><br></pre></td></tr></table></figure>
+<h2 id="what-is-rvalue-reference-in-c11">What is rvalue reference in C++11</h2>
+<h3 id="lvalue-references">lvalue references</h3>
+<p>在C++11以前只有引用，即指向现存变量的别名。</p>
+<p>c++11将原来的引用变成了左值引用，只能引用左值：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="type">int</span> &amp; lvalueRef = x; <span class="comment">// lvalueRef is a lvalue reference</span></span><br><span class="line"><span class="type">int</span> &amp; lvalueRef2 = (x+<span class="number">1</span>); <span class="comment">// compile error</span></span><br></pre></td></tr></table></figure>
+<h3 id="rvalue-reference">rvalue Reference</h3>
+<p>右值引用是C++11引入的新特性：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> &amp;&amp; rvalueRef = (x+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> &amp; lvalueRef3 = <span class="built_in">getData</span>(); <span class="comment">// compile error</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> &amp; lvalueRef3 = <span class="built_in">getData</span>(); <span class="comment">// OK but its const</span></span><br><span class="line"><span class="type">int</span> &amp;&amp; rvalueRef2 = <span class="built_in">getData</span>();</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/02/packaged-task-Example-and-Tutorial/" rel="next" title="packaged_task<> Example and Tutorial">
+                <i class="fa fa-chevron-left"></i> packaged_task<> Example and Tutorial
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/04/Move-Contsructor-rvalue-References/" rel="prev" title="Move Contsructor & rvalue References">
+                Move Contsructor & rvalue References <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rvalue-in-c"><span class="nav-number">1.</span> <span class="nav-text">Rvalue in C++</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#lvalue-vs-rvalue"><span class="nav-number">1.1.</span> <span class="nav-text">lvalue vs rvalue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-lvalue"><span class="nav-number">1.1.1.</span> <span class="nav-text">What is lvalue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-rvalue"><span class="nav-number">1.1.2.</span> <span class="nav-text">What is rvalue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#is-rvalue-immutable-in-c"><span class="nav-number">1.2.</span> <span class="nav-text">Is rvalue immutable in C++</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalues-of-builtin-data-type-is-immutable"><span class="nav-number">1.2.1.</span> <span class="nav-text">rvalues of builtin data type is Immutable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalue-of-user-defined-data-type-is-not-immutable"><span class="nav-number">1.2.2.</span> <span class="nav-text">rvalue of User Defined data type is not Immutable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-rvalue-reference-in-c11"><span class="nav-number">1.3.</span> <span class="nav-text">What is rvalue reference in C++11</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lvalue-references"><span class="nav-number">1.3.1.</span> <span class="nav-text">lvalue references</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rvalue-reference"><span class="nav-number">1.3.2.</span> <span class="nav-text">rvalue Reference</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

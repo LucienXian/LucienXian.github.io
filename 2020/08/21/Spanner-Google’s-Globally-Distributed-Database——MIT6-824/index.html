@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="分布式," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Spanner: Google’s Globally-Distributed Database  Spanner是谷歌提出的一个可扩展、多版本、全球分布和支持同步复制的数据库。这是第一个在全球范围内分发数据并支持外部一致性的分布式系统  Introduction Spanner作为一个数据库，它由遍布全球的数据中心的许多Paxos状态机进行数据分片。Spanner会随着数据量或者服务器数量的变化自">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spanner: Google’s Globally-Distributed Database——MIT6-824">
+<meta property="og:url" content="http://yoursite.com/2020/08/21/Spanner-Google%E2%80%99s-Globally-Distributed-Database%E2%80%94%E2%80%94MIT6-824/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="Spanner: Google’s Globally-Distributed Database  Spanner是谷歌提出的一个可扩展、多版本、全球分布和支持同步复制的数据库。这是第一个在全球范围内分发数据并支持外部一致性的分布式系统  Introduction Spanner作为一个数据库，它由遍布全球的数据中心的许多Paxos状态机进行数据分片。Spanner会随着数据量或者服务器数量的变化自">
+<meta property="og:locale">
+<meta property="og:image" content="https://pic.downk.cc/item/5f15cfcd14195aa594670175.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5f17213614195aa594fd18a2.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5f1c387614195aa594c3a268.png">
+<meta property="article:published_time" content="2020-08-20T16:50:14.000Z">
+<meta property="article:modified_time" content="2020-08-20T16:51:30.071Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.downk.cc/item/5f15cfcd14195aa594670175.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/21/Spanner-Google’s-Globally-Distributed-Database——MIT6-824/"/>
+
+
+
+
+
+  <title>Spanner: Google’s Globally-Distributed Database——MIT6-824 | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/21/Spanner-Google%E2%80%99s-Globally-Distributed-Database%E2%80%94%E2%80%94MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spanner: Google’s Globally-Distributed Database——MIT6-824</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-21T00:50:14+08:00">
+                2020-08-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="spanner-googles-globally-distributed-database">Spanner: Google’s Globally-Distributed Database</h1>
+<blockquote>
+<p>Spanner是谷歌提出的一个可扩展、多版本、全球分布和支持同步复制的数据库。这是第一个在全球范围内分发数据并支持外部一致性的分布式系统</p>
+</blockquote>
+<h2 id="introduction">Introduction</h2>
+<p>Spanner作为一个数据库，它由遍布全球的数据中心的许多Paxos状态机进行数据分片。Spanner会随着数据量或者服务器数量的变化自动在计算机之间重新分片数据，并自动在计算机之间迁移数据。应用程序可以通过跨大洲复制数据的方式来使用Spanner实现高可用性。</p>
+<p>Spanner的主要重心在于管理跨数据中心的复制数据，但也花了不少时间在分布式系统架构上设计和实现重要的数据库功能。</p>
+<p>作为全球分布的数据库，Spanner提供了一些有趣的功能。应用程序可以细粒度动态地控制数据的复制配置，支持在数据中心透明地移动数据，平衡资源使用，也对外提供外部一致的读写等等。</p>
+<p>Spanner会为事务分配具有全局意义的提交时间戳，这里关键因素是新的TrueTime API及其实现。下面会重点介绍。</p>
+<h2 id="implementation">Implementation</h2>
+<p>本章主要介绍Spanner实现的基础架构和原理。然后描述了目录抽象，最后则是描述了数据模型。</p>
+<p>一个Spanner的部署被称为Universe，Spanner则被组织为一组区域，这是管理部署的单位和物理隔离的单位。下图描述了Spanner Universe的服务器，一个区域具有一个zone master和若干个spanserver，通过location proxy来定位提供服务的spannerver。universe master 和 placement driver则是一个单例，前者主要是一个控制台，后者则是定期与spanserver通信，以找出需要移动的数据。</p>
+<p><img src="https://pic.downk.cc/item/5f15cfcd14195aa594670175.png" /></p>
+<h3 id="spanserver-software-stack">Spanserver Software Stack</h3>
+<p>这一章主要讲spanserver的实现，软件架构如图所示，底部为每个spanserver负责的100-1000个称为tablet的数据结构，它实现了一组以下的的映射：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(key:string, timestamp:int64) → string</span><br></pre></td></tr></table></figure>
+<p>tablet的状态存储在一个类似B树的文件和一个预写日志中，所有这些都存在一个叫Colossus的组件里。</p>
+<p><img src="https://pic.downk.cc/item/5f17213614195aa594fd18a2.png" /></p>
+<p>为了支持复制，Spanserver都在每个tablet的顶部实现了Paxos状态机，用来存储其元数据和tablet的日志。这里的Paxos实现通过基于时间的leader租约来支持生命周期长的leader。Spanner的实现中会写两次Paxos日志，一次在tablet中，一次在Paxos日志里。</p>
+<p>在leader副本中，Spanserver会实现一个锁表来做并发控制，这包含了两阶段锁的状态，能将key的范围映射到锁的状态。需要同步的操作（例如事务性读取）会在锁表中获取锁；其余操作绕过锁表。</p>
+<p>另外，在leader副本中，spansever还实现了一个事务管理器来支持分布式事务。如果一个事物仅仅涉及到一个Paxos组，则可以绕过事务管理器。否则这些组的leader会协调执行两阶段提交。</p>
+<h3 id="directories-and-placement">Directories and Placement</h3>
+<p>在一系列键值映射的上层，Spanner 实现支持一个被称为“目录”的桶抽象，为包含公共前缀的连续键的集合。一个目录是数据放置的基本单位，同一个目录下的所有数据具有相同的副本配置。当数据在不同的paxos组间移动时，会进行逐个目录的移动。如下图所示：</p>
+<p><img src="https://pic.downk.cc/item/5f1c387614195aa594c3a268.png" /></p>
+<p>一个Paxos组包含了若干个目录，tablet不一定是一个行空间内按照字典顺序排序的分区，可以是行空间内的多个分区。Movedir 是一个后台任务，用来在不同的 Paxos 组之间转移目录，也可以用来为Paxos组增加或删除副本。</p>
+<p>一个目录也是应用可以指定的放置策略的最小单元，一个应用就可以控制数据的复制。例如，一个应用可能会在自己的目录里存储每个终端用户的数据，这就有可能使得用户 A 的数据在欧洲有三个副本，用户 B 的数据在北美有 5 个副本。</p>
+<p>当一个目录变得太大时，Spanner会进行分片存储。每个分片可能被保存到不同的Paxos组。Movedir在不同组之间不再是转移目录，而是转移分片。</p>
+<h3 id="data-model">Data Model</h3>
+<p>Spanner暴露给应用的数据特性包括了：基于模式化的半关系表数据模型，SQL类型的查询语言和通用事务。</p>
+<p>应用的数据模型是在被目录桶装的键值层之上，一个应用会在一个universe中创建若干个数据库，每个数据库可以包含无限的模式化表。每个表都和关系数据库表类似，具备行、列和版本值。</p>
+<h3 id="truetime">TrueTime</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TT.now()</td>
+<td>TTinterval: [earliest, latest]</td>
+</tr>
+<tr class="even">
+<td>TT.after(t)</td>
+<td>true if t has definitely passed</td>
+</tr>
+<tr class="odd">
+<td>TT.before(t)</td>
+<td>true if t has definitely not arrived</td>
+</tr>
+</tbody>
+</table>
+<p>本章主要讲TrueTime API，但更多的内容在另一篇论文里。上面的表列出了API的方法，TrueTime是一款高度可用的分布式时钟，面向所有Google服务器上的应用提供，会把时间表达成一个时间区间TTinterval，具有一个有限的时间不确定性。TT.now()方法会返回一个 TTinterval，它可以保证包含调用TT.now()方法时的绝对时间。</p>
+<p>在底层，TrueTime使用的时间是基于GPS和原子钟实现的，这两种类型的时间具有不同的失败模式。GPS的弱点是天线和接收器失效、局部电磁干扰等等。而由于频率误差，在经过很长的时间以后，原子钟也会产生明显误差。</p>
+<p>TrueTime是由每个数据中心里的许多time master机器和每个机器上的一个timeslave daemon实现的。大多数master都具备专门的相互隔离的GPS接收器，而剩余的master则会配置了原子钟。所有master的时间参考值会进行彼此校对，每个master也会交叉检查时间参考值和本地时间的比值，如果二者差别太大，就会把自己踢出去。</p>
+<p>每个daemon会从许多master中收集投票，获知时间参考值，根据确定的界限，来剔除本地时钟误差较大的机器。</p>
+<p>在同步期间，一个daemon会表现出逐渐增加的时间不确定性。ε是从应用的最差时钟漂移中得到的。ε取决于time master的不确定性，以及与time master之间的通讯延迟。论文提到的线上应用环境里，ε通常是一个关于时间的锯齿函数，在1到7ms之间变化。</p>
+<h2 id="concurrency-control">Concurrency Control</h2>
+<p>本章主要讲trueTime是如何保证并发控制的正确性，简单来说则是实现这样的特性：在时间戳为t的读操作，一定能看到在t时刻之前提交的事务。</p>
+<h3 id="timestamp-management">Timestamp Management</h3>
+<p>Spanner支持三种操作类型：读写事务、只读事务和快照读取。独立的写操作会被当作读写事务执行，而非快照的独立读取操作则会被当作只读事务执行。</p>
+<p>一个只读事务是不需要锁机制的，通过选取系统的时间戳来执行，不会阻塞后续到达的写操作。而快照读操作同样不需要锁机制。这两个都可以在任意足够新的副本上执行。</p>
+<h4 id="paxos-leader-leases">Paxos Leader Leases</h4>
+<p>Spanner的Paxos实现中通过时间化的租约，来确保长时间的leader角色（默认10s）。</p>
+<p>一个潜在的leader可以发起请求，请求时间化的租约投票，在收到一定数量的投票后，就可以确保自己拥有租约。另外，当一个副本成功完成一个写操作，会隐式延长自己的租约。而租约快要到期时，则会显式请求延长租约。leader的租约有一个时间区间，起点是收到指定数量投票的那一刻，终点则是由于租约过期而失去一定数量投票的那一刻。注意，每个Paxos leader的租约时间区间和其他leader的时间区间是完全隔离的。</p>
+<p>而Paxos leader的退位则可以通过将slave从投票集合中释放的方式来实现，一个leader必须等到TT.after(smax)是真才能发起退位。</p>
+<h4 id="assigning-timestamps-to-rw-transactions">Assigning Timestamps to RW Transactions</h4>
+<p>事务读写会采用两阶段锁协议，获得所有的锁之后，就可以给事务分配时间戳，这个时间戳是Paxos写操作的，代表了事务提交的时间。在每个Paxos组内，会以单调递增的方式分配时间戳，这个比较好实现。而对于跨越多个leader的情况，一个leader只能分配属于自己租约区间的时间戳。一旦时间戳s被分配，上面提到的smax会变成s。</p>
+<p>另外，Spanner也实现了外部一致性：如果一个事务T2在事务T1提交以后开始执行，那么事务T2的时间戳一定大于事务T1的时间戳。简单来说，写进去的数据能够立即被读到，在被修改之前，读到的数据都是一样的。</p>
+<h4 id="serving-reads-at-a-timestamp">Serving Reads at a Timestamp</h4>
+<p>上面提到的特性，可以使得spanner可以正确地确定副本是否足够新，每个副本会记录一个安全时间值Tsafe，表示副本最近更新后的最大时间，当读操作的时间戳t小于或等于Tsafe的时候，读操作就可以在这个副本上读取。</p>
+<h4 id="assigning-timestamps-to-ro-transactions">Assigning Timestamps to RO Transactions</h4>
+<p>只读事务会分成两个阶段执行：分配时间戳sread，然后按照sread的快照读去执行事务操作。在事务开始后的任意时刻，可以分配sread=TT.now().latese。由于Tsafe的存在，或者smax的变化，sread时刻的读操作有可能被阻塞。因为Spanner最好是分配一个可以保持外部一致性的最大时间戳。</p>
+<h3 id="details">Details</h3>
+<h4 id="read-write-transactions">Read-Write Transactions</h4>
+<p>Spanner的读写事务，客户端对位于合适位置的组内leader副本发起读操作时，会先获取读锁，然后读取最新的数据。当一个客户端完成了所有的读操作后，会在客户端缓存所有的写操作，开始两阶段提交。客户端选择一个协调组，并且发送提交信息给所有参与的协调者leader，同时发送信息给所有缓冲的写操作。</p>
+<p>每个参与其中的、非协调者leader会先获取写锁，然后选择一个合适的时间戳，并通过Paxos将准备提交记录写入日志。最后，这些leader会将自己的准备时间戳告诉协调者。</p>
+<p>此时，扮演协调者的leader也会先获取写锁，然后选择一个事务时间戳，这个时间戳s必须大于或等于从前面获取到的准备时间戳信息，并且应该大于TT.now().latest。这样，这个leader，就会通过Paxos写入一个提交记录到日志，然后开始commit wait，即该leader会一直等待到TT.after(s)为true，最后发送一个提交时间戳给客户端和所有参与的leader。</p>
+<p>每个参与的领导者会通过Paxos把事务结果写入日志。所有的参与者会在同一个时间戳进行提交，释放锁。</p>
+<h4 id="read-only-transactions">Read-Only Transactions</h4>
+<p>分配只读事务的时间戳存在三种方案：</p>
+<ul>
+<li>事务开始时，根据一个表达式确定事务参与者，然后这些参与者的Paxos组之间协调，根据各自的LastTS()进行协商选出一个合适的时间戳；</li>
+<li>对于在单个Paxos组上的读取，直接获取该Paxos组的最后提交的写操作的时间戳；</li>
+<li>TT.now().latest；</li>
+</ul>
+<p>通过选择一个合适的时间戳，然后在相应的节点确认不会发生读写冲突、不会有复制协议的落后的情况下，可以处理这个读请求了。</p>
+<h4 id="schema-change-transactions">Schema-Change Transactions</h4>
+<p>TrueTime允许Spanner支持原子模式变更。模式变更事务通常是一个标准事务的、非阻塞的变种。它会显式地分配注册一个未来的时间戳，由于读写操作都会依赖于模式，因此当它们的时间戳小于t时，读写操作就会执行到时刻t；大于t时，读写操作必须阻塞，在模式变更事务后进行等待。</p>
+<h2 id="总结">总结</h2>
+<p>Spanner的理论最大亮点还是trueTime，相当于用基于原子钟的时间戳当做版本号，提高数据库的并发效率。Spanner实现的是Multi-Paxos，会有一个long-live的leader，但Spanner对Paxos的实现提及不多。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/22/Object-Storage-on-CRAQ%E2%80%94%E2%80%94MIT6-824/" rel="next" title="Object Storage on CRAQ——MIT6.824">
+                <i class="fa fa-chevron-left"></i> Object Storage on CRAQ——MIT6.824
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/15/No-compromises-distributed-transactions-with-consistency-availability-and-performance%E2%80%94%E2%80%94MIT6-824-1/" rel="prev" title="No compromises distributed transactions with consistency, availability, and performance——MIT6-824">
+                No compromises distributed transactions with consistency, availability, and performance——MIT6-824 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#spanner-googles-globally-distributed-database"><span class="nav-number">1.</span> <span class="nav-text">Spanner: Google’s Globally-Distributed Database</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#implementation"><span class="nav-number">1.2.</span> <span class="nav-text">Implementation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#spanserver-software-stack"><span class="nav-number">1.2.1.</span> <span class="nav-text">Spanserver Software Stack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#directories-and-placement"><span class="nav-number">1.2.2.</span> <span class="nav-text">Directories and Placement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-model"><span class="nav-number">1.2.3.</span> <span class="nav-text">Data Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#truetime"><span class="nav-number">1.2.4.</span> <span class="nav-text">TrueTime</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#concurrency-control"><span class="nav-number">1.3.</span> <span class="nav-text">Concurrency Control</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#timestamp-management"><span class="nav-number">1.3.1.</span> <span class="nav-text">Timestamp Management</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#paxos-leader-leases"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">Paxos Leader Leases</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#assigning-timestamps-to-rw-transactions"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">Assigning Timestamps to RW Transactions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#serving-reads-at-a-timestamp"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">Serving Reads at a Timestamp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#assigning-timestamps-to-ro-transactions"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">Assigning Timestamps to RO Transactions</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#details"><span class="nav-number">1.3.2.</span> <span class="nav-text">Details</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#read-write-transactions"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">Read-Write Transactions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#read-only-transactions"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">Read-Only Transactions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#schema-change-transactions"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">Schema-Change Transactions</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
