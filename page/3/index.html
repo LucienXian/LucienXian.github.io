@@ -264,6 +264,178 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/20/Paxos-Made-Simple%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/03/20/Paxos-Made-Simple%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" itemprop="url">Paxos Made Simple——论文阅读</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-20T23:36:18+08:00">
+                2021-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Paxos-Made-Simple"><a href="#Paxos-Made-Simple" class="headerlink" title="Paxos Made Simple"></a>Paxos Made Simple</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>Paxos——一个用于实现容错的分布式系统算法，核心是一个一致性算法——“synod”算法。基本上是根据一个一致性算法所必需满足的条件而呈现出来的，完整的Paxos算法会通过作为应用到使用状态机的分布式系统中的一致性实现部分来得出。</p>
+<h2 id="The-Consensus-Algorithm"><a href="#The-Consensus-Algorithm" class="headerlink" title="The Consensus Algorithm"></a>The Consensus Algorithm</h2><h3 id="The-Problem"><a href="#The-Problem" class="headerlink" title="The Problem"></a>The Problem</h3><p>假设存在一个多进程集合，里面每个进程都可以发出提案，那么一致性算法需要保证一个值能够被选定，而且一旦一个值被选定，所有进程都需要能够获知选定值。</p>
+<p>一致性safety的要求就是：</p>
+<ul>
+<li>只有被提出的值能够被选定；</li>
+<li>只能有一个选定值；</li>
+<li>只有一致同意该值，才能周知给集合里的所有进程；</li>
+</ul>
+<p>这里主要关注算法的safety，而不会明确要求liveness。</p>
+<p>在该一致性算法中，有三种角色：proposers，acceptors和learners，实际实现中，一个独立的进程可以充当不止一种角色。论文的假设是基于传统的异步模型，而不是拜占庭问题模型。</p>
+<h3 id="Choosing-a-Value"><a href="#Choosing-a-Value" class="headerlink" title="Choosing a Value"></a>Choosing a Value</h3><p>该算法在提案过程主要包括下面几个步骤</p>
+<p>对于proposer：</p>
+<ul>
+<li>proposer选择一个新的提案编号n，然后向acceptors集合的每个成员发送请求，要求acceptors对请求作出响应：<ul>
+<li>a. 一个承诺，保证不再通过任何编号小于n的提案；</li>
+<li>b. 如果接受过其他提案的话，需要返回当前通过的编号小于n的最大编号提案；</li>
+</ul>
+</li>
+<li>如果proposer从大多数acceptors收到期待的响应，则可以接着提议一个编号为n并且值为v的提案，这里的v要么是自由选择一个值（所有的响应都没接收过任何的提案），要么是从上面b响应中选出最大编号的提案的值；</li>
+</ul>
+<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求， acceptor就可以接受编号为n的提案。</p>
+<p>总结起来，acceptor和proposer的算法操作可以分为两个阶段：</p>
+<ul>
+<li>阶段一</li>
+</ul>
+<p>a. proposer提出一个编号为n的提案，向大多数acceptors发送一个带有编号为n的prepare请求；</p>
+<p>b. 如果acceptors收到了该请求，并且n比它之前响应过的prepare请求编号都大，那么它就会对该请求作出响应，返回一个保证不再通过任何编号小于n的提案的承诺，以及如果存在的话，接受过的最大编号的提案；</p>
+<ul>
+<li>阶段二</li>
+</ul>
+<p>a. 如果proposer从大多数acceptors收到响应，则会提出一个accept请求，内容包括了编号n和值为v，其中v要么是自由选择一个的值，要么是从响应中选出最大编号的提案的值；</p>
+<p>b. 如果acceptors收到该accept请求，并且之前没有响应过大于编号n的prepare请求，那么它就会对接受该请求；</p>
+<h3 id="Learning-a-Chosen-Value"><a href="#Learning-a-Chosen-Value" class="headerlink" title="Learning a Chosen Value"></a>Learning a Chosen Value</h3><p>为了获取到选定的值，learner必须要找出某个以及被大多数acceptors接受的提案。如果是每个acceptors都将通过的提案告知所有的learners，那么通信次数等于两者个数乘积；如果是只告诉一个特定learner，虽然通信次数减少了，但可靠行也降低了；更一般情况是，将它们的通过提案信息发送给一个特定的learners集合，其中的每个learner都可以将该信息告知所有的learners。</p>
+<p>由于信息的丢失，learners可能无法确定一个值是否有一个大多数的acceptors通过了，为了确定选定的值，必须重新发起一次新的提案。</p>
+<h3 id="Progress"><a href="#Progress" class="headerlink" title="Progress"></a>Progress</h3><p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
+<p>为了保证progress的进行，必须选择一个特定proposer来作为唯一一个提议提案的。如果这个proposer可以和半数以上的acceptors通信，同时使用一个比现有通过编号都大的编号作为提案的话，就可以产生一个成功通过的提案。</p>
+<blockquote>
+<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that a reliable algorithm for electing a proposer must use either randomness or real time—for example, by using timeouts. However, safety is ensured regardless of the success or failure of the election.</p>
+</blockquote>
+<p>无论选举是否成功，proposer选举算法的安全性都是可以得到保证的。</p>
+<h3 id="The-Implementation"><a href="#The-Implementation" class="headerlink" title="The Implementation"></a>The Implementation</h3><p>Paxos算法假设了一个多进程网络，在该算法里，每个进程都扮演了proposer，acceptor及learner的角色。Paxos算法通过选定一个leader来扮演上面提到的特定learner和proposer。Paxos一致性算法就是上述所描述的，其中请求和响应都作为普通消息发送。acceptor在发出响应消息之前，会需要可靠性存储来记录信息。</p>
+<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase 1。</p>
+<h2 id="Implementing-a-State-Machine"><a href="#Implementing-a-State-Machine" class="headerlink" title="Implementing a State Machine"></a>Implementing a State Machine</h2><p>实现分布式系统的一种简单方式是由一组客户端向一个中央服务器发出命令请求，该服务器可以看作是一个按顺序执行客户端命令的状态机。但使用单个服务器的可用性较低，因此想到了可以使用一组服务器，每个服务器独立地实现同样的状态机，只要所有服务器都产生一致的状态和输出，那么发出命令的客户端就可以采用任意一个服务器的输出了。</p>
+<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i 个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
+<p>假设服务器的集合是固定的，一般情况下一个独立的服务器被选为了leader，它就会扮演特定的proposer角色，多个客户端发送命令到leader，leader会决定每个命令的顺序。假设存在某条命令的序号为135，那么它就会通过一致性算法的第135个实例来选定一个提案，这里的命令就是提案的值。这个提案可能成功也可能失败，失败的原因可能来自机器故障，或者是存在另一个服务器认为自己是leader，从而判断了135实例存在其他值。但该算法能够保证最多只有一个命令被选定。</p>
+<p>这个策略的关键在于，Paxos算法中被提出的值只有phase 2才能被选定。前面说过的，phase 1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
+<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase 1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase 2，选定135和140的命令。</p>
+<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的”noop”命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140 号命令就可以被执行了。</p>
+<p>由此1-140命令都被选定了，leader就可以继续往下推进所有大于140的实例了。</p>
+<p>接下来讲讲空缺的产生，leader可以在提出命令141被选定之前，先提出命令142，但发送的关于141的信息可能会全部丢失，因此其他服务器可能先知道了142命令的选定，而不知道选择了什么作为命令141。这就产生了空缺。</p>
+<p>由于 leader 的故障以及新 leader 的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase 2的成本。在所有的一致性算法中， paxos一致性算法的phase 2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
+<p>特殊情况下，leader选举失败，导致出现多个“疑似”的leader，但paxos算法的安全性仍然可以保证不会同时有两个命令被选为第i个状态机命令。</p>
+<p>如果服务器的集合是变化的，那么也存在某种方式来决定哪些服务器可以作为这个一致性算法的实力，论文提到的方式是通过状态机自身来实现，即当前的服务器集合作为状态的一部分，比如将在执行完第i个状态机命令后标识的服务器集合，作为一致性算法执行实例i+a的服务器集合。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/07/Better-I-O-Through-Byte-Addressable-Persistent-Memory%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2009,149 +2181,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/20/decltype-in-c-11/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/12/20/decltype-in-c-11/" itemprop="url">decltype in c++11</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-20T01:59:14+08:00">
-                2019-12-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="decltype"><a href="#decltype" class="headerlink" title="decltype"></a>decltype</h1><p>decltype是c++11引入的类型推导标记符，与auto类似。基本语法比较简单，就是给一个表达式，返回表达式的类型：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">decltype</span> ( expression )</span><br></pre></td></tr></table></figure>
-
-<p>这里只会查询表达式的返回类型，并不会对表达式进行求值。</p>
-<p>decltype的判断规则是比较复杂的，主要分为以下几类：</p>
-<ul>
-<li>如果参数是无括号的标识表达式或无括号的类成员访问表达式，decltype会返回以该表达式命名的实体类型。但如果参数是一个重载函数，则会编译错误；</li>
-<li>若参数是其他类型为 <code>T</code> 的任何表达式<ul>
-<li>表达式的值类型为临时值&#x2F;亡值，则会返回T&amp;&amp;；</li>
-<li>表达式的值类型为左值，则会参会T&amp;；</li>
-<li>纯右值，则会返回T；</li>
-</ul>
-</li>
-</ul>
-<p>需要注意的是，如果对象的名字带有括号，则它被当做通常的左值表达式，从而 decltype(x) 和 decltype((x)) 通常是不同的类型。</p>
-<p>举个简单的例子：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> &#123; <span class="type">double</span> x; &#125;;</span><br><span class="line"><span class="type">const</span> A* a;</span><br><span class="line"><span class="type">int</span> i=<span class="number">10</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(a-&gt;x) y;       <span class="comment">// y 的类型是 double（其声明类型）</span></span><br><span class="line"><span class="keyword">decltype</span>((a-&gt;x)) z = y; <span class="comment">// z 的类型是 const double&amp;（被当作左值表达式）</span></span><br><span class="line"><span class="keyword">decltype</span>((i))b = i;   	<span class="comment">// b 的类型是 int&amp;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者用在无名函数的类型推导上</span></span><br><span class="line"><span class="keyword">auto</span> f = [](<span class="type">int</span> a, <span class="type">int</span> b) -&gt; <span class="type">int</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> a * b;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">decltype</span>(f) g = f; </span><br><span class="line">i = <span class="built_in">f</span>(<span class="number">2</span>, <span class="number">2</span>);</span><br><span class="line">j = <span class="built_in">g</span>(<span class="number">3</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
-
-<p>在日常编程中，用到decltype的情况还是比较少的，我们一般用在模版中，结合auto和尾返回类型，我们可以写出语言级别支持的简洁代码：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">foo</span><span class="params">(T t, U u)</span> -&gt; <span class="title">decltype</span><span class="params">(t + u)</span> </span>&#123; <span class="keyword">return</span> t + u; &#125;</span><br></pre></td></tr></table></figure>
-
-<p>另外，要判断是否为左值，可以考虑使用c++11标准库提供的模版类来做检查：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">is_lvalue_reference&lt;<span class="keyword">decltype</span>(++i)&gt;::value;</span><br></pre></td></tr></table></figure>
-
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2202,7 +2231,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">266</span>
+                <span class="site-state-item-count">267</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2215,7 +2244,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-count">29</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

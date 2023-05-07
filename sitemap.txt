@@ -1,3 +1,4 @@
+http://yoursite.com/2023/05/07/MIT18-06S-1-4%E7%AC%94%E8%AE%B0/
 http://yoursite.com/2023/03/06/Cloud-Native-Transactions-and-Analytics-in-SingleStore/
 http://yoursite.com/2022/11/16/Building-a-Fast-and-Efficient-LSM-tree-Store-by-Integrating-Local-Storage-with-Cloud-Storage/
 http://yoursite.com/2022/04/03/The-RocksDB-Experience/
@@ -294,3 +295,4 @@ http://yoursite.com/tags/DeepLearning/
 http://yoursite.com/tags/AiSys/
 http://yoursite.com/tags/Blockchain/
 http://yoursite.com/tags/Interview/
+http://yoursite.com/tags/Math/
