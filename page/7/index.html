@@ -264,6 +264,153 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/01/std-async-Tutorial-Example/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/01/std-async-Tutorial-Example/" itemprop="url">std::async Tutorial & Example</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-01T14:12:04+08:00">
+                2019-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="stdasync-tutorial-example">std::async Tutorial &amp;
+Example</h1>
+<p>本文将介绍在C++11中如何执行异步任务。</p>
+<h2 id="what-is-stdasync">what is std::async()</h2>
+<p>std::async()是一个函数模版，可以接收一个回调作为参数，并异步执行该函数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Fn</span>, <span class="keyword">class</span>... Args&gt;</span><br><span class="line">future&lt;<span class="keyword">typename</span> result_of&lt;<span class="built_in">Fn</span>(Args...)&gt;::type&gt; <span class="built_in">async</span> (launch policy, Fn&amp;&amp; fn, Args&amp;&amp;... args);</span><br></pre></td></tr></table></figure>
+<p>返回值是一个future对象，该对象存着异步执行的函数的返回值。</p>
+<p>第一个参数launch
+policy是一个启动策略，它控制着异步执行的行为，我们可以创建三种异步启动的策略：</p>
+<ul>
+<li>std::launch::async：传递进来的函数在独立的线程中执行；</li>
+<li>std::launch::deferred：只有某个线程对future对象调用get()的时候才会调用函数；</li>
+<li>std::launch::async | std::launch::deferred：默认行为；</li>
+</ul>
+<p>我们可以传递以下的回调到std::async中：</p>
+<ul>
+<li>函数指针；</li>
+<li>函数对象；</li>
+<li>lambda函数；</li>
+</ul>
+<p>假设这样的一个场景，异步调用函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;std::string&gt; resultFromDB = std::<span class="built_in">async</span>(std::launch::async, fetchDataFromDB, <span class="string">&quot;Data&quot;</span>);</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Do Some Stuff </span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//Fetch Data from DB</span></span><br><span class="line"><span class="comment">// Will block till data is available in future&lt;std::string&gt; object.</span></span><br><span class="line">std::string dbData = resultFromDB.<span class="built_in">get</span>();</span><br></pre></td></tr></table></figure>
+<p>std::async()的行为如下：</p>
+<ol type="1">
+<li>自动创建一个线程或者从线程池中获取一个，还会有创建一个promise对象；</li>
+<li>然后将promise对象传递进线程，并返回future对象；</li>
+<li>当传递进的参数，即函数退出时，它的返回值会被promise对象给设置进去；</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/30/std-future-std-promise-and-Returning-values-from-Thread/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1577,134 +1724,6 @@ threads</h2>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/17/C-11-Lambda-Capturing-Member-Variables/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/17/C-11-Lambda-Capturing-Member-Variables/" itemprop="url">C++11 Lambda: Capturing Member Variables</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-17T10:34:04+08:00">
-                2019-04-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="c11-lambda-capturing-member-variables">C++11 Lambda : Capturing
-Member Variables</h1>
-<p>本文将介绍如下从外部域捕获成员变量，假设有一个OddCounter类，在其成员函数中使用lambda函数，并需要捕获成员变量：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">OddCounter</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// tracks the count of odd numbers encountered</span></span><br><span class="line">	<span class="type">int</span> mCounter = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="type">int</span> <span class="title">getCount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> mCounter;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">(std::vector&lt;<span class="type">int</span>&gt; &amp; vec)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="comment">// Capturing member variable by value will not work</span></span><br><span class="line">                <span class="comment">// Will result in Compile Error</span></span><br><span class="line">		std::for_each(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>(), [mCounter](<span class="type">int</span> element)&#123;</span><br><span class="line">			<span class="keyword">if</span>(element % <span class="number">2</span>)</span><br><span class="line">				mCounter++; <span class="comment">// Accessing member variable from outer scope</span></span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>这种做法无论是将成员变量传值还是传引用都会出现编译错误。</p>
-<h2 id="capturing-member-variables-inside-lambda-function">Capturing
-Member variables inside Lambda Function</h2>
-<p>理想的做法是传递this指针的值，这样就可以访问外部成员变量了。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::for_each(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>(), [<span class="keyword">this</span>](<span class="type">int</span> element)&#123;</span><br><span class="line"><span class="comment">//....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1755,7 +1774,7 @@ Member variables inside Lambda Function</h2>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-count">268</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

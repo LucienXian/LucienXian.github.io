@@ -264,6 +264,197 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/CPU%E8%B0%83%E5%BA%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/14/CPU%E8%B0%83%E5%BA%A6/" itemprop="url">CPU调度</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T11:37:40+08:00">
+                2017-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="cpu调度">CPU调度</h1>
+<blockquote>
+<p>一般来说，CPU调度==处理机调度==进程调度</p>
+</blockquote>
+<h2 id="发生时刻">发生时刻</h2>
+<ul>
+<li>running to waiting</li>
+<li>running to ready</li>
+<li>waiting to ready</li>
+<li>terminates</li>
+</ul>
+<h2 id="调度方式">调度方式</h2>
+<ul>
+<li>抢占式：一旦给某个进程分配完cpu就让该进程进行下去；</li>
+<li>非抢占式：当一个进程在运行中，系统基于某种原则，剥夺分配给该进程的CPU；</li>
+</ul>
+<h2 id="调度策略">调度策略</h2>
+<p>先来看几个指标，这几个指标可以用来判断调度策略优劣的：</p>
+<blockquote>
+<p>Throughput(吞吐量)：单位时间内进程完成的数量；</p>
+<p>Turnaround
+time(周转时间)：执行一个进程花费的时间(从进入就绪队列到完成 Termination
+time - Arrival time)；</p>
+<p>Waiting time：一个进程在ready队列中等待的时间；</p>
+<p>Response
+time：从进程提出请求道首次被响应的时间（不包括执行完成）；</p>
+</blockquote>
+<h2 id="first-come-first-served">First come, First served</h2>
+<p>非抢占式的，根据它们的到达时间，系统维一个FIFO的进程列表；</p>
+<h2 id="shortest-job-first">Shortest-Job-First</h2>
+<p>系统在ready queue中，优先选择那些CPU burst time最少的进程。</p>
+<p>这种调度策略分为抢占式和非抢占式两种，抢占式的没什么好说，非抢占式的：当一个新的需要更少CPU
+burst time的进程到达时，CPU便会重新分配。</p>
+<p>SJF还有一种变形，即highest response ration
+next（等待时间+要求执行时间/要求执行时间）</p>
+<h2 id="priority">Priority</h2>
+<p>同样，优先级策略也分为抢占式和非抢占式两种。</p>
+<p>这种调度策略会导致一个非常严重的问题——<strong>starvation</strong>，优先级低的进程可能一直无法被执行。为了解决这个问题，我们可以采取动态优先级的策略，随着时间推移，我们提升某些进程的优先级。</p>
+<h3 id="优先级范围">优先级范围</h3>
+<ul>
+<li>windows的线程
+<ul>
+<li>windows的每一个线程都有优先级，范围是0-31，0最低，31最高；</li>
+</ul></li>
+<li>linux的进程
+<ul>
+<li>linux的进程范围是-20-19，值越小，优先级越高。通常情况下，linux的进程优先级是由父进程继承而来，通常是0；</li>
+<li>nice值反映了进程优先级；</li>
+<li>我们可以通过<strong>nice</strong>命令来对一个将要执行的命令进程nice值；通过<strong>renice</strong>重新设置nice值；</li>
+</ul></li>
+</ul>
+<h2 id="round-robin">Round Robin</h2>
+<p>这是一种抢占式的策略，给队列里的每个进程分配相同的时间片，无论进程是否执行完，当时间懂啊了都切换到下一个进程。</p>
+<blockquote>
+<p>当时间片Q太大时，就变成了FIFO；</p>
+<p>当Q太小，但不能小到切换上下文的花费比Q还小时；</p>
+</blockquote>
+<p>这种策略的turnaround time会比SJF更高，因为SJF选择的是更低burst
+time，避免等待时间增多；但response
+time会更少，因为它的切换频率更快，使得响应更快；</p>
+<h2 id="multilevel-queue">Multilevel Queue</h2>
+<p>分配进程到多个队列中，每个队列使用不同的调度算法：</p>
+<p>前台交互式(foreground)——RR</p>
+<p>后台批处理(background)——FCFS</p>
+<h2 id="multilevel-feedback">Multilevel Feedback</h2>
+<p>这是一种动态的调度策略，该策略需要定义以下这些部分：</p>
+<blockquote>
+<p>队列个数；</p>
+<p>每个队列的调度算法；</p>
+<p>更新队列所属队列的方法；</p>
+<p>提升或降低进程优先级的方法；</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/13/volatile%E9%99%90%E5%AE%9A%E7%AC%A6%E2%80%94%E2%80%94CPP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1741,205 +1932,6 @@ policy，这个策略用来被channel其它成员去接受，认可；</li>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/01/%E5%9F%BA%E4%BA%8Eopengl%E7%BB%98%E5%88%B6%E4%BA%94%E6%98%9F%E7%BA%A2%E6%97%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/01/%E5%9F%BA%E4%BA%8Eopengl%E7%BB%98%E5%88%B6%E4%BA%94%E6%98%9F%E7%BA%A2%E6%97%97/" itemprop="url">基于opengl绘制五星红旗</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-01T17:16:05+08:00">
-                2017-10-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="基于opengl绘制五星红旗">基于opengl绘制五星红旗</h1>
-<blockquote>
-<p>趁着今天是国庆，就更新一下绘制五星红旗的博文吧~祖国万岁</p>
-</blockquote>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/flag.png" alt="flag" />
-<figcaption aria-hidden="true">flag</figcaption>
-</figure>
-<h2 id="操作步骤">操作步骤</h2>
-<h3 id="确定绘制方法">确定绘制方法</h3>
-<p>这个实验分为两步，第一步是画出旗面，第二则是根据五角星的位置，画出大小、角度不同的三角形；根据《国旗法》要求，国旗长宽比为3:2，这个画起来难度不大，我们将旗面四个点的位置坐标设置为<strong>(-0.9,0.6)，(0.9,
-0.6)，(0.9,-0.6)，(-0.9, -0.6)</strong>。接下来关键是画五角星。</p>
-<p>我们来看一下，绘制图形所使用的函数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">WINGDIAPI <span class="type">void</span> APIENTRY <span class="title">glVertex3f</span> <span class="params">(GLfloat x, GLfloat y, GLfloat z)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>由于该函数只能绘制凸多边形，因此我们选择的绘制方法是，将五角星分成多个扇形三角形，然后顺时针逐个绘制三角形，这样能方便我们循环完成，如图：</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/star1.png" alt="star1" />
-<figcaption aria-hidden="true">star1</figcaption>
-</figure>
-<h3 id="计算相关参数">计算相关参数</h3>
-<p>首先是得到各五角星中点的位置，首先是将国旗分为四个小长方形，大五角星的位置为<strong>左五右十，上五下五</strong>，其它各个中心点如图：</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/xy1.png" alt="xy" />
-<figcaption aria-hidden="true">xy</figcaption>
-</figure>
-<h3 id="绘制三角形">绘制三角形</h3>
-<p>根据上面确定的绘制方法，我们需要将五角星分为十个扇形三角形，因此要绘制每个三角形，我们只需要三个参数——中心点，长半径的顶点，短半径的顶点，如图：</p>
-<p>根据几何计算，这两个角大小分别为18°和36°</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/t.png" alt="tan" />
-<figcaption aria-hidden="true">tan</figcaption>
-</figure>
-<p>因此要画出某一个的三角形，必须要得知中心点和其中的一个顶点。然后根据这两个点计算出长半径和短半径，如图，黑线代表长半径R，蓝线代表短半径r；</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/star2.png" alt="star2" />
-<figcaption aria-hidden="true">star2</figcaption>
-</figure>
-<ul>
-<li>首先根据两点之间的距离公式计算出长半径R；</li>
-<li>由以上的角度可以计算出：</li>
-</ul>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/consin1.png" alt="sincos" />
-<figcaption aria-hidden="true">sincos</figcaption>
-</figure>
-<p>接下来，由于我们每个三角形已知的参数中心点和长半径顶点的坐标（也就是已知第一条长半径的旋转角度），因此我们需要据此计算出短半径的坐标位置:</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/sincos.png" alt="sincos" />
-<figcaption aria-hidden="true">sincos</figcaption>
-</figure>
-<p>而我们又可以得知两边的夹角为36°，因此只需要将将36°带入β中即可求出下一条边的旋转角，如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tempC = cos1*cos36 - sin1*sin36;</span><br><span class="line">tempS = sin1*cos36 + cos1*sin36;</span><br></pre></td></tr></table></figure>
-<p>再根据旋转角和长度利用级坐标公式求出x和y的坐标值<strong>(其中midx和midy是五角星中点坐标)</strong>
-：</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/nwdd.png" alt="nwdd" />
-<figcaption aria-hidden="true">nwdd</figcaption>
-</figure>
-<p>代码如下</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">0</span>) &#123; <span class="comment">//偶数下标是外顶点</span></span><br><span class="line">	point[i][<span class="number">0</span>] = l_length*tempC + midx;</span><br><span class="line">	point[i][<span class="number">1</span>] = l_length*tempS + midy;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123; <span class="comment">//奇数下标是内顶点</span></span><br><span class="line">	point[i][<span class="number">0</span>] = s_length*tempC + midx;</span><br><span class="line">	point[i][<span class="number">1</span>] = s_length*tempS + midy;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="绘制红旗和五角星">绘制红旗和五角星</h3>
-<p>样例代码已经可以绘制出红旗，因此只需要将绘制五角星的过程封装成函数，并传入相关参数即可：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.60</span>, <span class="number">0.30</span>, <span class="number">-0.60</span>, <span class="number">0.48</span>); </span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.48</span>, <span class="number">-0.24</span>, <span class="number">0.48</span>);</span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.36</span>, <span class="number">-0.24</span>, <span class="number">0.36</span>);</span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.18</span>, <span class="number">-0.18</span>, <span class="number">0.24</span>);</span><br><span class="line"><span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.06</span>, <span class="number">-0.24</span>, <span class="number">0.06</span>);</span><br></pre></td></tr></table></figure>
-<p>并且，在函数中确定绘制颜色为黄色，绘制形状为三角形；</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">glColor3f</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">glBegin</span>(GL_TRIANGLE_FAN);</span><br></pre></td></tr></table></figure>
-<h2 id="实验数据记录和处理">实验数据记录和处理</h2>
-<p>五星红旗的四个坐标点分别为(-0.9,0.6)，(0.9, 0.6)，(0.9,-0.6)，(-0.9,
--0.6)；</p>
-<p>五角星中最大的一个坐标为(-0.60, 0.30)，其余四个分别为(-0.30,
-0.48),(-0.18, 0.36), (-0.18, 0.18), (-0.30, 0.06)</p>
-<h2 id="实验结果与分析">实验结果与分析</h2>
-<h3 id="绘制结果">绘制结果</h3>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/res.png" alt="res" />
-<figcaption aria-hidden="true">res</figcaption>
-</figure>
-<h3 id="完整代码">完整代码</h3>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;gl/glut.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;math.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> GLfloat PI = <span class="number">3.1415926f</span>;</span><br><span class="line"><span class="type">const</span> GLfloat cos36 = <span class="built_in">cos</span>(PI*<span class="number">0.2</span>);</span><br><span class="line"><span class="type">const</span> GLfloat sin36 = <span class="built_in">sin</span>(PI*<span class="number">0.2</span>);</span><br><span class="line"><span class="type">const</span> GLfloat cos72 = <span class="built_in">cos</span>(PI*<span class="number">0.4</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">DrawStar</span><span class="params">(GLfloat midx, GLfloat midy, GLfloat vx, GLfloat vy)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	GLfloat point[<span class="number">11</span>][<span class="number">2</span>]; <span class="comment">//存下所有顶点的位置</span></span><br><span class="line">	GLfloat l_length = <span class="built_in">sqrt</span>((midx - vx)*(midx - vx) + (midy - vy)*(midy - vy));<span class="comment">//计算出顶点长半径的长度</span></span><br><span class="line">	GLfloat s_length = l_length * cos72 / cos36;<span class="comment">//计算出顶点短半径的长度</span></span><br><span class="line">	GLfloat cos1 = (vx - midx) / l_length; <span class="comment">//计算出第一个外接顶点与中心点的三角函数值</span></span><br><span class="line">	GLfloat sin1 = (vy - midy) / l_length;</span><br><span class="line"></span><br><span class="line">	GLfloat tempC, tempS;</span><br><span class="line">	point[<span class="number">0</span>][<span class="number">0</span>] = vx, point[<span class="number">0</span>][<span class="number">1</span>] = vy;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; <span class="number">11</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		tempC = cos1*cos36 - sin1*sin36;</span><br><span class="line">		tempS = sin1*cos36 + cos1*sin36;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">0</span>) &#123; <span class="comment">//偶数下标是外顶点</span></span><br><span class="line">			point[i][<span class="number">0</span>] = l_length*tempC + midx;</span><br><span class="line">			point[i][<span class="number">1</span>] = l_length*tempS + midy;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123; <span class="comment">//奇数下标是内顶点</span></span><br><span class="line">			point[i][<span class="number">0</span>] = s_length*tempC + midx;</span><br><span class="line">			point[i][<span class="number">1</span>] = s_length*tempS + midy;</span><br><span class="line">		&#125;</span><br><span class="line">		cos1 = tempC;</span><br><span class="line">		sin1 = tempS;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glColor3f</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="built_in">glBegin</span>(GL_TRIANGLE_FAN);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(midx, midy, <span class="number">0.5</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">11</span>; i++)</span><br><span class="line">		<span class="built_in">glVertex3f</span>(point[i][<span class="number">0</span>], point[i][<span class="number">1</span>], <span class="number">0.5</span>); <span class="comment">//绘制三角形</span></span><br><span class="line">	<span class="built_in">glEnd</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">glClear</span>(GL_COLOR_BUFFER_BIT);</span><br><span class="line">	<span class="built_in">glColor3f</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="built_in">glBegin</span>(GL_QUADS);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">-0.9</span>, <span class="number">0.6</span>, <span class="number">0.5</span>);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">0.9</span>, <span class="number">0.6</span>, <span class="number">0.5</span>);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">0.9</span>, <span class="number">-0.6</span>, <span class="number">0.5</span>);</span><br><span class="line">	<span class="built_in">glVertex3f</span>(<span class="number">-0.9</span>, <span class="number">-0.6</span>, <span class="number">0.5</span>); <span class="comment">//旗面长宽比为3：2</span></span><br><span class="line">	<span class="built_in">glEnd</span>();</span><br><span class="line"></span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.60</span>, <span class="number">0.30</span>, <span class="number">-0.60</span>, <span class="number">0.48</span>); </span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.48</span>, <span class="number">-0.24</span>, <span class="number">0.48</span>);</span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.36</span>, <span class="number">-0.24</span>, <span class="number">0.36</span>);</span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.18</span>, <span class="number">0.18</span>, <span class="number">-0.18</span>, <span class="number">0.24</span>);</span><br><span class="line">	<span class="built_in">DrawStar</span>(<span class="number">-0.30</span>, <span class="number">0.06</span>, <span class="number">-0.24</span>, <span class="number">0.06</span>);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glutSwapBuffers</span>(); <span class="comment">//交换缓冲区</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span> <span class="params">(<span class="type">int</span> argc,  <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">glutInit</span>(&amp;argc,argv);</span><br><span class="line">	<span class="built_in">glutInitDisplayMode</span>(GLUT_RGB | GLUT_DOUBLE);</span><br><span class="line">	<span class="built_in">glutInitWindowPosition</span>(<span class="number">10</span>, <span class="number">10</span>);</span><br><span class="line">	<span class="built_in">glutInitWindowSize</span>(<span class="number">400</span>, <span class="number">300</span>);</span><br><span class="line">	<span class="built_in">glutCreateWindow</span>(<span class="string">&quot;National Flag&quot;</span>);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glutDisplayFunc</span>(display);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">glutMainLoop</span>();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="心得">心得</h2>
-<p>这是第一个图形学实验，让我好好回顾了一下三角函数的公式，总体花的时间不是特别多。其中犯的比较大的错误是在计算下一个顶点的旋转角的三角函数时，我没有替代原来的变量，而是在一次循环中直接在计算出正弦角后马上将新的正弦角带入计算余弦角，最后画出了一个不成形的五角星。好在最后找到了这个bug并成功修复。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1990,7 +1982,7 @@ policy，这个策略用来被channel其它成员去接受，认可；</li>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-count">268</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

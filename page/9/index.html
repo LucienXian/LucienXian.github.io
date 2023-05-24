@@ -264,6 +264,293 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/27/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%B8%80-%E2%80%94%E2%80%94MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/27/In-Search-of-an-Understandable-Consensus-Algorithm-%E4%B8%80-%E2%80%94%E2%80%94MIT6-824/" itemprop="url">In Search of an Understandable Consensus Algorithm<一>——MIT6.824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-27T20:33:49+08:00">
+                2019-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="in-search-of-an-understandable-consensus-algorithm">In Search of
+an Understandable Consensus Algorithm<一></h1>
+<h2 id="简介">简介</h2>
+<p>Raft是用于管理复制日志的一致性算法，但由于与paxos结构不同，raft更加容易被理解。</p>
+<h2 id="introduction">Introduction</h2>
+<p>共识算法可以使得一组机器作为一个工作组，在某些成员故障时仍然能很好地运行。</p>
+<p>raft算法有几点创新点：</p>
+<ul>
+<li>Strong leader：例如所有日志都只能从该leader流向其它服务器；</li>
+<li>Leader election：Raft使用随机的定时器来选举leader；</li>
+<li>Membership
+changes：raft更改集群中服务器集的机制，使用了一种新的共识算法，两种不同配置的机器允许在转换期间重叠；</li>
+</ul>
+<h2 id="replicated-state-machines">Replicated state machines</h2>
+<p>共识算法通常出现在复制状态机的上下文中，通过复制日志实现，如下图，每个服务器都存储着一些列命令的日志，状态机按顺序执行，由于状态机时确定性的，因此每个都计算出相同的状态和输出序列。</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/Replicated_state_machine_arch.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>保障复制日志的一致性是一致性算法的工作。服务器的共识模块从客户端接受命令并将其添加到日志中。正确复制命令后，每个服务器的状态机按日志顺序处理它们，并将输出返回给客户端。</p>
+<p>生产系统的共识算法具备以下特点：</p>
+<ul>
+<li>safety：永远不返回不正确的结果，包括网络延迟，分区和数据包丢失，重复和重新排序；</li>
+<li>只要大多数服务器都可以运行并且可以与客户和客户进行通信，它们就可以正常运行（可用）；</li>
+<li>不依赖于时间来确保日志的一致性；</li>
+<li>在通常情况下，只要大多数群集响应了RPC，命令就可以完成；</li>
+</ul>
+<h2 id="the-raft-consensus-algorithm">The Raft consensus algorithm</h2>
+<p>下图简洁地总结了raft算法：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_sum.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>raft通过选举一个leader来实现共识，然后让该leader负责管理复制的日志。leader可能会与服务器断开连接，这时需要选出新的leader。</p>
+<h3 id="raft-basic">raft basic</h3>
+<p>raft集群中包含多个服务器，在任意时间内，每个服务器都处于以下三种状态之一：leader、follower、candidate。一般情况下，只有一个leader，其它都是follower。follower不会自发请求，而是响应leader和candidate的请求，leader处理所有来自client的请求（即便client私自联系了follower，也会被重定向到leader）。以下是状态转换图：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_server_states.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>raft将时间划分为任意长度，如下图：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_terms.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>term是一个逻辑时钟，采用连续的整数编号。每个term都以选举开始，如果有candidate成为了leader，那么它将成为在剩下的term时间内成为leader。raft保障在一个term内最多只有一个leader。</p>
+<p>不同的服务器可以在不同的时间观察term之间的转换，每个服务器都有一个当前的term编号，并且随着时间单调递增。服务器间通信时交换当前term。如果一个服务器的当前term小于另一个服务器的当前term，则它将其当前term更新为更大的值。
+如果候选人或领导者发现其term已过期，则会立即变成到follower的状态。
+如果服务器收到带有过期term的请求，它将拒绝该请求。</p>
+<p>Raft服务器使用远程过程调用（RPC）进行通信。RequestVote
+RPCs由candidate在选举期间启动，Append-Entries
+RPCs由leader发起，用来复制日志条目并提供心跳形式。</p>
+<h3 id="leader-election">Leader election</h3>
+<p>raft使用心跳机制出发leader选举，leader向所有follower定期发送heartbeat(log
+entry为空的appendEntries
+RPC)。如果follower在选举超时的一定时间内没有收到任何联系，则会假定没有leader并开始重新选举。</p>
+<p>在开始选举时，follower会增加当前的term，并切换到candidate状态，然后它会给自己投上一票，并向所有其它server发送RequestVote
+RPC。candidate接下来会遇到以下三种情况：</p>
+<ul>
+<li>它赢得了选举；</li>
+<li>有其他服务器成为了leader；</li>
+<li>一段时间内没有选出leader；</li>
+</ul>
+<p>如果candidate在相同的期限内收到来自完整集群中大多数服务器的投票，则candidate将赢得选举。每个服务器将按照first-come-first-served的规则对给定期限内的一个候选人进行投票。一旦赢得选举，它会向所有其它服务器发送heartbeat，以确定自己的身份并阻止后续选举。</p>
+<p>在等待投票时，candidate可能会从另外的服务器上收到声称自己的是leader的AppendEntries
+RPC，这时会比较term，如果当前term小于RPC的term，则会视为合法，并返回follower状态。否则会拒绝RPC并保持candidate状态。</p>
+<p>第三种情况是由于出现了许多的candidate，使得投票分割，以便没有candidate获得多数票。这样每个candidate会超时并开始一个新的选举，增加其term。但是，如果不采取额外措施，分割票数可能会无限期重复。</p>
+<p>raft使用随机选举超时的机制来避免分割投票，从固定的范围内随机选择时间(150-300ms)选择一个时间作为选举超时，使得在大多数情况下只有一台服务器会超时，它会赢得选举并在其他服务器超时之前发送heartbeat。同理，这样可以解决分割投票的问题，每个candidate在重新选举时重启并选择随机选举超时，这减少了新选举时另一次分割投票的可能性。</p>
+<h3 id="log-replication">Log replication</h3>
+<p>在leader选举完毕之后，就开始为client请求提供服务，client把这些命令提供给状态机，leader则把命令作为新的条目添加到日志中，并通过<strong>AppendEntries
+RPC</strong>并行地发送到每个其它的服务器以复制条目。如果发送失败/包丢失/follower崩溃，leader会无限重试。</p>
+<p>日志的组织结构如下，每个条目都有一个term编号：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_logs_entries.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>Raft保证提交的条目是持久的，并最终由所有可用的状态机执行。一旦创建条目的领导者将其复制到大多数服务器上（例如，上图中的条目7），就会提交日志条目。并且还会提交leader日志中的所有前面的日志。</p>
+<p>Log Matching属性：</p>
+<ul>
+<li>如果不同日志中的两个条目具有相同的index和term，则它们存储相同的命令。</li>
+<li>如果不同日志中的两个条目具有相同的index和term，则所有前面的条目中的日志相同。</li>
+</ul>
+<p>第一个属性是基于leader在给定的term中最多创建一个具有给定日志索引的条目，并永远不会更改其在日志中的位置；第二个属性由AppendEntries执行的简单一致性检查保证。发送AppendEntries
+RPC时，leader在其日志中加入紧接在新条目之前的条目的索引和term。如果follower找不到相同索引和term的条目，则拒绝新日志条目。</p>
+<p>正常情况下，leader和follower保持着一致的日志，但也有可能出现日志不一致的情况，比如旧leader可能不提交日志，如下：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_log_eorr_scenarios.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>为了解决这种情况。raft会让leader通过强制follower的日志复制自己的日志来覆盖处理。</p>
+<p>要使得follower的日志与leader保持一致，leader必须找到共同的最新日志条目，在该店之后删除follower日志中的所有条目，然后往follower发送这之后的所有在leader上存在的日志。所有这些操作都是在响应AppendEntries
+RPC执行的一致性检查时发生的。leader为每个follower维护一个nextIndex，这是leader将发送给follower的下一个日志条目的索引。leader选举出来后，所有的nextIndex会被初始化到其日志中最后一个之后的索引（上图中的11）。如果不一致，RPC将会失败，拒绝后，leader会减少nextIndex，知道RPC成功。</p>
+<blockquote>
+<p>当然也可以做优化，减少AppendEntries
+RPC，则follower可以发送冲突条目的term和它为该term存储的第一个索引。这样就是一个term一次RPC。</p>
+</blockquote>
+<p>该机制使得leader在选举出来后，无需采取额外的操作恢复日志，而是正常运行，并且由于RPC自动收敛日志。Leader
+Append-Only，leader永远不会覆盖或者删除自己的日志。</p>
+<h3 id="safety">Safety</h3>
+<p>当leader提交多个日志时，follower可能崩溃了，这时新的leader会用新的日志条目覆盖原来的那些日志，导致不同的状态机可能执行不同的命令序列。</p>
+<h4 id="election-restriction">Election restriction</h4>
+<p>在基于leader的一致性算法中，leader最终会存储所有提交的日志条目，raft通过保证先前term的所有已提交的日志条目从其选举时出现在每个新leader身上，这意味着日志只会从了leader流向follower，leader之间不会覆盖日志。</p>
+<p>如果candidate的日志中没有与大多机器的日志保持着最新，raft会使用投票来阻止candidate赢得选举。RequestVote
+RPC实现了这一限制：RPC包含有关候选人日志的信息，如果其自己的日志比候选者的日志更新，则选民拒绝其投票。</p>
+<p>通过比较日志中最后一个条目的索引和术语，Raft确定两个日志中哪一个更新。如果日志包含具有不同term的最后一个条目，则具有较晚term的日志为新的。如果日志以相同的term结束，则索引更大的日志是新的。</p>
+<h4 id="committing-entries-from-previous-terms">Committing entries from
+previous terms</h4>
+<p>一个leader不能立马对之前term的log
+entry是否复制到大多数server来判断其是否已被提交。下图就是这样一个例子：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_log_time_seq.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>在c中，term2的日志已经在大多数server中了，但如果此时leader S1
+crash的话，在d这种情况下，term2的日志会被新leader S5给重写。</p>
+<p>为了消除这种情况，raft不会通过副本数来commit之前的log
+entries。只有当前term的log entries才会通过计算副本数被commit。</p>
+<h4 id="safety-argument">Safety argument</h4>
+<p>现在来证明Leader Completeness Property。</p>
+<p>假设leader在term T 提交了一个当前term的log entry，但是这个log
+entry在随后的term没有被leader保存。term U是大于term
+T的最小的term，并且term U的leader没有包含这个log entry。</p>
+<ol type="1">
+<li>在选举时leader
+U的日志中一定没有提交该条目（leader永远不会删除或覆盖条目）</li>
+<li>leaderT复制了大多数机器的条目，leaderU从集群的大多数群体中获得了投票。因此，至少一个服务器（“voter”）接受了来自leaderT的条目并投票给了leaderU；这个voter就是矛盾的关键；</li>
+<li>voter必须在给leader U投票之前收到了被leader
+T提交的entry。否则它会拒绝来自leader
+T的AppendEntries请求，因为它当前的term比T的高；</li>
+<li>当voter投票给leader
+U的时候，它仍然保存着这个entry，这中间的所有leader都会包含了这个条目；</li>
+<li>voter将票投给了leader U，所以leader
+U的log必须和voter至少是一样新的。这就导致了两个矛盾；</li>
+</ol>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/raft_leader_completeness.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h3 id="follower-and-candidate-crashes">Follower and candidate
+crashes</h3>
+<p>相对leader失败，follower和candidate的crash更容易被处理，而且都是通过重试来完成，这是因为raft的RPC都是幂等的。</p>
+<h3 id="timing-and-availability">Timing and availability</h3>
+<p>我们对raft的一个要求是安全性不能取决于时间安排，而可用性(系统及时对客户端作出响应的能力)则必然取决于时间。选举leader就体现了时间的重要性，只要系统满足以下的时间要求，就能保持稳定的leader：
+<span class="math display">\[
+broadcastTime &lt;&lt; electionTimeout &lt;&lt; MTBF
+\]</span></p>
+<ul>
+<li>broadcastTime：每个服务器发送RPC并接受响应的平均时间；</li>
+<li>electionTimeout：选举超时；</li>
+<li>MTBF：单个服务器的平均故障间隔时间；</li>
+</ul>
+<p>broadcastTime和MTBF都是底层系统的属性，而选举超时则是我们设计的。broadcastTime可能在0.5ms到20ms之间，选举超时可能介于10毫秒到500毫秒之间。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/24/The-Design-for-Practical-System-for-FT-Virtual-Machines%E2%80%94%E2%80%94MIT6-824/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2224,139 +2511,6 @@ T，T是类型参数的下界。在这种情况下，写入是有效的，因为
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/14/%E4%B8%8D%E8%A6%81%E4%BD%BF%E7%94%A8%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/14/%E4%B8%8D%E8%A6%81%E4%BD%BF%E7%94%A8%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B/" itemprop="url">不要使用原始类型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-14T23:17:37+08:00">
-                2019-02-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="不要使用原始类型">不要使用原始类型</h1>
-<h2 id="概述">概述</h2>
-<p>首先，泛型类和接口都被成为泛型类型。每个泛型类都定义了一组参数化的类型，例如List&lt;Strimg&gt;就是一个参数化的类型。另外，每个泛型类型都定义了一个原始类型，即List&lt;E&gt;对应的原始类型是List，它的主要目的是为了兼容那些在泛型出现之前写的代码。</p>
-<h2 id="原始类型的问题">原始类型的问题</h2>
-<p>对于Java9，这样声明仍然是合法的：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// My stamp collection. Contains only Stamp instances.</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="type">Collection</span> <span class="variable">stamps</span> <span class="operator">=</span> ... ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">Iterator</span> <span class="variable">i</span> <span class="operator">=</span> stamps.iterator(); i.hasNext(); ) ｛</span><br><span class="line">    <span class="type">Stamp</span> <span class="variable">stamp</span> <span class="operator">=</span> (Stamp) i.next(); <span class="comment">// Throws ClassCastException</span></span><br><span class="line">    stamp.cancel();</span><br><span class="line">｝</span><br></pre></td></tr></table></figure>
-<p>并且如果你往集合里添加了一个其它的对象，仍然可以编译运行，最多是得到一个warning。在你尝试获取到Coin对象之前都不会出现错误。</p>
-<p>使用了泛型方法后，编译器就知道集合只会包括Stamp实例这一点，插入不合法对象时，也会生成编译时错误：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Collection&lt;Stamp&gt; stamps = ... ;</span><br></pre></td></tr></table></figure>
-<p><strong>你使用了原始类型，你将会失去泛型所带来的安全性和可读性。</strong>以原始类型List和参数化类型List&lt;Object&gt;之间的区别为例，前者不接受类型系统的检查，而后者则显示地告诉编译器它可以接受任意类型的对象。</p>
-<p>如果使用参数化类型以允许插入任意对象，我们应该使用List&lt;Object&gt;；而对于元素类型未知而且不在乎元素类型的集合，更安全的方式是使用无限制通配符类型List&lt;?&gt;。无法将任意元素（null除外）放入一个Collection&lt;?&gt;。试图这么做的化将产生编译时错误。</p>
-<h2 id="例外">例外</h2>
-<p>对于不能使用原始类型这个规则，有两个例外：一是在类字面值中使用原始类型，例如List.class,
-int.class；二是与instanceof有关，因为泛型类型信息在运行时是被擦除了的，所以在参数化类型而不是无限制通配符类型上用instanceof操作符是非法的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2407,7 +2561,7 @@ int.class；二是与instanceof有关，因为泛型类型信息在运行时是�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">267</span>
+                <span class="site-state-item-count">268</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
