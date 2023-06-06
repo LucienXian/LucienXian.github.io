@@ -264,6 +264,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/30/std-array/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/30/std-array/" itemprop="url">std::array</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-30T13:09:44+08:00">
+                2019-05-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="stdarray">std::array</h1>
+<p>std::array是在c++11中引入的，对原来C语言的数组的一个包装器，具有额外的优点。这是一种具有恒定大小元素的顺序容器。</p>
+<p>其模版为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt; <span class="keyword">class</span> <span class="title class_">T</span>, <span class="type">size_t</span> N &gt; </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">array</span>;</span><br></pre></td></tr></table></figure>
+<p>T为元素类型，N为数组元素的个数。</p>
+<p>头文件为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;array&gt;</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="defining-and-initializing-an-stdarray-object">Defining and
+Initializing an std::array&lt;&gt; object</h2>
+<p>举两个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::array&lt;std::string, 200&gt; arr1;</span><br><span class="line">std::array&lt;<span class="type">int</span>, 10&gt; arr3 = &#123; <span class="number">34</span>, <span class="number">45</span> &#125;;<span class="comment">//Init: 34 , 45 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,</span></span><br></pre></td></tr></table></figure>
+<p>std::array还提供了一个方法可以一次性对所有的元素设置相同的值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::array&lt;<span class="type">int</span>, 10&gt; arr4;</span><br><span class="line"><span class="comment">// Fill all elements in array with same value</span></span><br><span class="line">arr4.<span class="built_in">fill</span>(<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="how-to-get-the-size-of-stdarray">How to get the size of
+std::array</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr.<span class="built_in">size</span>();</span><br></pre></td></tr></table></figure>
+<h2 id="how-to-access-elements-in-stdarray">How to access elements in
+std::array</h2>
+<ul>
+<li><strong>operator []</strong>：访问超出范围的元素时会引起undefined
+behaviour；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = arr[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>at()</strong>：访问超出范围的元素时会抛出<strong>out_of_range</strong>异常；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = arr.<span class="built_in">at</span>(<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>std::tuple’s
+get&lt;&gt;()</strong>：访问超出范围的元素时会编译错误；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = std::<span class="built_in">get</span>&lt;<span class="number">2</span>&gt;(arr);</span><br></pre></td></tr></table></figure>
+<h2 id="how-to-iterate-over-a-stdarray-object">How to Iterate over a
+std::array&lt;&gt; object</h2>
+<p>对array的遍历，存在四种方法：</p>
+<ul>
+<li>使用基于范围的迭代循环；</li>
+<li>使用循环；</li>
+<li>使用迭代器；</li>
+<li>使用for_each；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/28/weak-ptr-unique-ptr/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1782,152 +1942,6 @@ C++11</h2>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/02/packaged-task-Example-and-Tutorial/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/02/packaged-task-Example-and-Tutorial/" itemprop="url">packaged_task<> Example and Tutorial</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-02T18:33:38+08:00">
-                2019-05-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="packaged_task-example-and-tutorial">packaged_task&lt;&gt;
-Example and Tutorial</h1>
-<p>本文将主要讨论std::packagded_task的特性和使用</p>
-<h2 id="stdpackaged_task">std::packaged_task&lt;&gt;</h2>
-<p>std::packaged_task&lt;&gt;是一个代表异步任务的类模版，它包括两部分：</p>
-<ul>
-<li>一个可调用的实体。例如函数、lambda函数或者函数对象；</li>
-<li>一个存储着返回值的共享状态或者由相关回调抛出的异常；</li>
-</ul>
-<h2 id="need-of-stdpackaged_task">Need of
-std::packaged_task&lt;&gt;</h2>
-<p>假设我们想利用以下的函数从DB中获取数据：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">getDataFromDB</span><span class="params">( std::string token)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// Do some stuff to fetch the data</span></span><br><span class="line">	std::string data = <span class="string">&quot;Data fetched from DB by Filter :: &quot;</span> + token;</span><br><span class="line">	<span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>一种方法是使用前面提及的，在函数中传递std::promise&lt;&gt;对象。</p>
-<p>另一种方法就是使用std::packaged_task&lt;&gt;</p>
-<h2
-id="using-packaged_task-with-function-to-create-asynchronous-tasks">Using
-packaged_task&lt;&gt; with function to create Asynchronous tasks</h2>
-<p>当std::packaged_task&lt;&gt;在独立的线程上调用时，它会调用相关的回调并把返回值存储到内部的共享状态里。这些值可以在其它线程或者main函数里通过future对象访问。</p>
-<p>以上面的函数为例，我们可以创建一个packaged_task对象。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::packaged_task&lt;<span class="title">std::string</span> <span class="params">(std::string)</span>&gt; <span class="title">task</span><span class="params">(getDataFromDB)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>然后在将std::packaged_task传递进线程之前，先从中获取future对象。由于std::packaged_task是不可以拷贝的，因此需要用move。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;std::string&gt; result = task.<span class="built_in">get_future</span>();</span><br><span class="line"><span class="function">std::thread <span class="title">th</span><span class="params">(std::move(task), <span class="string">&quot;Arg&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>当此函数返回值时，std ::
-packaged_task&lt;&gt;将其设置为关联的共享状态，getDataFromDB()返回的结果或异常最终会在相关的future对象中可用。</p>
-<p>main函数阻塞调用：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string data =  result.<span class="built_in">get</span>();</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1978,7 +1992,7 @@ packaged_task&lt;&gt;将其设置为关联的共享状态，getDataFromDB()返�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">268</span>
+                <span class="site-state-item-count">269</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

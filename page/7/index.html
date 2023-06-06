@@ -264,6 +264,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/02/packaged-task-Example-and-Tutorial/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/02/packaged-task-Example-and-Tutorial/" itemprop="url">packaged_task<> Example and Tutorial</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-02T18:33:38+08:00">
+                2019-05-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="packaged_task-example-and-tutorial">packaged_task&lt;&gt;
+Example and Tutorial</h1>
+<p>本文将主要讨论std::packagded_task的特性和使用</p>
+<h2 id="stdpackaged_task">std::packaged_task&lt;&gt;</h2>
+<p>std::packaged_task&lt;&gt;是一个代表异步任务的类模版，它包括两部分：</p>
+<ul>
+<li>一个可调用的实体。例如函数、lambda函数或者函数对象；</li>
+<li>一个存储着返回值的共享状态或者由相关回调抛出的异常；</li>
+</ul>
+<h2 id="need-of-stdpackaged_task">Need of
+std::packaged_task&lt;&gt;</h2>
+<p>假设我们想利用以下的函数从DB中获取数据：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">getDataFromDB</span><span class="params">( std::string token)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// Do some stuff to fetch the data</span></span><br><span class="line">	std::string data = <span class="string">&quot;Data fetched from DB by Filter :: &quot;</span> + token;</span><br><span class="line">	<span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一种方法是使用前面提及的，在函数中传递std::promise&lt;&gt;对象。</p>
+<p>另一种方法就是使用std::packaged_task&lt;&gt;</p>
+<h2
+id="using-packaged_task-with-function-to-create-asynchronous-tasks">Using
+packaged_task&lt;&gt; with function to create Asynchronous tasks</h2>
+<p>当std::packaged_task&lt;&gt;在独立的线程上调用时，它会调用相关的回调并把返回值存储到内部的共享状态里。这些值可以在其它线程或者main函数里通过future对象访问。</p>
+<p>以上面的函数为例，我们可以创建一个packaged_task对象。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::packaged_task&lt;<span class="title">std::string</span> <span class="params">(std::string)</span>&gt; <span class="title">task</span><span class="params">(getDataFromDB)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>然后在将std::packaged_task传递进线程之前，先从中获取future对象。由于std::packaged_task是不可以拷贝的，因此需要用move。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;std::string&gt; result = task.<span class="built_in">get_future</span>();</span><br><span class="line"><span class="function">std::thread <span class="title">th</span><span class="params">(std::move(task), <span class="string">&quot;Arg&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>当此函数返回值时，std ::
+packaged_task&lt;&gt;将其设置为关联的共享状态，getDataFromDB()返回的结果或异常最终会在相关的future对象中可用。</p>
+<p>main函数阻塞调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string data =  result.<span class="built_in">get</span>();</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/01/std-async-Tutorial-Example/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1577,153 +1723,6 @@ with associated executing thread</strong></h3>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/18/Multithreading-Three-Ways-to-Create-Threads/" itemprop="url">Multithreading Three Ways to Create Threads</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-18T11:14:15+08:00">
-                2019-04-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1
-id="c11-multithreading-part-1-three-different-ways-to-create-threads">C++11
-Multithreading – Part 1 : Three Different ways to Create Threads</h1>
-<h2 id="thread-creation-in-c11">Thread Creation in C++11</h2>
-<p>每个C++应用中都存在一个默认的主线程——main()函数。在C++11中，我们可以通过创建std::thread的对象类创建额外的线程。头文件为：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br></pre></td></tr></table></figure>
-<h2 id="what-stdthread-accepts-in-constructor">What std::thread accepts
-in constructor ?</h2>
-<p>我们可以为std::thread对象附上一个callback，在线程开始时执行，这些callbacks可以是：</p>
-<ol type="1">
-<li>Function Pointer</li>
-<li>Function Objects</li>
-<li>Lambda functions</li>
-</ol>
-<p>调用方式如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">theObj</span><span class="params">(&lt;CALLBACK&gt;)</span></span></span><br></pre></td></tr></table></figure>
-<p>新的线程会在对象创建出来之后开始运行，并且会并行地执行传递进来的回调。此外，任何线程都可以通过调用该线程对象上的join()函数来等待另一个线程退出。</p>
-<p>让我们来看看三种不同的回调机制：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">thread_function</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="function">std::thread <span class="title">threadObj</span><span class="params">(thread_function)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DisplayThread</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="function">std::thread <span class="title">threadObj</span><span class="params">(DisplayThread())</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">threadObj</span><span class="params">([]&#123;...&#125;)</span></span>;</span><br></pre></td></tr></table></figure>
-<h2 id="differentiating-between-threads">Differentiating between
-threads</h2>
-<p>每个std::thread对象都有一个关联的ID。</p>
-<p>以下成员函数给出了关联的线程对象ID：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::thread::<span class="built_in">get_id</span>()</span><br></pre></td></tr></table></figure>
-<p>要得到当前线程的ID，可以通过：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::this_thread::<span class="built_in">get_id</span>()</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1774,7 +1773,7 @@ threads</h2>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">268</span>
+                <span class="site-state-item-count">269</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

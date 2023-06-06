@@ -264,6 +264,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/21/Effective-cpp-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/21/Effective-cpp-4/" itemprop="url">Effective-cpp-4</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-21T23:54:30+08:00">
+                2017-11-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="make-sure-that-objects-are-initialized-before-theyre-used">Make
+sure that objects are initialized before they're used</h1>
+<h2 id="尽量使用member-initialization-list">尽量使用member
+initialization list</h2>
+<ul>
+<li>如果只是在构造函数体内进行赋值，非内置类型会在<strong>default</strong>构造函数中先被初始化</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">myClass</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="built_in">myClass</span>(std::string&amp; address, std::list&lt;myClass&gt;&amp; l)&#123;</span><br><span class="line">      addr = address;<span class="comment">//只是赋值，早在默认构造函数已经被初始化</span></span><br><span class="line">      list = l;</span><br><span class="line">  	&#125;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  	std::string addr;</span><br><span class="line">  	std::list&lt;myClass&gt; list;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果使用member initialization
+list，会更加高效，避免了内置类型进行结果相同的初始化和赋值；而且member
+initialization list也能通过默认构造函数初始化成员变量；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">myClass::<span class="built_in">myClass</span>()</span><br><span class="line">	:<span class="built_in">addr</span>(),</span><br><span class="line">	 <span class="built_in">list</span>()</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>C++的成员初始化次序是固定
+<ul>
+<li>base class-&gt; derived class</li>
+<li>class的成员变量按照声明次序初始化；</li>
+</ul></li>
+</ul>
+<h2 id="不同编译单元的non-local-static对象">不同编译单元的non-local
+static对象</h2>
+<ul>
+<li>这个问题的起源是C++不保证不同的编译单元的初始化次序。</li>
+<li>例如</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//file1.cpp</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileSystem</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="function">std::<span class="type">size_t</span> <span class="title">numDisks</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">extern</span> FileSystem tfs;</span><br><span class="line"></span><br><span class="line"><span class="comment">//file2.cpp</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Dir</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	<span class="built_in">Dir</span>(params)&#123;</span><br><span class="line">  		std::<span class="type">size_t</span> disks = tfs.<span class="built_in">numDisks</span>();</span><br><span class="line">  	&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在这种情况，倘若tfs在tempDir初始化并没有完成初始化，这样就会出现问题；</li>
+</ul>
+<p>为了解决这个问题，我们采取singleton模式，把每个non-local
+static放到专属函数中。以local static对象替代non-local
+static对象。因为C++保证一个local
+static对象会在函数调用期间/首次遇到该对象被定义时进行初始化。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">FileSystem&amp; <span class="title">tfs</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="type">static</span> FileSystem fs;</span><br><span class="line">  <span class="keyword">return</span> fs;</span><br><span class="line">&#125;<span class="comment">//第一行是定义并初始化一个对象，第二行是返回该对象的引用。</span></span><br><span class="line"><span class="comment">//而且如果函数被反复调用，可以声明为inline</span></span><br></pre></td></tr></table></figure>
+<h2 id="建议">建议</h2>
+<ul>
+<li>构造函数最好使用member initialization list；</li>
+<li>以local static对象替代non-local
+static对象，保证跨编译单元的对象初始化；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/Effective-cpp-3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1575,153 +1736,6 @@ delete；</p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/const%E9%99%90%E5%AE%9A%E7%AC%A6%E2%80%94%E2%80%94CPP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/14/const%E9%99%90%E5%AE%9A%E7%AC%A6%E2%80%94%E2%80%94CPP/" itemprop="url">const限定符——CPP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T11:39:03+08:00">
-                2017-11-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="const限定符">const限定符</h1>
-<blockquote>
-<p>编译器会找到所有const对象，将常量值做替换。</p>
-</blockquote>
-<h2 id="作用域">作用域</h2>
-<ul>
-<li>默认情况下，const只在本文件内有效，因为这样编译器在做替换时才能访问到初始值，因此每个文件都必须要有定义。而为了避免重命名，const对象只在本文件内有效；</li>
-<li>如果想要在多文件内共享变量，则用extern限定；</li>
-</ul>
-<h2 id="引用">引用</h2>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> a = <span class="number">1024</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> &amp;b = a;<span class="comment">//正确</span></span><br><span class="line">b = <span class="number">42</span>;<span class="comment">//错误，不能通过引用修改常量</span></span><br><span class="line"><span class="type">int</span> &amp;c = a;<span class="comment">//错误，不能将让非常量引用指向常量</span></span><br><span class="line"><span class="type">double</span> doub = <span class="number">3.14</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> &amp;d = doub;<span class="comment">//初始化时，允许将一个非常量做为初始值，此时绑定的是一个临时的常量，因此不允许非常量引用时强制转换；</span></span><br><span class="line"><span class="comment">//const int temp = b;</span></span><br><span class="line"><span class="comment">//const int &amp;d = temp;</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>常量引用非常量，只是不能通过该常量去修改非常量的值；但如果有其他途径修改非常量的值也是可以的。</p>
-</blockquote>
-<h2 id="指针">指针</h2>
-<ul>
-<li>要想存放常量的地址，只能使用指向常量的指针；</li>
-<li>但指向常量的指针不一定指向常量，跟引用一样，可以通过其它方式修改指向的值；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> errNum = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> *<span class="type">const</span> curErr = &amp;errNum;<span class="comment">//常量指针，将一直指向errNum</span></span><br><span class="line"><span class="type">const</span> <span class="type">double</span> pi = <span class="number">3.14</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">double</span> *<span class="type">const</span> pip = &amp;pi;<span class="comment">//指向常量对象的常量指针</span></span><br></pre></td></tr></table></figure>
-<h2 id="函数中使用const">函数中使用const</h2>
-<h3 id="函数参数">函数参数</h3>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(<span class="type">const</span> <span class="type">int</span> var)</span></span>;<span class="comment">//无意义,传过来的参数不可以改变，但var本身就是实参；</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(<span class="type">const</span> <span class="type">int</span>* var)</span></span>;<span class="comment">//参数指针所指的内容；</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(<span class="type">int</span> *<span class="type">const</span> var)</span></span>;<span class="comment">//无意义，传过来的指针不可变，同1</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(<span class="type">const</span> Class&amp; Var)</span></span>; <span class="comment">//引用参数在函数内不可以改变，通常情况下，这种用法避免建立副本，在提高效率的同时禁止对引用对象修改；</span></span><br></pre></td></tr></table></figure>
-<h3 id="函数返回值">函数返回值</h3>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">const</span> <span class="type">int</span> <span class="title">fun1</span><span class="params">()</span></span>;<span class="comment">//无意义</span></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">int</span> *<span class="title">fun2</span><span class="params">()</span> <span class="comment">//调用时 const int *pValue = fun2(); </span></span></span><br><span class="line"><span class="function"><span class="type">int</span>* <span class="type">const</span> <span class="title">fun3</span><span class="params">()</span>   <span class="comment">//调用时 int * const pValue = fun2(); </span></span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>跟参数的用法基本相同，除了重载运算符，其它情况下不建议将返回值设为const，因为这样对象就不能对成员进行赋值操作；</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1772,7 +1786,7 @@ delete；</p>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">268</span>
+                <span class="site-state-item-count">269</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

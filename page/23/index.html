@@ -264,6 +264,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/10/Bridge-DesignPattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/10/Bridge-DesignPattern/" itemprop="url">Bridge(DesignPattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-10T23:40:30+08:00">
+                2017-12-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="bridge">Bridge</h1>
+<h2 id="目的">目的</h2>
+<p>将抽象部分与它的实现部分分离，使得它们都可以独立地完成变化</p>
+<h2 id="动机">动机</h2>
+<p>当一个抽象对象有多个实现时，通常的实现方式是通过继承来构造。但在某些情况下，子类的实现可能会不够灵活，出现大量重复的代码，也很难对其进行独立的修改。例如有一个公路1，公路2类，和一个角色A、B类，我们需要实现的实例是A在公路1，A在公路2等四个组合方式。但其出现了大量冗余，因为它们的动作是重复的。这时我们可以使用桥接的方式来构造它们。</p>
+<h2 id="使用范围">使用范围</h2>
+<ul>
+<li>不希望在抽象和它的实现部分有有一个固定的绑定关系，甚至乎，我希望能够在程序运行时动态地切换实现部分</li>
+<li>希望对不同的抽象接口和实现部分进行组合</li>
+<li>对一个抽象的修改不会影响客户</li>
+</ul>
+<h2 id="效果">效果</h2>
+<ul>
+<li>由于接口和实现是独立的，因此可以分离接口及其实现部分</li>
+<li>提高可扩充性，由于抽象和实现是独立的，我可以在两个层次做扩充，但不会影响客户</li>
+<li>隐藏实现细节，客户无需知道内部具体的实现细节</li>
+</ul>
+<h2 id="代码示例">代码示例</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bridge.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã¡£</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Implementor</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">virtual</span> ~<span class="built_in">Implementor</span>() &#123;&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="built_in">Implementor</span>() &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteImplementor</span> : <span class="keyword">public</span> Implementor &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		std::cout &lt;&lt; <span class="string">&quot;ConcreteImplementor::OperationImp()&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Abstraction</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">virtual</span> ~<span class="built_in">Abstraction</span>() &#123;&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="built_in">Abstraction</span>() &#123;&#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Implementor* imp;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">RefinedAbstratcion</span> : <span class="keyword">public</span> Abstraction&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">RefinedAbstratcion</span>(Implementor* imp) &#123;</span><br><span class="line">		_imp = imp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		_imp-&gt;<span class="built_in">OperationImp</span>();</span><br><span class="line">		std::cout &lt;&lt; <span class="string">&quot;RefinedAbstratcion::operation()&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Implementor* _imp;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Implementor* imp = <span class="keyword">new</span> <span class="built_in">ConcreteImplementor</span>();</span><br><span class="line">	Abstraction* abs = <span class="keyword">new</span> <span class="built_in">RefinedAbstratcion</span>(imp);</span><br><span class="line"></span><br><span class="line">	abs-&gt;<span class="built_in">operation</span>();</span><br><span class="line">	<span class="keyword">delete</span> imp;</span><br><span class="line">	<span class="keyword">delete</span> abs;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/10/Effective-cpp-16/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1686,221 +1824,6 @@ assignment操作符，这相当于在一个尚未初始化的对象身上做“�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/01/%E6%AD%BB%E9%94%81-Deadlock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/01/%E6%AD%BB%E9%94%81-Deadlock/" itemprop="url">死锁(Deadlock)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-01T13:46:01+08:00">
-                2017-12-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="deadlock">deadlock</h1>
-<h2 id="定义">定义</h2>
-<p>一个进程在得不到资源之后进入等待状态，而这个状态永远不会改变，这种情况就叫做死锁。</p>
-<p>死锁主要发生的情况就在于资源的请求与释放不合理，而这些资源包括了physical
-resource和logical resource（锁，信号量，文件等）</p>
-<h2 id="特点">特点</h2>
-<h3 id="发生死锁的必要不充分条件">发生死锁的必要不充分条件</h3>
-<blockquote>
-<p>不是独立的四个条件</p>
-</blockquote>
-<ul>
-<li>mutual exclusion：在同一时间内只有一个进程能访问该资源</li>
-<li>hold and
-wait：一个进程必须同时拥有一个资源，并且在请求另一份被别的进程拥有着的资源</li>
-<li>no preemption：资源不能被抢占</li>
-<li>circular
-wait：一系列的进程在循环等待，比如p1在等待p2的资源，p2在等待p3的资源，p3在等待p1的资源</li>
-</ul>
-<h3
-id="利用资源分配图可以检测是否发生了死锁">利用资源分配图可以检测是否发生了死锁</h3>
-<p>在资源分配图中，顶点分为resource(R)和process(P)两种，由R指向P的称为分配边（即P已经获得R的资源），由P指向R的称为请求边（即P在请求R的资源），而边是可以动态变化的。一旦分配成功，即从请求边转化为分配边。</p>
-<p>如下图：</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics.png" alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>那么如何检测死锁呢？</p>
-<p>一旦成环并且环中的每种资源只有一个实例(即没有多余的资源可用时)，就会发生死锁。如下图有两个环，其中没有多余资源。</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/RP_graphics1.png"
-alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<h2 id="解决办法">解决办法</h2>
-<p>目前有三种：</p>
-<ul>
-<li>采取办法去避免死锁，保证系统永远不会进入死锁状态；</li>
-<li>允许系统进入死锁状态，检测出来然后恢复；</li>
-<li>忽略死锁，然后假装死锁没有发生过；</li>
-</ul>
-<p>大多数操作系统采用第三种。</p>
-<h3 id="deadlock-prevention">deadlock prevention</h3>
-<blockquote>
-<p>使得前面提到的那四个死锁发生的必要不充分条件之一不成立，即可以避免死锁</p>
-</blockquote>
-<ul>
-<li>mutual exclusion：某些资源可以允许多个进程访问，比如read-only
-file。但互斥锁不能允许多个进程访问，因此这个方法不能采用。</li>
-<li>hold and
-wait：一个方法是实现一个协议使得进程应该一次性获得所有资源；另一种方法则是要求实现一个协议使得进程在释放所有资源之前，不能请求资源；但这两个方法有很多缺点：一是资源的调度效率很低，有些不用的资源却一直hold住。二是有可能发生饥饿，有可能想要的资源因为其它进程hold住而一直等待。</li>
-<li>no
-preemption：实现抢占式。一般应用在那些保存方便，易于重新加载的资源（比如寄存器）。但不能用在互斥锁和信号量。</li>
-<li>circular
-wait：举个例子，可以实现一个协议使得进程在请求资源时，按照资源id，从大到小去请求（也就是设置一个资源请求顺序）</li>
-</ul>
-<h3 id="deadlock-avoidance">deadlock avoidance</h3>
-<blockquote>
-<p>了解额外信息，决定资源如何分配</p>
-</blockquote>
-<ul>
-<li>safe
-state：系统以某些分配顺序去分配资源，不会发生死锁。这个顺序也叫safe
-sequence</li>
-<li>算法一：resource-allocation-graph algorithm
-<ul>
-<li>还是利用资源分配图表示，但此时由p指向r的虚线表示p请求资源；</li>
-<li>在多个进程请求资源资源时，系统会检测分配该资源给某个进程后，该图会否成环</li>
-</ul></li>
-<li>算法二：banker's algorithm
-<ul>
-<li>算法一 只适合于某种资源只有一个实例的情况；</li>
-<li>数据结构：available(某种资源的可用数量)、max(nxm的矩阵，某个进程Pi需要Ri资源的最大数量)、allocation(nxm的矩阵，某个进程Pi已经得到Ri资源的数量)、need(还需要多少资源)；need
-= max - allocation</li>
-<li>safety algorithm：</li>
-</ul></li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">初始化Work=avaliable和finish=<span class="literal">false</span>；<span class="comment">//数组</span></span><br><span class="line"><span class="number">2</span>：找一个索引i满足：finish[i]=<span class="literal">false</span> &amp;&amp; need[i]&lt;=work[i]</span><br><span class="line">如果不存在这个i，就goto4</span><br><span class="line">work = work+allocation</span><br><span class="line">finish[i]=<span class="literal">true</span></span><br><span class="line">goto2</span><br><span class="line"><span class="number">4</span>：如果所有都完成了，那么系统是安全状态</span><br></pre></td></tr></table></figure>
-<p>​ resource-request algorithm：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//requesti[ij]=k意味着进程i需要j类资源k个</span></span><br><span class="line"><span class="comment">//如果发生了请求,模拟一下操作</span></span><br><span class="line"><span class="number">1.</span> <span class="keyword">if</span> requesti&lt;=needi；<span class="keyword">goto</span> <span class="number">2</span>; <span class="keyword">else</span> 出错</span><br><span class="line"><span class="number">2.</span> requesti&lt;=available;<span class="keyword">goto</span> <span class="number">3</span>；<span class="keyword">else</span> waiting</span><br><span class="line"><span class="number">3.</span> available -= request; allocation += quest; need -= quest</span><br></pre></td></tr></table></figure>
-<h3 id="deadlock-detection">deadlock detection</h3>
-<blockquote>
-<p>如果系统没有采用以上两种死锁避免方法，就必须要有算法检测系统是否发生了死锁，并且使得系统从死锁中恢复</p>
-</blockquote>
-<ul>
-<li>假如每种资源只有一个实例，可以采用wait-for
-图来检测死锁是否发生（Pi指向Pj意味着Pi在等待Pj释放资源）。如果改图含有环，则意味着死锁发生了</li>
-<li>假如每种资源含有多个实例，那么可以采用以上的safety算法，只要在最后检查每个finish是否都是true即可</li>
-</ul>
-<h3 id="recovery-from-deadlock">recovery from deadlock</h3>
-<blockquote>
-<p>当检测到死锁发生时，需要从死锁中恢复</p>
-</blockquote>
-<ul>
-<li>中断一个或多个进程的运行，打破成环</li>
-<li>抢占资源：关键是要选择抢占谁的资源；实现回滚；并且如何避免饥饿的发生</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1951,7 +1874,7 @@ sequence</li>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">268</span>
+                <span class="site-state-item-count">269</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
