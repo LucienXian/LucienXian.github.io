@@ -264,6 +264,202 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/05/12/C-atomics-from-basic-to-advanced/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/05/12/C-atomics-from-basic-to-advanced/" itemprop="url">C++ atomics, from basic to advanced</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-12T01:00:54+08:00">
+                2021-05-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="c-atomics-from-basic-to-advanced">C++ atomics, from basic to
+advanced</h1>
+<h2 id="背景">背景</h2>
+<p>在C++11中引入了对多线程的支持，同时也带来了关于mutex和atomic相关的一些列标准，定义了memory
+model。这篇文章将关注C++11带来的一个无锁编程工具——atomics。</p>
+<h2 id="简介">简介</h2>
+<h3 id="无锁编程">无锁编程</h3>
+<p>在文章开始之前，首先来关注一些无锁编程这个概念（lock
+free——不使用锁来保持代码同步）。一般人在使用无锁编程或者了解这个概念之前，会先入为主地认为无锁编程性能更快，相对使用锁来同步拥有更好的运行速度。</p>
+<p>实际上，无论是lock free还是更严格的wait
+free都没有直接跟运行速度有直接关系，他们关联的是“steps”，但在程序运行过程中“step”的运行时间不一定是一样的。无锁编程的优势在于通过减少阻塞和等待来提高并发的可能性，消除race
+condition、死锁等潜在危机。因此在使用无锁编程之前应该先测试程序，观察代码的算法逻辑是否有问题。</p>
+<p>接下来我们开始了解C++的原子操作。</p>
+<h3 id="c-atomics">C++ atomics</h3>
+<h4 id="何谓原子操作">何谓原子操作</h4>
+<p>原子操作是一种以单个事务来执行的操作，这是一个“不可再分且不可并行的”操作，其他线程只能看到操作完成前或者完成后的资源状态，不存在中间状态可视。</p>
+<p>从底层来看，原子操作是一些硬件指令，其原子性是由硬件保证的，C++11对原子操作抽象出统一的接口，避免使用时嵌入平台相关的代码来支持跨平台使用。</p>
+<p>先来看看如果多线程中没有原子操作会发生什么情况：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">0</span>;</span><br><span class="line"><span class="comment">// ===============</span></span><br><span class="line"><span class="comment">// Thread 1</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> tmp = x; <span class="comment">// 0</span></span><br><span class="line">  ++tmp; <span class="comment">// 1</span></span><br><span class="line">  x = tmp; <span class="comment">// 1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Thread 2</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> tmp = x; <span class="comment">// 0</span></span><br><span class="line">  ++tmp; <span class="comment">// 1</span></span><br><span class="line">  x = tmp; <span class="comment">// 1!!! What!!!</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这是一个很典型的Read-modify-write的递增场景，多线程环境下就会出现data
+race。为什么会这样，以一个简易的计算机架构图来举例，这里存在三级缓存，变量在内存中初始化好为0，由于这里没有同步机制，每个CPU都从主存中将变量取出来（此时变量都是0），在寄存器中进行递增，最后将递增后的值1写回内存。</p>
+<p><img
+src="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce263b.png" /></p>
+<p>那么我们怎么在C++中进行数据共享呢？在C++11之前是没有标准的线程库的，在C++11之后引入了std::atomic模版类来提供原子操作。一个简单例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::atomic&lt;<span class="type">int</span>&gt; <span class="title">x</span><span class="params">(<span class="number">0</span>)</span></span>; <span class="comment">// Not support std::atomic&lt;int&gt; x = 0</span></span><br><span class="line">++x; <span class="comment">// now atomic operation</span></span><br></pre></td></tr></table></figure>
+<h4 id="stdatomic的使用">std::atomic的使用</h4>
+<p>std::atomic是一个模版，那么哪些类型可以实例画该模版呢？按照标准的说法，需要是Trivially
+Copyable的类型，简单来说就是满足三个条件：</p>
+<ul>
+<li>连续的内存；</li>
+<li>拷贝对象意味着按bit拷贝（memcpy）；</li>
+<li>没有虚函数；</li>
+</ul>
+<p>用代码来表达则是自定义结构满足下面5个条件：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">std::is_trivially_copyable&lt;T&gt;::value</span><br><span class="line">std::is_copy_constructible&lt;T&gt;::value</span><br><span class="line">std::is_move_constructible&lt;T&gt;::value</span><br><span class="line">std::is_copy_assignable&lt;T&gt;::value</span><br><span class="line">std::is_move_assignable&lt;T&gt;::value</span><br></pre></td></tr></table></figure>
+<p>那么对于一个合法的<code>std::atomic&lt;T&gt;</code>
+类型来说，它能进行哪些操作？一个是assignment，则读写操作；另一个则是特定的原子操作和跟类型T相关的其他操作。下面几种操作要么编译失败、要么是非原子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">std::atomic&lt;<span class="type">int</span>&gt; x&#123;<span class="number">0</span>&#125;;</span><br><span class="line">x *= <span class="number">2</span>; <span class="comment">// compile error</span></span><br><span class="line">x = x + <span class="number">1</span>; <span class="comment">// Not atomic: Atomic read followed by atomic write</span></span><br><span class="line">x = x * <span class="number">2</span>; <span class="comment">// Not atomic: Atomic read followed by atomic write</span></span><br></pre></td></tr></table></figure>
+<p>还有一个就是原子自增不支持浮点数。其他的原子操作包括CAS、exchange等等；</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">std::atomic&lt;T&gt; x;</span><br><span class="line">T y = x.<span class="built_in">load</span>(); <span class="comment">// same sa T y = x</span></span><br><span class="line">x.<span class="built_in">store</span>(y); <span class="comment">// same as x = y</span></span><br><span class="line">T z = x.<span class="built_in">exchange</span>(y); <span class="comment">// Atomically: z = x; x = y;</span></span><br><span class="line"><span class="comment">// if x == y, make x=z and return true</span></span><br><span class="line"><span class="comment">// Otherwise, set y=x and return false</span></span><br><span class="line"><span class="comment">// 还有一个compare_exchange_week，x == y也可能会失败，主要是因为某些平台会对锁有类似超时释放的操作，满足其高效调度</span></span><br><span class="line"><span class="type">bool</span> success = x.<span class="built_in">compare_exchange_strong</span>(y, z);</span><br></pre></td></tr></table></figure>
+<p>这里重点看一下CAS的使用，CAS在大多数无锁算法中都有应用，除了原子自增外，CAS还支持递增浮点数，进行乘法运算：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">std::atomic&lt;<span class="type">int</span>&gt; x&#123;<span class="number">0</span>&#125;;</span><br><span class="line"><span class="type">int</span> x0 = x;</span><br><span class="line"><span class="keyword">while</span> (!x.<span class="built_in">compare_exchange_strong</span>(x0, x0+<span class="number">1</span>)) &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> (!x.<span class="built_in">compare_exchange_strong</span>(x0, x0*<span class="number">2</span>)) &#123;&#125;</span><br><span class="line"><span class="comment">// fetch_xxx() == some operators</span></span><br><span class="line">std::atomic&lt;<span class="type">int</span>&gt; x&#123;<span class="number">0</span>&#125;;</span><br><span class="line">x.<span class="built_in">fetch_add</span>(y); <span class="comment">// same as x += y</span></span><br><span class="line"><span class="type">int</span> z = x.<span class="built_in">fetch_add</span>(y); <span class="comment">// same as z = (x += y) - y;</span></span><br></pre></td></tr></table></figure>
+<h4 id="stdatomic与无锁的关系">std::atomic与无锁的关系</h4>
+<p>这里有一个关键的信息：std::atomic并不意味着一定是无锁的；首先来看下面的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">long</span> x; <span class="comment">// lock free</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> &#123; <span class="type">long</span> x; &#125;; <span class="comment">// lock free</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> &#123; <span class="type">long</span> x; <span class="type">long</span> y; &#125;; <span class="comment">// run-time and platfrom dependent. x86 is lock free</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">C</span> &#123; <span class="type">long</span> x; <span class="type">long</span> y; <span class="type">long</span> z; &#125;; <span class="comment">// &gt; 16 bytes. not lock free</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">D</span> &#123; <span class="type">long</span> x; <span class="type">int</span> y; &#125;; <span class="comment">// alignment 16 bytes. lock free</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">E</span> &#123; <span class="type">long</span> x; <span class="type">int</span> y; &#125;; <span class="comment">// 12 bytes. not lock free</span></span><br></pre></td></tr></table></figure>
+<p>判断atomc是否无锁可以通过一个成员函数<code>std::atomic&lt;T&gt;::is_lock_free()</code>，这是一个运行时的判断（C++17提供了编译时判断<code>constexpr is_always_lock_free()</code>），之所以会出现无锁不确定的情况主要是因为对齐alignment。</p>
+<p>假设atomic是无锁的，但也有可能出现两个atomic变量互相等待的情况，假设存在这样的场景，两个atomic变量：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">std::atomic&lt;<span class="type">int</span>&gt; x[N];</span><br><span class="line"><span class="comment">// thread 1</span></span><br><span class="line">++x[<span class="number">0</span>];</span><br><span class="line"><span class="comment">// thread 2</span></span><br><span class="line">++x[<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+<p>这种情况下就会出现两个atomic变量互相等待的可能性，主要是因为这两个操作都是在同一个cache
+line，都从主存到CPU来回写入，因为两个CPU可能互斥访问同一个cache
+line，这就是所谓的false
+sharing。一个提高性能解决这个问题的方式是将每个线程的数据对齐到充满整个cache
+line。（NUMA机器上，可能是整个page）</p>
+<p><img
+src="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce268d.png" /></p>
+<h4 id="memory-barrier">memory barrier</h4>
+<p>memory
+barrier控制着某个CPU对内存的修改被另一个CPU可见的方式，这是一个对所有CPU的全局控制。这是通过硬件实现，确定指令的特定操作顺序。简单来说，就是CPU在执行指令的时候不一定按照编写顺序来执行，从而挖掘更多并行能力。</p>
+<p>如果仔细观察std::atomic相关操作的参数，会发现其还接受一个memory_order的枚举作为参数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> <span class="title class_">memory_order</span> &#123;</span><br><span class="line">	memory_order_relaxed,</span><br><span class="line">	memory_order_consume,</span><br><span class="line">	memory_order_acquire,</span><br><span class="line">	memory_order_release,</span><br><span class="line">	memory_order_acq_rel,</span><br><span class="line">	memory_order_seq_cst</span><br><span class="line">	&#125; memory_order;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>memory_order_relaxed：不对执行顺序做任何保证，即该原子操作指令可以任由编译器重排或者CPU乱序执行；</li>
+<li>memory_order_acquire：当前线程里，所有在该原子操作之后的读操作，都不能重排到该原子操作指令之前执行。原子操作指令先读；</li>
+<li>memory_order_release：当前线程里，所有在该原子操作之前的写操作，都不能重排到该原子操作指令之后执行。原子操作最后写；</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">Thread1</span><span class="params">(<span class="type">int</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> t=<span class="number">1</span>;</span><br><span class="line">    a.<span class="built_in">store</span>(t,memory_order_relaxed);</span><br><span class="line">    b.<span class="built_in">store</span>(<span class="number">2</span>,memory_order_release); <span class="comment">// a必须在b之前完成写入</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">Thread2</span><span class="params">(<span class="type">int</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(b.<span class="built_in">load</span>(memory_order_acquire)!=<span class="number">2</span>); <span class="comment">// b必须在a之前读 </span></span><br><span class="line">    cout＜＜a.<span class="built_in">load</span>(memory_order_relaxed)＜＜endl;<span class="comment">//输出1. </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>memory_order_acq_rel：包含memory_order_acquire和memory_order_release两个标志；</li>
+<li>memory_order_seq_cst：默认标志。顺序一致，确保代码在线程中的执行顺序与顺序看到的代码顺序一致，禁止重拍指令和乱序执行；</li>
+</ul>
+<p>改变memory
+order参数，在一定程度上可能会提高程序的性能，从代码中表达出程序员的意图。</p>
+<h2 id="总结">总结</h2>
+<p>C++的atomic操作在一定条件下能很好提高程序的性能，并且也提高了易用性，但也存在很多容易踩坑的地方，因此在使用前仍然需要做详细的设计。使用atomic的时机也需要细细斟酌，对于不适用的地方使用无锁或者atomic操作可能收效甚微。</p>
+<h2 id="参考资料">参考资料</h2>
+<p>https://www.infoq.com/news/2014/10/cpp-lock-free-programming/</p>
+<p>https://www.youtube.com/watch?v=ZQFzMfHIxng</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/19/Macro-Free-in-C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2281,241 +2477,6 @@ src="https://pic.downk.cc/item/5fb016c63e3fc2acb7182059.png" /></p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/21/Spanner-Google%E2%80%99s-Globally-Distributed-Database%E2%80%94%E2%80%94MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/08/21/Spanner-Google%E2%80%99s-Globally-Distributed-Database%E2%80%94%E2%80%94MIT6-824/" itemprop="url">Spanner: Google’s Globally-Distributed Database——MIT6-824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-21T00:50:14+08:00">
-                2020-08-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="spanner-googles-globally-distributed-database">Spanner: Google’s
-Globally-Distributed Database</h1>
-<blockquote>
-<p>Spanner是谷歌提出的一个可扩展、多版本、全球分布和支持同步复制的数据库。这是第一个在全球范围内分发数据并支持外部一致性的分布式系统</p>
-</blockquote>
-<h2 id="introduction">Introduction</h2>
-<p>Spanner作为一个数据库，它由遍布全球的数据中心的许多Paxos状态机进行数据分片。Spanner会随着数据量或者服务器数量的变化自动在计算机之间重新分片数据，并自动在计算机之间迁移数据。应用程序可以通过跨大洲复制数据的方式来使用Spanner实现高可用性。</p>
-<p>Spanner的主要重心在于管理跨数据中心的复制数据，但也花了不少时间在分布式系统架构上设计和实现重要的数据库功能。</p>
-<p>作为全球分布的数据库，Spanner提供了一些有趣的功能。应用程序可以细粒度动态地控制数据的复制配置，支持在数据中心透明地移动数据，平衡资源使用，也对外提供外部一致的读写等等。</p>
-<p>Spanner会为事务分配具有全局意义的提交时间戳，这里关键因素是新的TrueTime
-API及其实现。下面会重点介绍。</p>
-<h2 id="implementation">Implementation</h2>
-<p>本章主要介绍Spanner实现的基础架构和原理。然后描述了目录抽象，最后则是描述了数据模型。</p>
-<p>一个Spanner的部署被称为Universe，Spanner则被组织为一组区域，这是管理部署的单位和物理隔离的单位。下图描述了Spanner
-Universe的服务器，一个区域具有一个zone
-master和若干个spanserver，通过location
-proxy来定位提供服务的spannerver。universe master 和 placement
-driver则是一个单例，前者主要是一个控制台，后者则是定期与spanserver通信，以找出需要移动的数据。</p>
-<p><img
-src="https://pic.downk.cc/item/5f15cfcd14195aa594670175.png" /></p>
-<h3 id="spanserver-software-stack">Spanserver Software Stack</h3>
-<p>这一章主要讲spanserver的实现，软件架构如图所示，底部为每个spanserver负责的100-1000个称为tablet的数据结构，它实现了一组以下的的映射：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(key:string, timestamp:int64) → string</span><br></pre></td></tr></table></figure>
-<p>tablet的状态存储在一个类似B树的文件和一个预写日志中，所有这些都存在一个叫Colossus的组件里。</p>
-<p><img
-src="https://pic.downk.cc/item/5f17213614195aa594fd18a2.png" /></p>
-<p>为了支持复制，Spanserver都在每个tablet的顶部实现了Paxos状态机，用来存储其元数据和tablet的日志。这里的Paxos实现通过基于时间的leader租约来支持生命周期长的leader。Spanner的实现中会写两次Paxos日志，一次在tablet中，一次在Paxos日志里。</p>
-<p>在leader副本中，Spanserver会实现一个锁表来做并发控制，这包含了两阶段锁的状态，能将key的范围映射到锁的状态。需要同步的操作（例如事务性读取）会在锁表中获取锁；其余操作绕过锁表。</p>
-<p>另外，在leader副本中，spansever还实现了一个事务管理器来支持分布式事务。如果一个事物仅仅涉及到一个Paxos组，则可以绕过事务管理器。否则这些组的leader会协调执行两阶段提交。</p>
-<h3 id="directories-and-placement">Directories and Placement</h3>
-<p>在一系列键值映射的上层，Spanner
-实现支持一个被称为“目录”的桶抽象，为包含公共前缀的连续键的集合。一个目录是数据放置的基本单位，同一个目录下的所有数据具有相同的副本配置。当数据在不同的paxos组间移动时，会进行逐个目录的移动。如下图所示：</p>
-<p><img
-src="https://pic.downk.cc/item/5f1c387614195aa594c3a268.png" /></p>
-<p>一个Paxos组包含了若干个目录，tablet不一定是一个行空间内按照字典顺序排序的分区，可以是行空间内的多个分区。Movedir
-是一个后台任务，用来在不同的 Paxos
-组之间转移目录，也可以用来为Paxos组增加或删除副本。</p>
-<p>一个目录也是应用可以指定的放置策略的最小单元，一个应用就可以控制数据的复制。例如，一个应用可能会在自己的目录里存储每个终端用户的数据，这就有可能使得用户
-A 的数据在欧洲有三个副本，用户 B 的数据在北美有 5 个副本。</p>
-<p>当一个目录变得太大时，Spanner会进行分片存储。每个分片可能被保存到不同的Paxos组。Movedir在不同组之间不再是转移目录，而是转移分片。</p>
-<h3 id="data-model">Data Model</h3>
-<p>Spanner暴露给应用的数据特性包括了：基于模式化的半关系表数据模型，SQL类型的查询语言和通用事务。</p>
-<p>应用的数据模型是在被目录桶装的键值层之上，一个应用会在一个universe中创建若干个数据库，每个数据库可以包含无限的模式化表。每个表都和关系数据库表类似，具备行、列和版本值。</p>
-<h3 id="truetime">TrueTime</h3>
-<table>
-<thead>
-<tr class="header">
-<th>Method</th>
-<th>Returns</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>TT.now()</td>
-<td>TTinterval: [earliest, latest]</td>
-</tr>
-<tr class="even">
-<td>TT.after(t)</td>
-<td>true if t has definitely passed</td>
-</tr>
-<tr class="odd">
-<td>TT.before(t)</td>
-<td>true if t has definitely not arrived</td>
-</tr>
-</tbody>
-</table>
-<p>本章主要讲TrueTime
-API，但更多的内容在另一篇论文里。上面的表列出了API的方法，TrueTime是一款高度可用的分布式时钟，面向所有Google服务器上的应用提供，会把时间表达成一个时间区间TTinterval，具有一个有限的时间不确定性。TT.now()方法会返回一个
-TTinterval，它可以保证包含调用TT.now()方法时的绝对时间。</p>
-<p>在底层，TrueTime使用的时间是基于GPS和原子钟实现的，这两种类型的时间具有不同的失败模式。GPS的弱点是天线和接收器失效、局部电磁干扰等等。而由于频率误差，在经过很长的时间以后，原子钟也会产生明显误差。</p>
-<p>TrueTime是由每个数据中心里的许多time
-master机器和每个机器上的一个timeslave
-daemon实现的。大多数master都具备专门的相互隔离的GPS接收器，而剩余的master则会配置了原子钟。所有master的时间参考值会进行彼此校对，每个master也会交叉检查时间参考值和本地时间的比值，如果二者差别太大，就会把自己踢出去。</p>
-<p>每个daemon会从许多master中收集投票，获知时间参考值，根据确定的界限，来剔除本地时钟误差较大的机器。</p>
-<p>在同步期间，一个daemon会表现出逐渐增加的时间不确定性。ε是从应用的最差时钟漂移中得到的。ε取决于time
-master的不确定性，以及与time
-master之间的通讯延迟。论文提到的线上应用环境里，ε通常是一个关于时间的锯齿函数，在1到7ms之间变化。</p>
-<h2 id="concurrency-control">Concurrency Control</h2>
-<p>本章主要讲trueTime是如何保证并发控制的正确性，简单来说则是实现这样的特性：在时间戳为t的读操作，一定能看到在t时刻之前提交的事务。</p>
-<h3 id="timestamp-management">Timestamp Management</h3>
-<p>Spanner支持三种操作类型：读写事务、只读事务和快照读取。独立的写操作会被当作读写事务执行，而非快照的独立读取操作则会被当作只读事务执行。</p>
-<p>一个只读事务是不需要锁机制的，通过选取系统的时间戳来执行，不会阻塞后续到达的写操作。而快照读操作同样不需要锁机制。这两个都可以在任意足够新的副本上执行。</p>
-<h4 id="paxos-leader-leases">Paxos Leader Leases</h4>
-<p>Spanner的Paxos实现中通过时间化的租约，来确保长时间的leader角色（默认10s）。</p>
-<p>一个潜在的leader可以发起请求，请求时间化的租约投票，在收到一定数量的投票后，就可以确保自己拥有租约。另外，当一个副本成功完成一个写操作，会隐式延长自己的租约。而租约快要到期时，则会显式请求延长租约。leader的租约有一个时间区间，起点是收到指定数量投票的那一刻，终点则是由于租约过期而失去一定数量投票的那一刻。注意，每个Paxos
-leader的租约时间区间和其他leader的时间区间是完全隔离的。</p>
-<p>而Paxos
-leader的退位则可以通过将slave从投票集合中释放的方式来实现，一个leader必须等到TT.after(smax)是真才能发起退位。</p>
-<h4 id="assigning-timestamps-to-rw-transactions">Assigning Timestamps to
-RW Transactions</h4>
-<p>事务读写会采用两阶段锁协议，获得所有的锁之后，就可以给事务分配时间戳，这个时间戳是Paxos写操作的，代表了事务提交的时间。在每个Paxos组内，会以单调递增的方式分配时间戳，这个比较好实现。而对于跨越多个leader的情况，一个leader只能分配属于自己租约区间的时间戳。一旦时间戳s被分配，上面提到的smax会变成s。</p>
-<p>另外，Spanner也实现了外部一致性：如果一个事务T2在事务T1提交以后开始执行，那么事务T2的时间戳一定大于事务T1的时间戳。简单来说，写进去的数据能够立即被读到，在被修改之前，读到的数据都是一样的。</p>
-<h4 id="serving-reads-at-a-timestamp">Serving Reads at a Timestamp</h4>
-<p>上面提到的特性，可以使得spanner可以正确地确定副本是否足够新，每个副本会记录一个安全时间值Tsafe，表示副本最近更新后的最大时间，当读操作的时间戳t小于或等于Tsafe的时候，读操作就可以在这个副本上读取。</p>
-<h4 id="assigning-timestamps-to-ro-transactions">Assigning Timestamps to
-RO Transactions</h4>
-<p>只读事务会分成两个阶段执行：分配时间戳sread，然后按照sread的快照读去执行事务操作。在事务开始后的任意时刻，可以分配sread=TT.now().latese。由于Tsafe的存在，或者smax的变化，sread时刻的读操作有可能被阻塞。因为Spanner最好是分配一个可以保持外部一致性的最大时间戳。</p>
-<h3 id="details">Details</h3>
-<h4 id="read-write-transactions">Read-Write Transactions</h4>
-<p>Spanner的读写事务，客户端对位于合适位置的组内leader副本发起读操作时，会先获取读锁，然后读取最新的数据。当一个客户端完成了所有的读操作后，会在客户端缓存所有的写操作，开始两阶段提交。客户端选择一个协调组，并且发送提交信息给所有参与的协调者leader，同时发送信息给所有缓冲的写操作。</p>
-<p>每个参与其中的、非协调者leader会先获取写锁，然后选择一个合适的时间戳，并通过Paxos将准备提交记录写入日志。最后，这些leader会将自己的准备时间戳告诉协调者。</p>
-<p>此时，扮演协调者的leader也会先获取写锁，然后选择一个事务时间戳，这个时间戳s必须大于或等于从前面获取到的准备时间戳信息，并且应该大于TT.now().latest。这样，这个leader，就会通过Paxos写入一个提交记录到日志，然后开始commit
-wait，即该leader会一直等待到TT.after(s)为true，最后发送一个提交时间戳给客户端和所有参与的leader。</p>
-<p>每个参与的领导者会通过Paxos把事务结果写入日志。所有的参与者会在同一个时间戳进行提交，释放锁。</p>
-<h4 id="read-only-transactions">Read-Only Transactions</h4>
-<p>分配只读事务的时间戳存在三种方案：</p>
-<ul>
-<li>事务开始时，根据一个表达式确定事务参与者，然后这些参与者的Paxos组之间协调，根据各自的LastTS()进行协商选出一个合适的时间戳；</li>
-<li>对于在单个Paxos组上的读取，直接获取该Paxos组的最后提交的写操作的时间戳；</li>
-<li>TT.now().latest；</li>
-</ul>
-<p>通过选择一个合适的时间戳，然后在相应的节点确认不会发生读写冲突、不会有复制协议的落后的情况下，可以处理这个读请求了。</p>
-<h4 id="schema-change-transactions">Schema-Change Transactions</h4>
-<p>TrueTime允许Spanner支持原子模式变更。模式变更事务通常是一个标准事务的、非阻塞的变种。它会显式地分配注册一个未来的时间戳，由于读写操作都会依赖于模式，因此当它们的时间戳小于t时，读写操作就会执行到时刻t；大于t时，读写操作必须阻塞，在模式变更事务后进行等待。</p>
-<h2 id="总结">总结</h2>
-<p>Spanner的理论最大亮点还是trueTime，相当于用基于原子钟的时间戳当做版本号，提高数据库的并发效率。Spanner实现的是Multi-Paxos，会有一个long-live的leader，但Spanner对Paxos的实现提及不多。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2566,7 +2527,7 @@ wait，即该leader会一直等待到TT.after(s)为true，最后发送一个提�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">269</span>
+                <span class="site-state-item-count">270</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -264,6 +264,146 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/11/Effective-cpp-17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/11/Effective-cpp-17/" itemprop="url">Effective-cpp-#17</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-11T23:44:04+08:00">
+                2017-12-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1
+id="store-newed-objects-in-smart-pointers-in-standalone-statements">store
+newed objects in smart pointers in standalone statements</h1>
+<h2 id="动机">动机</h2>
+<p>这个条例是为了避免在“以对象管理资源”中可能出现bug</p>
+<p>比如</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">processWidget</span>(std::<span class="built_in">shared_ptr</span>&lt;Widget&gt;(<span class="keyword">new</span> Widget), <span class="built_in">priority</span>());</span><br></pre></td></tr></table></figure>
+<p>这里可能出现的问题是，C++对于函数参数的调用次序不确定，假如顺序是：</p>
+<ul>
+<li>调用new widget;</li>
+<li>调用priority（）</li>
+<li>调用shared_ptr的构造函数</li>
+</ul>
+<p>那么如果在priority中发生异常，new出来widget资源就会泄漏</p>
+<h2 id="解决方法">解决方法</h2>
+<p>分离new语句：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::shared_ptr&lt;Widget&gt; <span class="title">pw</span><span class="params">(<span class="keyword">new</span> Widget)</span>；</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">processWidget</span><span class="params">(pw, priority()）;</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="建议">建议</h2>
+<ul>
+<li>以独立语句将newed对象存到智能指针中；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/10/Bridge-DesignPattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1683,147 +1823,6 @@ resources</h1>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/03/Effective-cpp-12/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/03/Effective-cpp-12/" itemprop="url">Effective-cpp-#12</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-03T00:02:45+08:00">
-                2017-12-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="copy-all-parts-of-an-object">copy all parts of an object</h1>
-<h2 id="动机">动机</h2>
-<ul>
-<li>局部的拷贝，编译器是允许的。假如你自定义了一个拷贝构造函数或者拷贝复制函数，但函数内部只复制了部分的成员变量，那么编译器并不会报错。</li>
-<li>另一个问题是在继承时，由于子类无法访问基类的私有变量，那么拷贝构造函数可能会没有拷贝所有成员变量，而是由基类的default
-constructor初始化成员变量；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Customer</span>&#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  	...</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  std::string name;</span><br><span class="line">  Date last;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PriorityCustomer</span>: <span class="keyword">public</span> Customer&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">PriorityCustomer</span>(<span class="type">const</span> PriorityCustomer&amp; rhs):<span class="built_in">priority</span>(rhs.prioruty)&#123;&#125;</span><br><span class="line">  <span class="comment">//在这种情况，基类成员的初始化是在default constructor中完成的</span></span><br><span class="line">  PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="type">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">    priority = rhs.priority;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="type">int</span> priority;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h2 id="解决方法">解决方法</h2>
-<ul>
-<li>针对第一种情况，要注意在修改类之后，要同时修改两个拷贝函数；</li>
-<li>第二情况，则需要让派生类去调用基类的copy函数；</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PriorityCustomer</span>(<span class="type">const</span> PriorityCustomer&amp; rhs):<span class="built_in">Customer</span>(rhs) ,<span class="built_in">priority</span>(rhs.prioruty)&#123;&#125;</span><br><span class="line"><span class="comment">//分别调用基类的copy函数</span></span><br><span class="line">PriorityCustomer&amp; <span class="keyword">operator</span>=(<span class="type">const</span> PriorityCustomer&amp; rhs)&#123;</span><br><span class="line">	Customer::<span class="keyword">operator</span>=(rhs);</span><br><span class="line">  priority = rhs.priority;</span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="注意问题">注意问题</h2>
-<ul>
-<li>不应该在copy
-assignment操作符函数中调用copy构造函数，因为这相当于初始化一个已经存在存在的对象，这没意义，并且增加复杂度；</li>
-<li>也不应该在copy构造函数中调用copy
-assignment操作符，这相当于在一个尚未初始化的对象身上做“对已经初始化的对象的操作”；</li>
-<li>往往以上两种操作都很有可能造成循环调用；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1874,7 +1873,7 @@ assignment操作符，这相当于在一个尚未初始化的对象身上做“�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">269</span>
+                <span class="site-state-item-count">270</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -264,6 +264,196 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/13/%E5%9F%BA%E6%9C%AC%E5%9D%97%E4%B8%8E%E8%BD%A8%E8%BF%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/13/%E5%9F%BA%E6%9C%AC%E5%9D%97%E4%B8%8E%E8%BD%A8%E8%BF%B9/" itemprop="url">基本块与轨迹</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-13T15:14:19+08:00">
+                2018-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="基本块和轨迹">基本块和轨迹</h1>
+<p>在tree语言中含有一些与机器语言不一致的情况，但我们又必须将tree语言转换成汇编语言或者机器语言，例如</p>
+<ul>
+<li>CJUMP指令能够跳转到两个标号中的任意一个，但真正的机器指令在条件为false时是跳转到下一个指令；</li>
+<li>在表达式中使用ESEQ会很不方便，因为它会使得子树的不同计算顺序产生不同的结果；</li>
+<li>CALL指令也可能会有问题；</li>
+</ul>
+<p>因此我们必须要对任意一棵树进行转换，以避免上述情况：</p>
+<ul>
+<li>将一棵树重写成不含SEQ和ESEQ的规范树；</li>
+<li>将这一列树组合成其内不含标号和转移的基本块组合；</li>
+<li>对基本快并形成一组trace；</li>
+</ul>
+<h2 id="规范树">规范树</h2>
+<p>什么是规范树：</p>
+<ol type="1">
+<li>无SEQ或者ESEQ</li>
+<li>每一个CALL的父亲不是EXP，就是MOVE</li>
+</ol>
+<h3 id="eseq的转换">ESEQ的转换</h3>
+<p>消除ESEQ的方法是，在树中一级一级地将它们提升，直至它们可以变成SEQ节点。</p>
+<p>下面，介绍四种情况，其中三四两种情况的不同在于s1与e能否交换：</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/compiler8-1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>一般，常数和空语句可以与任何语句交换，其它假定不能交换。</p>
+<h3 id="一般重写规则">一般重写规则</h3>
+<p>一般而言，对于每一种tree语言或者表达式，都会有等价的子表达式。</p>
+<p>例如对于[e1, e2, ESEQ(s,
+e3)]，需要将s抽取出来放到e2和e1的左边。如果可以交换，则得到(s;
+[e1,e2,e3])，如果不能交换，则是上图中第三种情况。</p>
+<p>利用函数reorder接收一个表达式，并返回由(语句，表达式表)组成的一个偶对。其中语句必须包含所有在表达式表之前执行的操作。传入reorder的是一个链表，它会抽出所有的ESEQ。reorder对参数的链表中的每一个表达式都调用de_exp，而do_exp的实现又只是对除了ESEQ之外的任何类型的表达式建立其子表达式的地址表并调用reorder。</p>
+<h3 id="将call移到顶层">将call移到顶层</h3>
+<p>由于在tree语言允许call节点作为子表达式，但实际中call的实现是，每一个函数将它的结果返回到同一个规定的返回值寄存器中，那么后面的调用就可能把前面的调用给覆盖掉了。</p>
+<p>因此，我们可以重写：</p>
+<p>CALL(func, args)---&gt;ESEQ(MOVE(TEMP t, CALL(func, args)), TEMP
+t)</p>
+<p>在这种情况中，do_stm不会调用reorder去处理CALL节点，而是把f和args看做MOVE节点的儿子</p>
+<h3 id="线性语句表">线性语句表</h3>
+<p>一旦整个函数体都已经用do_stm处理完毕之后，所有的SEQ节点都集中在树的顶部。函数linearize重复施加规则，使得<strong>SEQ(SEQ(a,b),c)</strong>
+==&gt; <strong>SEQ(a, SEQ(b,c))</strong></p>
+<p>但SEQ节点不提供任何结构性信息，只是简单列表。</p>
+<h2 id="处理条件分支">处理条件分支</h2>
+<p>tree语言与多数机器指令集不一样的是，它具有两路分支CJUMP指令。为了便于将tree转换为机器指令，我们需要重新安排CJUMP，使得CJUMP(cond,
+lt, lf)后面跟随的LABEL(lf)。</p>
+<p>我们分两步实现这一目的：取一颗规范树，并由它们形成基本块；对这些基本块进行排序，形成trace轨迹。</p>
+<h3 id="基本块">基本块</h3>
+<p>在分析程序的控制流时，任何非分支指令的程序语句对分析都没有意义，因此可以将非分支指令的序列集中到基本块中。</p>
+<p>基本块是语句组成的一个序列，只能从序列的开始进入并从结尾处退出：</p>
+<ul>
+<li>第一个语句是一个LABEL；</li>
+<li>最后一个语句是JUMP或者CJUMP；</li>
+<li>没有其他的LABEL, JUMP或者CJUMP；</li>
+</ul>
+<p>划分基本块的算法：</p>
+<blockquote>
+<p>从头到尾扫描语句序列，遇到一个LABEL就开始一个新的基本块并结束前一个基本块，遇到一个JUMP或者CJUMP就结束一个基本块；若过程遗留的基本块中，有任何基本块不是以LABEL开始的，则新生成一个标号插入到开始；若有不是以JUMP结束的，则在这个基本块的末尾假如一个转移到下一个基本块标号的指令。</p>
+</blockquote>
+<h3 id="轨迹">轨迹</h3>
+<p>由于我们以任意顺序安排基本块，程序结果都是一致的，因此我们可以合理地安排基本块，以满足每个CJUMP之后都跟随它的false标号的基本块。</p>
+<p>另外，也可以安排基本块使得JUMP之后跟随的是它们的目标标号，然后删除这些转移。</p>
+<p>还有，需要安排轨迹使得重叠的轨迹越来越少。</p>
+<h3 id="完善">完善</h3>
+<p>主要针对的是CJUMP指令：</p>
+<ul>
+<li>所有后面直接跟随的false标号的CJUMP维持不变；</li>
+<li>对任何直接跟随true标号的CJUMP，交换true标号和false标号，并将条件改为相反；</li>
+<li>如果既不是true也不是false标号直接跟随着，则新生成一个标号lf'，重写CJUMP；</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CJUMP(cond, a, b, lt, lf<span class="number">&#x27;</span>)</span><br><span class="line">LABEL(lf<span class="number">&#x27;</span>)</span><br><span class="line">JUMP(NAME lf)</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/06/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2062,185 +2252,6 @@ recursion</h3>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/Introduction-to-parsing/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/01/Introduction-to-parsing/" itemprop="url">Introduction to parsing</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T23:03:30+08:00">
-                2018-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="introduction-to-parsing">Introduction to parsing</h1>
-<p>Input: sequence of tokens from lexer</p>
-<p>Output: parse tree of the program</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap5_1.png"
-alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<h2 id="context-free-grammars">Context-Free grammars</h2>
-<ul>
-<li><p>不是所有tokens都是有效的，怕parsers要进行区分</p></li>
-<li><p>程序语言是具有递归结构的</p></li>
-</ul>
-<p>CFG包含了以下内容：</p>
-<ul>
-<li>A set of terminals-&gt;T</li>
-<li>A set of non-terminals-&gt;N</li>
-<li>A start symbols-&gt;S</li>
-<li>A set of productions -&gt; X-&gt;Y1...Y2</li>
-</ul>
-<p>productions可以理解成rules，例如S-&gt;(S)，意味着左边的能被右边的替代</p>
-<p>CFG的处理过程：</p>
-<ol type="1">
-<li>从一个带有start symbol S的字符串开始</li>
-<li>替换所有字符串中所有non-terminal X，根据production X-&gt;Y1..Y2</li>
-<li>重复2，直到没有non-terminals</li>
-</ol>
-<p>假设G是以S为start symbol的CFG，那么语言L(G)就是：</p>
-<ul>
-<li>{a1....an | 对于所有的terminal ai，都有 S-&gt;a1....an}</li>
-</ul>
-<p>terminals是不能被替换，是永恒的，terminals就是语言的tokens；</p>
-<p>因此CFG就是指所有的production的左边只有一个非终结符</p>
-<h2 id="derivations">Derivations</h2>
-<p>derivations: 一些列的productions，可以表示成一颗树，根就是start
-symbol，箭头右边的就是子节点，</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap52.png"
-alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>叶节点都是terminals，根就是start symbol。这种推导就是left-most
-derivation，每一步都替代掉最左边的non-terminal。</p>
-<p>同理，也有right-most derivation：</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap53.png"
-alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>right-most和left-most有着相同的parse tree。</p>
-<h2 id="ambiguity">Ambiguity</h2>
-<p>考虑grammar：<strong>E-&gt;E+E|E<em>E|(E)|id<strong> ，
-</strong>string为id</em>id+id</strong></p>
-<p>会解释得到两个parse tree：</p>
-<figure>
-<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap54.png"
-alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>如果有两颗以上的parse tree，我们就认为一个grammar是ambiguous。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2291,7 +2302,7 @@ alt="img" />
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">269</span>
+                <span class="site-state-item-count">270</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

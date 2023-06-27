@@ -264,6 +264,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/01/%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B-%E4%B8%80/" itemprop="url">深度探索C++对象模型<一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T23:16:17+08:00">
+                2018-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>开始看这本神书，做一些笔记：</p>
+<h1 id="简单对象模型">简单对象模型</h1>
+<p>第一个模型很简单，一个对象是由一系列slots组成，但是成员（对象和函数）都不是放在对象内的，而是把指针放在对象内，通常来说这不被应用于实际产品。</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/simple_obj.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h1 id="表格驱动对象模型">表格驱动对象模型</h1>
+<p>存储两个指针，分别指向data member table和function member table</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/table_driven_obj_model.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h1 id="c对象模型">C++对象模型</h1>
+<p>来看看重头戏——C++对象模型。有几个需要注意的：</p>
+<ul>
+<li><p>非静态数据成员放在类的对象中；</p></li>
+<li><p>静态数据成员和成员函数放在类对象之外；</p></li>
+<li><p>至于虚函数，则需要从类和对象两个方面考虑：每一个类都会有一个相关联的虚函数表；每一个对象都会有一个指针指向虚函数表，而表中的第一个slot通常是type_info
+object；</p></li>
+</ul>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/cpp_object_model.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/C-class-size/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1534,144 +1680,6 @@ flow到达这个变量的定义表达式时，你就要承受其构造的成本�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/06/Effective-cpp-24/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/06/Effective-cpp-24/" itemprop="url">Effective-cpp-#24</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-06T16:51:15+08:00">
-                2018-02-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1
-id="declare-non-member-functions-when-type-conversions-should-apply-to-all-parameters">Declare
-non-member functions when type conversions should apply to all
-parameters</h1>
-<h2 id="动机">动机</h2>
-<p>通常来说，让一个类支持隐式是一个糟糕的设计，它会使得程序变得复杂。但在某些时候，我们需要隐式的转换，考虑一个有理数的类：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Rational</span>(<span class="type">int</span> numerator=<span class="number">0</span>, <span class="type">int</span> denominator=<span class="number">1</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p><br> 如果希望支持算术运算符诸如加法，乘法，那么可以这样实现：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="type">const</span> Rational <span class="keyword">operator</span>* (<span class="type">const</span> Rational&amp; rhs) <span class="type">const</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>但这种设计有个问题: <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational <span class="title">oneEighth</span><span class="params">(<span class="number">1</span>, <span class="number">8</span>)</span></span>;</span><br><span class="line"><span class="function">Rational <span class="title">oneHalf</span><span class="params">(<span class="number">1</span>, <span class="number">2</span>)</span></span>;</span><br><span class="line">Rational result = oneHalf * oneEighth; <span class="comment">//可以通过</span></span><br><span class="line"></span><br><span class="line">result = oneHalf * <span class="number">2</span>; <span class="comment">//也可以通过，等同于</span></span><br><span class="line">result = oneHalf.<span class="keyword">operator</span>*(<span class="number">2</span>);</span><br><span class="line"><span class="comment">//通过的原因，编译器构造了临时对象</span></span><br><span class="line"><span class="function"><span class="type">const</span> Rational <span class="title">temp</span><span class="params">(<span class="number">2</span>)</span></span>;</span><br><span class="line">result = oneHalf*temp；</span><br><span class="line"></span><br><span class="line"><span class="comment">//而如果是想要满足乘法交换律，则会失败：</span></span><br><span class="line">result = <span class="number">2</span> * oneHalf;</span><br><span class="line"><span class="comment">//因为2没有相应的class，也就没有operator*函数。当然编译器会尝试在命名空间内或者在global作用域内调用non-member operator*,而这也找不到</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="解决方法">解决方法</h2>
-<p>当然，可以声明explicit
-构造函数，这也就保证了一致性，但就无法满足了乘法运算。 <br> <br>
-为了解决这个问题，也满足了四则运算，我们可以构造一个non-member函数：
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rational</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//构造一个non-member函数</span></span><br><span class="line"><span class="type">const</span> Rational <span class="keyword">operator</span>*(<span class="type">const</span> Rational&amp; lhs,</span><br><span class="line">                        <span class="type">const</span> Rational&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Rational</span>(lhs.<span class="built_in">numerator</span>()*rhs.<span class="built_in">numerator</span>(),</span><br><span class="line">                    lhs.<span class="built_in">denominator</span>()*lhs.<span class="built_in">denominator</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这样，就都可以通过了</span></span><br><span class="line">Rational result;</span><br><span class="line">result = oneFourth * <span class="number">2</span>;</span><br><span class="line">result = <span class="number">2</span> * oneFourth;</span><br></pre></td></tr></table></figure> <br> 这样，就基本解决问题了。。。。 <br></p>
-<h2 id="建议">建议</h2>
-<ul>
-<li>如果你需要为某个函数的所有参数（包括被this指针所指的那个隐喻参数）进行类型转换，那么这个函数必须是一个non-member</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1722,7 +1730,7 @@ parameters</h1>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">269</span>
+                <span class="site-state-item-count">270</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
