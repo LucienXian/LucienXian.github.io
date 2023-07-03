@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数据库," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="LSM-based Storage Techniques: A survey Introduction 随着LSM在NoSQL的应用越来越广泛，关于LSM的研究也变得越来越多。本文是一篇综述，主要目的是提供一些关于LSM存储技术的最优选择和前沿研究，并详细地介绍了相关技术对LSM系统的提高和权衡。 LSM-tree Basics 这一章主要是回顾了LSM树的背景，并深入讨论了LSM的基本结构。 H">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LSM-based Storage Techniques: A survey">
+<meta property="og:url" content="http://yoursite.com/2023/07/03/LSM-based-Storage-Techniques-A-survey/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="LSM-based Storage Techniques: A survey Introduction 随着LSM在NoSQL的应用越来越广泛，关于LSM的研究也变得越来越多。本文是一篇综述，主要目的是提供一些关于LSM存储技术的最优选择和前沿研究，并详细地介绍了相关技术对LSM系统的提高和权衡。 LSM-tree Basics 这一章主要是回顾了LSM树的背景，并深入讨论了LSM的基本结构。 H">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-07-03T15:40:26.000Z">
+<meta property="article:modified_time" content="2023-07-03T15:41:22.491Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2023/07/03/LSM-based-Storage-Techniques-A-survey/"/>
+
+
+
+
+
+  <title>LSM-based Storage Techniques: A survey | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/07/03/LSM-based-Storage-Techniques-A-survey/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LSM-based Storage Techniques: A survey</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-07-03T23:40:26+08:00">
+                2023-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="lsm-based-storage-techniques-a-survey">LSM-based Storage
+Techniques: A survey</h1>
+<h2 id="introduction">Introduction</h2>
+<p>随着LSM在NoSQL的应用越来越广泛，关于LSM的研究也变得越来越多。本文是一篇综述，主要目的是提供一些关于LSM存储技术的最优选择和前沿研究，并详细地介绍了相关技术对LSM系统的提高和权衡。</p>
+<h2 id="lsm-tree-basics">LSM-tree Basics</h2>
+<p>这一章主要是回顾了LSM树的背景，并深入讨论了LSM的基本结构。</p>
+<h3 id="history-of-lsm-trees">History of LSM-trees</h3>
+<p>存储引擎主要分为两类结构：一是原地更新，如B+树等；另一个就是LSM树。前者对读和空间利用更友好，但牺牲了写的性能，至于后者则是对写更友好，但牺牲了读。非原地更新的结构在70年代就提出了，那时的做法就是将所有的写顺序地写到log文件里，但这种append-only
+logs的结构其读性能太差了，而且需要设计一个良好的逻辑去回收数据，做数据重组织。到了90年代，当下流行的LSM基本结构才逐渐成型，引入了多层结构，写memtable，实现了tiering
+merge策略等。</p>
+<h3 id="todays-lsm-trees">Today's LSM-trees</h3>
+<h4 id="basic-structure">Basic Structure</h4>
+<p>这一章主要介绍了基本的LSM结构，现在的LSM实现仍然是非原地更新的方式从而尽量减少随机IO，所有的写入都会append到memory
+component中。disk
+components则是进行定期的合并然后生成新的component，而不会去修改现有。</p>
+<p>通常来说会使用跳表或者B树去组织memory component，而disk
+component则是由B树或者sstable组成，一个sstable包含了多个data
+blocks和一个index
+block。对于LSM的查询来说，点查会从最新的component找到最旧的component，找到即返回，至于范围查询则需要所有层次的component都遍历一遍，丢到优先队列去归并。</p>
+<p>最后则是介绍了下图所示的merge策略，主要分为两种：第一种是Leveling
+merge，每层只有一个component，然后下一层是当前层的T倍大小；另一种则是Tiering
+merge，每层最多T个components。前者对于查询更友好，后者则有利于写入。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfa82.png" /></p>
+<h4 id="some-well-known-optimizations">Some Well-Known
+Optimizations</h4>
+<p>目前大多数LSM-tree实现都使用了两种比较流行的优化方法：一是bloom
+filter，它可以以非常节省空间的方式来判断集合成员的存在与否，它通常构建在磁盘组件之上，放在内存中，以极大地提高点查性能。</p>
+<p>另一种则是Partitioning，LSM树的磁盘通常会被划分为多个小分区，对应到LevelDB就是sstable。这种划分方法可以限制每个合并操作的处理时间以及创建新sstable所需的临时磁盘空间，另一方面也可以避免因为顺序更新或者热点更新带来的负载，前者几乎不需要合并，而后者则不需要合并那些不涉及的小分区。如下图所示，leveldb的L0多个分区一般是具备重叠键范围的，这是因为这些分区是由memtable直接flush的。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfb43.png" /></p>
+<h4 id="concurrency-control-and-recovery">Concurrency Control and
+Recovery</h4>
+<p>接下来主要讨论当今 LSM-tree
+实现所使用的并发控制和恢复技术。对于并发控制，LSM-tree需要处理并发读取和写入并处理并发刷新和合并操作，这里确保并发读写的正确性是数据库系统中访问方法的基本要求。根据事务隔离要求，现在的
+LSM-tree实现要么使用锁方案，要么使用多版本方案。后者天然适用于LSM树，因为在合并期间可以自然地对key的过时版本进行垃圾收集。对于恢复，则是使用WAL的方法，即先写日志再写memtable。</p>
+<h2 id="lsm-tree-improvements">LSM-tree Improvements</h2>
+<h3 id="a-taxonomy-of-lsm-tree-improvements">A Taxonomy of LSM-tree
+Improvements</h3>
+<p>尽管LSM
+tree在NoSQL领域很受欢迎，但基本的设计仍然存在各种缺点和不足。一是写放大，包括leveldb、RocksDB等采用了水平合并策略，仍然会产生相对较高的写入放大。二是合并操作会对系统产生负面影响，包括合并后的缓冲区cache
+miss和大规模合并期间可能产生的写入停顿。三是如何充分利用硬件，早期的LSM-tree是为硬盘设计的。四是如何调整和定制基本的LSM树实现，以更好地应对特殊的工作负载。五则是Auto-Tuning，由于LSM-trees具备非常多可以调整的参数，需要对应不同的场景以实现最佳选择。六是二级索引，基本的LSM-tree只提供了简单的kv接口，如何在写入性能开销很小的情况下有效地维护一组相关的二级索引是非常值得探讨的。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfbd8.png" /></p>
+<h3 id="reducing-write-amplification">Reducing Write Amplification</h3>
+<p>本节主要讲述为减少LSM树写入放大的改进。</p>
+<h4 id="tiering">Tiering</h4>
+<p>优化写入放大的一种方法是tiering的应用，因为它的写入放大比leveling低得多。文中提到了四种基于tiering进行的结构：</p>
+<ul>
+<li>WriteBuffer (WB) Tree，这是一种具有垂直分组的partitioned
+tiering设计的变体，依靠hash-partitioning实现工作负载均衡，使得每个SSTable
+group存储接近数量的数据。此外，它将SSTable组组织成B+树的结构，实现自平衡以最小化总层数。</li>
+<li>light-weight compaction tree (LWC-tree) ，采用了类似的partitioned
+tiering设计和垂直分组，SSTables不再是严格固定大小的，而是基于下一级重叠组的键范围而不是基于它们的大小生成的。</li>
+<li>PebblesDB也采用了类似的设计，主要区别在于它使用受调表的启发，利用Guards思想来确定SSTable组的key范围。
+Guards是SSTable组的key范围，这是根据插入的key概率选择的，从而实现工作负载平衡。一旦选择了一个Guard，它就会在下一次合并期间延迟应用。
+PebblesDB进一步执行SSTables的并行查找以提高范围查询性能。</li>
+<li>dCompaction则是引入了虚拟SSTables和虚拟合并的概念，以降低合并频率。虚拟合并操作会生成一个虚拟
+SSTable，它只指向输入SSTable，但并不执行实际合并。</li>
+</ul>
+<p>这四种结构都具有类似的基于partitioned
+tiering和垂直分组的高级设计，本质上都是用查询换取更低的写放大，它们的主要区别在于如何应付SSTable组的工作负载平衡。</p>
+<h4 id="merge-skipping">Merge Skipping</h4>
+<p>skip-tree提出了一种合并跳过的想法来提高写入性能，如果可以实现将item跳过一些级别去合并，那么总的写入成本就会降低。如下图所示，在级别L的合并期间，skip-tree直接将一些key推送到可变的Level
+L+K的缓冲区，以便可以跳过一些逐级合并的层级。同时，可变缓冲区中跳过的item将在后续合并期间与Level
+L+K的SSTable合并。为确保正确性，只有当该key未出现在任何中间层才可以，这通过检查中间层级的布隆过滤器来满足条件是否成立。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfc44.png" /></p>
+<h4 id="exploiting-data-skew">Exploiting Data Skew</h4>
+<p>TRIAD的做法是在memtable中将热键与冷键分开，以便只有冷键被刷新到磁盘，因此当热键更新时，可以直接丢弃旧版本，而无需将它们写入磁盘。这个设计减少了一些热key频繁更新的倾斜更新工作负载带来的写入放大。热key是定期复制到新的事务日志中，以便回收旧的事务日志。另外TRIAD还通过延迟level
+0的合并来减少写入放大，直到level 0包含多个
+SSTable。最后还提出了一种优化，可避免在刷新后创建新的磁盘组件，相反直接在事务日志本身构建索引结构以提高查找性能。</p>
+<h4 id="summary">Summary</h4>
+<p>Tiering已被广泛用于提高LSM树的写入性能，但这会降低查询性能和空间利用率。现有的基于Tiering的改进主要在
+SSTable的管理方式上有所不同，通过垂直分组或水平分组来满足写入需求，另外skip-tree和TRIAD也提出了几个新的想法来提高写入性能。虽然这些改进都声称极大地提高LSM-tree的写入性能，但往往没有考虑LSM-tree的可调能力，因为他们都是与默认配置的LevelDB
+或 RocksDB比较评估的。</p>
+<h3 id="optimizing-merge-operations">Optimizing Merge Operations</h3>
+<h4 id="improving-merge-performance">Improving Merge Performance</h4>
+<p>在merge性能提升方面很多研究都提出了相应的设计方法，VT-tree提出了一种stitching的操作来提高性能，其基本思想是，在合并多个SSTable时，如果输入的SSTable中某个页面的key范围不与其他SSTable中的任何页面的key范围重叠，则该页面可以简单地被生成的SSTable指向，而无需读取和复制一遍。缺点是可能导致页面碎片和无法生成布隆过滤器。</p>
+<p>还有一种思路如下图所示就是利用流水线优化，以更好地利用CPU和I/O并行性来提高合并性能，完整的合并操作包括了合并操作包含多个阶段，读取阶段、合并排序阶段和写入阶段。通过将其组合成流水线执行可以进一步加速合并。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfcc2.png" /></p>
+<h4 id="reducing-buffer-cache-misses">Reducing Buffer Cache Misses</h4>
+<p>这一章主要是讲了由于sstable合并导致旧sstable删除引起的cache
+miss优化，文中提到的一个做法是用缓存预热的方法，将来自对旧sstable的查询平滑地重定向到新sstable。还有一种做法是将level
+L的就sstable，附加到与level
+L+1关联的缓冲区中，而不是立即删除，这些旧sstable也会被查询搜索以减少缓冲区缓存未命中，并根据访问频率逐渐删除它们。</p>
+<h4 id="summary-1">Summary</h4>
+<p>这一章主要提出了一些关于优化合并操作的实现，包括写入性能、buffer
+cache命中率和write stall等。</p>
+<h3 id="auto-tuning">Auto-Tuning</h3>
+<p>本章主要介绍了一些关于自动调整LSM参数的技术研究。</p>
+<h4 id="parameter-tuning">Parameter Tuning</h4>
+<p>有一些研究提出了一个分析模型，通过统计key的分布来改进LSM操作的成本估计，关键目标是如果能在合并早期就发现某个key被删除或者被更新，它就可以避免前面的合并，减少写放大。</p>
+<p>还有一些研究是关于如何调整memtable与bloom
+filter之间的内存分配情况，以便找到特定工作负载最佳LSM设计，这里的一个关键是尽可能将Bloom
+filter的bit分配给低级别的sst table，最小化所有Bloom
+filter的误报率，从而最大化吞吐。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>这一篇论文主要是一个综述文章，把最近的关于改进LSM
+tree的研究工作分别简单地介绍了下，如果有必要的话，最好是详细阅读其中的论文。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/06/28/MIT18-06S-1-7%E7%AC%94%E8%AE%B0/" rel="next" title="MIT18_06S 1.7笔记">
+                <i class="fa fa-chevron-left"></i> MIT18_06S 1.7笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">271</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#lsm-based-storage-techniques-a-survey"><span class="nav-number">1.</span> <span class="nav-text">LSM-based Storage
+Techniques: A survey</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lsm-tree-basics"><span class="nav-number">1.2.</span> <span class="nav-text">LSM-tree Basics</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#history-of-lsm-trees"><span class="nav-number">1.2.1.</span> <span class="nav-text">History of LSM-trees</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#todays-lsm-trees"><span class="nav-number">1.2.2.</span> <span class="nav-text">Today&#39;s LSM-trees</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#basic-structure"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">Basic Structure</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#some-well-known-optimizations"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">Some Well-Known
+Optimizations</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#concurrency-control-and-recovery"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">Concurrency Control and
+Recovery</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lsm-tree-improvements"><span class="nav-number">1.3.</span> <span class="nav-text">LSM-tree Improvements</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#a-taxonomy-of-lsm-tree-improvements"><span class="nav-number">1.3.1.</span> <span class="nav-text">A Taxonomy of LSM-tree
+Improvements</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reducing-write-amplification"><span class="nav-number">1.3.2.</span> <span class="nav-text">Reducing Write Amplification</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tiering"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">Tiering</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#merge-skipping"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">Merge Skipping</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exploiting-data-skew"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">Exploiting Data Skew</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#summary"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">Summary</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#optimizing-merge-operations"><span class="nav-number">1.3.3.</span> <span class="nav-text">Optimizing Merge Operations</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#improving-merge-performance"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">Improving Merge Performance</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#reducing-buffer-cache-misses"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">Reducing Buffer Cache Misses</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#summary-1"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">Summary</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#auto-tuning"><span class="nav-number">1.3.4.</span> <span class="nav-text">Auto-Tuning</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#parameter-tuning"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">Parameter Tuning</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion"><span class="nav-number">1.4.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

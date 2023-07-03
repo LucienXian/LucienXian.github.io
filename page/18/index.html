@@ -264,6 +264,213 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/Syntax-Directed-Translation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/Syntax-Directed-Translation/" itemprop="url">Syntax-Directed Translation</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T23:03:45+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="syntax-directed-translation">Syntax-Directed Translation</h1>
+<h2 id="error-handling">error handling</h2>
+<p>编译器的两个作用：</p>
+<ul>
+<li>检测无效的程序；</li>
+<li>翻译有效的程序；</li>
+</ul>
+<p>error handler的作用：</p>
+<ul>
+<li><p>准确报告错误；</p></li>
+<li><p>迅速从错误回复；</p></li>
+<li><p>不影响有效部分的编译速度；</p></li>
+<li><p>panic mode：</p></li>
+</ul>
+<p>考虑这样的错误：(1++2)+3</p>
+<p>panic mode的测量是：跳过，到达下一个整数，然后继续；</p>
+<ul>
+<li>error productions</li>
+</ul>
+<p>分辨出已知的语法错误</p>
+<p>error
+correction：尝试去找出正确的接近的程序，对tokens进行插入和删除；</p>
+<h2 id="abstract-syntax-tree">Abstract Syntax Tree</h2>
+<p>编译器需要一个数据结构去代表那个程序。</p>
+<p>考虑grammar：E-&gt;int|(E)|E+E，字符串为5+(2+3)，lexical
+analysis之后变成int'+'('int'+'int')'，然后parse tree为</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap61.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>然后构造AST：</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/compilers_chap62.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>强调嵌套结构，更加抽象并且没有non-terminals</p>
+<h2 id="recursive-descent-parsing">Recursive Descent Parsing</h2>
+<p>也叫top-down parsing，则parse tree是从上到下，从左到右去构建。</p>
+<p>考虑grammar：</p>
+<p>E-&gt;T|T+E T-&gt;int | int * T | (E)</p>
+<p>token stream为：(int),匹配5个括号</p>
+<p>在构造过程中，按照从上到下从左到右一个一个比对，找到正确的parse
+tree</p>
+<h2 id="recursive-descent-algorithm">Recursive Descent Algorithm</h2>
+<p>首先来看一些特别的tokens：INT,OPEN,CLOSE,PLUS,TIMES，全局的next指向下一个的输入token</p>
+<p>定义个函数来检测匹配与否：</p>
+<ul>
+<li><p>对于给定的终止符：**bool term(TOKEN tok){return
+*next++==tok;}**</p></li>
+<li><p>S中的第n个production：<strong>bool Sn(){...}</strong></p></li>
+<li><p>尝试所有的production：<strong>bool S(){...}</strong></p></li>
+<li><p>对于production：E-&gt;T: <strong>bool E1(){return
+T();}</strong></p></li>
+<li><p>对于production：E-&gt;T+E: <strong>bool E2(){return
+T()&amp;&amp;term(PLUS)&amp;&amp;E();}</strong></p></li>
+<li><p>对于所有的productions of E(带回溯的情况):</p></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">E</span><span class="params">()</span>&#123;</span><br><span class="line">    TOKEN* save = next;</span><br><span class="line">    <span class="keyword">return</span> (next=save, E1()) || (next, save, E2()) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>non-terminal T:</li>
+</ul>
+<p><strong>bool T1(){return term(INT);}</strong></p>
+<p><strong>bool T2(){return
+term(INT)&amp;&amp;term(TIMES)&amp;&amp;T();}</strong></p>
+<p><strong>bool T3(){return
+term(OPEN)&amp;&amp;E()&amp;&amp;term(CLOSE);}</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">T</span><span class="params">()</span>&#123;</span><br><span class="line">    TOKEN* save = next;</span><br><span class="line">    <span class="keyword">return</span> (next=save, T1()) || (next=save, T2()) || (next=save, T3());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如何开始parser:</p>
+<ul>
+<li>初始化next指针</li>
+<li>调用E()</li>
+</ul>
+<p>接下来就可以按照从上到下，从左到右进行parse，如果mismatch就进行回溯。</p>
+<h2 id="left-recursion">Left Recursion</h2>
+<ul>
+<li>考虑这样的production：S-&gt;Sa</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">S1</span><span class="params">()</span>&#123;<span class="keyword">return</span> S()&amp;&amp;term(a);&#125;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">S</span><span class="params">()</span>&#123;<span class="keyword">return</span> S1();&#125;</span><br></pre></td></tr></table></figure>
+<p>在这种情况下，S()进入了无限递归；</p>
+<p>对于一个grammar，若存在P经过一次或者多次的递归，即推导出以P开头的式子，则称之为左递归。</p>
+<h3 id="elimination-of-left-recursion">elimination of left
+recursion</h3>
+<p>考虑这样的grammar：<strong>A→Aa1｜Aa2……｜Aan｜b1｜b2……｜bm</strong></p>
+<p>可以改写成：</p>
+<p><strong>A→b1A’｜b2A’……｜bmA’</strong></p>
+<p><strong>A’ →a1A’｜a2A’……｜anA’｜ε</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/Introduction-to-parsing/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1920,269 +2127,11 @@ alt="img" />
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/17/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap6/" itemprop="url">Unix网络编程——chap6</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T11:34:46+08:00">
-                2018-03-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="io复用select和poll函数">I/O复用：select和poll函数</h1>
-<h2 id="概述">概述</h2>
-<p>IO复用：一旦一个或者多个IO条件就绪了，内核就会通知进程</p>
-<p>应用场景：</p>
-<ul>
-<li>当客户处理多个描述符，例如交互输入和网络套接字</li>
-<li>一个客户处理多个套接字</li>
-<li>服务器既要处理监听套接字，又要处理已连接套接字</li>
-<li>服务器既要处理TCP，又要处理UDP</li>
-<li>服务器处理多个服务或者多个协议</li>
-</ul>
-<h2 id="io模型">I/O模型</h2>
-<p>阻塞型I/O；非阻塞型I/O；I/O复用；信号驱动式I/O；异步I/O</p>
-<p>套接字上的输入分为两步：首先是等待数据从网络中到达。到达后会先将数据复制到内核缓冲区，接着复制到应用进程缓冲区。</p>
-<h3 id="阻塞式io模型">阻塞式I/O模型</h3>
-<figure>
-<img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>进程在调用recvfrom()之后，一直阻塞直到数据复制到应用进程缓冲区或者返回错误</p>
-<h3 id="非阻塞式io模型">非阻塞式I/O模型</h3>
-<figure>
-<img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>应用进程持续的轮询，查看操作是否就绪。如果没有就绪就会返回一个错误。这种做法会耗费大量的CPU时间</p>
-<h3 id="io复用模型">I/O复用模型</h3>
-<figure>
-<img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>对于这种模型，我们可以使用select或者poll来完成我们的需求。通过select这个系统调用（阻塞于此），让内核在IO就绪的情况下通知应用进程，然后应用进程再调用recvfrom。这里使用了两个系统调用，但好处是可以等待多个描述符就绪。</p>
-<h3 id="信号驱动式io">信号驱动式I/O</h3>
-<figure>
-<img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>对于这种模型，首先是安装一个信号驱动函数，并马上返回。在内核发现描述符就绪后，通过信号通知应用进程。这样，在等待数据到达的期间进程不会被阻塞。</p>
-<h3 id="异步io">异步I/O</h3>
-<figure>
-<img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>这种模型比之信号驱动式I/O更绝，它是内核完成IO操作之后才会通知应用进程</p>
-<p>前面四种模型都是同步I/O模型，因为进程都会因为IO请求而阻塞，知道IO操作完成</p>
-<h2 id="select函数">select函数</h2>
-<p>先来看函数原型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> maxfdpl, fd_set *readset, fd_set *writeset, fd_set *exceptest, <span class="type">const</span> <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></table></figure>
-<p>对于最后一个函数，这是一个时间参数，控制的是在内核等待操作就绪需要花费多少时间：</p>
-<ul>
-<li>永远等待，直到有一个描述符就绪。设置为NULL</li>
-<li>等待一定的时间，在时间范围内直到有一个描述符就绪</li>
-<li>不等待，轮询，马上返回</li>
-</ul>
-<p>至于中间三个参数：readset，writeset，exceptest。控制的是内核需要测试哪些描述符的读写，异常操作。</p>
-<p>注意的是，fd_set是一个描述符集，通常是一个整数数组。每个元素是32位，每一个位对应的是一个描述符，其中第一个元素对应的是描述符0-31，第二个元素对应的是32-63。例如，3对应的就是描述符123。通过某些宏定义的操作可以设置需要检查的描述符。</p>
-<p>另外就是，由于这里传入的指针会被修改，也就是作为值——结果返回。通过调用select之后检查指针的值就知道哪些bit修改了，也就是描述符的操作就绪了。也因此，每次调用select都要重新设置。</p>
-<p>第一个参数就是待测试的最大描述符+1，也就是测试的描述符个数。</p>
-<h3 id="描述符就绪条件">描述符就绪条件</h3>
-<table>
-<thead>
-<tr class="header">
-<th>Condition</th>
-<th style="text-align: center;">Readable?</th>
-<th style="text-align: right;">Writable?</th>
-<th style="text-align: right;">Exception</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Data to read</td>
-<td style="text-align: center;">x</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr class="even">
-<td>Read half of the connection closed</td>
-<td style="text-align: center;">x</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr class="odd">
-<td>New connection ready for listening socket</td>
-<td style="text-align: center;">x</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr class="even">
-<td>Space available for writing</td>
-<td style="text-align: center;"></td>
-<td style="text-align: right;">x</td>
-<td style="text-align: right;"></td>
-</tr>
-<tr class="odd">
-<td>Write half of the connection closed</td>
-<td style="text-align: center;"></td>
-<td style="text-align: right;">x</td>
-<td style="text-align: right;"></td>
-</tr>
-<tr class="even">
-<td>Pending error</td>
-<td style="text-align: center;">x</td>
-<td style="text-align: right;">x</td>
-<td style="text-align: right;"></td>
-</tr>
-<tr class="odd">
-<td>TCP out-of-band data</td>
-<td style="text-align: center;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">x</td>
-</tr>
-</tbody>
-</table>
-<h2 id="shutdown函数">shutdown函数</h2>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">shutdown</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> howto)</span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>与close函数相比，shutdown函数不需理会引用计数是否为0，它可以直接激发TCP的正常连接终止；</li>
-<li>另外，close终止的是读与写两个方向的数据传送，而shutdown函数则是告诉对端我们已经完成了数据传送，即使对端仍有数据发送。</li>
-</ul>
-<p>也就是shutdown函数的调用会关闭一半的TCP连接。</p>
-<h2 id="poll函数">poll函数</h2>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fdarray, <span class="type">unsigned</span> <span class="type">long</span> nfds, <span class="type">int</span> timeout)</span>;</span><br></pre></td></tr></table></figure>
-<p>poll函数与select类似，但它能提供额外的信息，而且用的不是值——结果参数。</p>
-<p>注意第一个参数，fdarray是这样的一个结果体指针：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">short</span> events;</span><br><span class="line">    <span class="type">short</span> revents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>需要测试的条件由events指定，函数会在revents成员中返回描述符的测试结果。具体表现如下图：</p>
-<figure>
-<img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<p>从这个表可以看到，我们可以测试读写和异常三种操作，另外还能识别三类数据：普通数据，优先级带，高优先级带。至于怎么区分这些数据的类型，就有些争议了，这里就不写了。</p>
-<p>timeout参数跟select的类似，也是指定poll函数返回前等待多长时间。</p>
-<ul>
-<li>INFTIM：永远等待</li>
-<li>0：立即返回，不阻塞进程</li>
-<li><blockquote>
-<p>0：等待指定的时间</p>
-</blockquote></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/17/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/19/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+    <a class="extend prev" rel="prev" href="/page/17/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/19/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
   </nav>
 
 
@@ -2228,7 +2177,7 @@ alt="img" />
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">270</span>
+                <span class="site-state-item-count">271</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

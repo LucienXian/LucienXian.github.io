@@ -376,6 +376,226 @@ mjx-container[display="true"] + br {
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/07/03/LSM-based-Storage-Techniques-A-survey/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2023/07/03/LSM-based-Storage-Techniques-A-survey/" itemprop="url">LSM-based Storage Techniques: A survey</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-07-03T23:40:26+08:00">
+                2023-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="lsm-based-storage-techniques-a-survey">LSM-based Storage
+Techniques: A survey</h1>
+<h2 id="introduction">Introduction</h2>
+<p>随着LSM在NoSQL的应用越来越广泛，关于LSM的研究也变得越来越多。本文是一篇综述，主要目的是提供一些关于LSM存储技术的最优选择和前沿研究，并详细地介绍了相关技术对LSM系统的提高和权衡。</p>
+<h2 id="lsm-tree-basics">LSM-tree Basics</h2>
+<p>这一章主要是回顾了LSM树的背景，并深入讨论了LSM的基本结构。</p>
+<h3 id="history-of-lsm-trees">History of LSM-trees</h3>
+<p>存储引擎主要分为两类结构：一是原地更新，如B+树等；另一个就是LSM树。前者对读和空间利用更友好，但牺牲了写的性能，至于后者则是对写更友好，但牺牲了读。非原地更新的结构在70年代就提出了，那时的做法就是将所有的写顺序地写到log文件里，但这种append-only
+logs的结构其读性能太差了，而且需要设计一个良好的逻辑去回收数据，做数据重组织。到了90年代，当下流行的LSM基本结构才逐渐成型，引入了多层结构，写memtable，实现了tiering
+merge策略等。</p>
+<h3 id="todays-lsm-trees">Today's LSM-trees</h3>
+<h4 id="basic-structure">Basic Structure</h4>
+<p>这一章主要介绍了基本的LSM结构，现在的LSM实现仍然是非原地更新的方式从而尽量减少随机IO，所有的写入都会append到memory
+component中。disk
+components则是进行定期的合并然后生成新的component，而不会去修改现有。</p>
+<p>通常来说会使用跳表或者B树去组织memory component，而disk
+component则是由B树或者sstable组成，一个sstable包含了多个data
+blocks和一个index
+block。对于LSM的查询来说，点查会从最新的component找到最旧的component，找到即返回，至于范围查询则需要所有层次的component都遍历一遍，丢到优先队列去归并。</p>
+<p>最后则是介绍了下图所示的merge策略，主要分为两种：第一种是Leveling
+merge，每层只有一个component，然后下一层是当前层的T倍大小；另一种则是Tiering
+merge，每层最多T个components。前者对于查询更友好，后者则有利于写入。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfa82.png" /></p>
+<h4 id="some-well-known-optimizations">Some Well-Known
+Optimizations</h4>
+<p>目前大多数LSM-tree实现都使用了两种比较流行的优化方法：一是bloom
+filter，它可以以非常节省空间的方式来判断集合成员的存在与否，它通常构建在磁盘组件之上，放在内存中，以极大地提高点查性能。</p>
+<p>另一种则是Partitioning，LSM树的磁盘通常会被划分为多个小分区，对应到LevelDB就是sstable。这种划分方法可以限制每个合并操作的处理时间以及创建新sstable所需的临时磁盘空间，另一方面也可以避免因为顺序更新或者热点更新带来的负载，前者几乎不需要合并，而后者则不需要合并那些不涉及的小分区。如下图所示，leveldb的L0多个分区一般是具备重叠键范围的，这是因为这些分区是由memtable直接flush的。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfb43.png" /></p>
+<h4 id="concurrency-control-and-recovery">Concurrency Control and
+Recovery</h4>
+<p>接下来主要讨论当今 LSM-tree
+实现所使用的并发控制和恢复技术。对于并发控制，LSM-tree需要处理并发读取和写入并处理并发刷新和合并操作，这里确保并发读写的正确性是数据库系统中访问方法的基本要求。根据事务隔离要求，现在的
+LSM-tree实现要么使用锁方案，要么使用多版本方案。后者天然适用于LSM树，因为在合并期间可以自然地对key的过时版本进行垃圾收集。对于恢复，则是使用WAL的方法，即先写日志再写memtable。</p>
+<h2 id="lsm-tree-improvements">LSM-tree Improvements</h2>
+<h3 id="a-taxonomy-of-lsm-tree-improvements">A Taxonomy of LSM-tree
+Improvements</h3>
+<p>尽管LSM
+tree在NoSQL领域很受欢迎，但基本的设计仍然存在各种缺点和不足。一是写放大，包括leveldb、RocksDB等采用了水平合并策略，仍然会产生相对较高的写入放大。二是合并操作会对系统产生负面影响，包括合并后的缓冲区cache
+miss和大规模合并期间可能产生的写入停顿。三是如何充分利用硬件，早期的LSM-tree是为硬盘设计的。四是如何调整和定制基本的LSM树实现，以更好地应对特殊的工作负载。五则是Auto-Tuning，由于LSM-trees具备非常多可以调整的参数，需要对应不同的场景以实现最佳选择。六是二级索引，基本的LSM-tree只提供了简单的kv接口，如何在写入性能开销很小的情况下有效地维护一组相关的二级索引是非常值得探讨的。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfbd8.png" /></p>
+<h3 id="reducing-write-amplification">Reducing Write Amplification</h3>
+<p>本节主要讲述为减少LSM树写入放大的改进。</p>
+<h4 id="tiering">Tiering</h4>
+<p>优化写入放大的一种方法是tiering的应用，因为它的写入放大比leveling低得多。文中提到了四种基于tiering进行的结构：</p>
+<ul>
+<li>WriteBuffer (WB) Tree，这是一种具有垂直分组的partitioned
+tiering设计的变体，依靠hash-partitioning实现工作负载均衡，使得每个SSTable
+group存储接近数量的数据。此外，它将SSTable组组织成B+树的结构，实现自平衡以最小化总层数。</li>
+<li>light-weight compaction tree (LWC-tree) ，采用了类似的partitioned
+tiering设计和垂直分组，SSTables不再是严格固定大小的，而是基于下一级重叠组的键范围而不是基于它们的大小生成的。</li>
+<li>PebblesDB也采用了类似的设计，主要区别在于它使用受调表的启发，利用Guards思想来确定SSTable组的key范围。
+Guards是SSTable组的key范围，这是根据插入的key概率选择的，从而实现工作负载平衡。一旦选择了一个Guard，它就会在下一次合并期间延迟应用。
+PebblesDB进一步执行SSTables的并行查找以提高范围查询性能。</li>
+<li>dCompaction则是引入了虚拟SSTables和虚拟合并的概念，以降低合并频率。虚拟合并操作会生成一个虚拟
+SSTable，它只指向输入SSTable，但并不执行实际合并。</li>
+</ul>
+<p>这四种结构都具有类似的基于partitioned
+tiering和垂直分组的高级设计，本质上都是用查询换取更低的写放大，它们的主要区别在于如何应付SSTable组的工作负载平衡。</p>
+<h4 id="merge-skipping">Merge Skipping</h4>
+<p>skip-tree提出了一种合并跳过的想法来提高写入性能，如果可以实现将item跳过一些级别去合并，那么总的写入成本就会降低。如下图所示，在级别L的合并期间，skip-tree直接将一些key推送到可变的Level
+L+K的缓冲区，以便可以跳过一些逐级合并的层级。同时，可变缓冲区中跳过的item将在后续合并期间与Level
+L+K的SSTable合并。为确保正确性，只有当该key未出现在任何中间层才可以，这通过检查中间层级的布隆过滤器来满足条件是否成立。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfc44.png" /></p>
+<h4 id="exploiting-data-skew">Exploiting Data Skew</h4>
+<p>TRIAD的做法是在memtable中将热键与冷键分开，以便只有冷键被刷新到磁盘，因此当热键更新时，可以直接丢弃旧版本，而无需将它们写入磁盘。这个设计减少了一些热key频繁更新的倾斜更新工作负载带来的写入放大。热key是定期复制到新的事务日志中，以便回收旧的事务日志。另外TRIAD还通过延迟level
+0的合并来减少写入放大，直到level 0包含多个
+SSTable。最后还提出了一种优化，可避免在刷新后创建新的磁盘组件，相反直接在事务日志本身构建索引结构以提高查找性能。</p>
+<h4 id="summary">Summary</h4>
+<p>Tiering已被广泛用于提高LSM树的写入性能，但这会降低查询性能和空间利用率。现有的基于Tiering的改进主要在
+SSTable的管理方式上有所不同，通过垂直分组或水平分组来满足写入需求，另外skip-tree和TRIAD也提出了几个新的想法来提高写入性能。虽然这些改进都声称极大地提高LSM-tree的写入性能，但往往没有考虑LSM-tree的可调能力，因为他们都是与默认配置的LevelDB
+或 RocksDB比较评估的。</p>
+<h3 id="optimizing-merge-operations">Optimizing Merge Operations</h3>
+<h4 id="improving-merge-performance">Improving Merge Performance</h4>
+<p>在merge性能提升方面很多研究都提出了相应的设计方法，VT-tree提出了一种stitching的操作来提高性能，其基本思想是，在合并多个SSTable时，如果输入的SSTable中某个页面的key范围不与其他SSTable中的任何页面的key范围重叠，则该页面可以简单地被生成的SSTable指向，而无需读取和复制一遍。缺点是可能导致页面碎片和无法生成布隆过滤器。</p>
+<p>还有一种思路如下图所示就是利用流水线优化，以更好地利用CPU和I/O并行性来提高合并性能，完整的合并操作包括了合并操作包含多个阶段，读取阶段、合并排序阶段和写入阶段。通过将其组合成流水线执行可以进一步加速合并。</p>
+<p><img
+src="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfcc2.png" /></p>
+<h4 id="reducing-buffer-cache-misses">Reducing Buffer Cache Misses</h4>
+<p>这一章主要是讲了由于sstable合并导致旧sstable删除引起的cache
+miss优化，文中提到的一个做法是用缓存预热的方法，将来自对旧sstable的查询平滑地重定向到新sstable。还有一种做法是将level
+L的就sstable，附加到与level
+L+1关联的缓冲区中，而不是立即删除，这些旧sstable也会被查询搜索以减少缓冲区缓存未命中，并根据访问频率逐渐删除它们。</p>
+<h4 id="summary-1">Summary</h4>
+<p>这一章主要提出了一些关于优化合并操作的实现，包括写入性能、buffer
+cache命中率和write stall等。</p>
+<h3 id="auto-tuning">Auto-Tuning</h3>
+<p>本章主要介绍了一些关于自动调整LSM参数的技术研究。</p>
+<h4 id="parameter-tuning">Parameter Tuning</h4>
+<p>有一些研究提出了一个分析模型，通过统计key的分布来改进LSM操作的成本估计，关键目标是如果能在合并早期就发现某个key被删除或者被更新，它就可以避免前面的合并，减少写放大。</p>
+<p>还有一些研究是关于如何调整memtable与bloom
+filter之间的内存分配情况，以便找到特定工作负载最佳LSM设计，这里的一个关键是尽可能将Bloom
+filter的bit分配给低级别的sst table，最小化所有Bloom
+filter的误报率，从而最大化吞吐。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>这一篇论文主要是一个综述文章，把最近的关于改进LSM
+tree的研究工作分别简单地介绍了下，如果有必要的话，最好是详细阅读其中的论文。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/06/28/MIT18-06S-1-7%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2107,250 +2327,11 @@ Problems</h3>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/" itemprop="url">Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-14T23:43:55+08:00">
-                2022-01-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1
-id="napa-powering-scalable-data-warehousing-with-robust-ery-performance-at-google">Napa:
-Powering Scalable Data Warehousing with Robust !ery Performance at
-Google</h1>
-<blockquote>
-<p>Google产生的大量应用数据，需要有一个可扩展性强、响应时间短、可用性高和强一致性的存储提供服务。Napa就是Google用来满足这些要求的系统，其核心的数据就是使用一致的物化视图。</p>
-</blockquote>
-<h2 id="introduction">INTRODUCTION</h2>
-<p>Napa其实是用来替代Google另一款OLAP产品Mesa的，并且从Mesa迁移了PB级的历史数据，与Mesa相比，Napa的设计需求更为广泛：一是更稳定的查询性能，期望毫秒级的低查询延迟和无论集群负载如何延迟相对稳定；二是更灵活，支持用户根据需求在查询性能、数据新鲜度等方面进行取舍；三是数据写入高吞吐，在海量更新负载下，Napa实现了一个LSM范式的分布式表和视图维护框架。</p>
-<h2 id="napas-design-constraints">NAPA’S DESIGN CONSTRAINTS</h2>
-<p>这一章主要是将Napa的设计过程中考虑了哪些关键目标，最理想的情况当然是以尽可能低的成本实现最高的查询性能和最高的数据新鲜度。数据新鲜度是通过将数据添加到表的时间点到可用于查询的时间点之间的维度来衡量的，而成本则主要是数据处理和存储所需要的机器资源成本。</p>
-<h3 id="clients-need-flexibility">Clients Need Flexibility</h3>
-<p>这一个前面也说了，Napa需要支持client在下面三个因素（数据新鲜度、资源成本和查询性能）之间进行权衡选择。</p>
-<p><img
-src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcad.png" /></p>
-<p>一个重要的考虑点在于数据写入和当前存储是否耦合，如果将新的数据和当前存储结合起来，这意味着数据的写入只有只有在应用到表及其所有视图后才会提交，这是Mesa的设计，但有一个比较大的缺点，即额外添加视图会导致数据写入变慢，这种设计虽然提高了查询速度，但牺牲了一定的数据新鲜度。另一种就是视图的生成可以作为查询的一部分选择性地完成，维护视图的异步模型会在一定程度上影响表及视图之间的一致性。</p>
-<p>因此Napa需要提供一个灵活的client，以便随时调整系统对于这些目标的需求。</p>
-<h2 id="design-choices-made-by-napa">DESIGN CHOICES MADE BY NAPA</h2>
-<p>Napa中的一个关键设计选择是依靠物化视图来实现更高的查询性能。Napa的主要架构由下图三个组件组成：</p>
-<p><img
-src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcb1.png" /></p>
-<ul>
-<li>Ingestion
-framework：负责将更新数据提交到表中，这些更新在Napa称为deltas。</li>
-<li>Storage
-framework：将更新应用于表及其视图，Napa以LSM的结构维护deltas，每个表都以一个deltas的集合方式表示。Delta不断合并以形成更大的Delta，即Compaction。视图维护层通过应用相应的SQL转换将表Delta转换为视图Delta，存储层还负责定期压缩表和视图。</li>
-<li>Query
-serving：负责应对客户端的查询，系统在查询时执行表（或视图）的必要Delta合并。存储子系统处理更新的速度越快，查询时需要合并的增量就越少。</li>
-</ul>
-<p>Napa将数据写入、视图维护与查询处理进行解耦，允许client根据自己的需要在数据新鲜度、性能和成本之间进行权衡。</p>
-<h3 id="providing-flexibility-to-clients">Providing Flexibility to
-Clients</h3>
-<p>Napa会将client在数据新鲜度、查询性能和成本方面的要求转换为对应的数据库配置、比如视图数量、写入任务的quota限制、查询期间的最大打开delta数量等等，这是一个动态但易于理解的数据库状态指示器。</p>
-<p>为此Napa引入了称为可查询时间戳 (QT)
-的概念。QT是数据新鲜度的直接指标，因为[Now() -
-QT]表示数据延迟，客户端可以查询到 QT
-时间戳之前的所有数据。下文就介绍了三类Napa
-client以及系统如何使用QT来调整Napa。</p>
-<ul>
-<li>Tradeoff
-freshness：牺牲数据新鲜度即意味着Napa的QT推进会取决于查询执行时保持适度数量的视图和更少的deltas来合并。同时为了保持低资源成本，Napa的执行框架会使用更少的worker和资源进行视图维护。</li>
-<li>Tradeoff query
-performance：牺牲查询性能即意味着Napa的QT推进会取决于更少的视图，但在查询执行时需要合并的Deltas可能相对较多。由于每个表和视图的Deltas较多，查询性能较低。简单来说就是将视图维护和压缩的成本转移到查询；</li>
-<li>Tradeoff
-costs：以更高的成本提供良好的查询性能和数据新鲜度。Napa的QT推进取决于多个视图，并且合并时的Deltas数量非常少，从而确保更短的查询执行时间。并且花费更多的资源来增加worker来满足要求。</li>
-</ul>
-<h3 id="data-availability">Data Availability</h3>
-<p>关于数据可用性，Napa的做法是将数据和元数据操作解耦，在数据中心的每个副本上异步执行数据操作，并定期在Spanner使用元数据操作以确保副本彼此保持同步，确保副本之间的一致性，将同步和异步的模式进行组合。</p>
-<h2 id="system-architecture">SYSTEM ARCHITECTURE</h2>
-<p>如下图，Napa的架构由数据平面和控制平面组成，数据平面则是由上述的数据写入、存储和查询服务组成的。控制平面则负责协调各个子系统之间的工作，多个数据中心同步和元数据事务。</p>
-<p><img
-src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcbb.png" /></p>
-<p>Napa大量依赖了Google现有的基础设施，比如Napa的表数据就是存储在Colossus文件系统上、Spanner负责元数据管理和系统状态存储、F1
-Query则用来做查询服务和大规模的数据处理。</p>
-<p>Napa客户端使用ETL管道将数据写入表中，数据摄取框架可以承受高达数十GB/s压缩数据的负载。同时，Napa的存储组件通过压缩表和视图的delta，创建更大的delta，从而减少在线查询期间的合并操作。查询服务则在运行时进行必须要缓存、预取和合并Delta的操作，提供低延迟和稳定的查询，前者是通过查询定向到预先计算的物化视图实现的，后者则是通过控制compaction和一些系列IO优化技术来减少长尾。</p>
-<p>Napa依赖视图作为获得良好查询性能的主要机制，包含物化视图的Napa表按其主键进行排序、索引和Range分区。与现有数据库更多倾向于使用Scan的查询处理不同，Napa考虑到负载和查询性能等要求，最终选择了按索引key查找，当然这可能会带来热点和负载均衡等问题，但论文中并没有详细讲述如何应对的。</p>
-<p>Napa的控制平面则调度compaction和视图的更新任务，以控制表的deltas保持在一个配置值。如前所述，QT构成了数据新鲜度的基础，查询系统使用它来提供稳定的查询性能。如果数据相对落后了（写入慢了），Napa会通过牺牲查询性能来将写入速度拉回到一个合理的配置值。</p>
-<h2 id="ingesting-trillions-of-rows">INGESTING TRILLIONS OF ROWS</h2>
-<p>数据写入框架的目标是允许写入管道在没有显着开销的情况下将大量数据写到Napa中。该子系统的目标是接受数据、执行最少的处理并使其持久化，而不考虑后续视图维护的速度。如下图所示，所有写入的行都会被分配一个元数据时间戳用于排序，然后在满足其他持久性条件（例如复制）后标记为已提交。其次，该子系统允许通过配置增加或减少批处理、聚合复制等worker数量的方式来控制机器成本。</p>
-<p><img
-src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcc5.png" /></p>
-<p>客户端将要写入的数据发送到所有的Napa副本，该框架会产生写入优化的delta，但不能立即用于查询。这些就是unqueryable
-delta，需要在可查询前将它们进行压缩。</p>
-<h2 id="queryable-timestamp">QUERYABLE TIMESTAMP</h2>
-<p>表的可查询时间戳（QT）是一个时间戳，它表示可以查询的数据的新鲜度。假设QT(table)
-= X，则client可以查询到时间
-X之前的所有数据，并且时间X之后摄入的数据属于不可查询数据的一部分，即一个表的新鲜度是[Now()
--
-QT]。一旦在(Y-X)时间范围内写入的数据经过优化后满足了查询性能要求，QT的值将从X变成Y。因此client可以使用Napa的配置选项和这个指标来调整新鲜度、查询性能和成本。如果client想要高查询性能和低成本，但可以牺牲数据新鲜度，则系统优先使用较少的机器资源进行视图维护以降低成本，QT的推进则变得缓慢。</p>
-<p>确保更高查询性能的一个重要方法是优化读取的基础数据并确保视图可用以加快查询速度。Napa中的表是其所有delta
-files的集合，每个delta对应于在一个时间窗口内为该表接收的更新，如下图所示，不可查询的delta对应于最近写入的数据。每个delta都按key排序、范围分区，并具有类似本地B树的索引，在查询时合并需要读取的delta。</p>
-<p><img
-src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcd1.png" /></p>
-<p>一般client查询都会有严格的延迟限制，通常会在查询期间对打开和合并读的最多delta做限制，通常会限制不超过数十个delta，并且会根据对数据的查询性能做自动设置。通过保持给定数据库的增量数量接近恒定，Napa能够提供强大且稳定的查询性能。</p>
-<p>QT本质上会依赖于后台操作如compaction和视图维护的进度。数据库的QT是数据库中所有表的QT的最小值。
-另外，QT还用于为client提供跨所有Napa副本的一致数据视图。每个副本都有一个局部QT，它基于本地副本中数据的新鲜程度的得出的。
-QT的全局值则是根据查询服务可用性要求从本地QT值计算出来的，实际就是一个基于Quorum机制的选择。</p>
-<h2 id="maintaining-views-at-scale">MAINTAINING VIEWS AT SCALE</h2>
-<p>Napa的存储子系统负责维护视图和delta的compaction，其目标是能有效地管理数千个表和视图，并且数据量通常是PB级的。但视图维护遇到的一个困难是，基表的更新转换为视图更新的过程中，由于key空间的映射带来的数据倾斜问题。另外就是由于数据库的QT往往会受到长尾视图的影响，因此Napa利用了下面的技术来解决视图维护的问题：</p>
-<ul>
-<li>Use of F1 Query as a “data pump”：使用Google的F1 Query作为data
-pump来压缩表和维护视图，视图维护使用查询优化器，它可以在备选计划中做出很好的选择。</li>
-<li>Replanning to avoid data
-skews：如果检测到数据倾斜，系统可以即时做新的维护计划，提高视图的维护速度。</li>
-<li>Intelligence in the
-loop：需要具备能力，根据历史负载选择数据中心执行任务，根据进度主动终止任务，并发任务执行以限制长尾。</li>
-</ul>
-<h3 id="query-optimizations-challenges-in-view-maintenance">Query
-optimizations challenges in View Maintenance</h3>
-<p>Napa的视图维护过程有效地利用了输入中的数据属性，由于处理的数据量和特定数据属性使大规模查询处理变得更复杂，视图更新必须解决独特的优化挑战。数据属性的一个例子就是要更新的视图相对于基表的排序顺序。如果基于视图排序顺序对视图key重新排序，这可能会是一个非常昂贵的方案，而尽可能维护输入顺序反而是低成本。因此如下图所示，根据维护它们的成本，存在三类视图：</p>
-<p><img
-src="https://pic.imgdb.cn/item/61e199e72ab3f51d91a9e423.png" /></p>
-<ul>
-<li>与基表共享前缀的视图：例如基表具有键(A, B, C)，而视图位于(A,
-B)上，框架只需要对公共key前缀（A、B）对输入进行聚类则可以完全避免重新排序；</li>
-<li>仅有部分公共前缀的视图：例如基表具有key(A, B, C, D)，而视图位于(A,
-B,
-D)。即使在这种情况下，我们也可以通过在(A,B)上对输入基表进行聚类，然后在D上对每个唯一的(A,B)组进行排序来部分利用输入顺序；</li>
-<li>不共享任意前缀的视图：这一类的优化机会就很少了；</li>
-</ul>
-<h3 id="mechanics-of-compaction">Mechanics of Compaction</h3>
-<p>压缩将多个输入delta组合成一个输出delta，异步压缩能有效减少查询时的合并负载，但对于高频写入的表来说，压缩是非常高的代价，会使得数据新鲜度变低。由于delta
-files是单独排序的，因此压缩本质上是归并排序。合并过程会在各种输入之间分配固定的内存预算，因此输入越多，每个输入流的内存越小，并且当其中一个输入被消耗完时，归并过程将停止。因此大型的归并会使得发送归并终止的可能性越高。</p>
-<h2 id="robust-query-serving-performance">ROBUST QUERY SERVING
-PERFORMANCE</h2>
-<p>维护较低的查询性能是业务使用的关键，本节主要讲Napa如果使用QT、视图等一系列技术实现强大的查询性能。</p>
-<p>这里主要讲了几点：</p>
-<ol type="1">
-<li>尽量使用视图来响应查询，filter和聚合下推，尽可能减少读取的数据量。并且依赖并发加快查询。</li>
-<li>通过分布式的cache层和数据预取来进一步减少IO。</li>
-<li>并行化的IO调用往往会受到长尾延迟的影响，为了对抗这种延迟，Napa会尽可能合并小IO，并基于下面两种技术去实现：Lazy
-merging across deltas，当有N个子查询和M个delta时，尽可能避免delta
-server中的交叉delta合并，每个server只处理一个delta，将NxM的并行IO组合减少到N个冰箱IO；Size-based
-disk
-layout，根据delta大小选择不同的磁盘文件布局，PAX适用于小delta，将所有列访问组合到一个IO，大delta则使用按列layout，提高扫描查询的IO效率。</li>
-<li>由于Napa建立在多种Google基础设施上，对于这种复杂且相互依赖的系统所有可变性来源，无法完全消除长尾延迟。Napa的做法是采用对冲机制，则记录延迟的状态，尽可能在状态不稳定时将请求发送到不同的服务器/数据中心，以容忍一定的长尾延迟。</li>
-</ol>
-<h2 id="conclusion">CONCLUSION</h2>
-<p>Napa是Google新一代的OLAP系统，具备高可用性，并且与其他数据库依赖列存储、并行、压缩等方式不同，其强依赖物化视图提供了更好的查询能力，同时允许client自行在数据新鲜度、查询延迟和成本之间进行权衡选择，总体而言是一篇非常具备启发性的OLAP论文。</p>
-<h3 id="section"></h3>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/2/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/2/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
   </nav>
 
 
@@ -2396,7 +2377,7 @@ layout，根据delta大小选择不同的磁盘文件布局，PAX适用于小del
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">270</span>
+                <span class="site-state-item-count">271</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

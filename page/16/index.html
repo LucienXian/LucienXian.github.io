@@ -376,6 +376,270 @@ mjx-container[display="true"] + br {
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/12/LinearModel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/12/LinearModel/" itemprop="url">LinearModel</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-12T22:43:49+08:00">
+                2018-07-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="线性模型">线性模型</h1>
+<h2 id="基本形式">基本形式</h2>
+<p>线性模型是通过一个属性的线性组合进行预测的函数： <span
+class="math display">\[
+f(x) = w_1x_1 + w_2x_2 + ... + w_dx_d + b = w^Tx + b
+\]</span></p>
+<ul>
+<li>许多非线性模型可以通过在线性模型的基础上引入层级结构或者高维映射形成；</li>
+<li>另外，向量w直观地表达了各个属性在预测中的重要性；</li>
+</ul>
+<h2 id="线性回归">线性回归</h2>
+<p>给定数据集<span class="math inline">\(D={(x_1, y_1), (x_2,
+y_2),...,(x_m, y_m)}\)</span>，其中向量<span
+class="math inline">\(x_i=(x_{i1};x_{i2};...;x_{id})\)</span>。而线性回归就是希望找到一个线性模型能够准确地预测出值。也就是试图学习得：
+<span class="math display">\[
+f(x) == w^Tx + b，使得f(x_i)\approx{y_i}
+\]</span>
+那么这里的关键要确定w和b，也就是保证f(x)和y之间最小的时候获得w和b，从几何的角度来看，就是找到一条直线使得所有样本到直线上的欧氏距离之和最小。</p>
+<p>假设有 <span class="math display">\[
+X=
+\begin{bmatrix}
+    x_{11} &amp; x_{12} &amp; x_{13} &amp; \dots  &amp; x_{1d} \\
+    x_{21} &amp; x_{22} &amp; x_{23} &amp; \dots  &amp; x_{2d} \\
+    \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+    x_{m1} &amp; x_{m2} &amp; x_{m3} &amp; \dots  &amp; x_{md}
+\end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+y = (y_1; y_2;...;y_m)
+\]</span></p>
+<p>令<span class="math inline">\(E_w = (y-Xw)^T (y-Xw)\)</span>，对<span
+class="math inline">\(w\)</span>求导，得 <span class="math display">\[
+\frac{\alpha{E_w}}{\alpha{w}} = 2X^T(Xw-y)
+\]</span> 当<span
+class="math inline">\(X^TX\)</span>为正定矩阵或者满秩矩阵，令导数为0可得：
+<span class="math display">\[
+2X^T(Xw-y) = 0 \\
+X^TXw = X^Ty \\
+w = (X^TX)^{-1}X^Ty
+\]</span>
+假如我们认为对应的输入会导致在指数尺度上发生变化，可以转换成对数线性回归：
+<span class="math display">\[
+ln y = w^T+b
+\]</span></p>
+<h2 id="对数几率回归">对数几率回归</h2>
+<p>上面提及的是利用线性模型做回归学习，如果面对分类任务应该怎么做呢？</p>
+<p>考虑二分类问题，则<span class="math inline">\(y\in({0,
+1})\)</span>，我们需要将线性回归模型产生的值转换为0/1值。则</p>
+<blockquote>
+<p>当z&lt;0，y = 0;</p>
+<p>当z=0，y = 0.5;</p>
+<p>当z&gt;0，y = 1</p>
+</blockquote>
+<p>因此我们可以sigmoid函数代替，<span class="math inline">\(y =
+\frac{1}{1+e^{-z}}\)</span>，图像如下：</p>
+<figure>
+<img
+src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logistic-curve.svg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>带入上式，可以得到： <span class="math display">\[
+y = \frac{1}{1+e^{-{(w^Tx+b)}}} \\
+ln \frac{y}{1-y} = w^Tx+b
+\]</span> 若把y视为样本x作为正例的可能性，1-y为其反例可能性，那么$ln
+$就是对数几率。这个方法不仅仅可以预测出类别，更可以得到近似概率的预测，提高决策效果。</p>
+<p>当要确定w和b的时候，可以使用极大似然法来估计，目的是使得每个样本属于真实样本的可能性越大越好：
+<span class="math display">\[
+\iota(w, b) = \sum_{i=1}^{m}ln p(y_i|x_i;w,n)
+\]</span> 其中似然项可以写成： <span class="math display">\[
+p(y_i|x_i;w, b) = y_ip(y=1|x,w;b) + (1-y_i)p(y=0|x,w;b)
+\]</span> 带入上式之后，使用梯度下降可以求得最优解。</p>
+<p>关于极大似然法，可以<a
+target="_blank" rel="noopener" href="http://www.lucienxian.top/2018/05/15/Bayesian/">参考</a></p>
+<h2 id="线性判别分析">线性判别分析</h2>
+<p><strong>linear discriminant
+analysis(LDA)</strong>是一种经典的线性学习方法，可用作分类，也可以为后续的分类做降维操作。</p>
+<p>LDA的思想：设法将样本投影到这样的一条直线上：同类的样例的投影点尽可能相近，异类样例的投影点尽可能远离，这样就可以根据投影点的位置来确定新样本的类别。</p>
+<figure>
+<img src="https://i.stack.imgur.com/9k7iT.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<blockquote>
+<p>https://i.stack.imgur.com/9k7iT.png</p>
+</blockquote>
+<p>令<span class="math inline">\(X_i, \mu_i,
+\Sigma_{i}\)</span>分别表示第i类实例的集合、均值向量和协方差矩阵。在将样本值投影到直线之后，两个样本的协方差分别为<span
+class="math inline">\(w_T\Sigma_0w\)</span>和<span
+class="math inline">\(w_T\Sigma_1w\)</span>，而样本中心的投影则是<span
+class="math inline">\(w_T\mu_0\)</span>和<span
+class="math inline">\(w_T\mu_1\)</span>。因此，为了使得同类样例的投影点尽可能接近，异类样例的投影中心尽可能大，则需要最大化目标函数：
+<span class="math display">\[
+J = \frac{\Arrowvert
+w^T\mu_0-w^T\mu_1\Arrowvert^2_2}{w_T\Sigma_0w+w_T\Sigma_1w} \\
+= \frac{w_T(\mu_0-\mu_1)(\mu_0-\mu_1)^Tw}{w_T(\Sigma_0+\Sigma_1)w}
+\]</span> 分子<span class="math inline">\(\Arrowvert
+w^T\mu_0-w^T\mu_1\Arrowvert^2_2\)</span>尽可能大，保证类中心之间距离尽可能大。分母<span
+class="math inline">\(w_T\Sigma_0w+w_T\Sigma_1w\)</span>尽可能小，使得同样例的投影点的协方差尽可能小。</p>
+<h2 id="多分类学习">多分类学习</h2>
+<p>多分类学习的任务，可以基于二分类学习进行推广，即将多分类任务拆分为若干个二分类任务进行求解。有三种拆分策略：</p>
+<ul>
+<li>一对一：OvO；</li>
+<li>一对其余：OvR；</li>
+<li>多对多：MvM；</li>
+</ul>
+<h3 id="一对一">一对一</h3>
+<p>假设有N个类别，我们分别进行两两配对，那么就会产生N(N-1)/2个二分类任务，则有N(N-1)/2个分类器。那么在测试的时候，对于测试样本就会产生N(N-1)/2个结果。最终结果可以通过投票产生，被预测得最多的类别作为最终分类结果。</p>
+<h3 id="一对其余">一对其余</h3>
+<p>OvR的主要思路是每次将一个类别作为正例，其余所有类的样例作为反例，产生N个分类器。在测试的时候，若仅有一个分类器预测为正类，则对应的类别标记为最终结果；若有多个分类器预测为正类，则需要考虑分类器的预测置信度，选择置信度最大的作为分类结果。</p>
+<h3 id="多对多">多对多</h3>
+<p>多对多的思路是每次选取若干个类作为正类，若干个其它类作为反类，显然OvO和OvR都是MvM的特例，这里介绍一种最常见的MvM技术：纠错输出码(ECOC)。</p>
+<p>ECOC主要分为两个过程：</p>
+<ul>
+<li>编码：对N个类别做M次划分，每次将一部分类别作为正类，一部分作为反类。这样就形成了M个训练集和M个分类器。</li>
+<li>解码：M个分类器分别对测试样本进行预测，这些预测标记组成一个新的编码，将这个编码与各个类别的编码进行比较，返回其中距离最短的类别作为最终结构。</li>
+</ul>
+<p>类别的划分通过编码矩阵来指定，常见形式有二元码和三元码：</p>
+<figure>
+<img
+src="https://www.researchgate.net/profile/S_Escalera/publication/224347110/figure/fig1/AS:302774504968192@1449198475244/a-Binary-ECOC-design-for-a-4-class-problem-An-input-test-codeword-x-is-classified-to.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>三元码的0表示<span
+class="math inline">\(f_i\)</span>分类器不使用该类样本。</p>
+<p>纠错输出码对分类器的错误有一定的容忍和纠正能力，假设某个分类器出现了错误，基于这个编码仍能产生正确的分类的结果。另外ECOC编码越长，或者任意两个类别之间的编码距离越远，它的纠错能力就越强。</p>
+<h2 id="类别不平衡问题">类别不平衡问题</h2>
+<p>前面几章介绍的分类学习方法都有一个基本的前提，那就是不同类别的训练样本树木相当。但假设反例有998个，正例有2个，那么学习方法只要每次都返回一个永远将样本预测设为反例的学习器，那么精确度就有99.8%。但显然，这种学习没有意义。</p>
+<p>线性分类时，当我们用<span class="math inline">\(y =
+w^Tx+b\)</span>对新样本x进行分类时，事实上是用y跟一个阈值进行比较。实际上y代表了正例的可能性，那么几率<span
+class="math inline">\(\frac{y}{1-y}\)</span>代表了正例与反例的可能性比值，则：
+<span class="math display">\[
+若\frac{y}{1-y} &gt; 1，预测为正例
+\]</span> 然而当训练集正反例数目不等时，令<span
+class="math inline">\(m^+\)</span>为正例数目，<span
+class="math inline">\(m^-\)</span>为反例数目，那么观测几率就是<span
+class="math inline">\(\frac{m^+}{m^-}\)</span>，这是基于真实样本是无偏差采样的。因此，我们可以对类别平衡的样本进行一次<strong>“再缩放”</strong>。
+<span class="math display">\[
+\frac{y}{1-y} = \frac{y}{1-y} \times \frac{m^+}{m^-}
+\]</span> 现有技术对于这种类别平衡问题有三种做法：</p>
+<ul>
+<li>欠采样：去掉一些反例，使得正反例数目接近；</li>
+<li>过采样：增加一些正例，使得正反例数目接近；</li>
+<li>阈值移动：就是刚刚的那个再缩放；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/11/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2013,137 +2277,11 @@ sampling）。具体算法原理不大懂，大致的步骤就是首先产生一
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/14/cs231n-lecture1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/14/cs231n-lecture1/" itemprop="url">cs231n@lecture1</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-14T23:36:37+08:00">
-                2018-05-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="course-introduction"><strong>Course Introduction</strong></h1>
-<p>开一个坑，开始学cs231n。其实以前也在学校学过计算机视觉了，对一些算法也有一定的了解，但也仅限于实现一些opencv已有的算法，还不够深入。另外，也学过了吴恩达的机器学习课程。因此，希望以计算机视觉为切入点学一下深度学习，并全面学习计算机视觉。</p>
-<p>lecture
-1主要讲的是<strong>计算机视觉的概述、历史背景以及课程计划</strong>，没什么好说的，就开个题吧。</p>
-<p>这门课的作业用的是jupyter
-notebook发布的，毕竟是一门神课，网上有大量的资料，甚至答案。现在2018版本已经出来了，但视频只对Stanford的学生开发，所以我打算看2017的。官方在YouTube发布了视频，但我觉得去b站看即可，还有中文字幕。网站链接：https://www.bilibili.com/video/av17204303/</p>
-<p>等到完成了，再来写个总结吧。。。反正也没人看哈哈哈哈</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/17/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+    <a class="extend prev" rel="prev" href="/page/15/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/17/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
   </nav>
 
 
@@ -2189,7 +2327,7 @@ notebook发布的，毕竟是一门神课，网上有大量的资料，甚至答
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">270</span>
+                <span class="site-state-item-count">271</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

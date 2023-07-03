@@ -264,6 +264,264 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/17/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap6/" itemprop="url">Unix网络编程——chap6</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T11:34:46+08:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="io复用select和poll函数">I/O复用：select和poll函数</h1>
+<h2 id="概述">概述</h2>
+<p>IO复用：一旦一个或者多个IO条件就绪了，内核就会通知进程</p>
+<p>应用场景：</p>
+<ul>
+<li>当客户处理多个描述符，例如交互输入和网络套接字</li>
+<li>一个客户处理多个套接字</li>
+<li>服务器既要处理监听套接字，又要处理已连接套接字</li>
+<li>服务器既要处理TCP，又要处理UDP</li>
+<li>服务器处理多个服务或者多个协议</li>
+</ul>
+<h2 id="io模型">I/O模型</h2>
+<p>阻塞型I/O；非阻塞型I/O；I/O复用；信号驱动式I/O；异步I/O</p>
+<p>套接字上的输入分为两步：首先是等待数据从网络中到达。到达后会先将数据复制到内核缓冲区，接着复制到应用进程缓冲区。</p>
+<h3 id="阻塞式io模型">阻塞式I/O模型</h3>
+<figure>
+<img src="https://notes.shichao.io/unp/figure_6.1.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>进程在调用recvfrom()之后，一直阻塞直到数据复制到应用进程缓冲区或者返回错误</p>
+<h3 id="非阻塞式io模型">非阻塞式I/O模型</h3>
+<figure>
+<img src="https://notes.shichao.io/unp/figure_6.2.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>应用进程持续的轮询，查看操作是否就绪。如果没有就绪就会返回一个错误。这种做法会耗费大量的CPU时间</p>
+<h3 id="io复用模型">I/O复用模型</h3>
+<figure>
+<img src="https://notes.shichao.io/unp/figure_6.3.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>对于这种模型，我们可以使用select或者poll来完成我们的需求。通过select这个系统调用（阻塞于此），让内核在IO就绪的情况下通知应用进程，然后应用进程再调用recvfrom。这里使用了两个系统调用，但好处是可以等待多个描述符就绪。</p>
+<h3 id="信号驱动式io">信号驱动式I/O</h3>
+<figure>
+<img src="https://notes.shichao.io/unp/figure_6.4.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>对于这种模型，首先是安装一个信号驱动函数，并马上返回。在内核发现描述符就绪后，通过信号通知应用进程。这样，在等待数据到达的期间进程不会被阻塞。</p>
+<h3 id="异步io">异步I/O</h3>
+<figure>
+<img src="https://notes.shichao.io/unp/figure_6.5.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>这种模型比之信号驱动式I/O更绝，它是内核完成IO操作之后才会通知应用进程</p>
+<p>前面四种模型都是同步I/O模型，因为进程都会因为IO请求而阻塞，知道IO操作完成</p>
+<h2 id="select函数">select函数</h2>
+<p>先来看函数原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> maxfdpl, fd_set *readset, fd_set *writeset, fd_set *exceptest, <span class="type">const</span> <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></table></figure>
+<p>对于最后一个函数，这是一个时间参数，控制的是在内核等待操作就绪需要花费多少时间：</p>
+<ul>
+<li>永远等待，直到有一个描述符就绪。设置为NULL</li>
+<li>等待一定的时间，在时间范围内直到有一个描述符就绪</li>
+<li>不等待，轮询，马上返回</li>
+</ul>
+<p>至于中间三个参数：readset，writeset，exceptest。控制的是内核需要测试哪些描述符的读写，异常操作。</p>
+<p>注意的是，fd_set是一个描述符集，通常是一个整数数组。每个元素是32位，每一个位对应的是一个描述符，其中第一个元素对应的是描述符0-31，第二个元素对应的是32-63。例如，3对应的就是描述符123。通过某些宏定义的操作可以设置需要检查的描述符。</p>
+<p>另外就是，由于这里传入的指针会被修改，也就是作为值——结果返回。通过调用select之后检查指针的值就知道哪些bit修改了，也就是描述符的操作就绪了。也因此，每次调用select都要重新设置。</p>
+<p>第一个参数就是待测试的最大描述符+1，也就是测试的描述符个数。</p>
+<h3 id="描述符就绪条件">描述符就绪条件</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th style="text-align: center;">Readable?</th>
+<th style="text-align: right;">Writable?</th>
+<th style="text-align: right;">Exception</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data to read</td>
+<td style="text-align: center;">x</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td>Read half of the connection closed</td>
+<td style="text-align: center;">x</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td>New connection ready for listening socket</td>
+<td style="text-align: center;">x</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td>Space available for writing</td>
+<td style="text-align: center;"></td>
+<td style="text-align: right;">x</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td>Write half of the connection closed</td>
+<td style="text-align: center;"></td>
+<td style="text-align: right;">x</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td>Pending error</td>
+<td style="text-align: center;">x</td>
+<td style="text-align: right;">x</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td>TCP out-of-band data</td>
+<td style="text-align: center;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">x</td>
+</tr>
+</tbody>
+</table>
+<h2 id="shutdown函数">shutdown函数</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">shutdown</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> howto)</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>与close函数相比，shutdown函数不需理会引用计数是否为0，它可以直接激发TCP的正常连接终止；</li>
+<li>另外，close终止的是读与写两个方向的数据传送，而shutdown函数则是告诉对端我们已经完成了数据传送，即使对端仍有数据发送。</li>
+</ul>
+<p>也就是shutdown函数的调用会关闭一半的TCP连接。</p>
+<h2 id="poll函数">poll函数</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fdarray, <span class="type">unsigned</span> <span class="type">long</span> nfds, <span class="type">int</span> timeout)</span>;</span><br></pre></td></tr></table></figure>
+<p>poll函数与select类似，但它能提供额外的信息，而且用的不是值——结果参数。</p>
+<p>注意第一个参数，fdarray是这样的一个结果体指针：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">short</span> events;</span><br><span class="line">    <span class="type">short</span> revents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要测试的条件由events指定，函数会在revents成员中返回描述符的测试结果。具体表现如下图：</p>
+<figure>
+<img src="https://notes.shichao.io/unp/figure_6.23.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>从这个表可以看到，我们可以测试读写和异常三种操作，另外还能识别三类数据：普通数据，优先级带，高优先级带。至于怎么区分这些数据的类型，就有些争议了，这里就不写了。</p>
+<p>timeout参数跟select的类似，也是指定poll函数返回前等待多长时间。</p>
+<ul>
+<li>INFTIM：永远等待</li>
+<li>0：立即返回，不阻塞进程</li>
+<li><blockquote>
+<p>0：等待指定的时间</p>
+</blockquote></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/15/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1669,161 +1927,11 @@ shell是特殊的应用程序，为其它应用程序提供接口；</p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/09/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/09/Unix%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E2%80%94%E2%80%94chap3/" itemprop="url">Unix网络编程——chap3</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-09T11:50:54+08:00">
-                2018-03-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="套接字编程简介">套接字编程简介</h1>
-<h2 id="概述">概述</h2>
-<p>socket编程的基础就是socket结构，几乎所有的API都会用到。而socket通常只会在两个方向上传递——进程到内核和内核到进程。</p>
-<h2 id="套接字地址结构">套接字地址结构</h2>
-<p>先看看IPV4的结构</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> &#123;</span></span><br><span class="line">    <span class="type">in_addr_t</span> s_addr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sin_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sin_family;</span><br><span class="line">    <span class="type">in_port_t</span> sin_port;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span></span><br><span class="line">    <span class="type">char</span> sin_zero[<span class="number">8</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>在sockaddr_in这个结构体，通常只需要三个字段:
-sin_family、sin_addr和sin_port（POSIX标准）。另外sin_zero这个字段一般不会使用，我们直接把其置为０即可</p>
-<p>通常套接字地址结构，由于我们传递给socketAPI的是指针，所以这些API通常要处理各种支持不同协议的套接字地址，又因为套接字函数出来的时候，ANSI
-C还没有提出，也就无法使用通常指针void
-*。所以我们每次传入套接字函数，都需要转为以下的结构：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> sa_len;</span><br><span class="line">    <span class="type">sa_family_t</span> sa_family;</span><br><span class="line">    <span class="type">char</span> sa_data[<span class="number">14</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">serv</span>;</span></span><br><span class="line">bind(sockfd, (<span class="keyword">struct</span> sockaddr *) &amp;serv, <span class="keyword">sizeof</span>(serv));</span><br></pre></td></tr></table></figure>
-<p>另外在IPv6提出之后，有了新的同样套接字地址结构，并且可以支持任何套接字结构，这里就不表了，可以搜一下：<strong>struct
-sockaddr_storage</strong></p>
-<h2 id="值结果参数">值——结果参数</h2>
-<ul>
-<li><p>从进程到内核传递套接字地址的函数有３个：bind,
-connect和sendto，参数是指向结构的指针，和结构的大小；</p></li>
-<li><p>从内核到进程传递套接字的函数有４个：accept, recvfrom,
-getsockname,
-getpeername，参数是指向结构的指针和直线结构大小变量的指针；</p></li>
-</ul>
-<h2 id="字节排序函数">字节排序函数</h2>
-<p>这个是因为在不同的主机系统中，采用大小端模式是不同的，比如linux中是小端序，而apple中是大端序。这两种字节序转换用以下４个函数：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">htons</span><span class="params">(<span class="type">uint16_t</span> host16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">htonl</span><span class="params">(<span class="type">uint32_t</span> host32bitvalue)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">ntohs</span><span class="params">(<span class="type">uint16_t</span> net16bitvalue)</span>;</span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ntohl</span><span class="params">(<span class="type">uint32_t</span> net32bitvalue)</span>;</span><br></pre></td></tr></table></figure>
-<h2 id="字节操作函数">字节操作函数</h2>
-<p>没什么好说的，主要关注bzero，memset，memcpy等几个函数</p>
-<h2
-id="inet_aton-inet_addr-inet_ntoa函数和inet_ptoninet_ntop函数">inet_aton,
-inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</h2>
-<p>这些函数，是用来在ASCII字符串中和网络字节序的二进制值进行转换的。这两个函数——inet_pton，inet_ntop，针对IPv6和IPv4都是适用的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/18/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/20/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+    <a class="extend prev" rel="prev" href="/page/18/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/20/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
   </nav>
 
 
@@ -1869,7 +1977,7 @@ inet_addr, inet_ntoa函数和inet_pton，inet_ntop函数</h2>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">270</span>
+                <span class="site-state-item-count">271</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

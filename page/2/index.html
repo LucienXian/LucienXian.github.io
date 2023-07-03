@@ -264,6 +264,245 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/01/14/Napa-Powering-Scalable-Data-Warehousing-with-Robust-Query-Performance-at-Google/" itemprop="url">Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-14T23:43:55+08:00">
+                2022-01-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1
+id="napa-powering-scalable-data-warehousing-with-robust-ery-performance-at-google">Napa:
+Powering Scalable Data Warehousing with Robust !ery Performance at
+Google</h1>
+<blockquote>
+<p>Google产生的大量应用数据，需要有一个可扩展性强、响应时间短、可用性高和强一致性的存储提供服务。Napa就是Google用来满足这些要求的系统，其核心的数据就是使用一致的物化视图。</p>
+</blockquote>
+<h2 id="introduction">INTRODUCTION</h2>
+<p>Napa其实是用来替代Google另一款OLAP产品Mesa的，并且从Mesa迁移了PB级的历史数据，与Mesa相比，Napa的设计需求更为广泛：一是更稳定的查询性能，期望毫秒级的低查询延迟和无论集群负载如何延迟相对稳定；二是更灵活，支持用户根据需求在查询性能、数据新鲜度等方面进行取舍；三是数据写入高吞吐，在海量更新负载下，Napa实现了一个LSM范式的分布式表和视图维护框架。</p>
+<h2 id="napas-design-constraints">NAPA’S DESIGN CONSTRAINTS</h2>
+<p>这一章主要是将Napa的设计过程中考虑了哪些关键目标，最理想的情况当然是以尽可能低的成本实现最高的查询性能和最高的数据新鲜度。数据新鲜度是通过将数据添加到表的时间点到可用于查询的时间点之间的维度来衡量的，而成本则主要是数据处理和存储所需要的机器资源成本。</p>
+<h3 id="clients-need-flexibility">Clients Need Flexibility</h3>
+<p>这一个前面也说了，Napa需要支持client在下面三个因素（数据新鲜度、资源成本和查询性能）之间进行权衡选择。</p>
+<p><img
+src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcad.png" /></p>
+<p>一个重要的考虑点在于数据写入和当前存储是否耦合，如果将新的数据和当前存储结合起来，这意味着数据的写入只有只有在应用到表及其所有视图后才会提交，这是Mesa的设计，但有一个比较大的缺点，即额外添加视图会导致数据写入变慢，这种设计虽然提高了查询速度，但牺牲了一定的数据新鲜度。另一种就是视图的生成可以作为查询的一部分选择性地完成，维护视图的异步模型会在一定程度上影响表及视图之间的一致性。</p>
+<p>因此Napa需要提供一个灵活的client，以便随时调整系统对于这些目标的需求。</p>
+<h2 id="design-choices-made-by-napa">DESIGN CHOICES MADE BY NAPA</h2>
+<p>Napa中的一个关键设计选择是依靠物化视图来实现更高的查询性能。Napa的主要架构由下图三个组件组成：</p>
+<p><img
+src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcb1.png" /></p>
+<ul>
+<li>Ingestion
+framework：负责将更新数据提交到表中，这些更新在Napa称为deltas。</li>
+<li>Storage
+framework：将更新应用于表及其视图，Napa以LSM的结构维护deltas，每个表都以一个deltas的集合方式表示。Delta不断合并以形成更大的Delta，即Compaction。视图维护层通过应用相应的SQL转换将表Delta转换为视图Delta，存储层还负责定期压缩表和视图。</li>
+<li>Query
+serving：负责应对客户端的查询，系统在查询时执行表（或视图）的必要Delta合并。存储子系统处理更新的速度越快，查询时需要合并的增量就越少。</li>
+</ul>
+<p>Napa将数据写入、视图维护与查询处理进行解耦，允许client根据自己的需要在数据新鲜度、性能和成本之间进行权衡。</p>
+<h3 id="providing-flexibility-to-clients">Providing Flexibility to
+Clients</h3>
+<p>Napa会将client在数据新鲜度、查询性能和成本方面的要求转换为对应的数据库配置、比如视图数量、写入任务的quota限制、查询期间的最大打开delta数量等等，这是一个动态但易于理解的数据库状态指示器。</p>
+<p>为此Napa引入了称为可查询时间戳 (QT)
+的概念。QT是数据新鲜度的直接指标，因为[Now() -
+QT]表示数据延迟，客户端可以查询到 QT
+时间戳之前的所有数据。下文就介绍了三类Napa
+client以及系统如何使用QT来调整Napa。</p>
+<ul>
+<li>Tradeoff
+freshness：牺牲数据新鲜度即意味着Napa的QT推进会取决于查询执行时保持适度数量的视图和更少的deltas来合并。同时为了保持低资源成本，Napa的执行框架会使用更少的worker和资源进行视图维护。</li>
+<li>Tradeoff query
+performance：牺牲查询性能即意味着Napa的QT推进会取决于更少的视图，但在查询执行时需要合并的Deltas可能相对较多。由于每个表和视图的Deltas较多，查询性能较低。简单来说就是将视图维护和压缩的成本转移到查询；</li>
+<li>Tradeoff
+costs：以更高的成本提供良好的查询性能和数据新鲜度。Napa的QT推进取决于多个视图，并且合并时的Deltas数量非常少，从而确保更短的查询执行时间。并且花费更多的资源来增加worker来满足要求。</li>
+</ul>
+<h3 id="data-availability">Data Availability</h3>
+<p>关于数据可用性，Napa的做法是将数据和元数据操作解耦，在数据中心的每个副本上异步执行数据操作，并定期在Spanner使用元数据操作以确保副本彼此保持同步，确保副本之间的一致性，将同步和异步的模式进行组合。</p>
+<h2 id="system-architecture">SYSTEM ARCHITECTURE</h2>
+<p>如下图，Napa的架构由数据平面和控制平面组成，数据平面则是由上述的数据写入、存储和查询服务组成的。控制平面则负责协调各个子系统之间的工作，多个数据中心同步和元数据事务。</p>
+<p><img
+src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcbb.png" /></p>
+<p>Napa大量依赖了Google现有的基础设施，比如Napa的表数据就是存储在Colossus文件系统上、Spanner负责元数据管理和系统状态存储、F1
+Query则用来做查询服务和大规模的数据处理。</p>
+<p>Napa客户端使用ETL管道将数据写入表中，数据摄取框架可以承受高达数十GB/s压缩数据的负载。同时，Napa的存储组件通过压缩表和视图的delta，创建更大的delta，从而减少在线查询期间的合并操作。查询服务则在运行时进行必须要缓存、预取和合并Delta的操作，提供低延迟和稳定的查询，前者是通过查询定向到预先计算的物化视图实现的，后者则是通过控制compaction和一些系列IO优化技术来减少长尾。</p>
+<p>Napa依赖视图作为获得良好查询性能的主要机制，包含物化视图的Napa表按其主键进行排序、索引和Range分区。与现有数据库更多倾向于使用Scan的查询处理不同，Napa考虑到负载和查询性能等要求，最终选择了按索引key查找，当然这可能会带来热点和负载均衡等问题，但论文中并没有详细讲述如何应对的。</p>
+<p>Napa的控制平面则调度compaction和视图的更新任务，以控制表的deltas保持在一个配置值。如前所述，QT构成了数据新鲜度的基础，查询系统使用它来提供稳定的查询性能。如果数据相对落后了（写入慢了），Napa会通过牺牲查询性能来将写入速度拉回到一个合理的配置值。</p>
+<h2 id="ingesting-trillions-of-rows">INGESTING TRILLIONS OF ROWS</h2>
+<p>数据写入框架的目标是允许写入管道在没有显着开销的情况下将大量数据写到Napa中。该子系统的目标是接受数据、执行最少的处理并使其持久化，而不考虑后续视图维护的速度。如下图所示，所有写入的行都会被分配一个元数据时间戳用于排序，然后在满足其他持久性条件（例如复制）后标记为已提交。其次，该子系统允许通过配置增加或减少批处理、聚合复制等worker数量的方式来控制机器成本。</p>
+<p><img
+src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcc5.png" /></p>
+<p>客户端将要写入的数据发送到所有的Napa副本，该框架会产生写入优化的delta，但不能立即用于查询。这些就是unqueryable
+delta，需要在可查询前将它们进行压缩。</p>
+<h2 id="queryable-timestamp">QUERYABLE TIMESTAMP</h2>
+<p>表的可查询时间戳（QT）是一个时间戳，它表示可以查询的数据的新鲜度。假设QT(table)
+= X，则client可以查询到时间
+X之前的所有数据，并且时间X之后摄入的数据属于不可查询数据的一部分，即一个表的新鲜度是[Now()
+-
+QT]。一旦在(Y-X)时间范围内写入的数据经过优化后满足了查询性能要求，QT的值将从X变成Y。因此client可以使用Napa的配置选项和这个指标来调整新鲜度、查询性能和成本。如果client想要高查询性能和低成本，但可以牺牲数据新鲜度，则系统优先使用较少的机器资源进行视图维护以降低成本，QT的推进则变得缓慢。</p>
+<p>确保更高查询性能的一个重要方法是优化读取的基础数据并确保视图可用以加快查询速度。Napa中的表是其所有delta
+files的集合，每个delta对应于在一个时间窗口内为该表接收的更新，如下图所示，不可查询的delta对应于最近写入的数据。每个delta都按key排序、范围分区，并具有类似本地B树的索引，在查询时合并需要读取的delta。</p>
+<p><img
+src="https://pic.imgdb.cn/item/61e199b32ab3f51d91a9bcd1.png" /></p>
+<p>一般client查询都会有严格的延迟限制，通常会在查询期间对打开和合并读的最多delta做限制，通常会限制不超过数十个delta，并且会根据对数据的查询性能做自动设置。通过保持给定数据库的增量数量接近恒定，Napa能够提供强大且稳定的查询性能。</p>
+<p>QT本质上会依赖于后台操作如compaction和视图维护的进度。数据库的QT是数据库中所有表的QT的最小值。
+另外，QT还用于为client提供跨所有Napa副本的一致数据视图。每个副本都有一个局部QT，它基于本地副本中数据的新鲜程度的得出的。
+QT的全局值则是根据查询服务可用性要求从本地QT值计算出来的，实际就是一个基于Quorum机制的选择。</p>
+<h2 id="maintaining-views-at-scale">MAINTAINING VIEWS AT SCALE</h2>
+<p>Napa的存储子系统负责维护视图和delta的compaction，其目标是能有效地管理数千个表和视图，并且数据量通常是PB级的。但视图维护遇到的一个困难是，基表的更新转换为视图更新的过程中，由于key空间的映射带来的数据倾斜问题。另外就是由于数据库的QT往往会受到长尾视图的影响，因此Napa利用了下面的技术来解决视图维护的问题：</p>
+<ul>
+<li>Use of F1 Query as a “data pump”：使用Google的F1 Query作为data
+pump来压缩表和维护视图，视图维护使用查询优化器，它可以在备选计划中做出很好的选择。</li>
+<li>Replanning to avoid data
+skews：如果检测到数据倾斜，系统可以即时做新的维护计划，提高视图的维护速度。</li>
+<li>Intelligence in the
+loop：需要具备能力，根据历史负载选择数据中心执行任务，根据进度主动终止任务，并发任务执行以限制长尾。</li>
+</ul>
+<h3 id="query-optimizations-challenges-in-view-maintenance">Query
+optimizations challenges in View Maintenance</h3>
+<p>Napa的视图维护过程有效地利用了输入中的数据属性，由于处理的数据量和特定数据属性使大规模查询处理变得更复杂，视图更新必须解决独特的优化挑战。数据属性的一个例子就是要更新的视图相对于基表的排序顺序。如果基于视图排序顺序对视图key重新排序，这可能会是一个非常昂贵的方案，而尽可能维护输入顺序反而是低成本。因此如下图所示，根据维护它们的成本，存在三类视图：</p>
+<p><img
+src="https://pic.imgdb.cn/item/61e199e72ab3f51d91a9e423.png" /></p>
+<ul>
+<li>与基表共享前缀的视图：例如基表具有键(A, B, C)，而视图位于(A,
+B)上，框架只需要对公共key前缀（A、B）对输入进行聚类则可以完全避免重新排序；</li>
+<li>仅有部分公共前缀的视图：例如基表具有key(A, B, C, D)，而视图位于(A,
+B,
+D)。即使在这种情况下，我们也可以通过在(A,B)上对输入基表进行聚类，然后在D上对每个唯一的(A,B)组进行排序来部分利用输入顺序；</li>
+<li>不共享任意前缀的视图：这一类的优化机会就很少了；</li>
+</ul>
+<h3 id="mechanics-of-compaction">Mechanics of Compaction</h3>
+<p>压缩将多个输入delta组合成一个输出delta，异步压缩能有效减少查询时的合并负载，但对于高频写入的表来说，压缩是非常高的代价，会使得数据新鲜度变低。由于delta
+files是单独排序的，因此压缩本质上是归并排序。合并过程会在各种输入之间分配固定的内存预算，因此输入越多，每个输入流的内存越小，并且当其中一个输入被消耗完时，归并过程将停止。因此大型的归并会使得发送归并终止的可能性越高。</p>
+<h2 id="robust-query-serving-performance">ROBUST QUERY SERVING
+PERFORMANCE</h2>
+<p>维护较低的查询性能是业务使用的关键，本节主要讲Napa如果使用QT、视图等一系列技术实现强大的查询性能。</p>
+<p>这里主要讲了几点：</p>
+<ol type="1">
+<li>尽量使用视图来响应查询，filter和聚合下推，尽可能减少读取的数据量。并且依赖并发加快查询。</li>
+<li>通过分布式的cache层和数据预取来进一步减少IO。</li>
+<li>并行化的IO调用往往会受到长尾延迟的影响，为了对抗这种延迟，Napa会尽可能合并小IO，并基于下面两种技术去实现：Lazy
+merging across deltas，当有N个子查询和M个delta时，尽可能避免delta
+server中的交叉delta合并，每个server只处理一个delta，将NxM的并行IO组合减少到N个冰箱IO；Size-based
+disk
+layout，根据delta大小选择不同的磁盘文件布局，PAX适用于小delta，将所有列访问组合到一个IO，大delta则使用按列layout，提高扫描查询的IO效率。</li>
+<li>由于Napa建立在多种Google基础设施上，对于这种复杂且相互依赖的系统所有可变性来源，无法完全消除长尾延迟。Napa的做法是采用对冲机制，则记录延迟的状态，尽可能在状态不稳定时将请求发送到不同的服务器/数据中心，以容忍一定的长尾延迟。</li>
+</ol>
+<h2 id="conclusion">CONCLUSION</h2>
+<p>Napa是Google新一代的OLAP系统，具备高可用性，并且与其他数据库依赖列存储、并行、压缩等方式不同，其强依赖物化视图提供了更好的查询能力，同时允许client自行在数据新鲜度、查询延迟和成本之间进行权衡选择，总体而言是一篇非常具备启发性的OLAP论文。</p>
+<h3 id="section"></h3>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/12/05/Greenplum%EF%BC%9AA-Hybrid-Database-for-Transactional-and-Analytical-Workloads/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2450,226 +2689,11 @@ cell。每个Percolator的worker指定几个线程负责扫描这些脏cell。</
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/05/15/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/05/15/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-3/" itemprop="url">《UCB cs294》Required Reading 3</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-15T23:41:29+08:00">
-                2021-05-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="ucb-cs294required-reading-3">《UCB cs294》Required Reading
-3</h1>
-<h2 id="论文一">论文一</h2>
-<p>《Hidden Technical Debt in Machine Learning
-Systems》这篇文章是谷歌基于多年的机器学习系统开发和使用经验总结出来的，着重强调了在机器学习系统中出现的technical
-debt：</p>
-<ul>
-<li>Complex Models Erode Boundaries</li>
-</ul>
-<p>在一般的软件开发中，人们会使用封装、模块化等抽象手段，但机器学习系统由于其依赖大量外部数据，特征的改变会影响全局。论文提到的解决方法是模型隔离和监测模型中的变化。</p>
-<ul>
-<li>Data Dependencies Cost More than Code Dependencies</li>
-</ul>
-<p>这个主要是将对数据依赖关系的分析成本比通常的代码依赖关系分析要高，一是因为数据依赖关系不够稳定，可能存在把一个输出当成另一个地方外部输入的使用；二是存在不必要的数据依赖。对于这两个问题，论文的解决方法是做数据输入的版本控制和定期检查去除不必要的依赖。</p>
-<ul>
-<li>Feedback Loops</li>
-</ul>
-<p>机器学习系统的一大特征就是他们未来的更新很可能会影响到自身，导致analysis
-debt的出现，在模型部署之前很难预测模型的行为。Direct Feedback
-Loops是指模型直接影响自身的特征选择，Hidden Feedback
-Loops是指系统之间间接影响对方，这种Feedback Loops的问题更加严重。</p>
-<ul>
-<li>ML-System Anti-Patterns</li>
-</ul>
-<p>在实际的机器学习系统中，仅仅一小部分代码是用于学习和预测的，慢慢地，系统中会出现各种系统设计的Anti-Patterns。比如出现大量的机器学习库代码，论文的建议是使用胶水语言封装API；数据准备阶段积攒了更多的输入信号，混杂着各种数据操作；机器学习实验过程中，代码出现了一些不必要的条件分支，导致技债出现；还有就是一些代码的code
-smell比较差。</p>
-<ul>
-<li>Configuration Debt</li>
-</ul>
-<p>由于机器学习系统和算法比较复杂，大型的ML系统往往依赖大量的配置，因此需要关注配置的可维护性、易读性、需要做code
-review提交到库中。</p>
-<ul>
-<li>Dealing with Changes in the External World</li>
-</ul>
-<p>这个指的是ML系统与外部世界有较多的交互，外部世界的变化会影响系统、影响模型等。因此需要高效的监控预警配套。</p>
-<ul>
-<li>Other Areas of ML-related Debt</li>
-</ul>
-<p>Data Testing Debt，提供基本的、完整的代码测试；Reproducibility
-Debt，真实的ML系统由于外部世界的变化、并行学习中的随机等等难以保持严格的可重复性；Process
-Management
-Debt，模型的管理问题，真实的系统可能存在数以百计的模型，如何分配资源、控制优先级等很重要；Cultural
-Debt，文化问题，研究员和系统工程师可能存在沟通不当的情况。</p>
-<h2 id="论文二">论文二</h2>
-<p>《TFX: A TensorFlow-Based Production-Scale Machine Learning
-Platform》这篇论文主要介绍了Google开发的一个机器学习平台TFX。TFX最大的特点就是将机器学习所需的各个组件部分集成在一起，提供训练模型、分析验证模型和模型部署的完整工作流，避免了机器学习pipeline各个部分的割裂。</p>
-<h3 id="platform-overview">platform overview</h3>
-<p>作为一个机器学习平台，不单单只关注机器学习算法，还需要考虑到依赖分布式系统架构促使数据和模型的并行，机器学习工作流便于搭建，拥有集中的仓库跟踪保存训练过的多模型等等。</p>
-<p>TFX的设计主要考虑了以下几点：</p>
-<ul>
-<li>平台能应对多种学习任务，除了选用tensorflow作为核心算法库，还支持数据验证分析和可视化工具、模型验证评估和推断工具等；</li>
-<li>持续训练，TFX考虑支持多种持续训练策略；</li>
-<li>易用的配置与工具；</li>
-<li>生产级别的可靠性与可扩展性；</li>
-</ul>
-<p>基于上述的特点，把多种组建模块集成在一起，就形成了下图的平台。</p>
-<p><img
-src="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce25e3.png" /></p>
-<h3 id="data-analysis-transformation-and-validation">DATA ANALYSIS,
-TRANSFORMATION, AND VALIDATION</h3>
-<p>对于机器学习来说，了解数据并及时发现异常数据是至关重要的，有利于避免下游数据出错。这一章主要讲TFX将数据分析、转换和验证作为独立又相互关联的部分。</p>
-<p>数据分析的时候，需要对输入的数据集进行统计，输出一系列统计数据，如连续型数据需要分位数、直方图等等，离散数据需要top-K值和频率等等。</p>
-<p>数据转换则是对数据进行格式转换，如将特征转换为特定的整数。这里的关键是保证在训练和推断期间确保转换逻辑的一致性。TFX会将任何数据转换导出为经过训练的模型的一部分，从而避免了不一致的问题。</p>
-<p>数据验证则是使用schema来描述数据规范，每个算法团队维护自己的schema，数据验证时可以快速确认数据集的异常情况，如何进行修正，反映出数据的变化情况。</p>
-<h3 id="model-training">MODEL TRAINING</h3>
-<p>TFX的设计一大核心是尽可能流水线地、自动化地完成训练生产模型，支持训练使用Tensorflow配置的所有模型。TFX使用了warm
-starting来在模型质量和模型时效性之间达到一个平衡，这是迁移学习使用的技术，讲一个训练好的基准模型应用另一个场景。</p>
-<p>论文另外一点就是TFX用了定义和描述模型的API——model specification
-API，通过对Tensorflow的封装减少代码冗余，提高开发速度。</p>
-<h3 id="model-evaluation-and-validation">MODEL EVALUATION AND
-VALIDATION</h3>
-<p>模型的评估是模型上线前验证模型有效性的关键步骤，TFX对于好模型的定义主要是：<strong>safe
-to serve</strong>和<strong>the desired prediction
-quality</strong>，前者关心的是模型完整性，不会使得推断服务crash，资源使用少，后者则主要是模型预测准确率。</p>
-<p>TFX一方面也使用了各种准确率标准来做AB
-Test，根据不同的产品团队要求提供告警配置，另一方面也支持对数据集根据feature做slice切分，帮助更好地评估模型在不同feature伤的表现。</p>
-<h3 id="model-serving">MODEL SERVING</h3>
-<p>最后则是模型服务，TFX主要依赖Tensorflow
-serving去做这个事情，通过多用户隔离和快速的训练数据反序列化来满足系统的低时延和高性能要求，总的来说提供了一套工业级的模型上线推断服务。</p>
-<h2 id="论文三">论文三</h2>
-<p>《Towards Unified Data and Lifecycle Management for Deep
-Learning》这篇论文主要关注了深度学习中数据和生命周期管理系统的实现，提出了一个modelHub系统，包括了三个部分，一种DSL来帮助泛化对模型的探索、查询，一种新的模型版本管理系统（Dlv）和一种读参数优化的参数归档存储系统（PAS）。</p>
-<p><img
-src="https://pic.imgdb.cn/item/609febea6ae4f77d357d697a.png" /></p>
-<p>ModelHub主要分为local组件和远程组件，local
-functionality包括了一些DNN系统与本地计算机集群的集成，remote
-functionality则是不同用户组共享模型与其版本。</p>
-<p>DLV是一种通过命令行工具的版本控制系统，可以用来与其他本地或者远程组件进行交互，替代了传统的git/svn可以方便其更好地描述查询建模过程中生成的artifacts内部结构。另外通过DQL模块可以帮助研究员开发新模型。Model
-Learning模块本质是特定DNN系统的wrapper。</p>
-<p>至于本地仓库的PAS则是用来存储大量的模型学习参数，PAS的目标是在不影响查询性能的情况下，尽可能维护大量学习的模型信息。其中一大特点是使用了一种新的近似模型评估技术，适用于分段存储PAS。由于浮点算数表示中浮点数具备高熵，难以压缩，PAS提供了按字节分割的浮点矩阵存储方案，通过分割高阶和低阶尾数位，浮点数矩阵按块存储，第一个块由8个高位组成，其余的每个块被分割为一个字节，由于高阶位具有低熵，能更好地做压缩。</p>
-<p>这篇论文描述了如何通过ModelHub去解决一些在管理和调整深度学习模型中的关键数据管理挑战：</p>
-<ul>
-<li>通过调整网络结构和超参数，更容易优化潜在的模型效果；</li>
-<li>减少跟踪模型的负担；</li>
-<li>在不影响查询和检索性能的前提下，尽可能多地存储大量模型和构造快照；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/3/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+    <a class="extend prev" rel="prev" href="/">&lt;i class&#x3D;&quot;fa fa-angle-left&quot;&gt;&lt;&#x2F;i&gt;</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/3/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
   </nav>
 
 
@@ -2715,7 +2739,7 @@ Learning模块本质是特定DNN系统的wrapper。</p>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">270</span>
+                <span class="site-state-item-count">271</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

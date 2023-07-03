@@ -6,7 +6,7 @@
   <link href="http://yoursite.com/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2023-06-27T17:21:08.205Z</updated>
+  <updated>2023-07-03T15:41:22.491Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>LSM-based Storage Techniques: A survey</title>
+    <link href="http://yoursite.com/2023/07/03/LSM-based-Storage-Techniques-A-survey/"/>
+    <id>http://yoursite.com/2023/07/03/LSM-based-Storage-Techniques-A-survey/</id>
+    <published>2023-07-03T15:40:26.000Z</published>
+    <updated>2023-07-03T15:41:22.491Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="lsm-based-storage-techniques-a-survey">LSM-based StorageTechniques: A survey</h1><h2 id="introduction">Introduction</h2><p>随着LSM在NoSQL的应用越来越广泛，关于LSM的研究也变得越来越多。本文是一篇综述，主要目的是提供一些关于LSM存储技术的最优选择和前沿研究，并详细地介绍了相关技术对LSM系统的提高和权衡。</p><h2 id="lsm-tree-basics">LSM-tree Basics</h2><p>这一章主要是回顾了LSM树的背景，并深入讨论了LSM的基本结构。</p><h3 id="history-of-lsm-trees">History of LSM-trees</h3><p>存储引擎主要分为两类结构：一是原地更新，如B+树等；另一个就是LSM树。前者对读和空间利用更友好，但牺牲了写的性能，至于后者则是对写更友好，但牺牲了读。非原地更新的结构在70年代就提出了，那时的做法就是将所有的写顺序地写到log文件里，但这种append-onlylogs的结构其读性能太差了，而且需要设计一个良好的逻辑去回收数据，做数据重组织。到了90年代，当下流行的LSM基本结构才逐渐成型，引入了多层结构，写memtable，实现了tieringmerge策略等。</p><h3 id="todays-lsm-trees">Today's LSM-trees</h3><h4 id="basic-structure">Basic Structure</h4><p>这一章主要介绍了基本的LSM结构，现在的LSM实现仍然是非原地更新的方式从而尽量减少随机IO，所有的写入都会append到memorycomponent中。diskcomponents则是进行定期的合并然后生成新的component，而不会去修改现有。</p><p>通常来说会使用跳表或者B树去组织memory component，而diskcomponent则是由B树或者sstable组成，一个sstable包含了多个datablocks和一个indexblock。对于LSM的查询来说，点查会从最新的component找到最旧的component，找到即返回，至于范围查询则需要所有层次的component都遍历一遍，丢到优先队列去归并。</p><p>最后则是介绍了下图所示的merge策略，主要分为两种：第一种是Levelingmerge，每层只有一个component，然后下一层是当前层的T倍大小；另一种则是Tieringmerge，每层最多T个components。前者对于查询更友好，后者则有利于写入。</p><p><imgsrc="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfa82.png" /></p><h4 id="some-well-known-optimizations">Some Well-KnownOptimizations</h4><p>目前大多数LSM-tree实现都使用了两种比较流行的优化方法：一是bloomfilter，它可以以非常节省空间的方式来判断集合成员的存在与否，它通常构建在磁盘组件之上，放在内存中，以极大地提高点查性能。</p><p>另一种则是Partitioning，LSM树的磁盘通常会被划分为多个小分区，对应到LevelDB就是sstable。这种划分方法可以限制每个合并操作的处理时间以及创建新sstable所需的临时磁盘空间，另一方面也可以避免因为顺序更新或者热点更新带来的负载，前者几乎不需要合并，而后者则不需要合并那些不涉及的小分区。如下图所示，leveldb的L0多个分区一般是具备重叠键范围的，这是因为这些分区是由memtable直接flush的。</p><p><imgsrc="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfb43.png" /></p><h4 id="concurrency-control-and-recovery">Concurrency Control andRecovery</h4><p>接下来主要讨论当今 LSM-tree实现所使用的并发控制和恢复技术。对于并发控制，LSM-tree需要处理并发读取和写入并处理并发刷新和合并操作，这里确保并发读写的正确性是数据库系统中访问方法的基本要求。根据事务隔离要求，现在的LSM-tree实现要么使用锁方案，要么使用多版本方案。后者天然适用于LSM树，因为在合并期间可以自然地对key的过时版本进行垃圾收集。对于恢复，则是使用WAL的方法，即先写日志再写memtable。</p><h2 id="lsm-tree-improvements">LSM-tree Improvements</h2><h3 id="a-taxonomy-of-lsm-tree-improvements">A Taxonomy of LSM-treeImprovements</h3><p>尽管LSMtree在NoSQL领域很受欢迎，但基本的设计仍然存在各种缺点和不足。一是写放大，包括leveldb、RocksDB等采用了水平合并策略，仍然会产生相对较高的写入放大。二是合并操作会对系统产生负面影响，包括合并后的缓冲区cachemiss和大规模合并期间可能产生的写入停顿。三是如何充分利用硬件，早期的LSM-tree是为硬盘设计的。四是如何调整和定制基本的LSM树实现，以更好地应对特殊的工作负载。五则是Auto-Tuning，由于LSM-trees具备非常多可以调整的参数，需要对应不同的场景以实现最佳选择。六是二级索引，基本的LSM-tree只提供了简单的kv接口，如何在写入性能开销很小的情况下有效地维护一组相关的二级索引是非常值得探讨的。</p><p><imgsrc="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfbd8.png" /></p><h3 id="reducing-write-amplification">Reducing Write Amplification</h3><p>本节主要讲述为减少LSM树写入放大的改进。</p><h4 id="tiering">Tiering</h4><p>优化写入放大的一种方法是tiering的应用，因为它的写入放大比leveling低得多。文中提到了四种基于tiering进行的结构：</p><ul><li>WriteBuffer (WB) Tree，这是一种具有垂直分组的partitionedtiering设计的变体，依靠hash-partitioning实现工作负载均衡，使得每个SSTablegroup存储接近数量的数据。此外，它将SSTable组组织成B+树的结构，实现自平衡以最小化总层数。</li><li>light-weight compaction tree (LWC-tree) ，采用了类似的partitionedtiering设计和垂直分组，SSTables不再是严格固定大小的，而是基于下一级重叠组的键范围而不是基于它们的大小生成的。</li><li>PebblesDB也采用了类似的设计，主要区别在于它使用受调表的启发，利用Guards思想来确定SSTable组的key范围。Guards是SSTable组的key范围，这是根据插入的key概率选择的，从而实现工作负载平衡。一旦选择了一个Guard，它就会在下一次合并期间延迟应用。PebblesDB进一步执行SSTables的并行查找以提高范围查询性能。</li><li>dCompaction则是引入了虚拟SSTables和虚拟合并的概念，以降低合并频率。虚拟合并操作会生成一个虚拟SSTable，它只指向输入SSTable，但并不执行实际合并。</li></ul><p>这四种结构都具有类似的基于partitionedtiering和垂直分组的高级设计，本质上都是用查询换取更低的写放大，它们的主要区别在于如何应付SSTable组的工作负载平衡。</p><h4 id="merge-skipping">Merge Skipping</h4><p>skip-tree提出了一种合并跳过的想法来提高写入性能，如果可以实现将item跳过一些级别去合并，那么总的写入成本就会降低。如下图所示，在级别L的合并期间，skip-tree直接将一些key推送到可变的LevelL+K的缓冲区，以便可以跳过一些逐级合并的层级。同时，可变缓冲区中跳过的item将在后续合并期间与LevelL+K的SSTable合并。为确保正确性，只有当该key未出现在任何中间层才可以，这通过检查中间层级的布隆过滤器来满足条件是否成立。</p><p><imgsrc="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfc44.png" /></p><h4 id="exploiting-data-skew">Exploiting Data Skew</h4><p>TRIAD的做法是在memtable中将热键与冷键分开，以便只有冷键被刷新到磁盘，因此当热键更新时，可以直接丢弃旧版本，而无需将它们写入磁盘。这个设计减少了一些热key频繁更新的倾斜更新工作负载带来的写入放大。热key是定期复制到新的事务日志中，以便回收旧的事务日志。另外TRIAD还通过延迟level0的合并来减少写入放大，直到level 0包含多个SSTable。最后还提出了一种优化，可避免在刷新后创建新的磁盘组件，相反直接在事务日志本身构建索引结构以提高查找性能。</p><h4 id="summary">Summary</h4><p>Tiering已被广泛用于提高LSM树的写入性能，但这会降低查询性能和空间利用率。现有的基于Tiering的改进主要在SSTable的管理方式上有所不同，通过垂直分组或水平分组来满足写入需求，另外skip-tree和TRIAD也提出了几个新的想法来提高写入性能。虽然这些改进都声称极大地提高LSM-tree的写入性能，但往往没有考虑LSM-tree的可调能力，因为他们都是与默认配置的LevelDB或 RocksDB比较评估的。</p><h3 id="optimizing-merge-operations">Optimizing Merge Operations</h3><h4 id="improving-merge-performance">Improving Merge Performance</h4><p>在merge性能提升方面很多研究都提出了相应的设计方法，VT-tree提出了一种stitching的操作来提高性能，其基本思想是，在合并多个SSTable时，如果输入的SSTable中某个页面的key范围不与其他SSTable中的任何页面的key范围重叠，则该页面可以简单地被生成的SSTable指向，而无需读取和复制一遍。缺点是可能导致页面碎片和无法生成布隆过滤器。</p><p>还有一种思路如下图所示就是利用流水线优化，以更好地利用CPU和I/O并行性来提高合并性能，完整的合并操作包括了合并操作包含多个阶段，读取阶段、合并排序阶段和写入阶段。通过将其组合成流水线执行可以进一步加速合并。</p><p><imgsrc="https://pic.imgdb.cn/item/64a2ea451ddac507cc8cfcc2.png" /></p><h4 id="reducing-buffer-cache-misses">Reducing Buffer Cache Misses</h4><p>这一章主要是讲了由于sstable合并导致旧sstable删除引起的cachemiss优化，文中提到的一个做法是用缓存预热的方法，将来自对旧sstable的查询平滑地重定向到新sstable。还有一种做法是将levelL的就sstable，附加到与levelL+1关联的缓冲区中，而不是立即删除，这些旧sstable也会被查询搜索以减少缓冲区缓存未命中，并根据访问频率逐渐删除它们。</p><h4 id="summary-1">Summary</h4><p>这一章主要提出了一些关于优化合并操作的实现，包括写入性能、buffercache命中率和write stall等。</p><h3 id="auto-tuning">Auto-Tuning</h3><p>本章主要介绍了一些关于自动调整LSM参数的技术研究。</p><h4 id="parameter-tuning">Parameter Tuning</h4><p>有一些研究提出了一个分析模型，通过统计key的分布来改进LSM操作的成本估计，关键目标是如果能在合并早期就发现某个key被删除或者被更新，它就可以避免前面的合并，减少写放大。</p><p>还有一些研究是关于如何调整memtable与bloomfilter之间的内存分配情况，以便找到特定工作负载最佳LSM设计，这里的一个关键是尽可能将Bloomfilter的bit分配给低级别的sst table，最小化所有Bloomfilter的误报率，从而最大化吞吐。</p><h2 id="conclusion">Conclusion</h2><p>这一篇论文主要是一个综述文章，把最近的关于改进LSMtree的研究工作分别简单地介绍了下，如果有必要的话，最好是详细阅读其中的论文。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;lsm-based-storage-techniques-a-survey&quot;&gt;LSM-based Storage
+Techniques: A survey&lt;/h1&gt;
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;随着LSM在</summary>
+      
+    
+    
+    
+    
+    <category term="数据库" scheme="http://yoursite.com/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+  </entry>
   
   <entry>
     <title>MIT18_06S 1.7笔记</title>
@@ -481,32 +506,6 @@ href=&quot;https://sites.cs.ucsb.edu/~agrawal/fall2009/dynamo.pdf&quot;&gt;</sum
     
     
     <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>《UCB cs294》Required Reading 3</title>
-    <link href="http://yoursite.com/2021/05/15/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-3/"/>
-    <id>http://yoursite.com/2021/05/15/%E3%80%8AUCB-cs294%E3%80%8BRequired-Reading-3/</id>
-    <published>2021-05-15T15:41:29.000Z</published>
-    <updated>2021-05-15T15:43:47.748Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="ucb-cs294required-reading-3">《UCB cs294》Required Reading3</h1><h2 id="论文一">论文一</h2><p>《Hidden Technical Debt in Machine LearningSystems》这篇文章是谷歌基于多年的机器学习系统开发和使用经验总结出来的，着重强调了在机器学习系统中出现的technicaldebt：</p><ul><li>Complex Models Erode Boundaries</li></ul><p>在一般的软件开发中，人们会使用封装、模块化等抽象手段，但机器学习系统由于其依赖大量外部数据，特征的改变会影响全局。论文提到的解决方法是模型隔离和监测模型中的变化。</p><ul><li>Data Dependencies Cost More than Code Dependencies</li></ul><p>这个主要是将对数据依赖关系的分析成本比通常的代码依赖关系分析要高，一是因为数据依赖关系不够稳定，可能存在把一个输出当成另一个地方外部输入的使用；二是存在不必要的数据依赖。对于这两个问题，论文的解决方法是做数据输入的版本控制和定期检查去除不必要的依赖。</p><ul><li>Feedback Loops</li></ul><p>机器学习系统的一大特征就是他们未来的更新很可能会影响到自身，导致analysisdebt的出现，在模型部署之前很难预测模型的行为。Direct FeedbackLoops是指模型直接影响自身的特征选择，Hidden FeedbackLoops是指系统之间间接影响对方，这种Feedback Loops的问题更加严重。</p><ul><li>ML-System Anti-Patterns</li></ul><p>在实际的机器学习系统中，仅仅一小部分代码是用于学习和预测的，慢慢地，系统中会出现各种系统设计的Anti-Patterns。比如出现大量的机器学习库代码，论文的建议是使用胶水语言封装API；数据准备阶段积攒了更多的输入信号，混杂着各种数据操作；机器学习实验过程中，代码出现了一些不必要的条件分支，导致技债出现；还有就是一些代码的codesmell比较差。</p><ul><li>Configuration Debt</li></ul><p>由于机器学习系统和算法比较复杂，大型的ML系统往往依赖大量的配置，因此需要关注配置的可维护性、易读性、需要做codereview提交到库中。</p><ul><li>Dealing with Changes in the External World</li></ul><p>这个指的是ML系统与外部世界有较多的交互，外部世界的变化会影响系统、影响模型等。因此需要高效的监控预警配套。</p><ul><li>Other Areas of ML-related Debt</li></ul><p>Data Testing Debt，提供基本的、完整的代码测试；ReproducibilityDebt，真实的ML系统由于外部世界的变化、并行学习中的随机等等难以保持严格的可重复性；ProcessManagementDebt，模型的管理问题，真实的系统可能存在数以百计的模型，如何分配资源、控制优先级等很重要；CulturalDebt，文化问题，研究员和系统工程师可能存在沟通不当的情况。</p><h2 id="论文二">论文二</h2><p>《TFX: A TensorFlow-Based Production-Scale Machine LearningPlatform》这篇论文主要介绍了Google开发的一个机器学习平台TFX。TFX最大的特点就是将机器学习所需的各个组件部分集成在一起，提供训练模型、分析验证模型和模型部署的完整工作流，避免了机器学习pipeline各个部分的割裂。</p><h3 id="platform-overview">platform overview</h3><p>作为一个机器学习平台，不单单只关注机器学习算法，还需要考虑到依赖分布式系统架构促使数据和模型的并行，机器学习工作流便于搭建，拥有集中的仓库跟踪保存训练过的多模型等等。</p><p>TFX的设计主要考虑了以下几点：</p><ul><li>平台能应对多种学习任务，除了选用tensorflow作为核心算法库，还支持数据验证分析和可视化工具、模型验证评估和推断工具等；</li><li>持续训练，TFX考虑支持多种持续训练策略；</li><li>易用的配置与工具；</li><li>生产级别的可靠性与可扩展性；</li></ul><p>基于上述的特点，把多种组建模块集成在一起，就形成了下图的平台。</p><p><imgsrc="https://pic.imgdb.cn/item/609ab7ced1a9ae528fce25e3.png" /></p><h3 id="data-analysis-transformation-and-validation">DATA ANALYSIS,TRANSFORMATION, AND VALIDATION</h3><p>对于机器学习来说，了解数据并及时发现异常数据是至关重要的，有利于避免下游数据出错。这一章主要讲TFX将数据分析、转换和验证作为独立又相互关联的部分。</p><p>数据分析的时候，需要对输入的数据集进行统计，输出一系列统计数据，如连续型数据需要分位数、直方图等等，离散数据需要top-K值和频率等等。</p><p>数据转换则是对数据进行格式转换，如将特征转换为特定的整数。这里的关键是保证在训练和推断期间确保转换逻辑的一致性。TFX会将任何数据转换导出为经过训练的模型的一部分，从而避免了不一致的问题。</p><p>数据验证则是使用schema来描述数据规范，每个算法团队维护自己的schema，数据验证时可以快速确认数据集的异常情况，如何进行修正，反映出数据的变化情况。</p><h3 id="model-training">MODEL TRAINING</h3><p>TFX的设计一大核心是尽可能流水线地、自动化地完成训练生产模型，支持训练使用Tensorflow配置的所有模型。TFX使用了warmstarting来在模型质量和模型时效性之间达到一个平衡，这是迁移学习使用的技术，讲一个训练好的基准模型应用另一个场景。</p><p>论文另外一点就是TFX用了定义和描述模型的API——model specificationAPI，通过对Tensorflow的封装减少代码冗余，提高开发速度。</p><h3 id="model-evaluation-and-validation">MODEL EVALUATION ANDVALIDATION</h3><p>模型的评估是模型上线前验证模型有效性的关键步骤，TFX对于好模型的定义主要是：<strong>safeto serve</strong>和<strong>the desired predictionquality</strong>，前者关心的是模型完整性，不会使得推断服务crash，资源使用少，后者则主要是模型预测准确率。</p><p>TFX一方面也使用了各种准确率标准来做ABTest，根据不同的产品团队要求提供告警配置，另一方面也支持对数据集根据feature做slice切分，帮助更好地评估模型在不同feature伤的表现。</p><h3 id="model-serving">MODEL SERVING</h3><p>最后则是模型服务，TFX主要依赖Tensorflowserving去做这个事情，通过多用户隔离和快速的训练数据反序列化来满足系统的低时延和高性能要求，总的来说提供了一套工业级的模型上线推断服务。</p><h2 id="论文三">论文三</h2><p>《Towards Unified Data and Lifecycle Management for DeepLearning》这篇论文主要关注了深度学习中数据和生命周期管理系统的实现，提出了一个modelHub系统，包括了三个部分，一种DSL来帮助泛化对模型的探索、查询，一种新的模型版本管理系统（Dlv）和一种读参数优化的参数归档存储系统（PAS）。</p><p><imgsrc="https://pic.imgdb.cn/item/609febea6ae4f77d357d697a.png" /></p><p>ModelHub主要分为local组件和远程组件，localfunctionality包括了一些DNN系统与本地计算机集群的集成，remotefunctionality则是不同用户组共享模型与其版本。</p><p>DLV是一种通过命令行工具的版本控制系统，可以用来与其他本地或者远程组件进行交互，替代了传统的git/svn可以方便其更好地描述查询建模过程中生成的artifacts内部结构。另外通过DQL模块可以帮助研究员开发新模型。ModelLearning模块本质是特定DNN系统的wrapper。</p><p>至于本地仓库的PAS则是用来存储大量的模型学习参数，PAS的目标是在不影响查询性能的情况下，尽可能维护大量学习的模型信息。其中一大特点是使用了一种新的近似模型评估技术，适用于分段存储PAS。由于浮点算数表示中浮点数具备高熵，难以压缩，PAS提供了按字节分割的浮点矩阵存储方案，通过分割高阶和低阶尾数位，浮点数矩阵按块存储，第一个块由8个高位组成，其余的每个块被分割为一个字节，由于高阶位具有低熵，能更好地做压缩。</p><p>这篇论文描述了如何通过ModelHub去解决一些在管理和调整深度学习模型中的关键数据管理挑战：</p><ul><li>通过调整网络结构和超参数，更容易优化潜在的模型效果；</li><li>减少跟踪模型的负担；</li><li>在不影响查询和检索性能的前提下，尽可能多地存储大量模型和构造快照；</li></ul>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;ucb-cs294required-reading-3&quot;&gt;《UCB cs294》Required Reading
-3&lt;/h1&gt;
-&lt;h2 id=&quot;论文一&quot;&gt;论文一&lt;/h2&gt;
-&lt;p&gt;《Hidden Technical Debt in Machine Learning
-</summary>
-      
-    
-    
-    
-    
-    <category term="AiSys" scheme="http://yoursite.com/tags/AiSys/"/>
     
   </entry>
   
