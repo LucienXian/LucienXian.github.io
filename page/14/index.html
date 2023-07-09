@@ -264,6 +264,189 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/29/cs231n-lecture10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/29/cs231n-lecture10/" itemprop="url">cs231n@lecture10</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-29T23:27:11+08:00">
+                2018-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="recurrent-nerual-networks">Recurrent Nerual Networks</h1>
+<h2 id="目的">目的</h2>
+<p>相比较于CNN，RNN能够更好地序列的信息。比如理解一句话的意思，根据视频输出行为，判断文本的情感等等。前后的输入是有关联的。</p>
+<h2 id="结构">结构</h2>
+<p>RNN的结构中有一个内部状态值<span
+class="math inline">\(h_t\)</span>，这个值取决于输入的x和上一次的内部状态值<span
+class="math inline">\(h_{t-1}\)</span>。另外权重矩阵W随着时间的向前，是不会发生变化。同时每次的输入都会产生一个输出值<span
+class="math inline">\(Y_t\)</span></p>
+<p>结构图如下：</p>
+<figure>
+<img
+src="https://en.wikipedia.org/wiki/Recurrent_neural_network#/media/File:Recurrent_neural_network_unfold.svg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>RNN的公式如下： <span class="math display">\[
+Y_t = g(V h_t) \\
+h_t = f(UX_t+Wh_{t-1})
+\]</span></p>
+<h2 id="truncated-backprop">truncated backprop</h2>
+<p>假如数据序列很长，全部训练的话，我们无法全部放到RNN中，因为可能会造成梯度消失或者爆炸的问题，另外内存也容易不足。因此我们可以根据时间步将序列截断，用前一个序列的final
+states作为后一个序列的initial states。</p>
+<figure>
+<img src="https://r2rt.com/static/images/RNN_tf_truncated_backprop.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h2 id="vanilla-rnn">vanilla RNN</h2>
+<p>只有一层隐藏层的RNN</p>
+<h1 id="lstm">LSTM</h1>
+<p>用来缓解梯度消失和梯度爆炸。</p>
+<p>原先的RNN只有一个内部隐藏状态h，该状态对于短期的输入非常敏感，因此我们增加一个状态——cell
+state，即c，让它保存长期的状态。</p>
+<p>LSTM将隐藏状态和输入拼接在一起，然后乘以一个巨大的矩阵，得到四个门向量。</p>
+<ul>
+<li>i：input gate，whether to write to cell；</li>
+</ul>
+<p><span class="math display">\[
+i_t = \sigma  (W_i [h_{t-1},x_t] + b_i)
+\]</span></p>
+<ul>
+<li>f：forget gate，how much do we want to forget；</li>
+</ul>
+<p><span class="math display">\[
+f_t = \sigma (W_f [h_{t-1},x_t] + b_f)
+\]</span></p>
+<ul>
+<li>o：output gate，how much to reveal cell；</li>
+</ul>
+<p><span class="math display">\[
+o_t = \sigma (W_o [h_{t-1}, x_t] + b_o)
+\]</span></p>
+<ul>
+<li>g：gate gate，how much to write to cell；</li>
+</ul>
+<p><span class="math display">\[
+g_t = tanh(W_g [h_{t-1}, x_t] + b_g)
+\]</span></p>
+<p>cell state的计算公式为：(注意是按元素相乘) <span
+class="math display">\[
+c_t = f_t \circ c_{t-1} + i_t \circ g_t
+\]</span> 至于隐藏状态： <span class="math display">\[
+h_t = o_t \circ tanh(c_t)
+\]</span></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/30/redis%E7%9A%84%E5%AD%97%E5%85%B8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1902,185 +2085,6 @@ id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/04/go%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/04/go%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0/" itemprop="url">go入门学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T21:17:45+08:00">
-                2018-08-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="go入门学习">GO入门学习</h1>
-<h2 id="why">why</h2>
-<ul>
-<li>语法简单；</li>
-<li>性能好；</li>
-</ul>
-<h2 id="常用类型">常用类型</h2>
-<p>主要讲三种类型：</p>
-<h3 id="slice">slice</h3>
-<p>go里面有数组类型。但开发过程中使用比较少。因为其元素类型确定，长度不可变，并且传递参数时是值拷贝；</p>
-<p>slice是对底层数组的一段内容的引用：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data := [...]<span class="type">int</span>&#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>&#125;</span><br><span class="line">slice := data[<span class="number">1</span>:<span class="number">4</span>:<span class="number">5</span>] <span class="comment">//[low:high:max]</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>避免在两个变量中修改同一个底层数组；可以这样修改：</p>
-</blockquote>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">v2 := <span class="built_in">make</span>([]<span class="type">int</span>, <span class="number">6</span>)</span><br><span class="line"><span class="built_in">copy</span>(v2, v1[<span class="number">0</span>:<span class="number">6</span>])</span><br><span class="line">v3 := <span class="built_in">make</span>([]<span class="type">int</span>, <span class="number">3</span>)</span><br><span class="line"><span class="built_in">copy</span>(v3, v1[<span class="number">2</span>:<span class="number">5</span>])</span><br></pre></td></tr></table></figure>
-<h3 id="channel">channel</h3>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>, <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
-<p>创造一个长度为10，元素类型为int的管道；</p>
-<ul>
-<li>读 v := &lt;- ch</li>
-<li>写 ch &lt;- v</li>
-<li>关闭 close(ch)</li>
-</ul>
-<p>目的是保证协程之间交换数据时，并发安全；</p>
-<ul>
-<li>长度为0的channel为不带buffer的channel</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>)</span><br></pre></td></tr></table></figure>
-<p>同时读写的时候，读会在写之前发生。也不会发生额外的数据拷贝。</p>
-<ul>
-<li>长度不为0的</li>
-</ul>
-<p>写会在读之前发生；</p>
-<h3 id="interface">interface</h3>
-<p>定义一个抽象的方法：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Gun <span class="keyword">interface</span>&#123;</span><br><span class="line">    Shoot()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>作用：解耦，抽象</li>
-</ul>
-<h2 id="并发">并发</h2>
-<p>通过通信来共享数据，而不是通过共享数据来通信。</p>
-<h3 id="context">context</h3>
-<p>这是一个接口，内部有几个方法。context是在多个协程之间传递，如何保证数据安全。</p>
-<h3 id="web服务端模型">web服务端模型</h3>
-<p>接受一个请求，创建一个新的协程用于读写该连接上的数据，但这种方式在请求处理阻塞的情况下，容易引发协程爆炸。</p>
-<h2 id="性能分析">性能分析</h2>
-<p>go提供了一些性能分析的工具</p>
-<h3 id="profile">profile</h3>
-<ul>
-<li>cpu分析：每隔一段时间，记录当前正在运行的协程的栈，出现频率比较高的函数就是占用CPU比较多的；</li>
-<li>mem分析：分析堆上申请内存的情况；</li>
-</ul>
-<p>一般都是通过采样实现。</p>
-<h2 id="高效的go代码">高效的go代码</h2>
-<ul>
-<li>减少对象创建，减少内存分配；</li>
-<li>sync.Pool</li>
-<li>sync/atomic</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2131,7 +2135,7 @@ id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">271</span>
+                <span class="site-state-item-count">272</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

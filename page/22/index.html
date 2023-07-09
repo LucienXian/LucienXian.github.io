@@ -264,6 +264,168 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/Effective-cpp-27/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/09/Effective-cpp-27/" itemprop="url">Effective-cpp-#27</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-09T00:37:40+08:00">
+                2018-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="minimize-casting">Minimize casting</h1>
+<h2 id="动机">动机</h2>
+<p>C++的设计目标就是要保证“类型错误”不可能发生，使得程序能够“干净地”通过编译。</p>
+<h2 id="使用">使用</h2>
+<p>一般来说，在C++中有两种转型——"old-style casts"和"new-style casts"。 *
+old：(T)expression或者T(expression)； * new: <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">const_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">dynamic_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="built_in">reinterpret_cast</span>&lt;T&gt;(exp)</span><br><span class="line"><span class="keyword">static_cast</span>&lt;T&gt;)exp</span><br></pre></td></tr></table></figure></p>
+<ol type="1">
+<li>const_cast：通常用来去除对象的常量性；</li>
+<li>dynamic_cast：主要执行“安全向下转型”，但会耗费大量的运行成本；</li>
+<li>reinterpret_cast：主要是执行低级转型，实际结果取决于编译器，所以其不可移植。例如将一个<strong>pointer
+to int转为int</strong>；</li>
+<li>static_cast：用来强迫隐式转换，例如将non-const转为const，int转为double，同样也可以是void*转为typed指针，或者pointer
+to base转为pointer to derived</li>
+</ol>
+<p><br>
+之所以要用新式转换，有两个原因：一是很容易能够在代码中辨认出来，便于debug；二是将转型动作窄化，编译器更可能诊断出错误运用。
+<br>
+至于什么时候用旧式转换——调用一个explicit构造函数讲一个对象传递给一个函数时。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span>&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">explicit</span> <span class="title">Widget</span><span class="params">(<span class="type">int</span> size)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">doSomeWork</span><span class="params">(<span class="type">const</span> Widget&amp; w)</span></span>;</span><br><span class="line"><span class="built_in">doSomeWork</span>(<span class="built_in">Widget</span>(<span class="number">15</span>));</span><br><span class="line"><span class="built_in">doSomeWork</span>(<span class="built_in">Static_cast</span>&lt;Widget&gt;(<span class="number">15</span>));</span><br></pre></td></tr></table></figure>
+<p>往往，转型动作会令到编译器编译出运行期间不同执行的码。例如：
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;...&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&#123;...&#125;;</span><br><span class="line">Derived d;</span><br><span class="line">Base* pd = &amp;d;</span><br></pre></td></tr></table></figure> 我们可以看到，在这种情况下建立一个base
+class指针指向一个derived
+class对象，会有一个偏移量在运行期被施行于Derived<em>指针身上，用以取得正确的Base
+</em>指针值. <br> <br> 另一个有趣的事情是，如果我们希望在derived
+classes内的virtual函数代码第一个动作先调用base
+class的对应函数。使用以下的方式，其实是错误的： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Window</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SpecialWindow</span>: <span class="keyword">public</span> Windos&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="built_in">static_cast</span>&lt;Window&gt;(*<span class="keyword">this</span>).<span class="built_in">onResize</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+其实这种行为，调用的并不是当前对象上的函数，而是稍早转型动作所建立的一个"*this对象的base
+class成分"的暂时副本身上的onResize! <br> <br> <br>
+再来看看dynamic_cast，之所以需要dynamic_cast，通常是因为你只有一个“指向Base”的指针或引用，但希望在一个你认定为derived
+class对象身上执行derived class操作函数。<br>
+对于这种情况，有两个解决办法：<br> 使用容器并在其中存储指向derived
+class对象的指针，并且尽量避免转型： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> std::vector&lt;std::trl::shared_ptr&lt;SpecialWindow&gt; &gt;VPSW;</span><br><span class="line">VPSW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span> (VPSW::iterator iter = winPtrs.<span class="built_in">begin</span>();</span><br><span class="line">     iter != winPtrs.<span class="built_in">end</span>();</span><br><span class="line">     ++iter)</span><br><span class="line">    (*iter)-&gt;<span class="built_in">blink</span>();</span><br></pre></td></tr></table></figure>
+但是这种方法，不能在同一个容器中存储指针“指向所有可能的Window派生类”。
+<br><br> 另外一种做法就可以让你通过base class
+接口处理“所有可能的各种Window派生类”，那就是在base
+class内提供virtual函数做你想对各个Window派生类做的事。当然，在base
+class只是提供一个“什么都不做”的缺省实现码。</p>
+<h2 id="建议">建议</h2>
+<ul>
+<li>如果可以，尽量避免转型，尤其是注重效率的代码中避免使用dynamic_cast；</li>
+<li>如果转型是必要的，试着将其隐藏在某个函数背后。客户随后直接调用该函数，而不需要将转型放进自己的代码内；</li>
+<li>宁愿使用新式转型，不要使用旧式转型；</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/Effective-cpp-26/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1864,148 +2026,6 @@ frame，然后再把victim frame写回disk，据说？这样进程就能快速�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/13/Composite-DesignPattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/13/Composite-DesignPattern/" itemprop="url">Composite(DesignPattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-13T23:55:31+08:00">
-                2017-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="composite">Composite</h1>
-<h2 id="目的">目的</h2>
-<p>将对象组合起来，以达到能同时表达整体与局部的效果，使得用户能一致地操作单个对象和组合对象</p>
-<h2 id="动机">动机</h2>
-<p>在一些系统中，用户希望通过简单的组件组合成复杂的组件，但同时由于用户认为这些组件的操作是一致的，因此不适合将组件进行区别的对待。有一种实现方法是为所有简单组件定义一些类，另外定义一些容器类来管理简单组件。但这样势必需要区别对待地操作所有组件，如果组件的组合方式很多样化，那么操作起来就很不方便。因此我们可以使用递归组合这些组件，避免用户对组件使用不同的操作。</p>
-<h2 id="使用范围">使用范围</h2>
-<ul>
-<li>表示对象的整体与局部的层次结构</li>
-<li>忽略组合对象与单个对象的不同，从而对其进行统一的操作</li>
-</ul>
-<h2 id="效果">效果</h2>
-<ul>
-<li>首先在这个设计模式中会有几个角色：component（定义公共接口），leaf（最基本的组件），composite（含有叶节点的组件）；</li>
-<li>composite模式使得基本对象即叶节点可以组成复合对象，同理复合对象也可以组成更大的符合对象，从而递归下去；</li>
-<li>可以简化用户代码，因为composite和leaf的接口类似，操作也相近；</li>
-<li>方便添加新组件，无论是leaf还是composite都可以自由地添加到原来的结构中，也就不会影响客户的使用；</li>
-<li>会有一些约束：
-<ul>
-<li>因为你无法限制其添加组件，也就无法在编译时限定哪些组件可以添加进来，只能在运行时进行判断；</li>
-</ul></li>
-</ul>
-<h2 id="代码示例">代码示例</h2>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Composite.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">add</span><span class="params">(Component* )</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">remove</span><span class="params">(Component* )</span></span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Component* <span class="title">getChild</span><span class="params">(<span class="type">int</span> index)</span> </span>&#123; <span class="keyword">return</span> <span class="number">0</span>; &#125;</span><br><span class="line">	<span class="keyword">virtual</span> ~<span class="built_in">Component</span>()&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Composite</span> :<span class="keyword">public</span> Component&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">auto</span> c : com)</span><br><span class="line">			c-&gt;<span class="built_in">operation</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">add</span><span class="params">(Component* c)</span> </span>&#123;</span><br><span class="line">		com.<span class="built_in">push_back</span>(c);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">remove</span><span class="params">(Component* c)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function">Component* <span class="title">getChild</span><span class="params">(<span class="type">int</span> index)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (index &lt; com.<span class="built_in">size</span>())</span><br><span class="line">			<span class="keyword">return</span> com[index];</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	std::vector&lt;Component* &gt; com;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Leaf</span> :<span class="keyword">public</span> Component &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		std::cout &lt;&lt; <span class="string">&quot;leaf::operation()&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Leaf *leaf = <span class="keyword">new</span> <span class="built_in">Leaf</span>();</span><br><span class="line">	leaf-&gt;<span class="built_in">operation</span>();</span><br><span class="line">	Composite *com = <span class="keyword">new</span> <span class="built_in">Composite</span>();</span><br><span class="line">	com-&gt;<span class="built_in">add</span>(leaf);</span><br><span class="line">	com-&gt;<span class="built_in">operation</span>();</span><br><span class="line">	Component *leaf_ = com-&gt;<span class="built_in">getChild</span>(<span class="number">0</span>);</span><br><span class="line">	leaf_-&gt;<span class="built_in">operation</span>();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">delete</span> leaf;</span><br><span class="line">	<span class="keyword">delete</span> com;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2056,7 +2076,7 @@ frame，然后再把victim frame写回disk，据说？这样进程就能快速�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">271</span>
+                <span class="site-state-item-count">272</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

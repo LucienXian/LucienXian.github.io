@@ -264,6 +264,145 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/Sharing-Data-Race-Conditions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/21/Sharing-Data-Race-Conditions/" itemprop="url">Sharing Data & Race Conditions</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T14:28:22+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="sharing-data-race-conditions">Sharing Data &amp; Race
+Conditions</h1>
+<p>多线程编程的一个经典问题就是<strong>Race Condition</strong>。</p>
+<h2 id="what-is-a-race-condition">What is a Race Condition?</h2>
+<p>race
+condition是多线程编程的一个经典bug，它指的是当多个线程并行执行某些操作时，它们访问公共的内存区域。此时有若干个线程回去修改这篇内存区域的的数据。</p>
+<h2 id="a-practical-example-of-race-condition">A Practical example of
+Race Condition</h2>
+<p>假设有这样的一个钱包类，我们提供一个成员函数addMoney()：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Wallet</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> mMoney;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Wallet</span>() :<span class="built_in">mMoney</span>(<span class="number">0</span>)&#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">getMoney</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> mMoney; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">addMoney</span><span class="params">(<span class="type">int</span> money)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; money; ++i)</span><br><span class="line">       &#123;</span><br><span class="line">          mMoney++;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>接着我们创建5个线程，共享这个钱包类的对象，并行地添加1000到哪步的money变量，预期结果钱包类的结果应该是5000。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">testMultithreadedWallet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Wallet walletObject;</span><br><span class="line">   std::vector&lt;std::thread&gt; threads;</span><br><span class="line">   <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)&#123;</span><br><span class="line">        threads.<span class="built_in">push_back</span>(std::<span class="built_in">thread</span>(&amp;Wallet::addMoney, &amp;walletObject, <span class="number">1000</span>));</span><br><span class="line">   &#125;</span><br><span class="line"> </span><br><span class="line">   <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; threads.<span class="built_in">size</span>() ; i++)</span><br><span class="line">   &#123;</span><br><span class="line">       threads.<span class="built_in">at</span>(i).<span class="built_in">join</span>();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> walletObject.<span class="built_in">getMoney</span>();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"> </span><br><span class="line">  <span class="type">int</span> val = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> k = <span class="number">0</span>; k &lt; <span class="number">1000</span>; k++)</span><br><span class="line">  &#123;</span><br><span class="line">     <span class="keyword">if</span>((val = <span class="built_in">testMultithreadedWallet</span>()) != <span class="number">5000</span>)</span><br><span class="line">     &#123;</span><br><span class="line">       std::cout &lt;&lt; <span class="string">&quot;Error at count = &quot;</span>&lt;&lt;k&lt;&lt;<span class="string">&quot; Money in Wallet = &quot;</span>&lt;&lt;val &lt;&lt; std::endl;</span><br><span class="line">     &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但由于并发时，mMoney++并不是原子操作，而是分为三个机器指令：</p>
+<ul>
+<li>从存储加载mMoney到寄存器；</li>
+<li>递增寄存器的值；</li>
+<li>把寄存器的值更新回存储；</li>
+</ul>
+<p>以下是出现的几种非预期结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Error at count = 14 Money in Wallet = 4000</span><br><span class="line">Error at count = 44 Money in Wallet = 4112</span><br><span class="line">Error at count = 52 Money in Wallet = 4387</span><br><span class="line">Error at count = 65 Money in Wallet = 4904</span><br><span class="line">Error at count = 81 Money in Wallet = 4907</span><br><span class="line">Error at count = 98 Money in Wallet = 4666</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/20/Passing-Arguments-to-Threads/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1528,174 +1667,6 @@ lastValue, UnaryPredicate predFunctionObject);</em></strong></p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/10/C-11-%E2%80%98delete%E2%80%99-keyword-and-deleted-functions/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/10/C-11-%E2%80%98delete%E2%80%99-keyword-and-deleted-functions/" itemprop="url">C++11 ‘delete’ keyword and deleted functions</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-10T19:54:47+08:00">
-                2019-04-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="c11-c14-delete-keyword-and-deleted-functions">C++11 / C++14 :
-‘delete’ keyword and deleted functions</h1>
-<p>本文将介绍C++11的一个新特性——delete，通过将delete应用到函数来限制其调用：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>= <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
-<p>它通常用在以下的地方：</p>
-<ul>
-<li>delete编译器生成的函数，如拷贝构造函数、赋值运算符、移动拷贝函数、移动赋值运算符和默认构造函数；</li>
-<li>delete成员函数，以避免数据丢失；</li>
-<li>delete类的new运算符，以限制堆的对象创建；</li>
-<li>delete特定的模版特化；</li>
-</ul>
-<h2 id="deleting-copy-constructor-and-assignment-operator">Deleting Copy
-Constructor and Assignment Operator</h2>
-<p>假设存在这样的一个类，拷贝构造函数和赋值运算符都被delete了：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span></span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line">	<span class="type">int</span> id;</span><br><span class="line">	std::string name;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)</span><br><span class="line">	&#123;&#125;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Copy Constructor is deleted</span></span><br><span class="line">	<span class="built_in">User</span>(<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line">	<span class="comment">// Assignment operator is deleted</span></span><br><span class="line">	User &amp; <span class="keyword">operator</span> = (<span class="type">const</span> User &amp; obj) = <span class="keyword">delete</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;id &lt;&lt; <span class="string">&quot; ::: &quot;</span>&lt;&lt;name&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>如果调用这赋值运算符：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">User obj = userObj;</span><br></pre></td></tr></table></figure>
-<p>编译时报错：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:30:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User obj = userObj;</span><br><span class="line">         ^     ~~~~~~~</span><br><span class="line">delete.cpp:15:2: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">        User(const User &amp; obj) = delete;</span><br><span class="line">        ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
-<h2
-id="deleting-member-functions-to-prevent-data-loss-conversions">Deleting
-member functions to prevent data loss conversions</h2>
-<p>由于类型的隐式转换，有可能会在调用函数时传递了错误的参数，例如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">User</span>(<span class="type">int</span> userId, std::string userName) : <span class="built_in">id</span>(userId), <span class="built_in">name</span>(userName)&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 这样调用会被cast</span></span><br><span class="line"><span class="function">User <span class="title">obj4</span><span class="params">(<span class="number">5.5</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br><span class="line"> </span><br><span class="line"><span class="function">User <span class="title">obj5</span><span class="params">(<span class="string">&#x27;a&#x27;</span>, <span class="string">&quot;Riti&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>通过利用delete来避免类型转换：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent narrowing conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">double</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Deleting a constructor that accepts a double as ID to prevent invalid type conversion</span></span><br><span class="line"><span class="built_in">User</span>(<span class="type">char</span> userId, std::string userName) = <span class="keyword">delete</span> ;</span><br></pre></td></tr></table></figure>
-<p>报错如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">elete.cpp:32:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj1(5.5, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:14:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(double userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">delete.cpp:33:10: error: call to deleted constructor of &#x27;User&#x27;</span><br><span class="line">    User userObj2(&#x27;a&#x27;, &quot;John&quot;);</span><br><span class="line">         ^        ~~~~~~~~~~~</span><br><span class="line">delete.cpp:15:5: note: &#x27;User&#x27; has been explicitly marked deleted here</span><br><span class="line">    User(char userId, std::string userName) = delete ;</span><br><span class="line">    ^</span><br><span class="line">2 errors generated.</span><br></pre></td></tr></table></figure>
-<h2
-id="restrict-object-creation-on-heap-by-deleting-new-operator-for-class">Restrict
-Object creation on Heap by deleting new operator for class</h2>
-<p>我们也可以限制new运算符的使用：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> * <span class="keyword">operator</span> <span class="title">new</span> <span class="params">(<span class="type">size_t</span>)</span> </span>= <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line">User * ptr = <span class="keyword">new</span> <span class="built_in">User</span>(<span class="number">1</span>, <span class="string">&quot;Riti&quot;</span>);</span><br></pre></td></tr></table></figure>
-<p>报错如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete.cpp:34:17: error: call to deleted function &#x27;operator new&#x27;</span><br><span class="line">    User *ptr = new User(1, &quot;Rziti&quot;);</span><br><span class="line">                ^</span><br><span class="line">delete.cpp:17:12: note: candidate function has been explicitly deleted</span><br><span class="line">    void * operator new (size_t) = delete;</span><br><span class="line">           ^</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
-<h2 id="delete-specific-template-specialisation">Delete specific
-template specialisation</h2>
-<p>使用delete关键字，我们可以限制模板类或函数的某些模板特化。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ComplexNumber</span></span><br><span class="line">&#123;</span><br><span class="line">	T x;</span><br><span class="line">	T y;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">ComplexNumber</span>(T a, T b) : <span class="built_in">x</span>(a) , <span class="built_in">y</span>(b)</span><br><span class="line">	&#123;&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">display</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::cout&lt;&lt;x &lt;&lt; <span class="string">&quot; + i&quot;</span>&lt;&lt;y&lt;&lt;std::endl;</span><br><span class="line">	&#125;</span><br><span class="line">        <span class="comment">// Deleted template specialisation </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">char</span> a, <span class="type">char</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="comment">// Deleted template specialisation  </span></span><br><span class="line">	<span class="built_in">ComplexNumber</span>(<span class="type">double</span> a, <span class="type">double</span> b) = <span class="keyword">delete</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>原来该模版类可以接收char参数和double参数，通过delete，我们可以限制其特化。</p>
-<h2
-id="different-between-deleted-function-and-private-functions">Different
-between deleted function and private functions</h2>
-<p>相比private成员函数，delete有两个优点：</p>
-<ul>
-<li>避免被其它成员函数调用；</li>
-<li>delete函数在name
-lookup中，如果函数delete了，那么它就不会根据该类型去查找其它匹配函数；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1746,7 +1717,7 @@ lookup中，如果函数delete了，那么它就不会根据该类型去查找�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">271</span>
+                <span class="site-state-item-count">272</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
