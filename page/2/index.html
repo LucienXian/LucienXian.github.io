@@ -264,6 +264,244 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/03/05/The-Dataflow-Model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/03/05/The-Dataflow-Model/" itemprop="url">The Dataflow Model</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-03-05T17:41:19+08:00">
+                2022-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1
+id="the-dataflow-model-a-practical-approach-to-balancing-correctness-latency-and-cost-in-massive-scale-unbounded-out-of-order-data-processing">The
+Dataflow Model: A Practical Approach to Balancing Correctness, Latency,
+and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing</h1>
+<blockquote>
+<p>无界、无序、大规模的数据集在日常业务中越来越普遍，并且，这些数据的消费端也发展出更复杂的需求，例如事件时间排序和数据本身特征的窗口化等，以及对消费速度有了更高的要求。本文介绍了Google在数据流模型的核心设计原则</p>
+</blockquote>
+<h2 id="introduction">INTRODUCTION</h2>
+<p>现代的数据处理是一个非常复杂且发展蓬勃的领域，从MapReduce到SQL社区内大量关于流的工作如窗口、查询系统等，再到Spark
+Streaming、Storm等低延迟领域的发展。然而，现有的模型和系统在许多常见场景中仍然存在不足。批处理系统会遇到导入系统带来的延迟问题，而对于流处理系统，要么缺乏大规模的容错机制，要么缺乏提供exactly-once语义的能力影响数据准确性，又或者缺少窗口所必需的时间原语等等。Lambda架构可以满足很多需求，但由于必须和构建两套系统就会带来简单性的不足。论文提出的观点是，不再关注执行引擎决定系统语义的主流思维，而是通过考虑批处理，微批处理和流传输系统之间潜在的差异（即延迟和资源成本）来选择执行引擎。</p>
+<p>本文提出了一个简单统一的模型概念：</p>
+<ul>
+<li>允许计算event-time的有序结果，并根据数据本身的特征在无边界，无序的数据源上进行窗口聚合处理，在准确性，延迟和成本三者之间平衡；</li>
+<li>拆分四个跨维度相关的管道实现：
+<ul>
+<li>what：正在计算什么结果；</li>
+<li>where：事件发生时在哪里计算；</li>
+<li>when：在哪个处理时间内进行物化；</li>
+<li>how：前期结果如何与后续改进相关联；</li>
+</ul></li>
+<li>将数据处理的逻辑概念与底层的物理实现分开，允许基于准确性，延迟和成本的考虑来选择批处理，微批处理或流引擎；</li>
+</ul>
+<p>具体而言可以分为以下几个部分：</p>
+<ul>
+<li><strong>A windowing
+model</strong>：支持未对齐的event-time窗口；</li>
+<li><strong>A triggering
+model</strong>：将事件处理的运行时特征与输出次数坐绑定；</li>
+<li><strong>incremental processing
+model</strong>：将数据更新整合到前面的window model和trigger
+model中；</li>
+<li><strong>Scalable
+implementations</strong>：基于MillWheel流式引擎和Flume批处理引擎实现了Google
+cloud Dataflow的SDK；</li>
+<li><strong>core principles</strong>：模型设计的核心原则；</li>
+</ul>
+<h3 id="unboundedbounded-vs-streamingbatch">Unbounded/Bounded vs
+Streaming/Batch</h3>
+<p>Dataflow统一用Bounded/Unbounded
+Dataset来描述有限/无限数据集，而Streaming/Batch则用来特指某些执行引擎。</p>
+<h3 id="window">Window</h3>
+<p>Window即窗口化，是指将无限的数据集切分为有限的数据片以便进行聚合处理。对于无边的数据集，有些操作如<strong>aggregation</strong>，<strong>outer
+join</strong>，<strong>time-bounded</strong>都需要窗口。窗口一般是基于时间的，但也有些系统支持基于记录数的窗口，这可以理解为是逻辑时间，其中的元素按顺序依次增加逻辑时间戳。</p>
+<p>窗口模型主要由三种主要分为以下三种：</p>
+<p><img
+src="https://pic.imgdb.cn/item/62232fcf5baa1a80ab64f01d.png" /></p>
+<ul>
+<li>Fixed
+Window：这是按固定窗口的大小定义的，比如说小时窗口或天窗口，通常是对齐窗口，每个窗口都包含了对应时间段范围内的所有数据，可以看到的是每个窗口之间没有重叠；</li>
+<li>Sliding
+Window：这是根据窗口大小和滑动周期大小来定义的，比如说小时窗口，每一分钟滑动一次，通常情况滑动周期会比窗口更小，滑动窗口一般也是对齐的，如上图的五个滑动窗口实际上都包含了对三个键的处理；Fixed
+Window可以认为是窗口大小等于滑动周期大小的Sliding Window；</li>
+<li>Session
+Window：这种类型的窗口会在数据的子集上捕捉一段时间内的活动，属于非对齐窗口，比如上图的窗口2只包含key
+1，窗口3则只包含key2；</li>
+</ul>
+<h3 id="time-domain">Time Domain</h3>
+<p>在流式处理中有两个关于时间的概念需要重点关注：</p>
+<ul>
+<li>Event
+Time：事件本身实际发生的时间，系统时钟时间在事件发生时的记录；</li>
+<li>Processing Time：事件在系统中被处理的时间；</li>
+</ul>
+<p>在数据处理过程中，由于系统自身收到的影响如通信延迟，调度算法，处理时长，管道中间数据序列化等，会导致上述两个值之间存在一定的差值，诸如punctuations或watermarks之类的全局进度指标都提供了一种可视化这种差值的好方法，本文则是使用了一种类似MillWheel的水位标记，这是一个时间戳，用来表示小于这个时间戳的数据已经完全被系统处理了。理想情况下，这两个时间的差值应该为0，即事件一旦发生则马上做处理，如下图所示。但实际上，由于前面提到的原因，水位标记会偏离真实时间，这是非常正常的现象。</p>
+<p><img
+src="https://pic.imgdb.cn/item/62232fcf5baa1a80ab64f020.png" /></p>
+<h2 id="dataflow-model">DATAFLOW MODEL</h2>
+<p>接下来将讨论Dataflow的正式模型。</p>
+<h3 id="core-primitives">Core Primitives</h3>
+<p>首先从经典的批处理模型开始，Dataflow把所有的数据都抽象成键值对，并提出了两个核心的数据转换操作：</p>
+<ul>
+<li>ParDo：对每个输入元素都用一个用户自定义函数进行处理，生成零个活多个的输出元素，如下图所示：</li>
+</ul>
+<p><img
+src="https://pic.imgdb.cn/item/62232fcf5baa1a80ab64f026.png" /></p>
+<ul>
+<li>GroupByKey：根据键值将元素重新分组，作为一个聚合操作，由于需要收集到所有需要的数据，需要结合窗口化一起使用；</li>
+</ul>
+<p><img
+src="https://pic.imgdb.cn/item/62232fcf5baa1a80ab64f02c.png" /></p>
+<h3 id="windowing">Windowing</h3>
+<p>支持GroupByKey的系统通常会将其重新定义为GroupByKeyAndWindow，Dataflow在这里的主要贡献是支持未对齐窗口，其底层的优化则是通过下面两部来实现：</p>
+<ul>
+<li><strong>Set<Window> AssignWindows(T
+datum)</strong>：将元素复制给若干个窗口；</li>
+<li><strong>Set<Window> MergeWindows(Set<Window>
+windows)</strong>：窗口合并；</li>
+</ul>
+<p>为了在本地支持事件时间的窗口，这里不再是传递简单的键值对，而是传递(key,
+value, eventtime,
+window)4元组。元素进入系统时会带有事件时间的时间戳，并且在最初会分配一个磨人的全局窗口。</p>
+<h4 id="window-assignment">Window Assignment</h4>
+<p>窗口赋值就是指将数据拷贝到对应的窗口。下图就是一个窗口大小为2分，滑动窗口间隔为1分钟的例子。</p>
+<p><img
+src="https://pic.imgdb.cn/item/62232fcf5baa1a80ab64f033.png" /></p>
+<h4 id="window-merge">Window Merge</h4>
+<p>窗口合并是GroupByKeyAndWindow操作的一部分，具体来说这是一个由五部分组成的复合操作：DropTimestamps、GroupByKey、MergeWindows、GroupAlsoByWindow和ExpandToElements，其具体的含义可以参考下图：</p>
+<p><img
+src="https://pic.imgdb.cn/item/62232ff85baa1a80ab65130d.png" /></p>
+<h3 id="triggers-incremental-processing">Triggers &amp; Incremental
+Processing</h3>
+<p>能够构建未对齐的事件时间窗口是一种进步，但仍面临两个问题：</p>
+<ul>
+<li>为了与其他流式系统保持兼容，需要提供基于processing
+time和基于tuple的窗口；</li>
+<li>由于事件发生时间是无序的，数据可能会慢一步到来，我们需要何时才能将窗口的结果数据发往下游；</li>
+</ul>
+<p>论文这里主要讨论第二种情况，就是如何保证窗口数据的完整性。最原始的想法是使用某种全局事件时间戳，比如watermark来处理，这里可以立即为一个阈值，但watermark设计的过长过短对数据处理的准确性会有一定的影响，过短会导致水位标记到达后仍有记录到达，过长则可能会使得迟到的数据影响到整个数据处理管道的watermark。</p>
+<p>Dataflow的处理方法是用一种叫Trigger的机制，这种机制是受信号激励从而触发GroupByKeyAndWindow执行并输出结果的机制，相对于窗口是决定哪些event
+time数据被分到一组进行聚合操作，Trigger更多是决定在什么处理时间窗口的结果会被输出。Trigger提供了三种不同的模式来控制不同计算结果之间是如何关联的：</p>
+<ul>
+<li>Discarding：窗口数据的Trigger之后直接丢弃；</li>
+<li>Accumulating：窗口的结果数据在Trigger之后持久化下来，用以支持后面的数据更新；</li>
+<li>Accumulating &amp;
+Retracting：在第二种基础上增加了回撤结果，即窗口再次Trigger时会将上次的结果做回撤，然后将新的结果作为正常数据下发。</li>
+</ul>
+<h2 id="conclusions">CONCLUSIONS</h2>
+<p>无边界的数据时数据处理的未来，有边界的数据本身也是由无边界的对应部分所包含的，并且处理数据的消费者进化的越来越快，因此需要更强大的架构支持例如事件时间顺序和未对齐的窗口等。Dataflow模型把数据处理的逻辑划分了以下几个部分：计算什么、在哪个event
+time范围内计算、在什么处理时间点触发计算，如果用新的结果修正之前的处理结果，这使得整个数据处理逻辑变得更加透明清晰。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/01/14/Mesa-Geo-Replicated-Near-Real-Time-Scalable-Data-Warehousing/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2456,274 +2694,6 @@ of an execution 破烂，这减少了必须从存储层发送到引擎层的元�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/18/SuRF-Range-Query-Filter/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/07/18/SuRF-Range-Query-Filter/" itemprop="url">SuRF: Range Query Filter</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-18T23:26:19+08:00">
-                2021-07-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="surf">SuRF</h1>
-<blockquote>
-<p>本文介绍了一种SuRF的数据结构实现，用以替代传统的布隆过滤器，支持单点查询和范围查询使用。</p>
-</blockquote>
-<h2 id="introduction">INTRODUCTION</h2>
-<p>LSM树是市面上数据库常用的底层存储引擎，能提供快速写和一定速度的读取。但该设计的一个问题是由于SSTable的多层设计导致大量磁盘IO读取，由此引入了布隆过滤器作为内存数据结构来帮助查询。布隆过滤器对于单点查询很有用，但并不能处理范围查找，尽管也有一些类似的设计（如前缀布隆过滤器）做了优化，但总体不够灵活通用。</p>
-<p>因此本文提出了Succinct Range
-Filter（下文简称SuRF），这是一种快速紧凑的过滤器，提供了精确匹配过滤、范围过滤和近似范围计数等功能。SuRF是建立在Fast
-Succinct
-Trie（FST）这一新型空间高效简洁的数据结构上，FST每个trie节点仅需要10bit。文章使用SuRF替代了RocksDB的布隆过滤器，这将范围查询的速度提高了1.5倍到5倍，但极端情况下会导致单点查询变慢40%。</p>
-<h2 id="fast-succinct-tries">FAST SUCCINCT TRIES</h2>
-<p>SuRF的核心数据结构是FST，这是一种空间优化的静态tire，可以做单点查询和范围查询，其设计基于以下的思路：一个tire的上层节点较少，但访问量很大；下层节点虽多，但访问不算频繁。因此FST使用了基于位图的快速编码方案（LOUDS-Dense）来对上层节点编码，下层则用LOUDS-Sparse方案来编码，节省空间。</p>
-<h3 id="background">Background</h3>
-<p>如果一颗树所占用的空间接近于信息论的下限，则该树可以认为是succinct。论文使用的是一种叫Level-Ordered
-Unary Degree
-Sequence的技术，LOUDS以广度优先的顺序遍历节点，并使用一元编码Unary
-coding对每个节点的度进行编码，例如下图节点3有三个字节点，因此被编码成"1110"。</p>
-<p><img
-src="https://pic.imgdb.cn/item/60f447735132923bf826bdba.png" /></p>
-<p>编码完成后，该树会变成一组bit序列，需要访问节点时，则使用rank＆select两种操作：</p>
-<ul>
-<li>rank1(i): 返回[0, i]位置区间中, 1的个数；</li>
-<li>select1(i): 返回第i个1的位置(整个bit序列)；</li>
-<li>对应的则是rank0(i)和select0(i)操作；</li>
-</ul>
-<p>如今关于rank＆select的实现会使用查找表预算存取计算好的结果，保证查询时可以在常数时间里完成。有了rank＆select的支持，LOUDS就可以在常数时间内实现SuRF需要的点查询和范围查询。假设节点代号和bit位置都是从0开始的：</p>
-<ul>
-<li>在bit序列中第i个节点的位置：<code>select0(i)+1</code>；</li>
-<li>在bit序列中从p开始的节点的第k个子节点：<code>select0 (rank1 (p + k)) + 1</code>；</li>
-<li>始于p的节点的父节点位置：<code>select1 (rank0 (p))</code>；</li>
-</ul>
-<p><img
-src="https://pic.imgdb.cn/item/60f447735132923bf826bdda.png" /></p>
-<h3 id="louds-dense">LOUDS-Dense</h3>
-<p>LOUDS-Dense使用三个bit
-map和一个value的字节序列对每个trie节点按层级进行编码：</p>
-<ul>
-<li>D-Labels：记录每个节点的分支标签；上图中根节点具有标记为f，s和t的三个分支。
-D-Labels位图设置第102位（f），115位（s）和116位（t）并清除其余位；</li>
-<li>D-HasChild：表示节点是叶子节点还是中间节点，以上图根节点为例，f和t都有子节点，但s没有，所以102和106两个bit会设置为1；</li>
-<li>D-IsPrefixKey：标记当前前缀是否为有效key；以上图根节点为例，f既作为前缀，同时也是trie里的有效key；</li>
-<li>D-Values : 存储的是固定大小的 value，本文中则是三种后缀的指针；</li>
-</ul>
-<p>用rank&amp;select操作trie树，则是：</p>
-<ul>
-<li>第一个孩子节点：<code>D-ChildNodePos(pos)=256 × rank1(D-HasChild, pos)</code>；</li>
-<li>父节点：<code>DParentNodePos(pos)=select1(D-HasChild,[pos / 256])</code>；</li>
-</ul>
-<h3 id="louds-sparse">LOUDS-Sparse</h3>
-<p>如上图所示，LOUDS-Sparse使用四个字节或者bit序列对trie节点进行编码，然后将编码的节点按层次顺序进行串联。</p>
-<ul>
-<li>S-Labels：记录分支标签，按level
-order顺序记录所有节点的label，并且使用0xFF($)来标记该key同时也是key节点；</li>
-<li>S-HasChild：使用一个bit记录节点的label是否含有分支子节点；</li>
-<li>S-LOUDS：使用一个bit记录每个label是否为该节点的第一个label；</li>
-<li>S-Values：与上面类似；</li>
-</ul>
-<p>用rank&amp;select操作trie树，则是：</p>
-<ul>
-<li>孩子节点：<code>S-ChildNodePos(pos) = select1(S-LOUDS, rank1(S-HasChild, pos) + 1);</code>；</li>
-<li>父节点：<code>S-ParentNodePos(pos) = select1(S-HasChild, rank1(S-LOUDS, pos) - 1)</code>；</li>
-</ul>
-<h3 id="louds-ds-and-operations">LOUDS-DS and Operations</h3>
-<p>LOUDS-DS就是一种混合trie，上层用LOUDS-Dense编码，下层使用LOUDS-Sparse编码。其中的分界点则根据性能和空间进行调整，LOUDS-Dense-Size(l)表示从0到l（不包含l）层采用LOUDS-Dense编码，而LOUDS-Sparse-Size(l)则表示从l到H层采用LOUDS-Sparse方式编码：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOUDS-Dense-<span class="built_in">Size</span>(l) × R ≤ LOUDS-Sparse-<span class="built_in">Size</span>(l) <span class="comment">// 通常使用R = 64作为默认值，R越小，性能越好但空间使用更多</span></span><br></pre></td></tr></table></figure>
-<p>LOUDS-DS支持三个基本操作：</p>
-<ul>
-<li>ExactKeySearch(key)：如果key存在，则返回key的值（否则返回NULL）；</li>
-<li>LowerBound(key)：返回一个迭代器，该迭代器指向的键-值对(k,
-v)，其中k是按字典顺序的满足k≥key的最小的键；</li>
-<li>MoveToNext(iter)：将迭代器移至下一个键值；</li>
-</ul>
-<p>对于点查询，则是先在LOUDS-Dense上查询，查不到即到LOUDS-Sparse查询。对于范围查询，则是执行LowerBound，找到最小的满足k≥key的键后，则光标将从当前的叶子标签位置开始并向前移动，就是正常的tree搜索方式。</p>
-<h3 id="space-and-performance-analysis">Space and Performance
-Analysis</h3>
-<p>考虑到在LOUDS-DS中LOUDS-Sparse的节点更多，假设这是一个具备n个节点的trie，其中会有8n位用于S标签，2n位用于S-HasChild和S-LOUDS，总共10n位。</p>
-<p>对于点查询，在每个LOUDS-Dense级别上进行搜索都需要两次数组查找，以及对位向量D-HasChild的rank操作。因此，主要操作是对所有位向量进行rank和
-select，并在LOUDS-Sparse层进行标签搜索。</p>
-<h3 id="optimizations">Optimizations</h3>
-<p>论文针对LOUDS-DS中的三个关键操作：rank、select和label
-search进行了优化。</p>
-<p><img
-src="https://pic.imgdb.cn/item/60f447735132923bf826be06.png" /></p>
-<ul>
-<li>Rank</li>
-</ul>
-<p>上图展示了一个简洁的Rank结构，将bit vector分割成B
-bits大小的块，每个块用32bits的字段预先计算好的到这个block的rank值。对于一个pos来说，就有<code>rank1(pos) = LUT[i / B] + popcount[i / B * B, i]</code>。popcount是内置的CPU指令，可以快速计算出某一段区间1的个数。</p>
-<ul>
-<li>Select</li>
-</ul>
-<p>同样是使用LUT的方法，预先计算好值。假设采样周期是3，上图中第三个LUT保存的就是3x2，也就是第6个1的pos值，即8。那就有<code>select1(i) = LUT[i / S] + (selecting (i - i / S * S)th set bit starting from LUT[i / S] + 1) + 1</code>。</p>
-<ul>
-<li>Label Search</li>
-</ul>
-<p>使用SIMD指令在LOUDS-Sparse中执行标签搜索。</p>
-<ul>
-<li>Prefetching</li>
-</ul>
-<p>在切换到LOUDS-DS中的不同位/字节序列之前进行预取。</p>
-<h2 id="succinct-range-filters">SUCCINCT RANGE FILTERS</h2>
-<p>基于FST构建SuRF，最重要的是在false positive
-rate和filter所需要的内存使用之间取得平衡。论文的做法是使用裁剪trie，通过截断低层次的trie，并使用从key获得的后缀位（key本身或者key的哈希值）做替代。论文介绍了4种不同的trie树裁剪方式。</p>
-<p><img
-src="https://pic.imgdb.cn/item/60f447735132923bf826be2f.png" /></p>
-<ol type="1">
-<li>Basic SuRF</li>
-</ol>
-<p>Basic
-SuRF的基本思路就是只存储key的共有前缀和一个额外的byte，裁剪掉树的部分叶节点。Basic
-SuRF的FPR与key的分布有关。</p>
-<ol start="2" type="1">
-<li>SuRF with Hashed Key Suffixes</li>
-</ol>
-<p>在Basic
-SuRF基础上，通过对key进行哈希计算，将hash值的n个bits存储到value中，这种方法可以降低FPR，但对范围查询没有帮助。</p>
-<ol start="3" type="1">
-<li>SuRF with Real Key Suffixes</li>
-</ol>
-<p>SuRF-Real存储n个bits的真实key，这样同时增强了Point query和Range
-query，但其FPR还是要比SuRF-Hash高。</p>
-<ol start="4" type="1">
-<li>SuRF with Mixed Key Suffixes</li>
-</ol>
-<p>SuRF-Mixed的做法是混合使用2和3两种方式，一部分是real
-key，另一部分是hashed key。</p>
-<h3 id="operations">Operations</h3>
-<p>论文总结了如何使用FST实现SuRF的基本操作。</p>
-<ul>
-<li>build(keyList)：根据给定的key构建fitter；</li>
-<li>result =
-lookup(k)：对k执行点查询，返回true意味着k可能存储。以上面SuRF为例，首先搜寻key，直到叶子结点。如果未到叶节点就终止了则返回false；否则计算k的相关bits与叶节点的相关bits做比较；</li>
-<li>iter, fp_flag =
-moveToNext(k)：这个操作实际上是LowerBound执行，返回满足&gt;=k的最小key的双向迭代器；</li>
-<li>count, low_fp_flag, high_fp_flag = count(lowKey,
-highKey)：返回在[lowKey, highKey]范围内的key个数；</li>
-</ul>
-<h2 id="example-application-rocksdb">EXAMPLE APPLICATION: ROCKSDB</h2>
-<p>论文将SuRF与RocksDB集成在一起，以替代其Bloom过滤器。下图显示了RocksDB中Get，Seek和Count查询的执行路径。Next的核心算法类似于Seek。过滤器操作在红色框中。如果该框为虚线，则可能由于误报需要检查边界key。</p>
-<p><img
-src="https://pic.imgdb.cn/item/60f447735132923bf826be57.png" /></p>
-<p>对于Get(key)，SuRF的用法与Bloom过滤器完全相同。</p>
-<p>对于Seek(lk,
-hk)，RocksDB首先通过在块索引中搜索lk来决定所有级别的候选SSTable。在没有SuRF的情况下，RocksDB会检查每个候选SSTable并获取满足&gt;=lk的最小的块。
-RocksDB然后比较候选key，找到全局最小key。使用SuRF，则无需获取实际的块，RocksDB可以通过在其SuRF上执行moveToNext(lk)查询来避免每个SSTable都进行IO，从而获取每个SSTable的候选key。如果查询成功（例如，是Open
-Seek或K≤hk），RocksDB将从选定的SSTable中精确地获取一个包含全局最小值K的块。如果查询失败（即，K&gt;hk），则不没有读盘IO。</p>
-<h2 id="conclusion">CONCLUSION</h2>
-<p>本文介绍了SuRF，该filter支持单点查询、范围查询和计数查询，SuRF建立在一个新的succinct数据结构上，即FST。FST的性能极高，并且SuRF本身的内存使用也是较为搞笑的，其空间使用与FPR的权衡可以通过不同数量的后缀位来调整。通过在RocksDB上替换了bloom
-filter的测试，显著地减少了IO并提高了范围查询的吞吐量。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2774,7 +2744,7 @@ filter的测试，显著地减少了IO并提高了范围查询的吞吐量。</p
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">272</span>
+                <span class="site-state-item-count">273</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

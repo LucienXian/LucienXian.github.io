@@ -264,6 +264,144 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/%E7%94%A8%E7%A7%81%E6%9C%89%E6%9E%84%E9%80%A0%E5%99%A8%E6%88%96%E8%80%85%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E5%BC%BA%E5%8C%96Singleton%E5%B1%9E%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/16/%E7%94%A8%E7%A7%81%E6%9C%89%E6%9E%84%E9%80%A0%E5%99%A8%E6%88%96%E8%80%85%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E5%BC%BA%E5%8C%96Singleton%E5%B1%9E%E6%80%A7/" itemprop="url">用私有构造器或者枚举类型强化Singleton属性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:11:53+08:00">
+                2018-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1
+id="用私有构造器或者枚举类型强化singleton属性">用私有构造器或者枚举类型强化Singleton属性</h1>
+<h2 id="概述">概述</h2>
+<p>Singleton指仅仅被实例化一次的类。</p>
+<h2 id="实现方式">实现方式</h2>
+<p>在jsk1.5之前，实现Singleton的两种方式都把构造函数声明为private：</p>
+<ul>
+<li>公有静态成员是一个final域</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Elvis</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Elvis</span> <span class="variable">INSTANCE</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Elvis</span>();</span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Elvis</span><span class="params">()</span> &#123;...&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> leaveTheBuilding&#123;...&#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>但这种方法存在一个缺点，客户端可以通过反射来生成第二个实例，要避免这种弊端，可以在创建第二个对象的时候抛出异常</p>
+</blockquote>
+<ul>
+<li>公有成员是一个静态工厂方法</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Elvis</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Elvis</span> <span class="variable">INSTANCE</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Elvis</span>();</span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Elvis</span><span class="params">()</span> &#123;...&#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Elvis <span class="title function_">getInstance</span><span class="params">()</span> &#123;<span class="keyword">return</span> INSTANCE; &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> leaveTheBuilding&#123;...&#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>jdk1.5发布之后，可以编写一个包含单个元素的枚举类型：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">Elvis</span> &#123;</span><br><span class="line">	INSTANCE;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> leaveTheBuilding&#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/%E6%B8%85%E7%90%86%E8%BF%87%E6%9C%9F%E7%9A%84%E5%AF%B9%E8%B1%A1%E5%BC%95%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1523,150 +1661,6 @@ id="通过私有构造器强化不可实例化的能力">通过私有构造器�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/06/Proxy-of-Java/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/06/Proxy-of-Java/" itemprop="url">Proxy of Java</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-06T00:28:29+08:00">
-                2018-11-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>最近在学习Java，学习到了一个新的Java特性——代理(Proxy)。代理可以为其它对象实现一种新的控制访问方式，这是Java
-SE1.3新加的特性。</p>
-<h2 id="目的">目的</h2>
-<p>假如我们希望在运行时创建一个实现了一组给定接口的新类，我们就可以使用代理实现。</p>
-<h2 id="模式">模式</h2>
-<p>代理类可以运行时创建全新的类，这个代理类能够实现指定的接口：</p>
-<ul>
-<li>指定接口所需要的全部方法</li>
-<li>Object类中的全部方法</li>
-</ul>
-<p>这个模式首先要让代理类和目标类实现相同的接口，然后客户端在通过代理类调用目标类的时候，代理类会将所有方法调用分派到目标对象上反射执行。分派过程中则可以在前后增加一些想要的功能。</p>
-<h2 id="步骤">步骤</h2>
-<ol type="1">
-<li>通过实现InvocationHandler接口来自定义自己的handler，该接口有一个invoke的方法；</li>
-<li>使用Proxy类的newProxyInstance创建一个代理对象，并将handler传入该对象；</li>
-<li>通过代理对象调用目标方法；</li>
-</ol>
-<h2 id="原理">原理</h2>
-<p>首先来看一个实现例子，这个程序会打印出被调用的参数和名字：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.*;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ProxyTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span>&#123;</span><br><span class="line">        Object[] elements = <span class="keyword">new</span> <span class="title class_">Object</span>[<span class="number">1000</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; elements.length; i++) &#123;</span><br><span class="line">            <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> i + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">            <span class="type">InvocationHandler</span> <span class="variable">handler</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TraceHandler</span>(value);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">proxy</span> <span class="operator">=</span> Proxy.newProxyInstance(<span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Comparable.class&#125;, handler);</span><br><span class="line">            elements[i] = proxy;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">Integer</span> <span class="variable">rand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>().nextInt(elements.length) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> Arrays.binarySearch(elements, rand);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (res &gt; <span class="number">0</span>)</span><br><span class="line">            System.out.println(elements[res]);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TraceHandler</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Object target;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TraceHandler</span><span class="params">(Object t)</span></span><br><span class="line">    &#123;</span><br><span class="line">        target = t;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(Object proxy, Method m, Object[] args)</span> <span class="keyword">throws</span> Throwable</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.print(target);</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">&quot;.&quot;</span> + m.getName()+<span class="string">&quot;(&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (args != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; args.length; i++)</span><br><span class="line">            &#123;</span><br><span class="line">                System.out.print(args[i]);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (i &lt; args.length - <span class="number">1</span>)</span><br><span class="line">                    System.out.print(<span class="string">&quot;, &quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;)&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> m.invoke(target, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Ouput:</span></span><br><span class="line"><span class="comment">500.compareTo(155)</span></span><br><span class="line"><span class="comment">250.compareTo(155)</span></span><br><span class="line"><span class="comment">125.compareTo(155)</span></span><br><span class="line"><span class="comment">187.compareTo(155)</span></span><br><span class="line"><span class="comment">156.compareTo(155)</span></span><br><span class="line"><span class="comment">140.compareTo(155)</span></span><br><span class="line"><span class="comment">148.compareTo(155)</span></span><br><span class="line"><span class="comment">152.compareTo(155)</span></span><br><span class="line"><span class="comment">154.compareTo(155)</span></span><br><span class="line"><span class="comment">155.compareTo(155)</span></span><br><span class="line"><span class="comment">155.toString()</span></span><br><span class="line"><span class="comment">155</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-<p>通过打印结果可以得知，每次调用代理对象的compareTo方法，都会调用InvocationHandler的invoke方法。这是因为JVM动态生成的代理类生成代理对象时，会传入InvocationHandler实例对象。</p>
-<p>然后我们在invoke方法内部通过Method.invoke()方法打印方法名称和参数来进行调用。</p>
-<h2 id="特性">特性</h2>
-<p>代理类只有一个实例域，那就是InvocationHandler。另外，所有的代理类都覆盖了Object类中的方法toString，equals和hashCode。</p>
-<p>对于特定的类加载器和预设的一组接口，只能有一个代理类。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1717,7 +1711,7 @@ SE1.3新加的特性。</p>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">272</span>
+                <span class="site-state-item-count">273</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

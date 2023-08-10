@@ -264,6 +264,150 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/06/Proxy-of-Java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/06/Proxy-of-Java/" itemprop="url">Proxy of Java</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-06T00:28:29+08:00">
+                2018-11-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>最近在学习Java，学习到了一个新的Java特性——代理(Proxy)。代理可以为其它对象实现一种新的控制访问方式，这是Java
+SE1.3新加的特性。</p>
+<h2 id="目的">目的</h2>
+<p>假如我们希望在运行时创建一个实现了一组给定接口的新类，我们就可以使用代理实现。</p>
+<h2 id="模式">模式</h2>
+<p>代理类可以运行时创建全新的类，这个代理类能够实现指定的接口：</p>
+<ul>
+<li>指定接口所需要的全部方法</li>
+<li>Object类中的全部方法</li>
+</ul>
+<p>这个模式首先要让代理类和目标类实现相同的接口，然后客户端在通过代理类调用目标类的时候，代理类会将所有方法调用分派到目标对象上反射执行。分派过程中则可以在前后增加一些想要的功能。</p>
+<h2 id="步骤">步骤</h2>
+<ol type="1">
+<li>通过实现InvocationHandler接口来自定义自己的handler，该接口有一个invoke的方法；</li>
+<li>使用Proxy类的newProxyInstance创建一个代理对象，并将handler传入该对象；</li>
+<li>通过代理对象调用目标方法；</li>
+</ol>
+<h2 id="原理">原理</h2>
+<p>首先来看一个实现例子，这个程序会打印出被调用的参数和名字：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.*;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ProxyTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span>&#123;</span><br><span class="line">        Object[] elements = <span class="keyword">new</span> <span class="title class_">Object</span>[<span class="number">1000</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; elements.length; i++) &#123;</span><br><span class="line">            <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> i + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">            <span class="type">InvocationHandler</span> <span class="variable">handler</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TraceHandler</span>(value);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">proxy</span> <span class="operator">=</span> Proxy.newProxyInstance(<span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Comparable.class&#125;, handler);</span><br><span class="line">            elements[i] = proxy;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">Integer</span> <span class="variable">rand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>().nextInt(elements.length) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> Arrays.binarySearch(elements, rand);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (res &gt; <span class="number">0</span>)</span><br><span class="line">            System.out.println(elements[res]);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TraceHandler</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Object target;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TraceHandler</span><span class="params">(Object t)</span></span><br><span class="line">    &#123;</span><br><span class="line">        target = t;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(Object proxy, Method m, Object[] args)</span> <span class="keyword">throws</span> Throwable</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.print(target);</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">&quot;.&quot;</span> + m.getName()+<span class="string">&quot;(&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (args != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; args.length; i++)</span><br><span class="line">            &#123;</span><br><span class="line">                System.out.print(args[i]);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (i &lt; args.length - <span class="number">1</span>)</span><br><span class="line">                    System.out.print(<span class="string">&quot;, &quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;)&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> m.invoke(target, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Ouput:</span></span><br><span class="line"><span class="comment">500.compareTo(155)</span></span><br><span class="line"><span class="comment">250.compareTo(155)</span></span><br><span class="line"><span class="comment">125.compareTo(155)</span></span><br><span class="line"><span class="comment">187.compareTo(155)</span></span><br><span class="line"><span class="comment">156.compareTo(155)</span></span><br><span class="line"><span class="comment">140.compareTo(155)</span></span><br><span class="line"><span class="comment">148.compareTo(155)</span></span><br><span class="line"><span class="comment">152.compareTo(155)</span></span><br><span class="line"><span class="comment">154.compareTo(155)</span></span><br><span class="line"><span class="comment">155.compareTo(155)</span></span><br><span class="line"><span class="comment">155.toString()</span></span><br><span class="line"><span class="comment">155</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>通过打印结果可以得知，每次调用代理对象的compareTo方法，都会调用InvocationHandler的invoke方法。这是因为JVM动态生成的代理类生成代理对象时，会传入InvocationHandler实例对象。</p>
+<p>然后我们在invoke方法内部通过Method.invoke()方法打印方法名称和参数来进行调用。</p>
+<h2 id="特性">特性</h2>
+<p>代理类只有一个实例域，那就是InvocationHandler。另外，所有的代理类都覆盖了Object类中的方法toString，equals和hashCode。</p>
+<p>对于特定的类加载器和预设的一组接口，只能有一个代理类。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/29/cs231n-lecture10/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1900,191 +2044,6 @@ test接受-covermode标志来将覆盖模式设置为以下三种：</p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/04/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/04/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4/" itemprop="url">Linux内核学习——进程地址空间</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T23:40:20+08:00">
-                2018-08-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="进程地址空间">进程地址空间</h1>
-<p>在Linux中，所有进程之间都以虚拟方式共享内存。</p>
-<h2 id="地址空间">地址空间</h2>
-<p>进程地址空间由进程可寻址的虚拟内存组成，使得每个进程都能有一个32bit或者64bit的连续地址空间。</p>
-<p>进程只能访问有效内存内的物理内存区域，如果访问非法的内存区域，内核将会终止该进程，返回段错误。</p>
-<p>内存区域可以包含：</p>
-<ul>
-<li>text section；</li>
-<li>data section；</li>
-<li>未初始化的全局变量，bss段；</li>
-<li>进程空间栈；</li>
-<li>内存映射文件，包括匿名的内存映射，比如由malloc()分配的内存；</li>
-</ul>
-<h2 id="内存描述符">内存描述符</h2>
-<p>内核使用内存描述符结构体来表示进程的地址空间——<strong>mm_struct</strong>。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mm_struct</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vm_area_struct</span> * <span class="title">mmap</span>;</span>    <span class="comment">//指向虚拟区间(VMA)的链表</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rb_root</span> <span class="title">mm_rb</span>;</span>            <span class="comment">//指向线性区对象红黑树的根</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vm_area_struct</span> * <span class="title">mmap_cache</span>;</span>     <span class="comment">//指向最近找到的虚拟区间</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">long</span><span class="params">(*get_unmapped_area)</span> <span class="params">(<span class="keyword">struct</span> file *filp,</span></span><br><span class="line"><span class="params">    <span class="type">unsigned</span> <span class="type">long</span> addr, <span class="type">unsigned</span> <span class="type">long</span> len,</span></span><br><span class="line"><span class="params">    <span class="type">unsigned</span> <span class="type">long</span> pgoff, <span class="type">unsigned</span> <span class="type">long</span> flags)</span>;<span class="comment">//在进程地址空间中搜索有效线性地址区</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">long</span><span class="params">(*get_unmapped_exec_area)</span> <span class="params">(<span class="keyword">struct</span> file *filp,</span></span><br><span class="line"><span class="params">        <span class="type">unsigned</span> <span class="type">long</span> addr, <span class="type">unsigned</span> <span class="type">long</span> len,</span></span><br><span class="line"><span class="params">        <span class="type">unsigned</span> <span class="type">long</span> pgoff, <span class="type">unsigned</span> <span class="type">long</span> flags)</span>;</span><br><span class="line">    <span class="type">void</span>(*unmap_area) (<span class="keyword">struct</span> mm_struct *mm, <span class="type">unsigned</span> <span class="type">long</span> addr);<span class="comment">//释放线性地址区间时调用的方法</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> mmap_base;                <span class="comment">/* base of mmap area */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> task_size;                <span class="comment">/* size of task vm space */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> cached_hole_size;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> free_area_cache;          <span class="comment">//内核从这个地址开始搜索进程地址空间中线性地址的空闲区域</span></span><br><span class="line">    <span class="type">pgd_t</span> * pgd;                            <span class="comment">//指向页全局目录</span></span><br><span class="line">    <span class="type">atomic_t</span> mm_users;                      <span class="comment">//次使用计数器，使用这块空间的个数    </span></span><br><span class="line">    <span class="type">atomic_t</span> mm_count;                      <span class="comment">//主使用计数器</span></span><br><span class="line">    <span class="type">int</span> map_count;                          <span class="comment">//线性的个数</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rw_semaphore</span> <span class="title">mmap_sem</span>;</span>           <span class="comment">//线性区的读/写信号量</span></span><br><span class="line">    <span class="type">spinlock_t</span> page_table_lock;             <span class="comment">//线性区的自旋锁和页表的自旋锁</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">mmlist</span>;</span>              <span class="comment">//指向内存描述符链表中的相邻元素</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Special counters, in some configurations protected by the</span></span><br><span class="line"><span class="comment">    * page_table_lock, in other configurations by being atomic.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">mm_counter_t</span> _file_rss; <span class="comment">//mm_counter_t代表的类型实际是typedef atomic_long_t</span></span><br><span class="line">    <span class="type">mm_counter_t</span> _anon_rss;  </span><br><span class="line">    <span class="type">mm_counter_t</span> _swap_usage;</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> hiwater_rss;    <span class="comment">//进程所拥有的最大页框数</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> hiwater_vm;     <span class="comment">//进程线性区中最大页数</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> total_vm, locked_vm, shared_vm, exec_vm;</span><br><span class="line">    <span class="comment">//total_vm 进程地址空间的大小(页数）</span></span><br><span class="line">    <span class="comment">//locked_vm 锁住而不能换出的页的个数</span></span><br><span class="line">    <span class="comment">//shared_vm 共享文件内存映射中的页数</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> stack_vm, reserved_vm, def_flags, nr_ptes;</span><br><span class="line">    <span class="comment">//stack_vm 用户堆栈中的页数</span></span><br><span class="line">    <span class="comment">//reserved_vm 在保留区中的页数或者在特殊线性区中的页数</span></span><br><span class="line">    <span class="comment">//def_flags 线性区默认的访问标志</span></span><br><span class="line">    <span class="comment">//nr_ptes 进程的页表数</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> start_code, end_code, start_data, end_data;</span><br><span class="line">    <span class="comment">//start_code 可执行代码的起始地址</span></span><br><span class="line">    <span class="comment">//end_code 可执行代码的最后地址</span></span><br><span class="line">    <span class="comment">//start_data已初始化数据的起始地址</span></span><br><span class="line">    <span class="comment">// end_data已初始化数据的最后地址</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> start_brk, brk, start_stack;</span><br><span class="line">    <span class="comment">//start_stack堆的起始位置</span></span><br><span class="line">    <span class="comment">//brk堆的当前的最后地址</span></span><br><span class="line">    <span class="comment">//用户堆栈的起始地址</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> arg_start, arg_end, env_start, env_end;</span><br><span class="line">    <span class="comment">//arg_start 命令行参数的起始地址</span></span><br><span class="line">    <span class="comment">//arg_end命令行参数的起始地址</span></span><br><span class="line">    <span class="comment">//env_start环境变量的起始地址</span></span><br><span class="line">    <span class="comment">//env_end环境变量的最后地址</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> saved_auxv[AT_VECTOR_SIZE]; <span class="comment">/* for /proc/PID/auxv */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">linux_binfmt</span> *<span class="title">binfmt</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">cpumask_t</span> cpu_vm_mask; <span class="comment">//用于惰性TLB交换的位掩码</span></span><br><span class="line">    <span class="comment">/* Architecture-specific MM context */</span></span><br><span class="line">    <span class="type">mm_context_t</span> context; <span class="comment">//指向有关特定结构体系信息的表</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> faultstamp;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> token_priority;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> last_interval;</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags; <span class="comment">/* Must use atomic bitops to access the bits */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">core_state</span> *<span class="title">core_state</span>;</span> <span class="comment">/* coredumping support */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_AIO</span></span><br><span class="line">    <span class="type">spinlock_t</span>              ioctx_lock;  <span class="comment">//用于保护异步I/O上下文链表的锁</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hlist_head</span>       <span class="title">ioctx_list</span>;</span><span class="comment">//异步I/O上下文</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_MM_OWNER</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> *<span class="title">owner</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_PROC_FS</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> num_exe_file_vmas;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_MMU_NOTIFIER</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mmu_notifier_mm</span> *<span class="title">mmu_notifier_mm</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_TRANSPARENT_HUGEPAGE</span></span><br><span class="line">    <span class="type">pgtable_t</span> pmd_huge_pte; <span class="comment">/* protected by page_table_lock */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __GENKSYMS__</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> rh_reserved[<span class="number">2</span>];</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    <span class="comment">//有多少任务分享这个mm OOM_DISABLE</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span> rh_reserved_aux;</span><br><span class="line">        <span class="type">atomic_t</span> oom_disable_count;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* base of lib map area (ASCII armour) */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> shlib_base;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>在该结构体中，mm_users记录着使用该地址的进程数目，而mm_count则是mm_struct的主引用计数。比如有9个线程共享改地址，那么mm_users为9，mm_count为1。当mm_count为0时，需要销毁该结构体。</p>
-<p>mmap和mm_rb描述相同的对象，该地址空间的全部内存区域，但前者是以链表形式存储，后者则是红黑树形式。一种用来高效遍历，另一种则是为了查询特定内存。</p>
-<p>所有的mm_struct都通过自身mmlist连接在一个双向链表中。</p>
-<h3 id="分配内存描述符">分配内存描述符</h3>
-<p>在task_struct中的mm域存放着该进程的内存描述符，如果父子进程共享内存，需要设置CLONE_VM标识，这样的进程称作线程，在Linux内核中，线程就是共享资源的进程。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (clone_flags &amp; CLONE_VM)&#123;</span><br><span class="line">    <span class="type">atomic_inc</span>(&amp;current-&gt;mm-&gt;mm_users);</span><br><span class="line">    tsk-&gt;mm = current-&gt;mm;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="撤销内存描述符">撤销内存描述符</h3>
-<p>进程退出时，内核会调用exit_mm()函数，进程撤销工作。</p>
-<h3 id="mm_struct与内核线程">mm_struct与内核线程</h3>
-<p>内核线程没有进程地址空间，也没有内存描述符，所以内核线程的mm域为空。</p>
-<p>当一个进程被调度时，该进程的mm域指向的地址空间会被装载到内存。</p>
-<h2 id="虚拟内存区域">虚拟内存区域</h2>
-<p>内存区域由vm_area_struct结构体描述，描述了指定地址空间内连续区间的一个独立内存范围。每个VMA对其mm_struct来说是唯一的。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* This struct defines a memory VMM memory area. */</span></span><br><span class="line">vm_area_struct &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mm_struct</span> * <span class="title">vm_mm</span>;</span> <span class="comment">/* VM area parameters */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> vm_start;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> vm_end;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* linked list of VM areas per task, sorted by address */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vm_area_struct</span> *<span class="title">vm_next</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">pgprot_t</span> vm_page_prot;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> vm_flags;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* AVL tree of VM areas per task, sorted by address */</span></span><br><span class="line">    <span class="type">short</span> vm_avl_height;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vm_area_struct</span> * <span class="title">vm_avl_left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vm_area_struct</span> * <span class="title">vm_avl_right</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* For areas with an address space and backing store,</span></span><br><span class="line"><span class="comment">    * font-size: 10px;&quot;&gt;vm_area_struct *vm_next_share;</span></span><br><span class="line"><span class="comment">    struct vm_area_struct **vm_pprev_share;</span></span><br><span class="line"><span class="comment">    struct vm_operations_struct * vm_ops;</span></span><br><span class="line"><span class="comment">    unsigned long vm_pgoff; /* offset in PAGE_SIZE units, *not* PAGE_CACHE_SIZE */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> * <span class="title">vm_file</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> vm_raend;</span><br><span class="line">    <span class="type">void</span> * vm_private_data; <span class="comment">/* was vm_pte (shared mem) */</span></span><br><span class="line">&#125;; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h3 id="vma标志">VMA标志</h3>
-<p>VMA是一种位标志，包含在vm_flags内，标记了该内存区域所包含的页面的行为和信息，不同于物理访问权限，反应的是内核处理要遵守的行为标准。</p>
-<p>比如可读，写，执行，可共享</p>
-<h3 id="vma操作">VMA操作</h3>
-<p>vm_area_struct结构体中的vm_ops域指向与指定内存区域相关的操作函数表：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">vm_operations_struct</span> &#123;</span></span><br><span class="line">	<span class="type">void</span> (*open)(<span class="keyword">struct</span> vm_area_struct * area);</span><br><span class="line">	<span class="type">void</span> (*close)(<span class="keyword">struct</span> vm_area_struct * area);</span><br><span class="line">	<span class="type">int</span> (*fault)(<span class="keyword">struct</span> vm_area_struct *vma, <span class="keyword">struct</span> vm_fault *vmf);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* notification that a previously read-only page is about to become</span></span><br><span class="line"><span class="comment">	 * writable, if an error is returned it will cause a SIGBUS */</span></span><br><span class="line">	<span class="type">int</span> (*page_mkwrite)(<span class="keyword">struct</span> vm_area_struct *vma, <span class="keyword">struct</span> page *page);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* called by access_process_vm when get_user_pages() fails, typically</span></span><br><span class="line"><span class="comment">	 * for use by special VMAs that can switch between memory and hardware</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="type">int</span> (*access)(<span class="keyword">struct</span> vm_area_struct *vma, <span class="type">unsigned</span> <span class="type">long</span> addr,</span><br><span class="line">		      <span class="type">void</span> *buf, <span class="type">int</span> len, <span class="type">int</span> write);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_NUMA</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * set_policy() op must add a reference to any non-NULL @new mempolicy</span></span><br><span class="line"><span class="comment">	 * to hold the policy upon return.  Caller should pass NULL @new to</span></span><br><span class="line"><span class="comment">	 * remove a policy and fall back to surrounding context--i.e. do not</span></span><br><span class="line"><span class="comment">	 * install a MPOL_DEFAULT policy, nor the task or system default</span></span><br><span class="line"><span class="comment">	 * mempolicy.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="type">int</span> (*set_policy)(<span class="keyword">struct</span> vm_area_struct *vma, <span class="keyword">struct</span> mempolicy *new);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * get_policy() op must add reference [mpol_get()] to any policy at</span></span><br><span class="line"><span class="comment">	 * (vma,addr) marked as MPOL_SHARED.  The shared policy infrastructure</span></span><br><span class="line"><span class="comment">	 * in mm/mempolicy.c will do this automatically.</span></span><br><span class="line"><span class="comment">	 * get_policy() must NOT add a ref if the policy at (vma,addr) is not</span></span><br><span class="line"><span class="comment">	 * marked as MPOL_SHARED. vma policies are protected by the mmap_sem.</span></span><br><span class="line"><span class="comment">	 * If no [shared/vma] mempolicy exists at the addr, get_policy() op</span></span><br><span class="line"><span class="comment">	 * must return NULL--i.e., do not &quot;fallback&quot; to task or system default</span></span><br><span class="line"><span class="comment">	 * policy.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">mempolicy</span> *(*<span class="title">get_policy</span>)(<span class="keyword">struct</span> <span class="title">vm_area_struct</span> *<span class="title">vma</span>,</span></span><br><span class="line"><span class="class">					<span class="title">unsigned</span> <span class="title">long</span> <span class="title">addr</span>);</span></span><br><span class="line">	<span class="type">int</span> (*migrate)(<span class="keyword">struct</span> vm_area_struct *vma, <span class="type">const</span> <span class="type">nodemask_t</span> *from,</span><br><span class="line">		<span class="type">const</span> <span class="type">nodemask_t</span> *to, <span class="type">unsigned</span> <span class="type">long</span> flags);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<ul>
-<li>指定内存区域被加入到一个地址空间时，open函数被调用</li>
-<li>指定内存区域被删除时，close函数被调用</li>
-</ul>
-<h3
-id="内存区域的树型结构和内存区域的链表结构">内存区域的树型结构和内存区域的链表结构</h3>
-<p>mmap域使用单独链表连接所有的内存区域对象，每个vm_area_struct结构体通过自身vm_next域连入链表。</p>
-<p>而mm_rb则是用红黑树连接所有的内存区域。</p>
-<h2 id="操作内存区域">操作内存区域</h2>
-<p>内核经常需要在某个内存区域上执行一些操作。</p>
-<h3 id="find_vma">find_vma()</h3>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> vm_area_struct * <span class="title function_">find_vma</span><span class="params">(strcut mm_struct *mm, <span class="type">unsigned</span> <span class="type">long</span> addr)</span>;</span><br></pre></td></tr></table></figure>
-<p>该函数在指定的地址空间中搜搜第一个vm_end大于addr的内存区域，如果找不到则返回NULL。并且该返回结果会被缓存在mmap_cache中，查找时会先从缓存找，搜不到则通过红黑树搜索。</p>
-<h3 id="find_vma_prev">find_vma_prev()</h3>
-<p>该函数返回第一个小于addr的内存区域。</p>
-<h3 id="find_vma_intersection">find_vma_intersection()</h3>
-<p>该函数返回第一个和指定地址区间相交的VMA。</p>
-<h2 id="mmap和do_mmap创建地址区间">mmap()和do_mmap()：创建地址区间</h2>
-<p>内核使用do_mmap()创建一个新的线性地址区间，不过不同的是，如果新创建的地址区间与一个已经存在的地址区间相邻，并且它们具有相邻的访问权限时，两个区间就会合并为一个。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">do_mmap</span><span class="params">(<span class="keyword">struct</span> file *file, 			<span class="type">unsigned</span> <span class="type">long</span> addr,</span></span><br><span class="line"><span class="params">        <span class="type">unsigned</span> <span class="type">long</span> len, <span class="type">unsigned</span> <span class="type">long</span> prot,</span></span><br><span class="line"><span class="params">        	<span class="type">unsigned</span> <span class="type">long</span> flag, <span class="type">unsigned</span> <span class="type">long</span> offset)</span></span><br><span class="line">&#123;</span><br><span class="line">         <span class="type">unsigned</span> <span class="type">long</span> ret = -EINVAL;</span><br><span class="line">         <span class="keyword">if</span> ((offset + PAGE_ALIGN(len)) &lt; offset)</span><br><span class="line">                   <span class="keyword">goto</span> out;</span><br><span class="line">         <span class="keyword">if</span> (!(offset &amp; ~PAGE_MASK))</span><br><span class="line">                   ret = do_mmap_pgoff(file, addr, len, prot, flag, offset &gt;&gt; PAGE_SHIFT);</span><br><span class="line">out:</span><br><span class="line">         <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>该函数映射由file指定的文件。</p>
-<h2
-id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址区间</h2>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">do_mummap</span><span class="params">(<span class="keyword">struct</span> mm_struct *mm, <span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">size_t</span> len)</span>;</span><br></pre></td></tr></table></figure>
-<p>该函数从特定的进程地址空间中删除从地址start开始，长度为len字节的空间。</p>
-<p>而mummap()则是对do)mummap()函数的一个简单封装。</p>
-<h2 id="页表">页表</h2>
-<p>应用程序虽然面对的是虚拟内存，但真实操作的是物理内存，因此需要一个从虚拟内存到物理内存的转化机制。</p>
-<p>在Linux中，是通过三级页表来实现的，顶级页表是页全局目录——PGD，包含了一个pgd_t的数组；而二级页表则是中间页目录——PMD，是一个pmd_t数组；最后一级则是页表项指向物理内存的页表。</p>
-<p>为了提高效率，还引入了一个TLB的高速缓存器，在查询物理地址时首先在TLB中查询，找不到时采取内存中查找页表。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2135,7 +2094,7 @@ id="mummap和do_mummap删除地址区间">mummap()和do_mummap()：删除地址�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">272</span>
+                <span class="site-state-item-count">273</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

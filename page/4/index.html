@@ -264,6 +264,227 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/05/Scaling-Memcache-at-Facebook%E2%80%94%E2%80%94MIT6-824/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/01/05/Scaling-Memcache-at-Facebook%E2%80%94%E2%80%94MIT6-824/" itemprop="url">Scaling Memcache at Facebook——MIT6-824</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-05T00:03:08+08:00">
+                2021-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="scaling-memcache-at-facebook">Scaling Memcache at Facebook</h1>
+<blockquote>
+<p>Memcache是一个有名的且简单的纯内存缓存方案。论文主要讲了Facebook基于Memcache来构建一个分布式kv存储来为它的社交网站服务，处理几十亿的QPS，存储了上万亿的数据项</p>
+</blockquote>
+<h2 id="introduction">Introduction</h2>
+<p>本文主要讲述了Facebook如何改进memcached的开源版本，这是一个全内存哈希表的开源实现，能够以较低的开销提供了对存储的访问。Facebook的目标之一是展现部署在不同规模系统的实现，同时需要保持性能、效率、容错能力和一致性。</p>
+<h2 id="overview">Overview</h2>
+<p>论文提到的设计面临的场景是：读多写少，需要能从多个数据源读取数据。</p>
+<p>MemCached提供了一组简单的操作（set、get和delete），这使它能够成为大规模分布式系统重要的基础组件。开源版本是一个单机内存哈希表，本文基于这个开源版本构建了一个可以处理每秒数十亿请求的分布式的KV储存系统。下文将用“memcached”来指代它的源码或者它运行的二进制实例，用“memcache”来指代由每个实例构成的分布式系统。</p>
+<p><img
+src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c45c.png" /></p>
+<p><strong>Query
+cache</strong>：依赖memcache来减轻读取数据库的负担。如上图所示，读取的时候先读memcache，不命中再读数据库，查询成功后会更新memcache。写请求则是写到数据库，接着发删除请求到memcache。</p>
+<p><strong>Generic
+cache</strong>：论文还讲了如何使memcache成为一个更加通用的kv系统，如保存机器学习算法的中间结果。</p>
+<p><img
+src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c464.png" /></p>
+<p>在系统的迭代中，论文考虑了两个重要的设计：</p>
+<ul>
+<li>只有对用户或者运维产生影响的问题，才值得优化；</li>
+<li>系统可能会暴露轻微陈旧的数据以便后台免受高负载的影响；</li>
+</ul>
+<h2 id="in-a-cluster-latency-and-load">In a Cluster : Latency and
+Load</h2>
+<p>这一章主要聚焦于拉取缓存数据时的延迟和缓存不命中时带来的负载</p>
+<h3 id="reducing-latency">Reducing Latency</h3>
+<p>为了减轻数据库的负载，需要准备由数百台memcache机器组成的缓存集群，但多个web服务器对多台memcache服务器的关系，可能会在短时间内导致incast
+congestion。数据副本可以缓解这种情况，但又会带来内存浪费。</p>
+<p>因此论文中提到的减少延迟的方法主要集中在memcache客户端。</p>
+<p><strong>Parallel requests and
+batching</strong>：为了尽可能减少网络请求，该系统通过做拓扑图分析来表示数据间的依赖，整合将多个独立请求，并尽可能进行并发操作。</p>
+<p><strong>Client-server
+communication</strong>：memcached服务器之间并不会直接通信，而是相关控制逻辑集成到client上，memcache的client分为两个部分：sdk和一个叫mcrouter的的proxy，mcrouter在web服务器和memcached服务器之间，提供与memcached相同的接口。</p>
+<p>考虑到对数据错误容忍度高，memcached
+client的get请求使用UDP与memcached服务器通信，减少了创建和维护连接带来的开销。一旦出现丢包或者乱序包，client会将其作为异常处理，即视作cache
+miss，get请求会被重传到数据库，论文中提到系统在高峰期也只有0.25%的请求会被丢弃。为了可靠性，对于set和delete，则是通过可靠的TCP通信。</p>
+<p><strong>Incast congestion</strong>：对于Incast
+congestion问题，memcached的client实现了类似TCP的拥塞控制逻辑，根据网络情况控制滑动窗口。</p>
+<h3 id="reducing-load">Reducing Load</h3>
+<p>为了减轻负载，论文提到了三种技术；</p>
+<h4 id="leases">Leases</h4>
+<p>文中引入了租约机制来解决下面两个问题：stale sets和thundering
+herds，前者是保证了并发更新下的最终一致性，后者则是缓解惊群效应。</p>
+<p>对于stale sets，是因为发生cache
+miss的时候，并发读取数据库后需要重新写入到memcache，这样就可能出现过期的数据在数据被删除之后才写入，导致数据库和memcache内的数据不一致。通过引入租约，每次出现cache
+miss的时候都会返回一个与key绑定的lease
+id，当数据被删除后，之前发出的lease
+id会失效，写入数据时，sdk需要带上上次收到的lease
+id，根据该id是否失效来仲裁写入与否。</p>
+<p>对于惊群效应，当数据出现热点的时候，可能会出现大量的cache
+miss，导致数据库负载增大。memcache通过控制每个key的lease发送速率，比如每个key在10秒内只发送一个lease
+id，在这期间有对这个key的请求时，会让客户端等待重试，这时数据可能已经被获得lease的给填上，这时就会重试成功。</p>
+<p><strong>过期值</strong>：对于某些能接受过期数据的应用，memcache会将已经删除的数据短暂地保存到另一个数据结构中，此时web
+server可以决定是等待新的数据还是读取过期数据，从而减轻负载。</p>
+<h4 id="memcache-pools">Memcache Pools</h4>
+<p>将memcache作为通用缓存意味着所有不同的workloads会共享这一设施，Facebook统计过更新频率高的key很可能会将更新频率低的key给逐出来。</p>
+<p>考虑到这一点，Facebook将集群的memcache服务器分割成独立的池，一个默认pool，一个访问频率高但cache
+miss成本低的small poll，一个访问频率低但cache miss成本高的large
+pool。</p>
+<h3 id="replication-with-in-pools">Replication With in Pools</h3>
+<p>对于某些pool，可以通过数据冗余的方式来提高请求的并发能力。</p>
+<p>###Handling Failures</p>
+<p>论文对于故障处理主要提到了两个维度的故障：网络故障和集群自身服务器宕机。</p>
+<p>对于少数几个server宕机或者网络故障，Facebook主要依赖一个自动恢复机制，如果大规模的停机，Facebook会将用户请求直接转移到另一个数据中心。为了避免在自动恢复的那几分钟里对数据库或者后台服务带来的雪崩，memcached的client会将请求转移到Gutter机器上接管故障服务器的能力。</p>
+<p>一般来说，每次失败的请求都会导致转移到Gutter的存取，从而减轻数据库的负载。</p>
+<h2 id="in-a-region-replication">In a Region: Replication</h2>
+<p>随着流量的增大，需要对Memcached做横向扩展，并且能够解决key的热点问题和网络incast
+congestion，论文在replication和sharding之间做了取舍，选择了将memcached
+servers切分成多个集群，这一个memcached集群、前端访问集群还有共享存储集群统称为region。</p>
+<h3 id="regional-invalidations">Regional Invalidations</h3>
+<p>考虑到由于存在多个memcached
+server集群，需要确保数据的一致性，避免同一条数据的不同版本出现在不同集群上。论文的做法是，监控MySQL，一旦出现数据被删除或者更新，且事务提交，那么对应key就会被一个mcsqueal守护进程记录（读取MySQL的commit
+log），然后批量地将删除明亮发送给对应的Memcached实例。</p>
+<p><img
+src="https://pic.downk.cc/item/5ff33a4b3ffa7d37b349c46b.png" /></p>
+<h3 id="regional-pools">Regional Pools</h3>
+<p>考虑对部分数据的QPS很低，Facebook的做法是不把所有数据在一个region内存储多份冗余，而是在单个region内划分出一个pool来存储那些访问率低的数据。</p>
+<h3 id="cold-cluster-warmup">Cold Cluster Warmup</h3>
+<p>由于现有集群需要进行定期维护，在新集群上线时，缓存命中率会很低。Facebook构建了一个Cold
+Cluster Warmup的系统，在新集群发生cache
+miss时从热集群中加载数据，而不是去读持久化存储。</p>
+<h2 id="across-regions-consistency">Across Regions: Consistency</h2>
+<p>Facebook在全球都有数据中心，因此每个数据中心都会有若干个region来服务用户。基于MySQL的复制机制，Facebook将一个region设为master，其他的都是只读region，web
+servers请求的时候只会访问本地的DB或者memcache。至于写入，所有的请求只是发给master处理，然后mysql再将其同步到从region。这样就可能带来一致性的问题，即从region的memcache一直保留着过期数据。</p>
+<p>对于这种场景，该系统保持一致性的方法是：</p>
+<ul>
+<li><p>如果在master
+region写，前端集群收到更新，请求转发到数据库，同时删除本集群的memcache记录。数据库的进程同步修改到其他集群，其他region删除过期的记录；</p></li>
+<li><p>在非master region写数据d：</p>
+<ul>
+<li>本地的memcache会设置remote marker，rd；</li>
+<li>将d写到master region的db；</li>
+<li>将d从memcache中删除；</li>
+<li>等待master DB同步带有rd信息的数据到非master DB；</li>
+<li>该非master DB通过解析数据，然后删除掉rd；</li>
+</ul>
+<p>在这个过程中，非master region有对该数据d进行读取，并发生cache
+miss时，如果发现了数据带有rd，则直接跨region访问master
+DB，否则直接读取本地DB。</p></li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>论文主要是基于memcache技术来满足Facebook的业务需求，有很多取舍在优化线上系统性能时都非常值得参考。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/05/Resilient-Distributed-Datasets-A-Fault-Tolerant-Abstraction-for-In-Memory-Cluster-Computing%E2%80%94%E2%80%94MIT6-824-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2130,243 +2351,6 @@ src="https://puui.qpic.cn/fans_admin/0/3_118841988_1575731978815/0" /></p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/10/No-compromises-distributed-transactions-with-consistency-availability-and-performance%E2%80%94%E2%80%94MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/10/10/No-compromises-distributed-transactions-with-consistency-availability-and-performance%E2%80%94%E2%80%94MIT6-824/" itemprop="url">No compromises: distributed transactions with consistency, availability, and performance——MIT6.824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-10T00:24:13+08:00">
-                2019-10-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1
-id="no-compromises-distributed-transactions-with-consistency-availability-and-performance">No
-compromises: distributed transactions with consistency, availability,
-and performance</h1>
-<h2 id="abtract">Abtract</h2>
-<p>本文展示了一个名为FaRM的主存分布式计算平台，可以提供强串行化、高性能、高可用和耐用性等特质，为此设计了新的事务，复制和恢复协议。</p>
-<h2 id="introduction">Introduction</h2>
-<p>具有高可用性和严格序列化的事务虽然简化了编程，但在一定程度上也影响了系统的性能。因此，像Dynamo或者Memcached之类的系统通过不支持事务或者提供弱一致性来提高性能。有些系统则是仅在所有数据都停留在一台机器中时才提供事务。因此需要程序员费心思去考虑数据分区的问题。</p>
-<p>FaRM提供了分布式的ACID事务，具有严格的可分级性，高可用性，高吞吐量和低延迟。设计的协议则利用数据中心中出现的两种硬件趋势——具有RDMA的快速网络和廉价的DRAM提供，通过在电源故障时将DRAM的内容写入SSD来实现非易失性。FaRM的协议遵循三个原则来解决CPU瓶颈：减少消息计数，使用单向的RDMA读写而不是消息，并有效地利用并行性。</p>
-<p>FaRM通过使用单向RDMA操作进一步降低了CPU开销，因为并不会使用到远程CPU。为了使用单向的RDMA，需要设计新的恢复协议（例如RDMA的数据请求是通过网卡提供的，不能简单地在期限到时拒绝传入请求）。另外，恢复协议借助并行性，在集群中均匀地分配每个状态的恢复，并在每台机器的core之间作并行恢复。</p>
-<h2 id="hardware-trends">Hardware trends</h2>
-<p>前面讲过，FaRM的提出利用了两种硬件趋势——非易失性DRAM和具有RDMA的快速网络。</p>
-<h3 id="rdma-networking">RDMA networking</h3>
-<p>FaRM尽可能使用单向的RDMA操作，这是一种远程直接数据存取，是为了解决网络传输中服务器端数据处理的延迟而产生的。文中的实验发现，RDMA读取比可靠性的RPC执行性能高2倍，而RDMA的性能瓶颈是网卡的消息速率。另外，RDMA和RPC都会受到CPU的限制，因此降低CPU开销才是挖掘硬件潜力的好方法。</p>
-<h2 id="programming-model-and-architecture">Programming model and
-architecture</h2>
-<p>FaRM为应用程序提供了跨集群机器的全局地址空间的抽象，每个机器都运行独立的应用程序进程并存储对象在地址空间里。FaRM的API提供了对本地或者远程对象的透明访问，应用程序线程可以随时启动事务，在事务执行期间可以执行任意逻辑，随后可以调用FaRM来提交这些逻辑操作。</p>
-<p>FaRM事务使用乐观并发控制，所有更新都被本地缓存，并且仅在成功提交后才对其他事务可见。如果并发事务冲突，事务的提交就会失败。</p>
-<p>FaRM
-API还提供了无锁读取（优化的单对象只读事务）和位置提示，这样应用程序就可以将相关对象共存于同一组机器上，从而改善性能。</p>
-<p>如下图所示，每台机器在用户进程中固定在每个硬件线程中的内核线程上运行FaRM，，每个内核线程运行一个事件循环，该循环执行应用程序代码并轮询RDMA完成队列。</p>
-<p><img
-src="https://puui.qpic.cn/fans_admin/0/3_131288061_1569132674961/0" /></p>
-<p>随着计算机故障或添加新计算机，FaRM实例会随着时间推移逐步进行一系列的配置。配置是元组⟨i，S，F，CM⟩，其中i是唯一的，单调递增的64位配置标识符，S是配置中的一组计算机，F是从计算机到故障域的映射，CM则是配置管理器，FaRM使用Zookeeper来协调服务，确保机器就当前配置达成一致并进行存储。每个配置更改都会由CM调用一次Zookeeper，以更新配置。</p>
-<p>FaRM中的全局地址空间由2GB的Region组成，每个Region都会备份到一个主备份和f个副备份中。每台机器在非易失性DRAM中存储多个Region，其他Region可以使用RDMA读取这些Region。读取对象必须要从包含该Region的主备份中完成，如果该Region位于本机，则使用局部地址空间读取。如果是远程，则使用单面RDMA读取。每个对象都有一个用于并行控制和复制的64位版本。Region标识符，即从主备份和副备份的映射由CM管理，并由线程与将单面RDMA读取发布到主备份所需的RDMA引用一起缓存。</p>
-<p>所有机器都与CM沟通以分配新Region，从单调递增的计数器分配Region标识符，并选择该区域的副本。副本选择需要平衡存储在每台机器上的Region数量，同时受到以下限制：容量足够大，每个副本位于不同的故障域中，并且当应用程序指定位置限制时，该Region与目标Region位于同一位置。CM将准备消息发送给具有Region标识符的所选副本。如果所有副本都报告分配区域成功，则CM向所有副本发送一条提交消息。这是一个两阶段协议。</p>
-<p>每台机器还存储实现FIFO队列的环形缓冲区。它们用作事务日志或消息队列。发送者会使用对尾部进行的单面RDMA写入，将记录追加到日志中。NIC会确认这些写入，但是不会涉及接收方的CPU。接收者定期轮询日志的开头以处理记录。</p>
-<h2 id="distributed-transactions-and-replication">Distributed
-transactions and replication</h2>
-<p>FaRM集成了事务和备份的协议可以很好地提高性能，传统协议相比，它使用的消息更少，并且利用单面RDMA读取和写入来提高CPU效率和降低延迟。FaRM使用非易失性DRAM中的主备份复制来存储数据和事务日志，并使用单个事务协调器直接与primary和backup进行通信。</p>
-<p>下图是FaRM事务的timeline。虚线和实线分别表示RDMA的读写，点线表示硬件的响应，矩形是对象数据。</p>
-<p><a
-target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0"><img
-src="https://puui.qpic.cn/fans_admin/0/3_1574395846_1569165668189/0" /></a></p>
-<p>在执行阶段，事务使用单向RDMA读取对象，并且它们在本地缓存写操作。协调器还记录所有访问对象的地址和版本，如果primary和backup与协调器位于同一个机器，对象访问会使用本地内存而不是RDMA来读取和写入日志。</p>
-<p>提交事务：</p>
-<ol type="1">
-<li>Lock：协调器将LOCK记录写入每台机器上的日志，这些机器是写入对象的主要机器。Primary的机器通过锁定特定版本对象的方式来处理这些记录。如果获取到所有的lock，那么将发送一条报告消息，否则会终止事务；</li>
-<li>Validate：协调器对primary机器执行读取验证，主要是读取所有对象的版本号，看是否一致。验证默认是通过单边的RDMA读取完成的；</li>
-<li>Commit
-backups：协调器在每次备份时将COMMITBACKBACK记录写入非易失性日志，然后等待NIC硬件的确认，而不是中断backup机器的CPU；</li>
-<li>Commit
-primaries：在COMMITBACKBACK写入backup机器之后，协调器开始对每台机器提交COMMIT-PRIMARY。Primary会更新对象的版本号；</li>
-<li>Truncate：在协调器收到所有主节点的响应之后，就会通过在其他日志记录中附带截断事务的标识符来实现记录的截断；</li>
-</ol>
-<h3 id="正确性">正确性</h3>
-<p>提交的读写事务在获取所有写锁时是可序列化的，而提交的只读事务在上一次读取时是可序列化的。在没有失败的情况下，这等效于在序列化时间点原子地执行和提交整个事务。</p>
-<p>为了确保跨故障的可序列化性，必须在写入COMMIT-PRIMARY之前等待所有备份硬件的确认。否则一旦主节点在不接收COMMIT-BACKUP记录的情况下挂掉了，那么就可能丢失掉某个region的修改。</p>
-<p>由于读集仅存储在协调器中，因此如果协调器失败并且没有提交记录可以生存以证明验证是成功的，则事务将中止。协调器必须要在其中一个主数据库上等待成功提交，然后再向应用程序报告成功提交。否则，如果协调器和所有相关backup节点都挂掉了，那么事务就会被终止了。因为没有可以用来做验证的记录。</p>
-<h3 id="performance">Performance</h3>
-<p>对于FaRM来说，其协议比传统的分布式提交协议具有更多的优势，以带有备份的两阶段提交协议——Spanner的协议为例，Spanner使用Paxos复制事务协调器及其参与者，它们是存储由事务读取数据或写入数据的机器。每个Paxos状态机在传统的两阶段提交协议中都扮演着单独的机器的角色。因此这需要2f
-+1个副本才能容忍f个故障，每个状态机操作至少需要2f
-+1个往返消息，则需要4P（2f +1）个消息（其中P是事务参与者的数量）。</p>
-<p>FaRM使用primary-backup复制而不是Paxos状态机复制。这将数据副本的数量减少到f+1，减少了在事务处理期间传输的消息的数量。并且由于协调器直接与主备节点交流，进一步减少了延迟和消息数。此外，通过RDMA进行的读取验证可确保只读参与者主节点不占用CPU，并且对COMMIT-PRIMARY和COMMIT-BACKUP记录使用单向RDMA写操作可减少对远程CPU的等待，另外CPU也可以批处理和懒惰处理。</p>
-<h2 id="failure-recovery">Failure recovery</h2>
-<p>FaRM中的故障恢复有以下五个阶段：故障检测，重新配置，事务状态恢复，批量数据恢复和分配器状态恢复。</p>
-<h3 id="failure-detection">Failure detection</h3>
-<p>FaRM使用租约来检测故障。除CM之外，每台计算机都在CM上拥有租约，而CM在其他每台计算机上都拥有租约。租约到期就会触发故障恢复，租约是通过3次握手来授予的。每台机器向CM发送一个租赁请求，并以一条消息作为响应，该消息既充当对该计算机的租赁授权，又充当CM的租赁请求。然后非CM的计算机回复该租赁请求就行。</p>
-<p>为了确保高可用性，FaRM的租期非常短。FaRM使用了专门的队列来实现租约，以避免其它消息类型在共享队列中，影响了其的延迟。为了提高性能，避免为每台机器在CM上增加一个队列，FaRM使用无限带宽的技术发送和接受各种操作。</p>
-<p>租约的续期是在CPU上实现的，FaRM使用了专门的租约管理器线程，该线程以最高的用户空间优先级运行。</p>
-<h3 id="reconfiguration">Reconfiguration</h3>
-<p>重新配置协议将FaRM实例从一种配置移到另一种。以下是重新配置的时间图：</p>
-<p><a
-target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0"><img
-src="https://puui.qpic.cn/fans_admin/0/3_1271937727_1569687914509/0" /></a></p>
-<ol type="1">
-<li>怀疑。当某个机器的租约在CM到期时，它将怀疑该机器发生了故障。然后屏蔽所有外部客户端请求。</li>
-<li>探测。新的CM向配置中的所有机器发出RDMA读取，但被怀疑的机器除外。同时也怀疑任何读取失败的机器，新CM仅在获得大多数探测的响应后才继续进行重新配置，避免CM处于小分区。</li>
-<li>更新配置。在收到对探针的答复后，新的CM尝试将存储在Zookeeper中的配置数据更新为⟨c+
-1，S，F和CMid⟩，其中c是当前配置标识符，S是已回复的探测器，F是计算机到故障域的映射，而CMid是其自身的标识符。</li>
-<li>重新映射区域。新CM重新分配先前映射到故障机器的区域，以将副本数恢复到f+1。</li>
-<li>发送新配置。重新映射区域后，CM将NEW-CONFIG消息发送到配置中的所有计算机，其中包含配置标识符，其自身的标识符，配置中其他计算机的标识符以及区域到计算机的所有新映射。</li>
-<li>应用新配置。当机器收到配置标识符大于其自身配置的NEW-CONFIG时，它将更新其当前配置标识符及其区域映射的缓存副本，并分配空间以容纳分配给它的所有新区域副本。</li>
-<li>提交新配置。一旦CM从配置中的所有计算机接收到NEW-CONFIG-ACK消息，它将等待以确保先前配置中授予该配置中的计算机的租约均已到期。然后，CM将NEW-CONFIG-COMMIT发送给所有配置成员，这些成员拿到了租约的授权；</li>
-</ol>
-<h3 id="transaction-state-recovery">Transaction state recovery</h3>
-<p>在配置更改之后，FaRM使用分布在因事务而修改对象副本所产生的日志来恢复事务状态。下图展示了事务恢复状态的timeline，FaRM通过在集群中的线程和机器之间分配工作来实现快速恢复。</p>
-<p><a
-target="_blank" rel="noopener" href="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0"><img
-src="https://puui.qpic.cn/fans_admin/0/3_1440820042_1570028784599/0" /></a></p>
-<ol type="1">
-<li><em>Block access to recovering regions.</em></li>
-</ol>
-<p>当一个primary挂掉，backup会被配置选举成新的primary，此时所有对相关区域的访问都会被屏蔽，知道上图第四步完成，重新获取读写锁。</p>
-<ol start="2" type="1">
-<li><em>Drain logs.</em></li>
-</ol>
-<p>要确保跨配置的一致性，一般是拒绝来自旧配置的消息。但FaRM无法这样做，因为NIC会提交写入事务日志的COMMIT-BACKUP和COMMIT-PRIMARY记录，而不会考虑它们的发布配置。FaRM通过drain日志的方式解决这个问题，即在收到NEW-CONFIGCOMMIT消息时都会处理其日志中的所有记录。完成后，它们会将配置标识符记录在变量LastDrained中，配置标识符小于或等于LastDrained的事务日志记录将会被拒绝。</p>
-<ol start="3" type="1">
-<li><em>Find recovering transactions.</em></li>
-</ol>
-<p>所有机器必须就给定事务是否为恢复事务达成一致，FaRM通过在重新配置阶段在通信中附带一些额外的元数据来实现此目的。协调器读取每台计算机上的LastDrained变量，对于自LastDrained之后其映射被更改的每个区域r，CM都会在NEW-CONFIG消息中向该计算机发送两个配置标识符——LastPrimaryChange[r]和LastReplicaChange[r]，分别是r的主备对象更改时的最后一个配置标识符，在配置c-1中开始提交的事务将在配置c中恢复。</p>
-<p>用于恢复事务的记录可以分布在不同主数据库的日志中，以及由事务更新的备份机器中。region的每个备份都将NEED-RECOVERY消息与配置标识符，区域标识符以及更新该区域的恢复事务标识符一起发送给主数据库。</p>
-<ol start="4" type="1">
-<li><em>Lock recovery.</em></li>
-</ol>
-<p>每个region的primary都会一直等到本机的日志排干并且等待收到每台backup的NEED-RECOVERY消息，然后才去构建完整的恢复事务集合。然后，它通过其线程上的标识符对事务进行分片，以便每个线程t恢复具有协调器线程标识符t的事务状态。同时，主数据库中的线程并行地从尚未本地存储的备份中获取所有事务日志记录，然后锁定通过恢复事务修改的任何对象。</p>
-<p>当某个区域的锁恢复完成时，该区域就处于活动状态，本地和远程协调器可以获得本地指针和RDMA引用。</p>
-<ol start="5" type="1">
-<li><em>Replicate log records.</em></li>
-</ol>
-<p>primary日志中的线程通过向backup发送缺失的事务的REPLICATE-TXSTATE消息来进行记录。该消息包含区域标识符，当前配置标识符以及与LOCK记录相同的数据。</p>
-<ol start="6" type="1">
-<li><em>Vote.</em></li>
-</ol>
-<p>正在恢复事务的协调器根据事务更新的每个区域的投票来决定是提交还是中止事务。</p>
-<ol start="7" type="1">
-<li><em>Decide.</em></li>
-</ol>
-<p>如果协调器收到来自任何region的commit-primary投票，则决定进行事务。否则，它将等待所有区域投票，如果至少一个区域对
-commit-backup投票，而其他所有区域被事务投票锁定、提交备份或截断，则它将等待提交。</p>
-<h2 id="recovering-data">Recovering data</h2>
-<p>FaRM必须在某个region的新备份中恢复（重新复制）数据，以确保将来可以容忍复制失败。一个区域的新备份最初具有新分配的零区域副本。它将区域划分为多个工作线程，以并行方式恢复该工作线程。</p>
-<p>在复制到备份之前，必须检查每个恢复的对象。如果对象的版本大于本地版本，则备份将通过比较和交换锁定本地版本，更新对象状态，然后将其解锁。</p>
-<h2 id="recovering-allocator-state">Recovering allocator state</h2>
-<p>FaRM分配器将区域划分为块（1
-MB），用作分配小对象的slabs。它保留了两个元数据：块标头（包含对象的大小）和slab的空闲列表。</p>
-<p>分配新块时，块头将复制到备份中。这样可确保它们在发生故障后在新的主数据库上可用。slab空闲列表仅保留在primary上，以减少对象分配的开销。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2417,7 +2401,7 @@ MB），用作分配小对象的slabs。它保留了两个元数据：块标头�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">272</span>
+                <span class="site-state-item-count">273</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
