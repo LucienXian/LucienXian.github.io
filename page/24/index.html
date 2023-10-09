@@ -264,6 +264,179 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/06/OS%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/06/OS%E7%BB%93%E6%9E%84/" itemprop="url">OS结构</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-06T23:32:43+08:00">
+                2017-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="操作系统结构">操作系统结构</h1>
+<h2 id="operating-system-services">operating system services</h2>
+<ul>
+<li>用户接口</li>
+<li>程序</li>
+<li>IO操作</li>
+<li>文件系统</li>
+<li>通讯</li>
+<li>错误检测</li>
+<li>资源分配</li>
+<li>安全</li>
+</ul>
+<h2 id="user-operating-system-interface">User Operating System
+Interface</h2>
+<ul>
+<li>command interface
+<ul>
+<li>CIL: command-line interface</li>
+<li>GUI: graphics user interface</li>
+</ul></li>
+<li>program interface(System call)</li>
+</ul>
+<h2 id="system-call">system call</h2>
+<ul>
+<li>定义：系统调用是在用户进程和系统内核之间的程序接口</li>
+<li>多数情况下，用户进程通过API而不是系统调用与内核打交道。
+<ul>
+<li>API是一组函数定义，提供了一个特定的服务；而一个系统调用时通过软中断向内核发送一个请求；</li>
+<li>API可能需要一个或多个系统调用来完成其功能，如果不与内核打交道，则不需要用到系统调用；</li>
+<li>系统调用是在内核态中运行的，而API是在用户态中运行；</li>
+</ul></li>
+<li>系统调用如何传递参数？有三种：
+<ul>
+<li>在寄存器中传递，适用于参数比较少的，因此会限制参数长度；</li>
+<li>在block、table或者内存中，然后再寄存器存着所在block的地址；</li>
+<li>存在stack中，需要时则pop；</li>
+</ul></li>
+</ul>
+<h2 id="operating-system-structure">Operating system structure</h2>
+<ul>
+<li>simple structure: MS-DOS</li>
+<li>Microkernel system structure:
+由“微”内核和若个个服务组成，基本功能由中央内核提供，其它功能由独立进程提供
+<ul>
+<li>windows、Macos</li>
+</ul></li>
+<li>Monolithic Kernels:
+内核的所有代码，包括子系统都被打包进一个文件中，内核中的每个函数都可以访问内核中所有部分
+<ul>
+<li>linux</li>
+</ul></li>
+</ul>
+<h2 id="virtual-machines">virtual machines</h2>
+<p>虚拟机是在硬件上的一层服务，物理机的资源被用来创建虚拟机。虚拟机很好地避免了与硬件资源的直接访问</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/06/I-O%E5%A4%8D%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1670,146 +1843,6 @@ from leaving destructions</h1>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/25/Factory-method-DesignPattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/25/Factory-method-DesignPattern/" itemprop="url">Factory method(DesignPattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-25T23:42:48+08:00">
-                2017-11-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="factory-method">Factory method</h1>
-<h2 id="目的">目的</h2>
-<p>定义一个用于创建对象的接口，让子类去决定实例化哪一个类</p>
-<h2 id="动机">动机</h2>
-<p>一个框架通过抽象类来定义对象之间的关系，并且客户通过子类来定义相关对象的实现。假设有一个应用框架来显示文档，画图框架显示画图文档等，我们需要具体的子类来重定义创建文档的操作，而这个操作就叫做抽象方法。</p>
-<h2 id="使用范围">使用范围</h2>
-<ul>
-<li>当一个类不知道它所创建的对象的类的时候；</li>
-<li>当一个类希望它的子类来指定创建哪个对象的时候；</li>
-</ul>
-<h2 id="效果">效果</h2>
-<ul>
-<li>工厂方法不会将与特定的应用有关的类绑定到代码中，代码仅仅处理product的接口；</li>
-<li>客户为了创建一个product，往往需要创建一个具体的creator；</li>
-</ul>
-<blockquote>
-<p>与abstract factory不同的是，factory
-method的工厂仅仅是一个方法，而抽象工厂里的工厂是一个类。因此抽象工厂里，客户在使用时，产品本身是固定死的；而工厂方法则需要使用到产品本身（接口）。总结就是，抽象工厂看不到产品，因此需要使用客户端和更换工程，而工厂方法直接使用产品，从而生产产品；</p>
-</blockquote>
-<h2 id="代码示范">代码示范</h2>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Factory_method.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Product</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Product</span>() &#123; cout &lt;&lt; <span class="string">&quot;Product...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;partA...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;partB...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">derivedPro</span> : <span class="keyword">public</span> Product &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">derivedPro</span>() &#123; cout &lt;&lt; <span class="string">&quot;derived Product...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partA</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;derived partA...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">partB</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;derived partB...&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Creator</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">Product* <span class="title">getProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (_product == <span class="number">0</span>) &#123;</span><br><span class="line">			_product = <span class="built_in">createProduct</span>();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> _product;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Product* _product;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">TheProduct</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">standardCreator</span> :<span class="keyword">public</span> Creator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> Product* <span class="title">createProduct</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">TheProduct</span>&gt;</span><br><span class="line">Product* standardCreator&lt;TheProduct&gt;::<span class="built_in">createProduct</span>() &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> TheProduct;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	standardCreator&lt;Product&gt; myCreator1;</span><br><span class="line">	Product* p = myCreator1.<span class="built_in">getProduct</span>();</span><br><span class="line">	p-&gt;<span class="built_in">partA</span>();</span><br><span class="line">	p-&gt;<span class="built_in">partB</span>();</span><br><span class="line"></span><br><span class="line">	standardCreator&lt;derivedPro&gt; myCreator2;</span><br><span class="line">	Product* q = myCreator2.<span class="built_in">getProduct</span>();</span><br><span class="line">	q-&gt;<span class="built_in">partA</span>();</span><br><span class="line">	q-&gt;<span class="built_in">partB</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1860,7 +1893,7 @@ method的工厂仅仅是一个方法，而抽象工厂里的工厂是一个类�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">273</span>
+                <span class="site-state-item-count">274</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

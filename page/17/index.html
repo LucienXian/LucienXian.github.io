@@ -376,6 +376,185 @@ mjx-container[display="true"] + br {
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/29/cs231n-lecture2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/29/cs231n-lecture2/" itemprop="url">cs231n@lecture2</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-29T23:13:33+08:00">
+                2018-05-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="图像分类">图像分类</h1>
+<h2 id="数据驱动方法">数据驱动方法</h2>
+<p>图像识别时，计算机接收图像，并从固定的标签从选择一个标签，计算机看到的图像其实是一个多维数组。</p>
+<p>但改变相机角度，环境光度，图像变形，遮挡，与背景重叠，类内差异等情况，计算机的识别算法应该是robust的。</p>
+<p>实际上，我们不会考虑为某个是别的物体硬编码某个规则，而是收集图像数据和标签，然后用机器学习去训练分类器，再利用分类器去预测标签。这就是一种数据驱动的算法。</p>
+<p>在比较图像时，我们可以使用L1 distance: <span
+class="math inline">\(d_1(I_1, I_2)=\sum_{p}|I_1^2-I_2^2|\)</span></p>
+<p>对于NNC，最近邻分类器，它的train是O(1)，而predict是O(N)，而我们希望的是训练可以慢一点，而测试要快一点。另外就是，最近邻可能会使得分类不够泛化，因此我们使用knn来解决这个问题。</p>
+<p>下面这张图很好地表示了knn带来的效果，使得分类更加平滑：</p>
+<figure>
+<img
+src="https://pic2.zhimg.com/80/51aef845faa10195e33bdd4657592f86_hd.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h2 id="k最近邻算法">k最近邻算法</h2>
+<p>L1距离有坐标依赖，如果特征有特别的意义，一般选择L1距离。但最好都尝试一下。</p>
+<p>L2距离</p>
+<p>k和distance：hyperrparameters</p>
+<p>超参数的设置：</p>
+<ul>
+<li>将参数分为三组：train、validation、test，validation选择参数。</li>
+<li>cross-validation：将数据分成多组，轮流将每组选做validation，然后平均其结果。</li>
+</ul>
+<p>knn很少在图像上使用，一方面是太慢了，另一方面则是距离向量的计算不适合图像像素</p>
+<h2 id="线性分类i">线性分类I</h2>
+<p>相对于knn，线性分类需要参数。</p>
+<p>image-&gt;f(x, W)=Wx+b-&gt;10 number giving class scores</p>
+<p>打个比方，以下的图可以看作</p>
+<figure>
+<img
+src="https://pic4.zhimg.com/80/7c204cd1010c0af1e7b50000bfff1d8e_hd.jpg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>对于图像来说，我们可以将图像想象成高维空间的一个点，线性分类器就是一条分割线。</p>
+<h2 id="问题">问题</h2>
+<ol type="1">
+<li><p>搭建环境时遇到了这个问题</p>
+<blockquote>
+<p>Unable to compile python Pillow</p>
+</blockquote></li>
+</ol>
+<p>也就是无法编译pillow，导致在virtualenv中无法pip要求的库。从这里找到了答案：https://github.com/Microsoft/WSL/issues/256，把依赖装上</p>
+<p><strong>sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev
+libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev
+python-tk</strong></p>
+<ol start="2" type="1">
+<li>用脚本，下载数据集太慢了，还不如手动下载</li>
+<li>pip install -r requirements.txt 时遇到了site无法安装，按照<a
+target="_blank" rel="noopener" href="https://stackoverflow.com/questions/48696858/unable-to-install-distribution-site">这里</a>的说法，site是内置的。</li>
+</ol>
+<blockquote>
+<p><a
+target="_blank" rel="noopener" href="https://docs.python.org/3/library/site.html"><code>site</code></a>
+is internal to the Python interpreter, and is used to initialize
+machine-specific details of your Python installation.</p>
+<p>What's telling you that you need to install this module? Ignore it.
+It's wrong.</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/27/%E6%B4%BB%E8%B7%83%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2165,168 +2344,6 @@ alt="img" />
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/TCP%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9%E4%BB%8B%E7%BB%8D/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/13/TCP%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%89%E9%A1%B9%E4%BB%8B%E7%BB%8D/" itemprop="url">TCP套接字选项介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T21:48:04+08:00">
-                2018-04-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="通用套接字选项">通用套接字选项</h1>
-<p>其实应该是通用套接字选项，标题写错了，就不改了，仅仅作为自己学习使用，如有错误，不负责任</p>
-<p>因为之前面试有问到，但自己不大熟悉，就学习记录一下，主要参考UNP这本书</p>
-<h2 id="so_debug套接字选项">SO_DEBUG套接字选项</h2>
-<p>这是一个仅仅由TCP支持的选项，开启该选项之后，内核将为TCP在该套接字上的所有分组保留详细的追踪信息，保存在内核的环形缓冲区。</p>
-<h2 id="so_error套接字选项">SO_ERROR套接字选项</h2>
-<p>当一个套接字发送错误时，内核会将套接字的名为so_error的变量设为标准Unix
-Exxx值的一个，称为待处理的错误。一般会以以下两种方式之一立即通知进程这个错误。</p>
-<ol type="1">
-<li><p>进程阻塞在对该套接字的select调用上，那么无论是检查可读条件还是可写条件，select均返回并设置其中一个或所有两个条件；</p></li>
-<li><p>如果进程使用信号驱动式IO模型，那就给进程产生一个SIGIO信号；</p></li>
-</ol>
-<h2 id="so_keepalive套接字选项">SO_KEEPALIVE套接字选项</h2>
-<p>套接字设置该选项后，如果在2小时内在该套接字上都没有数据交换，TCP会自动给对端发送一个保持存活探测分节。这是一个对端必须响应的TCP分节，会导致以下三种情况：</p>
-<ul>
-<li><p>对端以期望的ACK响应；</p></li>
-<li><p>对端以RST响应，告知本端TCP，对端已崩溃且已经重新启动；</p></li>
-<li><p>对端对保持存活探测分节没有任何响应；</p></li>
-</ul>
-<h2 id="so_linger">SO_LINGER</h2>
-<p>本选项指定close函数堆面向连接的协议如何操作。默认操作是close立即返回，但是如果有数据残留在套接字发送缓冲区中，系统会试着将数据发送给对端。</p>
-<p>本选项主要是在内核空间和用户进程之间传递以下的结构：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">linger</span>&#123;</span></span><br><span class="line">    <span class="type">int</span> l_onoff;</span><br><span class="line">    <span class="type">int</span> l_lingger;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>因此设置该选项时就会出现三种情况：</p>
-<ol type="1">
-<li><p>l_onoff为0，关闭本选项，忽略l_lnlinger。即默认操作，close立即返回；</p></li>
-<li><p>l_onoff
-非0，l_linger为0，这时调用close，会丢弃发送缓冲区的数据，并发送一个RST给对端，跳过TIME_WAIT的状态。当然这也会带来一个问题是，创建该连接的另一个化身时，有可能会导致刚刚被终止连接的旧分节被重复传递到新的化身上；</p></li>
-<li><p>两个都为非0时，调用close后，套接字发送缓存区如果还有残留数据，那么进程会进入睡眠，直到所有数据都已经发送完并且被对方确认或延滞时间到（如果是这种情况会返回EWOULDBLOCK错误）；</p></li>
-</ol>
-<h2
-id="so_rectimeo和so_sndtimeo套接字选项">SO_RECTIMEO和SO_SNDTIMEO套接字选项</h2>
-<p>这两个选项允许我们给套接字的接收和发送设置一个超时值。</p>
-<h1 id="tcp套接字选项">TCP套接字选项</h1>
-<p>TCP有两个套接字选项：</p>
-<h2 id="tcp_maxseg套接字选项">TCP_MAXSEG套接字选项</h2>
-<p>本选项允许我们获得或者设置TCP连接的最大分节大小。</p>
-<h2 id="tcp_nodelay套接字选项">TCP_NODELAY套接字选项</h2>
-<p>设置了该选项后会禁止TCP的Nagle算法。</p>
-<blockquote>
-<p>Nagle算法：目的是减少广域网上小分组的数目。如果连接上有未被确认的小包（即小于MSS），那么下一个包会被缓存下来，直到上一个包得到确认或者缓存的包的大小达到最大值。</p>
-</blockquote>
-<p>有两种情况不适用Nagle算法，一是其服务器不在相反方向产生数据以便携带ACK；二则是客户端是使用若干个小片数据向服务器发送单个逻辑请求的客户。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2377,7 +2394,7 @@ id="so_rectimeo和so_sndtimeo套接字选项">SO_RECTIMEO和SO_SNDTIMEO套接字
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">273</span>
+                <span class="site-state-item-count">274</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -264,6 +264,147 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/07/Inner-class-of-Java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/07/Inner-class-of-Java/" itemprop="url">Inner class of Java</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-07T22:04:57+08:00">
+                2018-11-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="内部类">内部类</h1>
+<p>内部类(Inner Class)是定义在一个类中的类。</p>
+<h2 id="作用">作用</h2>
+<ul>
+<li>内部类可以访问该类定义的作用域数据，包括私有数据；</li>
+<li>内部类可以对同包内的其它类隐藏；</li>
+<li>用匿名类实现回调函数；</li>
+</ul>
+<blockquote>
+<p>C++有嵌套类，嵌套类是一种类之间的关系，而不是对象之间的关系。另外，Java内部类能够引用实例化该内部对象的外部类对象。</p>
+</blockquote>
+<p>只有内部类可以设为private的。</p>
+<h2 id="使用方法">使用方法</h2>
+<p>大多数用法与常规类类似，有一些特殊的语法规则：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">outerObject.<span class="keyword">new</span> <span class="title class_">InnerClass</span>(para);</span><br></pre></td></tr></table></figure>
+<h2 id="局部内部类">局部内部类</h2>
+<p>如果某个内部类只有在某个方法中创建类型时使用一次，那么可以在一个方法中定义局部类：</p>
+<h3 id="外部方法访问final变量">外部方法访问final变量</h3>
+<p>局部类不但能访问外部类，还可以访问局部变量。但该局部变量必须是final的。</p>
+<h3 id="静态内部类">静态内部类</h3>
+<p>如果内部类不需要引用外部类对象，就可以把该内部类声明为静态内部类。</p>
+<p>在静态方法中new对象的时候，对应的类必须为static。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/06/Proxy-of-Java/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1868,182 +2009,6 @@ index)</strong>找到需要的数据，将一个adress_space对象和一个偏�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/07/Golang%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/07/Golang%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/" itemprop="url">Golang测试覆盖率</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-07T00:02:03+08:00">
-                2018-08-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="golang测试覆盖率">Golang测试覆盖率</h1>
-<blockquote>
-<p>最近实习在做一些CI/CD的工作，用到了go的一些测试工具，学习记录一下。都是官网博客找的来源：https://blog.golang.org/cover</p>
-</blockquote>
-<p>golang1.2引进了一种新的测试覆盖工具，采用一种特别的方法来生成覆盖率统计数据。</p>
-<h2 id="覆盖率测试">覆盖率测试</h2>
-<p>代码覆盖率测试是指，通过运行一个测试来查看有多少代码被执行了。如果使用的测试样例导致80%的源代码语句运行，我们就认为代码覆盖率为80%。</p>
-<p>go语言引进了一个轻量级的测试框架<strong>testing</strong>和自带的<strong>go
-test</strong>命令来实现单元测试和性能测试。这套框架的原理很简单，就是在2变异之前重写package的源代码以添加检测、编译和运行修改后的源代码，并且将统计信息转移。</p>
-<h2 id="golang的覆盖率测试">golang的覆盖率测试</h2>
-<p>假设有这样一个源代码：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;negative&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;zero&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;small&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;big&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;huge&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;enormous&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>和这样的一个测试样例：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> size</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;testing&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Test <span class="keyword">struct</span> &#123;</span><br><span class="line">    in  <span class="type">int</span></span><br><span class="line">    out <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> tests = []Test&#123;</span><br><span class="line">    &#123;<span class="number">-1</span>, <span class="string">&quot;negative&quot;</span>&#125;,</span><br><span class="line">    &#123;<span class="number">5</span>, <span class="string">&quot;small&quot;</span>&#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSize</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i, test := <span class="keyword">range</span> tests &#123;</span><br><span class="line">        size := Size(test.in)</span><br><span class="line">        <span class="keyword">if</span> size != test.out &#123;</span><br><span class="line">            t.Errorf(<span class="string">&quot;#%d: Size(%d)=%s; want %s&quot;</span>, i, test.in, size, test.out)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然后使用go
-test命令加上<strong>-cover</strong>选项来测试代码覆盖率，产生结果如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok  	_/Users/lucien/Study/gosrc	0.006s</span><br></pre></td></tr></table></figure>
-<ul>
-<li>由于go
-test命令只能在一个相应的目录下执行所有文件，注意这两个文件需要在同一个目录下。</li>
-<li>另外测试文件必须要以_test.go结尾，这样在执行go
-test的时候才能执行到相应的代码。</li>
-<li>在测试文件中必须要import
-testing这个包，另外所有测试函数都以Test开头，并且参数是testing.T，用来记录错误或者测试状态；格式为：</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestXxx</span> <span class="params">(t *testing.T)</span></span> <span class="comment">//Xxx开头必须大写</span></span><br></pre></td></tr></table></figure>
-<p>上面的结果显示，我们代码的测试覆盖率为42.9%，这个数字怎么来的呢？当启用测试覆盖的时候，go
-test会用cover工具在编译之前重写源代码，在原始代码中寻找分支，然后在每个分支"种下"锚点。
-等所有的case都跑完后，通过统计执行锚点的数量来计算覆盖率。比如变成这样：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Size</span><span class="params">(a <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    GoCover.Count[<span class="number">0</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">switch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">2</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;negative&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a == <span class="number">0</span>:</span><br><span class="line">        GoCover.Count[<span class="number">3</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;zero&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">10</span>:</span><br><span class="line">        GoCover.Count[<span class="number">4</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;small&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">100</span>:</span><br><span class="line">        GoCover.Count[<span class="number">5</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;big&quot;</span></span><br><span class="line">    <span class="keyword">case</span> a &lt; <span class="number">1000</span>:</span><br><span class="line">        GoCover.Count[<span class="number">6</span>] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;huge&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    GoCover.Count[<span class="number">1</span>] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;enormous&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>虽然这样重写代码的方式开销看起来比较昂贵，但实际上它会被编译为单个的move指令，在实际测试时开销仅仅增加3%。</p>
-<blockquote>
-<p>Although that annotating assignment might look expensive, it compiles
-to a single "move" instruction. Its run-time overhead is therefore
-modest, adding only about 3% when running a typical (more realistic)
-test. That makes it reasonable to include test coverage as part of the
-standard development pipeline.</p>
-</blockquote>
-<h2 id="查看结果">查看结果</h2>
-<p>实际上，刚刚那种测试结果看起来比较简陋，我们需要了解更加详细的测试内容，因此我们可以使用go
-test来输出一个<strong>coverage
-profile</strong>，该文件保存着收集的统计信息的文件，使得我们研究它们更加方便。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">% </span><span class="language-bash">go <span class="built_in">test</span> -coverprofile=coverage.out</span> </span><br><span class="line">PASS</span><br><span class="line">coverage: 42.9% of statements</span><br><span class="line">ok      size    0.030s</span><br><span class="line"><span class="meta prompt_">%</span></span><br></pre></td></tr></table></figure>
-<p>输出结果为：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mode: set</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:3.25,4.12 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:16.5,16.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:5.16,6.26 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:7.17,8.22 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:9.17,10.23 1 1</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:11.18,12.21 1 0</span><br><span class="line">_/Users/lucien/Study/gosrc/test.go:13.19,14.22 1 0</span><br></pre></td></tr></table></figure>
-<p>有了这么一个文件，我们可以不进行测试，直接查看测试结果：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">% </span><span class="language-bash">go tool cover -func=coverage.out</span></span><br><span class="line">size.go:    Size          42.9%</span><br><span class="line">total:      (statements)  42.9%</span><br><span class="line"><span class="meta prompt_">%</span></span><br></pre></td></tr></table></figure>
-<h2 id="热图">热图</h2>
-<p>我们可以以多种方式来检测代码覆盖率，go
-test接受-covermode标志来将覆盖模式设置为以下三种：</p>
-<ul>
-<li>set：每个语句都运行了吗</li>
-<li>count：每个语句运行了多少次</li>
-<li>atomic：跟count一样，但能平行程序中精确计算（使用了来自sync/atomic的原子操作）</li>
-</ul>
-<p>运行这样一行命令，会打开一个浏览器，注意查看绿色的强度如何变化。更明亮的绿色表示具有更高的执行次数。将鼠标停留在语句上，会显示具体的执行次数</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go tool cover -html=count.out</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2094,7 +2059,7 @@ test接受-covermode标志来将覆盖模式设置为以下三种：</p>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">273</span>
+                <span class="site-state-item-count">274</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
