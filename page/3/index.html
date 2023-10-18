@@ -264,6 +264,304 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/26/Dynamo-Amazon%E2%80%99s-Highly-Available-Key-value-Store/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/07/26/Dynamo-Amazon%E2%80%99s-Highly-Available-Key-value-Store/" itemprop="url">Dynamo: Amazon’s Highly Available Key-value Store</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-26T00:10:16+08:00">
+                2021-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="dynamo">Dynamo</h1>
+<blockquote>
+<p>原文是2007年SOSP上Amazon发布的分布式存储经典论文<a
+target="_blank" rel="noopener" href="https://sites.cs.ucsb.edu/~agrawal/fall2009/dynamo.pdf">《<strong>Dynamo:
+Amazon’s Highly Available Key-value
+Store</strong>》</a>。这是一个高可用的分布式KV存储——Dynamo，Amazon的一些核心服务就是依赖Dynamo提供持续可用的服务，为了达到这种可用级别，Dynamo牺牲了几种特定场景下的一致性。并且，Dynamo大量地使用了对象版本化和应用层面的冲突解决机制。</p>
+</blockquote>
+<h2 id="introduction">INTRODUCTION</h2>
+<p>支撑着Amazon电商发展的是建立在分布于全球数据中心成千上万的服务器基础上的，因此对性能、可靠性和效率都有很高的要求。同时为了支撑业务的持续增长和避免因故障导致的经济损失，平台需要有足够好的可扩展性、可靠性。</p>
+<p>Amazon使用的是去中心化的、松耦合的、面向服务的架构，这种服务架构对持续可用的存储技术有着强烈的诉求。例如，即便是磁盘故障、路由抖动、数据中心被摧毁，用户仍然能够向购物车添加和查看商品。因此Amazon推出了一款高可用的kv存储组件——Dynamo。Dynamo用于管理对可靠性要求非常高的服务，这些服务还要求对一致性、成本效率和性能有很强的控制能力。</p>
+<p>Dynamo使用了一些常见的技术来实现了可扩展性和高可用性：</p>
+<ul>
+<li>数据通过一致性哈希来分区和复制；</li>
+<li>通过对象版本化来实现一致性；</li>
+<li>副本之间的一致性使用了类似quorum的技术和一个去中心化的副本同步协议；</li>
+<li>gossip-based分布式故障检测和成员检测协议；</li>
+</ul>
+<p>Dynamo是一个极少需要人工管理的、完全去中心化的系统，向Dynamo添加或者删除节点不需要人工调整哈希节点和重分布节点间数据。</p>
+<h2 id="background">BACKGROUND</h2>
+<p>传统上生产系统会使用关系型数据库来存储状态，但这并不是一种理想的方式，大多数服务并不需要RDBMS提供的复杂查询和管理功能，这些额外的支持带来的硬件成本并不经济，并且这类数据库的复制功能有局限，往往是通过牺牲可用性来换取一致性。</p>
+<h3 id="system-assumptions-and-requirements">System Assumptions and
+Requirements</h3>
+<p>Dynamo对于使用它的服务有几点假设：</p>
+<ul>
+<li>Query Model：通过唯一的key对数据进行读写，存储状态是binary
+objects。没有relational schema需求，无跨data
+items的操作。存储对象较小，往往小于1MB；</li>
+<li>ACID
+Properties：Dynamo的设计目标是使用部分一致性来换取更高的可用性；</li>
+<li>Efficiency：存储系统必须满足那些严格的SLA；</li>
+<li>Other Assumptions：内部使用，假设环境足够安全；</li>
+</ul>
+<h3 id="service-level-agreements-sla">Service Level Agreements
+(SLA)</h3>
+<p>在Amazon去中心化的基础设施中，SLA会扮演着重要的角色，客户端和服务端会定义一个
+SLA协议。Amazon不是使用传统的平均值、中位数和方差来描述面向性能的SLA，而是更多使用了P99.9分布，来确定性能的长尾结果。</p>
+<h3 id="design-considerations">Design Considerations</h3>
+<p>前面提过，很多系统中数据复制算法一般是同步的，为了提供一个强一致性的数据访问结果，往往会牺牲掉某些场景下的可用性。考虑到这一点，Dynamo最终被设计为最终一致的数据存储系统。</p>
+<p>在分布式系统中，需要关注的是机器或者网络故障时可能会导致数据冲突，需要检测和解决冲突。一些传统的数据库可能会在写的时候解决冲突，牺牲一点可用性。但Dynamo的目标是提供一个持续可写的存储，因此将解决冲突的逻辑放到了读操作，从而避免写操作被拒绝。同时Dynamo可以配置是存储系统来解决冲突还是应用选择自行实现冲突解决操作。</p>
+<h2 id="system-architecture">SYSTEM ARCHITECTURE</h2>
+<p>本文主要介绍了Dynamo用到的部分分布式系统技术：包括partitioning,
+replication, versioning, membership, failure handling 和 scaling。</p>
+<h3 id="system-interface">System Interface</h3>
+<p>Dynamo的存储接口非常简单，只有两个：</p>
+<ul>
+<li>get()：会返回存储key对应的所有对象副本，以及一个context；</li>
+<li>put()：确定对象的存储位置，写入到相应的磁盘。</li>
+</ul>
+<p>Dynamo将调用方提供的key和对象都视作是opaque array of
+bytes，其对key应用MD5哈希得到一个128bit的ID，并根据ID计算应该存储到哪个存储节点。</p>
+<h3 id="partitioning-algorithm">Partitioning Algorithm</h3>
+<p>Dynamo的设计有一个核心诉求：支持增量扩展。这就要求有一种机制能够将数据分散到系统的不同节点中，Dynamo的方案是基于一致性哈希，其哈希函数的输出是一个固定范围，作为一个循环空间环，每个节点会随机分配一个循环空间内的值，代表着节点在环上的节点。</p>
+<p>Dynamo寻找item对应节点的方法：</p>
+<ul>
+<li>首先对key做哈希得到哈希值；</li>
+<li>然后在环上沿着顺时针方向找到第一个多带值被这个哈希值更大的节点；</li>
+</ul>
+<p>这种方法有一个缺陷，就是每个节点随机分配的位置可能会导致数据不均匀分布负载，也没有考虑到节点的异构因素。为了解决这些问题，Dynamo做了优化，每个节点不是映射到环上的一个点，而是多个点。Dynamo使用了虚拟节点的概念，一个新节点加入到系统后，会在环上分配多个位置（对应多个token）。</p>
+<p>虚拟节点的好处就是：</p>
+<ul>
+<li>当一个节点不可用离开时，会将该节点管理的虚拟节点平均分配给其他真实节点均衡管理；</li>
+<li>同理，新节点加入时，会从现有虚拟节点中拿出虚拟节点分配给新节点；</li>
+<li>一个节点负责的虚拟节点数量可以根据节点容量来决定，充分利用机器的异构性信息；</li>
+</ul>
+<h3 id="replication">Replication</h3>
+<p>为了实现高可用性和持久性，Dynamo会将数据复制到N台机器上，N可配置。</p>
+<p>具体的做法是，每个Key都会分配一个coordinator节点，coordinator负责落到它管理范围内的复制，除了自己存储一份之外，还会沿着顺时针方向的其他N-1个节点存储一份副本。</p>
+<p>如下图，B除了自己存储一份之外，还会将数据存储到C和D节点。D实际存储的数据，其key范围包括了<code>(A, B]</code>、<code>(B, C]</code>
+和 <code>(C, D]</code>。</p>
+<p><img
+src="https://pic.imgdb.cn/item/60fd8cb75132923bf82b2916.png" /></p>
+<p>存储某个特定key的所有节点会组成一个<strong>preference
+list</strong>，为了防止节点的failure，整这个preference
+list可能多于N个节点，另外由于引入了虚拟节点机制，preference
+list会保证N个节点不落在相同的物理机上。</p>
+<h3 id="data-versioning">Data Versioning</h3>
+<p>Dynamo提供最终一致性，所有更新操作会异步地传递给所有的副本。put()操作返回时，更新可能还没有应用到所有的副本，后续的get操作可能去不到最新数据。Amazon有些应用是可以容忍这种不一致性的，应用在这种情况下能继续运行。以操作购物车威力，如果购物车的最新状态不可用，用户对一个老版本的购物车状态做了修改，这种修改是需要保留的，由后续的步骤来解决冲突。</p>
+<p>为了解决冲突，Dynamo将每次修改结果都作为一个全新的版本，允许系统多个版本共存。使得冲突一致化的两种方式：syntactic
+reconciliation和semantic
+reconciliation。在大多数情况下，新版本都包含了老版本的数据，而且系统可以判断哪个是权威版本，这就是syntactic
+reconciliation。</p>
+<p>但是在发生故障并且并发更新的情况下，版本可能发生分叉，系统无法处理这种情况，需要客户端介入，从而将多个版本分支合并成一个，这就是semantic
+reconciliation。这种操作的好处是写操作永远可用，但会导致业务应用上一些奇怪现象，比如已经删除的商品偶尔又在购物车中冒出来。</p>
+<p>Dynamo使用<strong>向量时钟（vector
+clock）</strong>来追踪同一个对象不同版本之间的因果关系，一个向量时钟就是一个
+(node, counter)
+列表。一个向量时钟关联了一个对象的所有版本，可以用来判断对象两个版本是并行分支还是具备因果关系。如果对象的第一个时钟上的所有
+counter 都小于它的第二个时钟上的 counter，那第一
+时钟就是第二个的祖先，可以安全的删除。否则需要进行reconciliation。</p>
+<p>在Dynamo中，客户端更新一个对象需要指明基于哪个版本进行更新。流程是先读拿到context，context带有vector
+clock，写的时候把context带下去。在读的时候如果发现了多个版本，并且系统无法reconcile这些版本，就会返回所有的版本，待解决了冲突将多个版本分支合并起来。</p>
+<p>以下图为例</p>
+<p><img
+src="https://pic.imgdb.cn/item/60fd8cb75132923bf82b2923.png" /></p>
+<ul>
+<li>客户端写入一个对象。处理这个key的写请求节点Sx增加key的counter，系统有了一个对象D1和它的时钟[(Sx,
+1)]；</li>
+<li>客户端更新这个对象。假设还是Sx处理这个请求。此时，系统有了对象D2和它的时钟
+[(Sx, 2)]，但可能D1在其他节点的副本还没有看到这个更新；</li>
+<li>假设这个客户端，再次更新了对象，并且这次是由另外的一个节点Sy处理
+请求。此时，系统有了D3和它的时钟[(Sx, 2), (Sy,
+1)]。假设另一个客户端读取D2，并尝试更新它，写请求由另一个节点Sz处理。
+现在，系统有D4（D2的后代），版本clock是[(Sx, 2), (Sz, 1)]。</li>
+<li>此时，D3和D4各自的改动都没有反映在对方之中。因此这两个版本都应当被保留，然后交给客户端，由客户端在下次读取的时候执行semantic
+reconciliation；</li>
+<li>假设某个客户端读到了D3和D4，即[(Sx, 2), (Sy, 1), (Sz,
+1)]。如果客户端执行
+reconciliation，并且节点Sx执行协调写，Sx会更新自己在clock中的序列号。最终新生成的数据D5的clock格式如下：[(Sx,
+3), (Sy, 1), (Sz, 1)]。</li>
+</ul>
+<p>vector
+clock的一个潜在问题是，如果有多个节点先后协调同一个对象的写操作，那这个对象的clock
+vector会变得很长。这种情况发生的可能性不大，只有在网络分裂或多台服务器挂掉的情况下，写操作才可能由非preference
+list前N个节点来执行，导致vector clock变长。</p>
+<p>为了避免这个问题，Dynamo采用的方法是clock truncation
+scheme，另外保存一个和<code>(node, counter)</code>
+对应的时间戳，记录最后一次更新该记录的时间，当vector
+clock达到阈值时就删掉最老的一个。这种方案可能会导致无法精确判断部分后代的因果关系，但论文说生产环境没遇到过这个问题。</p>
+<h3 id="execution-of-get-and-put-operations">Execution of get () and put
+() operations</h3>
+<p>Dynamo中所有存储节点都可以接受key的读写操作。</p>
+<p>读写操作由Amazon基础设施相关的请求处理框架发起HTTP请求。客户端有两种选择：</p>
+<ul>
+<li>将请求路由到负载均衡器，由后者根据负载信息选择后端节点；</li>
+<li>使用能感知partition的客户端，直接路由到coordinator节点；</li>
+</ul>
+<p>前者是负载均衡器转发到环上任意一个节点，如果收到请求的节点不是preference
+list前N个节点中的一个，那它就不会处理这个请求，而是转发到preference
+list第一个节点。</p>
+<p>读写操作需要preference list中有不可用节点，就跳过。优先访问preference
+list中编号较小的节点。</p>
+<p>为了保证副本的一致性，Dynamo使用了一种类似quorum的一致性协议。这个协议有两个配置参数：<code>R</code>
+和 <code>W</code>：</p>
+<ul>
+<li>R：允许执行一次读操作所需的最少节点数；</li>
+<li>W：允许执行一次写操作所需的最少节点数；</li>
+</ul>
+<p>设置<code>R + W &gt; N</code>，就得到了一个quorum系统。在这种模型下，读写请求由R/W副本中最慢的一个决定。</p>
+<p>当收到写请求后，coordinator 会为新版本生成 vector
+clock，并将其保存到节点本地。然后将新版本（和对应的vector
+clock）发送给N个排在最前面的、可用的节点，只要有至少W-1个节点返回成功，就认为写操作成功。</p>
+<p>读操作类似，如果coordinator收集到多个版本，它会将所有系统判断没有因果关系的版本返
+回给客户端。客户端需要对版本进行reconcile，合并成一个最新版本，然后将结果写回
+Dynamo。</p>
+<h3 id="handling-failures-hinted-handoff">Handling Failures: Hinted
+Handoff</h3>
+<p>如果使用传统的quorum算法，Dynamo无法在节点不可用时保持可用。Dynamo采用了一种更为宽松quorum：所有读和写操作在preference
+list的前N个健康节点上执行，遇到不可用节点，会沿着哈希环的顺时针方向顺延。</p>
+<p>以下图为例，如果A临时不可用，正常情况下发到A的请求会发送到D，发到D副本的元数据中会提示这个副本数据应该发到A，然后这个数据会被D保存到本地的一个独立数据库中，并且有一个定期任务不断扫描，一旦A可用了，就将这个数据发送回
+A，然后D就可以从本地数据库中将其删除了。</p>
+<h3 id="handling-permanent-failures-replica-synchronization">Handling
+permanent failures: Replica synchronization</h3>
+<p>如果出现了在hinted副本移交给原副本节点之前就变的不可用，就会威胁到持久性。Dynamo基于Merkle
+trees实现了一种逆熵（副本同步）协议来保证副本是同步的。</p>
+<h3 id="membership-and-failure-detection">Membership and Failure
+Detection</h3>
+<h4 id="ring-membership">Ring Membership</h4>
+<p>Amazon使用显式机制来向Dynamo环增删节点，管理员通过命令行或web方式连接到
+Dynamo node，然后下发一个成员变更命令增删节点。负责处理这个请求的 node
+将成员变动信息和对应的时间写入持久存储。成员变动会形成历史记录。Dynamo使用一个gossip-based的算法传播成员变更信息。</p>
+<h4 id="external-discovery">External Discovery</h4>
+<p>上面的逻辑会有个问题，假设管理员同时添加两个节点，那么它们不会立即感知到对方，导致临时的逻辑分裂。为了避免这个问题，论文将部分Dynamo节点作为种子节点，所有节点都知道种子节点的存在，因为所有节点最终都会和种子节点reconcile成员信息，所以逻辑分裂就几乎不可能发生了。种子是从静态配置文件或者配置中心获取的。</p>
+<h4 id="failure-detection">Failure Detection</h4>
+<p>故障检测在Dynamo中的读写操作或者partition和hinted
+replica时移跳过不可用的节点。其做法是，节点B只要没有应答节点A的消息，A就认为B不可达。在有持续的client请求时，Dynamo
+Ring上的节点会有持续的交互，能定期检查及诶但是否恢复。使用简单的gossip协议就可以感知到节点的增删。</p>
+<h3 id="addingremoving-storage-nodes">Adding/Removing Storage Nodes</h3>
+<p>当新节点加入系统后，会获得一些随机分散到Ring上的token，此时原本负责某些key
+range的节点会将此时负责的key转移到新节点。</p>
+<h2 id="implementation">IMPLEMENTATION</h2>
+<p>Dynamo支持选择不同的本地存储组件来作为存储引擎，其实以插件的方式引入的，包括了BDB、Mysql、in-memory
+buffer with persistent backing
+store等。应用能够为不同的访问类型选择最合适的存储引擎。</p>
+<p>coordinator会代替客户端执行读写请求，每个客户端请求都会在收到这个请求的节点上创建一个状态机，包括了所有相关的逻辑。</p>
+<p>对于写请求，前面提到过由preference
+list前N个节点中任一个coordinate，总是由第一个来coordinate的好处是使得在同一个地方完成写操作的顺序化，但可能会导致复杂不均匀。为了解决这个问题，preference
+list内的所有N个节点都可以coordinate写操作，另外由于写操作前面都带有读操作，写操作的coordinator会选择前一次读操作返回最快的节点（这个信息会被存在返回的上下文中）。由于这项优化使得前一次读操作选中的存储节点更容易被选中，提高了read-your-writes的概率。</p>
+<h2 id="conclusions">CONCLUSIONS</h2>
+<p>本文介绍了Dynamo作为一个高可用、高可扩展性的数据存储系统，在Amazon的诸多核心系统中都有应用。Dynamo提供了期望的可用性与性能，能够很好处理节点不可用、网络分裂的情况。Dynamo最大的意义是证明了：一些去中心化的技术结合起来能够提供一个高可用的系统，并且在很多应用环境中投产了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/26/TiDB-A-Raft-based-HTAP-Database/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2272,215 +2570,6 @@ shadow paging的技术来提供较强的安全性和一致性保证。</p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/02/18/Bitcoin-A-Peer-to-Peer-Electronic-Cash-System%E2%80%94%E2%80%94MIT6-824/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/02/18/Bitcoin-A-Peer-to-Peer-Electronic-Cash-System%E2%80%94%E2%80%94MIT6-824/" itemprop="url">Bitcoin: A Peer-to-Peer Electronic Cash System——MIT6-824</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-18T20:23:44+08:00">
-                2021-02-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="bitcoin-a-peer-to-peer-electronic-cash-system">Bitcoin: A
-Peer-to-Peer Electronic Cash System</h1>
-<blockquote>
-<p>一个纯粹的p2p电子支付能够绕过第三方金融机构直接从一方发到另外一方。数字签名能解决部分场景问题，但还不够好，因为仍旧需要一个信任的第三方去防止双重支付。因此论文提出一种解决方案来解决双重支付问题，即使用了一个点对点网络。</p>
-</blockquote>
-<h2 id="introduction">Introduction</h2>
-<p>目前网上的电子支付越来越依赖金融机构来充当可信的第三方机构，但这种基于信任的第三方机构具有天生的缺点：由于不可逆的交易并不存在，金融机构需要协调买卖双方的争端，产生的成本最终会转嫁到买家头上。而通过使用现金，由于可以一手交货一手交钱，这些成本可以进一步避免，但由于交易双方天生互不信任，在没有可信第三方机构的前提下，仍旧缺乏一个可靠的机制来保障交易的进行。总结来说，第三方的可信与否，现在的这套体系需要付出巨大的成本来处理，这是目前这套体系的“天然缺陷”。</p>
-<p>论文提出的电子支付系统就是一个基于密码学证明而非信任的系统，允许双方在不需要第三方机构的前提下进行直接的交易。计算上的不可逆性能保证卖家不被欺骗，而常规的第三方托管机构可以轻松地被使用来保护买家（卖家比买家更有优势？）。在论文里提出了一种方案来解决双重支付问题：使用一种p2p的分布式时间戳服务，生成交易的时间顺序的可计算证明。只要诚实节点共同控制的算力比攻击节点组织控制的算力大，那么整个系统就是安全。</p>
-<h2 id="transactions">Transactions</h2>
-<p>论文对电子货币的定义就是一个带有数字签名的链表，每一个货币拥有者交易给下一个人时，先是通过对上一个交易的输出和接受者公钥进行hash后，然后货币拥有者再用自己的私钥对hash值进行数字签名，这样收款人就可以通过验证签名来进行溯源。</p>
-<p><img
-src="https://img.imgdb.cn/item/600bdec03ffa7d37b3aef39f.png" /></p>
-<p>但这个过程有一个问题就是，无法验证付款人有没有双重支付，即这个付款人有没有同时转账给了另一个人。一个可靠的方法是引入一个中央机构，在每一笔交易后，这个货币必须被中央机构回收从而发行一个新的货币，并且只有货币是被直接从可信的中央机构发行才能保证不被双重支付，但这又回到了前面的银行老路了。</p>
-<p>论文的做法是，每一笔交易必须被公开广播出来，收款人需要确保，这笔交易是大多数节点所公认的第一次出现，第一次被接收。因为需要一个系统让所有参与者公认一个唯一的历史序列。</p>
-<h2 id="timestamp-server">Timestamp Server</h2>
-<p>论文提出的解决方案先从时间服务器开始，其工作过程是把一组数据形成的区块hash结果加盖上时间戳并广播这个hash。这个时间戳就证明，这些数据在这个时刻一定是存在的。每一个时间戳在hash过程中都包含前面一个时间戳，随着每个新增的时间戳加强了可信度，让每一个区块都包含了前面所有区块的时间戳，这样构成了一个链条。</p>
-<p><img
-src="https://img.imgdb.cn/item/600be4823ffa7d37b3b17413.png" /></p>
-<h2 id="proof-of-work">Proof-of-Work</h2>
-<p>为了实现一个基于p2p的分布式时间戳服务器，将会需要使用一个工作量证明系统。在hash的时候，工作量证明机制将参与扫描一个值，这个hash从一串0bits开始，平均工作量随着0的增长将呈指数级增长，然而只执行一个hash运算就能验证这个hash值。</p>
-<p>对于时间戳网络，我们通过在区块中增加一个随机数来实现这个工作量证明，直到一个指定块的hash所需要的0-bits值被找到。只要CPU效率被花费来作为工作量证明，除非重新做一遍相当的工作量，否则这个区块就不能再被改变。简单来说就是做的工作越多，找到这个随机数的概率就越大，这样就构建了一个工作量证明机制。</p>
-<p>工作量证明机制同时解决了大多数代表的问题，论文解释了不考虑一个IP一票的这种模式，因为这个机制很容易被拥有大多数IP的给颠覆。工作量证明本质上是一CPU一票，最长的链就表示了大多数，同时也有最大的工作量。如果一个大多数CPU的算力都被诚实节点所控制，那么该链就会增长得最快且超过其他任何链。想要改变一个过去的块，攻击者需要重做这个块和所有在这个块后的块工作量证明，之后还要追赶上并超过现在所有诚实节点的工作。一个更慢的攻击者想要追上不断延伸的区块链，可能性是呈指数级下降的。</p>
-<p><img
-src="https://img.imgdb.cn/item/600c44fd3ffa7d37b3e712cb.png" /></p>
-<p>同时为了抵消硬件速度提升和节点变化的影响，工作量的困难度是由一个变化的平均目标决定的——每一个小时的平均区块，全网只按一个平均时间来生成一个区块。如果块生成的速度更快了，单位时间所需要的工作量就会变得更大，在同等算力下，计算随机数的难度更大了。</p>
-<h2 id="network">Network</h2>
-<p>网络运行的步骤如下：</p>
-<ol type="1">
-<li>新的交易被广播到所有节点；</li>
-<li>每一个节点都把新交易收集进入到一个块；</li>
-<li>每一个节点都为自己的块去找到那个工作量证明；</li>
-<li>节点找到后，将块广播给所有的节点；</li>
-<li>其他所有节点认可这个块的所有交易合法，并且接受这个块；</li>
-<li>节点开始使用该块的hash作为prev
-hash，开始转向下一个块的工作量证明；</li>
-</ol>
-<p>节点总是只认可最长的链，如果2个节点同时广播不同版本的块，一些节点会首先收到其中一个块，并为第一个收到块工作，但同时也保存下另一个块。当下一个工作量证明被发现的时候且这时另一条分支会变得更长，在其他分支工作的节点们也将会转换到这个最长的分支上，即块重组。</p>
-<p>新交易是没必要广播到所有的节点上，只要交易到达了许多节点上，它们就会进入到一个区块中。并且块的广播能够容忍被丢失的信息，节点意识到那一块缺失就可以进行请求。</p>
-<h2 id="incentive">Incentive</h2>
-<p>一般来说，这里存在两种激励。</p>
-<p>一个块里面第一笔交易信息是一个特别的交易，它开始了一个新的币，这个币属于这个块的创造者，这就是系统对这个节点的激励，提供了一个方式来初始化货币进入到整个系统当中。</p>
-<p>另一种激励就是手续费了。如果一个交易的输出值小于输入值，那么这个差值就是交易的手续费，手续费被附加到包含交易信息的块中。一旦所有货币进入流通，这个激励机制就可完全地转变为交易手续费，并且可以完全避免通货膨胀。</p>
-<p>另外，激励可以帮助鼓励节点保持诚实。如果一个贪婪的攻击者能够收集到比所有诚实节点更多的CPU算力，他就面临一个选择：要么用这个算力进行二次支付来欺骗别人，或者使用算力来生成更多的货币。后者的收益更大，这就是一个博弈关系。</p>
-<h2 id="reclaiming-disk-space">Reclaiming Disk Space</h2>
-<p>一旦一个货币最新的交易收入进入足够多的块中，那么在这笔交易之前的交易信息就能够被抛弃来节省硬盘资源。为了不损害块的hash，交易信息被hash成一种Merkle树的形态，只有root节点被包含进了这个区块的hash。通过拔除Merkle树的分支，不保存内部的hash值，以此来压缩块。</p>
-<p>此时一个块的头部大概会是80byte大小。假设块每10分钟就生成一个，那么每年产生<code>80bytes * 6 * 25 * 365 = 4.2MB</code>的数据。</p>
-<p><img
-src="https://img.imgdb.cn/item/600da6543ffa7d37b3902338.png" /></p>
-<h2 id="simplified-payment-verification">Simplified Payment
-Verification</h2>
-<p>支付验证不需要运行所有的网络节点，有些节点已经不再持有全部的块信息，但用户可以通过向网络节点发起询问从而拿到最长工作量证明链条上的块副本，从而得到了Merkle树的分支，连接到这个用户的交易被加上时间戳的地方。用户自己不能验证交易，但可以通过把交易连接到Merkle树的分支。就可以看见一个可以看到一个网络节点曾经接受过它，在它后面增加的块也能证明网络曾经接收过它。</p>
-<p><img
-src="https://img.imgdb.cn/item/600dae9e3ffa7d37b394b331.png" /></p>
-<p>因而只要有多数诚实节点控制网络，支付的验证就是可靠的，而一旦网络被攻击者控制，一个简单的验证方法就是：当这些网络节点监测到一个非法的块，就会提醒用户去下载相关的全部区块，进行独立的安全验证。</p>
-<h2 id="combining-and-splitting-value">Combining and Splitting
-Value</h2>
-<p>虽然可以独立的处理电子货币，但在一次转账中为每一分钱都构造一个独立的交易是不明智的。为了能让价值能够分割和组合，交易包含了多个输入和输出。通常情况，前面的交易要么是一大笔单一的输入或者是包括很多小额的多笔输入，输出也有两种，一个是付款，另一个是找零。bitcoin只关心差额，不关心货币最小单元。</p>
-<p><img
-src="https://img.imgdb.cn/item/600db0e83ffa7d37b395e1a6.png" /></p>
-<h2 id="privacy">Privacy</h2>
-<p>传统的银行系统实现隐私的保护是通过限制访问信息被提供给相关的参与者和第三方。像现在的场景需要将全部交易公开广播的时候，就不能使用这种方法了。这里的做法是公钥匿名，公众可以看到有一个人转账给另一个人，但是没有信息能把交易和人联系在一起。</p>
-<p><img
-src="https://img.imgdb.cn/item/600db2213ffa7d37b396c40a.png" /></p>
-<p>还有一个额外的防范机制，就是每次有新的交易，进来都使用一个新的密钥对。但一旦用户的公私密钥被泄漏，由于信息是全网公开的，通过多笔的输入交易，仍然可能推测出这个人是谁。</p>
-<h2 id="calculations">Calculations</h2>
-<p>接下来我们考虑一个场景，一个攻击者尝试生成一条比目前诚实链还长的替换链。即便这样能实现，也不代表整个系统完全受制于攻击者。节点是不会接受无效的交易作为支付的，攻击者只能只能尝试修改他自己的交易信息，从而要回自己花掉的钱。</p>
-<p>诚实链和攻击链的竞争可以看作是一个Binomial
-RandomWalk，这是指随机漫步有两个方向的概率模型，要么是诚实链领先，要么是攻击链领先。成功事件是诚实链延长了一个块，使其+1领先，同时失败事件是攻击链延长一个块，使得差距-1。攻击者从一个既定的差距中追上的可能性可以看作是一个Gambler's
-Ruinproblem。一个攻击者要追上诚实链，如下所示：</p>
-<ul>
-<li><p>P=诚实链发现下一个区块的概率</p></li>
-<li><p>q=攻击者发现下一个区块的概率</p></li>
-<li><p>qz=攻击者花费了z个区块追赶上了</p></li>
-</ul>
-<p><img
-src="https://img.imgdb.cn/item/600ef71e3ffa7d37b32d909f.png" /></p>
-<p>假设p&gt;q，那么攻击者追上的概率就会随着块数目的增加而指数下降。现在可以考虑一个新的交易能够被充分地确认发送方不能再更改交易的情况要等多久，即不能再追上。假设付款人是一个攻击者，他希望收款方认为他已经付过款了，并且在之后把这个钱在付款后拿回来。收款方在这件事情发生的时候会被通知警告，但是付款方希望这件事情很久才发生。</p>
-<p>接收方生成了一个新密钥对并在短时间内把这个公钥给了付款方，这能有效防止付款方事先准备好一个在时间之前的区块链。</p>
-<p>一旦交易被发送，这个不诚实的发送者开始为包含替换他交易版本的并行链而秘密工作。事实上接收方不知道攻击者确切地进展了多少块。假设诚实块是花费平均时间来产生的，那么攻击者的潜在进展会呈现一种泊松密度分布，期望值λ是：</p>
-<p><img
-src="https://img.imgdb.cn/item/600ef91d3ffa7d37b32e42ca.png" /></p>
-<p>为了得到攻击者能追上的概率，将泊松密度乘以从该点追上的概率得到：</p>
-<p><img
-src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e32.png" /></p>
-<p><img
-src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e35.png" /></p>
-<p>附上一段代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;math.h&gt;</span> </span></span><br><span class="line">doubleAttackerSuccessProbability(<span class="type">double</span> q, <span class="type">int</span> z)&#123;</span><br><span class="line">      <span class="type">double</span> p= <span class="number">1.0</span> - q;</span><br><span class="line">      doublelambda = z * (q / p);</span><br><span class="line">      doublesum = <span class="number">1.0</span>;</span><br><span class="line">      <span class="type">int</span> i, k;</span><br><span class="line">      <span class="keyword">for</span> (k =<span class="number">0</span>; k &lt;= z; k++)</span><br><span class="line">      &#123;</span><br><span class="line">             doublepoisson = <span class="built_in">exp</span>(-lambda);</span><br><span class="line">             <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= k; i++) </span><br><span class="line">                   poisson *= lambda / i; </span><br><span class="line">                   sum -= poisson * (<span class="number">1</span> - <span class="built_in">pow</span>(q / p, z - k));</span><br><span class="line">      &#125;    </span><br><span class="line">      <span class="keyword">return</span> sum; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="总结">总结</h2>
-<p>论文提出了一个不依赖信任的电子交易系统，为了解决双重支付的问题，提出了一种p2p的网络，并采用工作量证明机制来记录交易的历史。当大多数节点控制主要的CPU算力，攻击者就不会通过计算去修改。整个网络还是比较鲁棒的，独立工作不需要太多协调，不需要被认证，可随意离开或加入网络，通过CPU算力投票进行工作从而延长区块链，以此表达他们对有效区块的接受。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2531,7 +2620,7 @@ src="https://img.imgdb.cn/item/600ef9e93ffa7d37b32e8e35.png" /></p>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">274</span>
+                <span class="site-state-item-count">275</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

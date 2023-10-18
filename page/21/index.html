@@ -264,6 +264,142 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/06/STL%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/06/STL%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF-%E4%B8%80/" itemprop="url">STL学习之路<一></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-06T23:18:18+08:00">
+                2018-03-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="概念理解">概念理解</h1>
+<ul>
+<li>容器算法迭代器的关系</li>
+</ul>
+<p>每个容器都有自己专属的迭代器，而算法则是通过迭代器来操作容器中的元素</p>
+<p>容器通过模板实现，能够装下各种类型的元素</p>
+<p>迭代是一种只能指针，通过*来解引用</p>
+<ul>
+<li>迭代器种类</li>
+</ul>
+<p>5种：输入、输出、前向、双向、随机访问</p>
+<ul>
+<li>适配器种类</li>
+</ul>
+<p>3种：容器适配器（例如stack，queue和priority_queue都是给予其它容器实现的）；迭代器适配器；函数适配器</p>
+<h1 id="sort算法">sort算法</h1>
+<p>数据量大的时候选用快排，分段递归排序，一旦分段小于某个数据量之后采用的是插入排序。如果递归层次过深，又会转而调用堆排序。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/05/C-11-%E6%A8%A1%E6%9D%BF%E5%AD%A6%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1512,141 +1648,6 @@ class和interface class；</li>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Effective-cpp-30/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/11/Effective-cpp-30/" itemprop="url">Effective-cpp-#30</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T20:14:37+08:00">
-                2018-02-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="understand-the-ins-and-outs-of-inlining">Understand the ins and
-outs of inlining</h1>
-<p>inline函数，不是第一次接触这个概念了。编译器的最优化机制会被设计用来执行语境相关的最优化。但有利有弊，由于inline函数的主体会被插到调用处。这样一来，你的目标码会变得越来越大，有可能导致额外的paging行为。</p>
-<p><br></p>
-<p>通常来说，inline函数有两种定义方法——一是在类内定义函数，这是一种隐喻的方式；二是在定义式前加inline关键字。</p>
-<h2 id="注意">注意</h2>
-<p>inline函数尽量置于头文件内，因为大多数build
-environment通常会在编译时进行inlining，这是因为为了将一个“函数调用”替换为“被调用函数的本体”，编译器必须知道那个函数长什么样子。</p>
-<p>template的具体化与inline无关，我们需要的考虑的是——是否希望每一个具体实现的函数都是inline的，毕竟这有可能会引发代码膨胀。</p>
-<p>关于编译器的问题，编译器不一定就真的会对inline函数进行inline行为，例如编译器通常不会对“通过函数指针而进行的函数调用”进行inline行为。另外，如果程序要调用某个inline函数，往往，编译器会生成一个outlined函数本体</p>
-<p>最后一个需要注意的问题是，<strong>inline函数无法随着程序库的升级而升级</strong>。假设f是一个inline函数，而设计者修改了这个函数f，那么所有用到f的客户端程序都必须重新编译，而对于non-inline函数，客户端只需要重新链接即可，这比重新变异的负担少。</p>
-<h2 id="建议">建议</h2>
-<ul>
-<li>将大多数inline限制在小型的、被频繁调用的函数身上。这可以使得日后的调试和二进制升级更加容易，也可以使得潜在的代码膨胀问题最小化；</li>
-<li>不要只因为function template出现在头文件，就将它们声明为inline；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1697,7 +1698,7 @@ environment通常会在编译时进行inlining，这是因为为了将一个“�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">274</span>
+                <span class="site-state-item-count">275</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

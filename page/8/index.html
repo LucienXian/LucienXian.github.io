@@ -264,6 +264,178 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/24/%E3%80%8AJoint-3D-Face-Reconstruction-and-Dense-Alignment-with-Position-Map-Regression-Network%E3%80%8B%E9%98%85%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/24/%E3%80%8AJoint-3D-Face-Reconstruction-and-Dense-Alignment-with-Position-Map-Regression-Network%E3%80%8B%E9%98%85%E8%AF%BB/" itemprop="url">《Joint 3D Face Reconstruction and Dense Alignment with Position Map Regression Network》阅读</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-24T10:47:57+08:00">
+                2019-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1
+id="joint-3d-face-reconstruction-and-dense-alignment-with-position-map-regression-network">Joint
+3D Face Reconstruction and Dense Alignment with Position Map Regression
+Network</h1>
+<p>本文提出了一种直观的方法，可以同时完成3D人脸结构的重建和人脸对齐。作者设计了一种称为UV位置图的2D表示方法，它记录了UV空间中完整面部的3D形状。该方法并不依赖任何的先验脸部模型，而是直接重建完整的人脸几何与语义。</p>
+<h2 id="introduction">Introduction</h2>
+<p>在早期，2D基准点的人脸检测通常作为其它一些人脸研究任务的基础条件。随着深度学习的发展，一些任务开始用CNN去估计3D可变模型（3DMM）的系数或3D模型变形函数，以此来从2D面部图像恢复相应的3D信息。然而，由于面部模型或模板定义的3D空间的限制，这些方法的性能受到限制。包括透视投影或3D
+Thin Plate Spline（TPS）转换在内的所需操作也增加了整个过程的复杂性。</p>
+<p>最近有一些基于端到端的方法绕开了模型的限制，实现了很好的性能，但却丢失了点的语义。</p>
+<p>本文提出了一种称为位置映射回归网络（PRN）的端到端方法，以预测人脸密集对齐并重建3D人脸形状。具体来说，作者设计了一个UV位置图，它是一个2D图像，记录了完整的面部点云的3D坐标，同时保持每个UV位置的语义。然后，文中训练一个带有加权损失的简单编码器
+-
+解码器网络，该网络更多地关注重要区域，以从单个2D面部图像回归UV位置图。</p>
+<h2 id="proposed-method">Proposed Method</h2>
+<h3 id="d-face-representation">3D Face Representation</h3>
+<p>本文的目标是从单个2D图像中回归3D人脸几何体以及起对齐信息，因此需要一个可以通过深度网络来进行预测的适当表示。为了解决一些以前的工作留下的弊端，本文提出了UV位置图作为具有人脸对齐信息的3D人脸结构呈现，UV位置图记录了UV空间中所有点的3D位置。</p>
+<p>与传统UV坐标不同，本文使用UV空间来存储与2D图像相对应的3D人脸模型点的空间位置，其中<span
+class="math inline">\(Pos(u_i, v_i)=(x_i, y_i, z_i)\)</span>，其中<span
+class="math inline">\((u_i,
+v_i)\)</span>表示的是人脸第i个点的UV坐标，因此<span
+class="math inline">\((u_i, v_i)\)</span>与<span
+class="math inline">\((x_i,
+y_i)\)</span>表示相同的人脸位置。如下图：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig2.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>因此，该位置图以其语义含义记录了3D人脸的密集点集，通过使用CNN直接从无约束的3D图像中回归位置图，就能够同时获得3D人脸结构以及密集对齐的结果。</p>
+<p>由于要直接从2D图像回归3D完整结构，因此端到端训练需要无约束的2D面部图像及其相应的3D形状。300W-LP是一个大型数据集，包含超过60K的无约束图像和3DMM参数，适合形成训练集。</p>
+<h3 id="network-architecture-and-loss-function">Network Architecture and
+Loss Function</h3>
+<p>论文的网络结构通过将输入的RGB图像转为位置图图像，采用了编码器-解码器的结构来学校变换函数。网络的编码器以一个卷积层开始，后面紧跟10个残差块，这样就可以将图像(256x256x3)转变为特征图(8x8x512)。解码器部分使用了17个转置卷积层，kernel大小为4，并使用ReLU层进行激活。架构如下：</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig3.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>为了学习网络参数，论文使用了MSE作为损失函数，但这里做了一些改动。因为MSE平等对待所有的点，而图像中人脸的中心区域比其它区域具备更多辨别特征，因此作者使用了权重掩码来构造损失函数。如下图所示，权重掩码记录了图中每个点的权重。按照设计目的，论文将点分为四个类别，分别是68个关键点、眼睛鼻子嘴巴、其它脸部区域和脖子区域，而脖子区域因为容易被毛发或者衣服遮盖，所以分配了0权重。</p>
+<figure>
+<img
+src="https://lucienxian-blog-666-1258586914.cos.ap-shanghai.myqcloud.com/face_re_Joint_3D_face_fig4.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>因此损失函数的公式为： <span class="math display">\[
+Loss = \sum || Pos(u,v) - \overline{Pos}(w,v)|| \cdot W(u,v)
+\]</span></p>
+<h3 id="training-details">Training Details</h3>
+<p>论文使用了300W-LP的数据集来构造训练集，这是一个包含了不同角度人脸的图像和预测的3DMM系数，从中可以生成3D点云。具体实现上，首先根据ground-truth边框来裁剪图像，然后缩放到256x256大小，然后利用带注释的3DMM参数生成相应的3D位置，并将它们渲染到UV空间中以获得地面实况位置图。</p>
+<p>另外，论文还推荐通过在2D图像平面中随机旋转和平移目标面来扰乱训练集。论文使用了Adam优化器，学习率从0.00001开始，并在每5个epochs后衰减一半，batch
+size设为16。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/23/Need-of-Event-Handling/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1511,149 +1683,6 @@ pass outer scope elements inside lambda functions</h2>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/14/Variadic-Templates/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/14/Variadic-Templates/" itemprop="url">Variadic Templates</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-14T11:18:52+08:00">
-                2019-04-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="c11-variadic-template-function">C++11 – Variadic Template
-Function</h1>
-<p>Variadic模版允许函数采用任意类型的可变数量参数，考虑这样的一个例子，假设我们创建一个函数log()，它接受任意类型的可变数量参数，并在控制台上打印。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">log</span>(<span class="number">1</span>,<span class="number">4.3</span>, <span class="string">&quot;Hello&quot;</span>);</span><br><span class="line"> </span><br><span class="line"><span class="built_in">log</span>(<span class="string">&#x27;a&#x27;</span>, <span class="string">&quot;test&quot;</span>, <span class="number">78L</span>, <span class="number">5</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span>;</span><br><span class="line">Student obj;</span><br><span class="line"> </span><br><span class="line"><span class="built_in">log</span>(<span class="number">3</span>, obj);</span><br></pre></td></tr></table></figure>
-<p>对于可变类型的参数，我们一般考虑的是创建模版函数，如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T obj)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout&lt;&lt;obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>但以上做法只能接受一个参数。</p>
-<h2
-id="vardiac-template-function-creating-function-that-accepts-variable-number-of-arguments-of-ant-type">Vardiac
-Template Function: Creating function that accepts variable number of
-arguments of ant type</h2>
-<p>使用vardiac
-template，我们可以定义这样的一个函数，接收不定数量的参数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> ... Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T first, Args ... args)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>上述函数可以接收多个参数，**Args…代表了模版参数的可变数目。</p>
-<p>声明一个vardiac
-template函数是容易的，但其内部具体定义会有点tricky。由于我们无法直接访问到被传递进去的可变数目的参数。我们需要使用c++的类型推导机制和递归来实现。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> ... Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(T first, Args ... args)</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Print the First Element</span></span><br><span class="line">	std::cout&lt;&lt;first&lt;&lt;<span class="string">&quot; , &quot;</span>;</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// Forward the remaining arguments</span></span><br><span class="line">	<span class="built_in">log</span>(args ...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>现在假设我们通过这种方式调用log函数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">log</span>(<span class="number">2</span>, <span class="number">3.4</span>, <span class="string">&quot;aaa&quot;</span>);</span><br></pre></td></tr></table></figure>
-<p>居于模版的类型推导，编译器回创建这样的函数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(<span class="type">int</span> first, <span class="type">double</span> b, <span class="type">const</span> <span class="type">char</span> * c)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  std::cout&lt;&lt;first&lt;&lt;<span class="string">&quot; , &quot;</span>;</span><br><span class="line">  <span class="built_in">log</span>(b, c);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(<span class="type">double</span> first, <span class="type">const</span> <span class="type">char</span> * c)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  std::cout&lt;&lt;first&lt;&lt;<span class="string">&quot; , &quot;</span>;</span><br><span class="line">  <span class="built_in">log</span>(c);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(<span class="type">const</span> <span class="type">char</span> * first)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  std::cout&lt;&lt;first&lt;&lt;<span class="string">&quot; , &quot;</span>;</span><br><span class="line">  <span class="built_in">log</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>为了log函数能够在无参数的状态下返回，我们另外定义一个函数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function that accepts no parameter</span></span><br><span class="line"><span class="comment">// It is to break the recursion chain of vardiac template function</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1704,7 +1733,7 @@ template函数是容易的，但其内部具体定义会有点tricky。由于我
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">274</span>
+                <span class="site-state-item-count">275</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

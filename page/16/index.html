@@ -264,6 +264,380 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/19/Tensorflow%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/19/Tensorflow%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/" itemprop="url">Tensorflow安装指南</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-19T14:11:38+08:00">
+                2018-07-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="tensorflow安装指南">Tensorflow安装指南</h1>
+<h2 id="简介">简介</h2>
+<p>当然你可以<a
+target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-metas">查看</a></p>
+<p>因为cs231n要使用TensorFlow完成作业，就只能硬着头皮安装了GPU版本的TensorFlow了。此次安装版本为CUDA9.0和cuDNN7.0</p>
+<p>我的电脑显卡为：GeForce GTX 850M</p>
+<p>硬件支持：</p>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 12%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 10%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Distribution</th>
+<th>Kernel</th>
+<th>GCC</th>
+<th>GLIBC</th>
+<th>ICC</th>
+<th>PGI</th>
+<th>XLC</th>
+<th>CLANG</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x86_64</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>RHEL 7.x</td>
+<td>3.10.0</td>
+<td>4.8.5</td>
+<td>2.17</td>
+<td>17.0</td>
+<td>18.x</td>
+<td>NO</td>
+<td>5.0.0</td>
+</tr>
+<tr class="odd">
+<td>RHEL 6.x</td>
+<td>2.6.32</td>
+<td>4.4.7</td>
+<td>2.12</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>CentOS 7.x</td>
+<td>3.10.0</td>
+<td>4.8.5</td>
+<td>2.17</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>CentOS 6.x</td>
+<td>2.6.32</td>
+<td>4.4.7</td>
+<td>2.12</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Fedora 27</td>
+<td>4.15.x</td>
+<td>7.3.1</td>
+<td>2.26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>OpenSUSE Leap 42.3</td>
+<td>4.4.120</td>
+<td>4.8.5</td>
+<td>2.22</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>SLES 12 SP3</td>
+<td>4.4.120</td>
+<td>4.8.5</td>
+<td>2.22</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Ubuntu 17.10</td>
+<td>4.13</td>
+<td>7.2.0</td>
+<td>2.26</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Ubuntu 16.04.4(**)</td>
+<td>4.4.0</td>
+<td>5.4.0</td>
+<td>2.23</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>POWER8(***)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>RHEL 7.x</td>
+<td>3.10.0</td>
+<td>4.8.5</td>
+<td>2.17</td>
+<td>NO</td>
+<td>18.x</td>
+<td>13.1.6</td>
+<td>5.0.0</td>
+</tr>
+<tr class="odd">
+<td>Ubuntu 16.04.4</td>
+<td>4.4.0</td>
+<td>5.4.0</td>
+<td>2.23</td>
+<td>NO</td>
+<td>18.x</td>
+<td>13.1.6</td>
+<td>5.0.0</td>
+</tr>
+<tr class="even">
+<td>POWER9(****)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>RHEL 7.5 IBM Power LE</td>
+<td>4.14.0</td>
+<td>4.8.5</td>
+<td>2.17</td>
+<td>NO</td>
+<td>18.x</td>
+<td>13.1.6</td>
+<td>5.0.0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装cuda">安装CUDA</h2>
+<p>我这里选择的是<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-90-download-archive">9.0</a></p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/CUDA9.0.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>下载完之后，一次输入以下指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i cuda-repo-ubuntu1604-9-0-local_9.0.176-1_amd64.deb</span><br><span class="line">sudo apt-key add /var/cuda-repo-&lt;version&gt;/7fa2af80.pub</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install cuda</span><br></pre></td></tr></table></figure>
+<p>在下载安装过程中非常慢，因此我换了阿里云的源（不一定需要换源，如果速度够快的话）：</p>
+<ol type="1">
+<li>备份原来的源</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp /etc/apt/sources.list /etc/apt/sources.list_backup.list</span><br></pre></td></tr></table></figure>
+<ol start="2" type="1">
+<li>更换源</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gedit /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+<p>复制以下的源地址：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">deb-src http://archive.ubuntu.com/ubuntu xenial main restricted #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial main restricted multiverse universe #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted multiverse universe #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial universe</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates universe</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse #Added by software-properties</span><br><span class="line">deb http://archive.canonical.com/ubuntu xenial partner</span><br><span class="line">deb-src http://archive.canonical.com/ubuntu xenial partner</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted multiverse universe #Added by software-properties</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security universe</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security multiverse</span><br></pre></td></tr></table></figure>
+<ol start="3" type="1">
+<li>更新</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
+<p>安装CUDA之后，需要添加环境变量：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/usr/local/cuda-9.0/bin$&#123;PATH:+:$&#123;PATH&#125;&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">64bit</span></span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">32bit</span></span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="安装cudnn">安装cuDNN</h2>
+<p>在<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/cudnn">这里</a>注册一下，要做一个下的问卷调查。</p>
+<p>进入<a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/rdp/cudnn-download">download界面</a></p>
+<p>勾选<strong>I Agree To the Terms of the cuDNN Software License
+Agreement</strong></p>
+<p>我选择的是v7.0.5版本的，记得Runtime Library和Developer
+Library都要下载，即：</p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7_7.0.5.15-1+cuda9.0_amd64">cuDNN
+v7.0.5 Runtime Library for Ubuntu16.04 (Deb)</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.0.5/prod/9.0_20171129/Ubuntu16_04-x64/libcudnn7-dev_7.0.5.15-1+cuda9.0_amd64">cuDNN
+v7.0.5 Developer Library for Ubuntu16.04 (Deb)</a></li>
+</ul>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/cudnn.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>一开始我只下载了<strong>Developer Library</strong>
+，在安装的时候出现了这样的错误：</p>
+<blockquote>
+<p>Package libcudnn7 is not installed.</p>
+</blockquote>
+<p>两个都下载完之后，进入deb包目录，打开终端，输入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg -i libcudnn7*.deb</span><br></pre></td></tr></table></figure>
+<p>输入nvidia-smi，看到：</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/nvidia-smi.png" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<blockquote>
+<p>如果显示报错，建议重启一下</p>
+</blockquote>
+<h2 id="安装tensorflow">安装TensorFlow</h2>
+<p>可以查看官网，选择一种<a
+target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#determine_which_tensorflow_to_install">安装方式</a>。建议使用
+Virtualenv 进行<a
+target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux#installing_with_virtualenv">安装</a></p>
+<h2 id="验证安装">验证安装</h2>
+<p>进入交互界面，输入以下代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">hello = tf.constant(<span class="string">&#x27;Hello, TensorFlow!&#x27;</span>)</span><br><span class="line">sess = tf.Session()</span><br><span class="line"><span class="built_in">print</span>(sess.run(hello))</span><br></pre></td></tr></table></figure>
+<p>如果显示了显卡信息，就基本没有问题了，我的显示如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Python 3.5.2 (default, Nov 23 2017, 16:37:01) </span><br><span class="line">[GCC 5.4.0 20160609] on linux</span><br><span class="line">Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.</span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt;&gt; import tensorflow as tf</span></span><br><span class="line">/home/lucienxian/Study/cs231n/assignment2/tensorflow/lib/python3.5/site-packages/h5py/__init__.py:34: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.</span><br><span class="line">  from ._conv import register_converters as _register_converters</span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt;&gt; hello = tf.constant(<span class="string">&#x27;Hello,world!&#x27;</span>)</span></span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt;&gt; sess = tf.Session()</span></span><br><span class="line">2018-07-19 14:08:56.590394: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA</span><br><span class="line">2018-07-19 14:08:56.675095: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:897] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero</span><br><span class="line">2018-07-19 14:08:56.675799: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1392] Found device 0 with properties: </span><br><span class="line">name: GeForce GTX 850M major: 5 minor: 0 memoryClockRate(GHz): 0.8625</span><br><span class="line">pciBusID: 0000:01:00.0</span><br><span class="line">totalMemory: 1.96GiB freeMemory: 1.73GiB</span><br><span class="line">2018-07-19 14:08:56.675820: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1471] Adding visible gpu devices: 0</span><br><span class="line">2018-07-19 14:09:14.060705: I tensorflow/core/common_runtime/gpu/gpu_device.cc:952] Device interconnect StreamExecutor with strength 1 edge matrix:</span><br><span class="line">2018-07-19 14:09:14.060759: I tensorflow/core/common_runtime/gpu/gpu_device.cc:958]      0 </span><br><span class="line">2018-07-19 14:09:14.060766: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971] 0:   N </span><br><span class="line">2018-07-19 14:09:14.060961: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1084] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 1489 MB memory) -&gt; physical GPU (device: 0, name: GeForce GTX 850M, pci bus id: 0000:01:00.0, compute capability: 5.0)</span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt;&gt; result = sess.run(hello)</span></span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt;&gt; sess.close()</span></span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt;&gt; <span class="built_in">print</span>(result)</span></span><br><span class="line">b&#x27;Hello,world!&#x27;</span><br><span class="line"><span class="meta prompt_">&gt;</span><span class="language-bash">&gt;&gt; <span class="built_in">exit</span>()</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/18/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1931,182 +2305,6 @@ x_i\)</span>，假设所有的输入样本都乘以1000，那么权重的梯度�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/29/cs231n-lecture3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/29/cs231n-lecture3/" itemprop="url">cs231n@lecture3</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-29T23:14:20+08:00">
-                2018-05-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="损失函数与优化">损失函数与优化</h1>
-<p>##损失函数</p>
-<p>线性分类器：高维空间下的线性决策边界。</p>
-<p>loss
-function：判断我们分类器的效果，损失函数有多种版本：softmax和svm</p>
-<p>svm的实现公式如下： <span class="math display">\[
-L = \frac1N\sum_{i}\sum_{j\neq y_i} [max (0, f(x_i, W)_j - f(x_i,
-W)_{y_i} + 1)] + \alpha R(W)
-\]</span>
-通过上面的公式可看到，如果基于参数集W做出的分类预测与真实情况比较接近，那么计算出来的L就会比较小。因此，我们需要做<strong>Optimization</strong>，寻找使得顺势函数最小化的参数W的过程。</p>
-<h3 id="multiclass-svm">multiclass svm</h3>
-<p>如果真实分类的分数比其他类分数高很多（一般我们可以加上一个边界），我们是满意的；否则，我们认为会得到一些loss。</p>
-<p>svn损失函数最小值为0，最大值是无穷大，看hinge图。</p>
-<p>如果所有的score都接近0，并且相差不大，那么损失函数为C-1。</p>
-<p>使得loss为0的W不是唯一的，可以加倍，那么边界也会加倍。</p>
-<p>不需要关心分类器在训练集上的表现，避免过拟合。因此，我们可以对loss进行正则化，增加一个正则项。</p>
-<ul>
-<li>L2正则化、L1正则化</li>
-</ul>
-<h3 id="softmax-classifier">softmax classifier</h3>
-<p>使得概率接近1</p>
-<p>刚开始应该是-logC</p>
-<h2 id="最优化">最优化</h2>
-<p>SVM损失函数是一个凸函数，但我们最终的目标并不仅仅是对凸函数进行优化，而是能够最优化一个神经网络。</p>
-<p>我们使用的策略是<strong>follow the
-slope</strong>。即根据梯度在权重空间W中寻找一个方向，沿着该方向能够降低损失函数的损失值。</p>
-<p>计算梯度有两种方法：</p>
-<ul>
-<li>有限差分法</li>
-</ul>
-<p>为了计算梯度，我们是在梯度负方向进行更新，这样才能使得损失函数值降低；另外，我们要注意步长的影响，梯度指明了函数在哪个方向是变化率最大的，但步长则指明了在这个方向上走多远。步长也叫学习率。小步长下降稳定，但进度慢，大步长则是进展快，但风险高，容易错过最优点。</p>
-<p>从效率来看，有限差分法每走一步就需要计算n次损失函数的梯度（n为参数数量），这是一种效率极低的策略</p>
-<ul>
-<li>微积分计算梯度</li>
-</ul>
-<p>用SVM的损失函数在某个数据点上的计算为例： <span
-class="math display">\[
-L_i = \sum_{j\neq y_i} \left[ \max(0, w_j^Tx_i - w_{y_i}^Tx_i + \Delta)
-\right]
-\]</span> 然后对函数进行微分。比如对<span
-class="math inline">\(w_{y_i}\)</span>进行微分： <span
-class="math display">\[
-\nabla_{w_{y_i}} L_i = - \left( \sum_{j\neq y_i} \mathbb{1}(w_j^Tx_i -
-w_{y_i}^Tx_i + \Delta &gt; 0) \right) x_i
-\]</span>
-其中<strong>1</strong>是一个示性函数，如果括号中的条件为真，那么函数值为1，如果为假，则函数值为0。这是对正确分类的梯度，至于不正确的分类的梯度计算：
-<span class="math display">\[
-\nabla_{w_j} L_i = \mathbb{1}(w_j^Tx_i - w_{y_i}^Tx_i + \Delta &gt; 0)
-x_i
-\]</span>
-以下就是，在梯度下降过程中，我们计算权重的梯度，然后使用它们来实现参数的更新</p>
-<figure>
-<img
-src="https://pic2.zhimg.com/80/03b3eccf18ee3760e219f9f95ec14305_hd.jpg"
-alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2157,7 +2355,7 @@ alt="img" />
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">274</span>
+                <span class="site-state-item-count">275</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

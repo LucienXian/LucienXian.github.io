@@ -264,6 +264,141 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/09/%E9%81%BF%E5%85%8D%E5%88%9B%E5%BB%BA%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E5%AF%B9%E8%B1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/09/%E9%81%BF%E5%85%8D%E5%88%9B%E5%BB%BA%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E5%AF%B9%E8%B1%A1/" itemprop="url">避免创建不必要的对象<Effective Java></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-09T23:10:44+08:00">
+                2018-12-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="避免创建不必要的对象">避免创建不必要的对象</h1>
+<h2 id="概述">概述</h2>
+<p>最好能重用对象，而不是每次需要的时候创建一个功能相同的对象</p>
+<h2 id="极端例子">极端例子</h2>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(<span class="string">&quot;test&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>这种用法的坏处就是，语句每次被执行的时候都会创建一个新的实例。因此我们可以用字符串常量代替使用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;test&quot;</span>;</span><br></pre></td></tr></table></figure>
+<p>对于在同一台虚拟机运行的代码，只要它们包含相同的字符串常量，该对象就会被复用。</p>
+<h2 id="重用">重用</h2>
+<p>尽量使用静态工厂方法而不是构造器；</p>
+<p>使用静态初始化器创建不会被修改的对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="type">Calendar</span> <span class="variable">gmtCal</span> <span class="operator">=</span> Calendar.getInstance(TimeZone.getTimeZone(<span class="string">&quot;GMT&quot;</span>));</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">        ....</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="autoboxing">autoBoxing</h2>
+<p>要优先使用基本类型而不是Boxed primitive type，考虑这样的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">sum</span> <span class="operator">=</span> <span class="number">0L</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">long</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; Integer.MAX_VALUE; i++) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于sum被声明成Long而不是long，这意味着程序构造了2^31个Long实例。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/07/Inner-class-of-Java/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1858,157 +1993,6 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/11/linux%E5%86%85%E6%A0%B8%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%92%8C%E9%A1%B5%E5%9B%9E%E5%86%99/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/11/linux%E5%86%85%E6%A0%B8%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%A1%B5%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%92%8C%E9%A1%B5%E5%9B%9E%E5%86%99/" itemprop="url">linux内核分析——页高速缓存和页回写</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T16:47:22+08:00">
-                2018-08-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="页高速缓存和页回写">页高速缓存和页回写</h1>
-<p>从访问速度来看，内存访问速度高于磁盘访问，而缓存访问速度又高于内存。</p>
-<h2 id="缓存手段">缓存手段</h2>
-<p>页高速缓存是由内存中的物理页面组成，对应的是磁盘上的物理块，可以动态扩大缩小。当内核开始读操作时，会先检查数据是否子啊缓存中，不命中采取磁盘找。</p>
-<blockquote>
-<p>现在的缓存一般焊接在CPU上</p>
-</blockquote>
-<h3 id="写缓存">写缓存</h3>
-<p>Linux在调用写操作时，使用的策略是——<strong>回写</strong>。这种策略是直接写到缓存中，而存储不是立刻更新，而是将页高速缓存中被写入的页面标记成<strong>脏页</strong>，表示缓存与磁盘不同步。延迟写磁盘，能方便后续对该页面的操作。</p>
-<h3 id="缓存回收">缓存回收</h3>
-<p>Linux实现的是一种改良LRU算法，则使用双链。Linux维护的是两个链表——活跃链表和非活跃链表，非活跃链表的页面是可以被换出的，而两个链表要保持数量平衡。</p>
-<h2 id="linux页高速缓存">Linux页高速缓存</h2>
-<p>由于页高速缓存中的页可能包含多个不连续的物理磁盘块。Linux页高速缓存使用一个新的结构来管理缓存项和页面io操作。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">inode</span>            *<span class="title">host</span>;</span>              <span class="comment">/* owning inode */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">radix_tree_root</span>  <span class="title">page_tree</span>;</span>          <span class="comment">/* radix tree of all pages */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              tree_lock;          <span class="comment">/* page_tree lock */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">int</span>            i_mmap_writable;    <span class="comment">/* VM_SHARED ma count */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">prio_tree_root</span>   <span class="title">i_mmap</span>;</span>             <span class="comment">/* list of all mappings */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">i_mmap_nonlinear</span>;</span>   <span class="comment">/* VM_NONLINEAR ma list */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              i_mmap_lock;        <span class="comment">/* i_mmap lock */</span></span><br><span class="line">        <span class="type">atomic_t</span>                truncate_count;     <span class="comment">/* truncate re count */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span>           nrpages;            <span class="comment">/* total number of pages */</span></span><br><span class="line">        <span class="type">pgoff_t</span>                 writeback_index;    <span class="comment">/* writeback start offset */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span>   *<span class="title">a_ops</span>;</span>   <span class="comment">/* operations table */</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span>           flags;              <span class="comment">/* gfp_mask and error flags */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">backing_dev_info</span> *<span class="title">backing_dev_info</span>;</span>  <span class="comment">/* read-ahead information */</span></span><br><span class="line">        <span class="type">spinlock_t</span>              private_lock;       <span class="comment">/* private lock */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>        <span class="title">private_list</span>;</span>       <span class="comment">/* private list */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span>    *<span class="title">assoc_mapping</span>;</span>     <span class="comment">/* associated buffers */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>其中i_mmap字段是一个优先搜索树，它包含了在该结构体中所有共享的与私有的映射页面。</p>
-<h3 id="address_space-操作">address_space 操作</h3>
-<p>a_ops域指向地址空间对象中的操作函数表，由adress_space_operations结构体表示：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">address_space_operations</span> &#123;</span></span><br><span class="line">        <span class="type">int</span> (*writepage)(<span class="keyword">struct</span> page *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*readpage) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*sync_page) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*writepages) (<span class="keyword">struct</span> address_space *, <span class="keyword">struct</span> writeback_control *);</span><br><span class="line">        <span class="type">int</span> (*set_page_dirty) (<span class="keyword">struct</span> page *);</span><br><span class="line">        <span class="type">int</span> (*readpages) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> address_space *,<span class="keyword">struct</span> list_head *, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*prepare_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">int</span> (*commit_write) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">unsigned</span>, <span class="type">unsigned</span>);</span><br><span class="line">        <span class="type">sector_t</span> (*bmap)(<span class="keyword">struct</span> address_space *, <span class="type">sector_t</span>);</span><br><span class="line">        <span class="type">int</span> (*invalidatepage) (<span class="keyword">struct</span> page *, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">        <span class="type">int</span> (*releasepage) (<span class="keyword">struct</span> page *, <span class="type">int</span>);</span><br><span class="line">        <span class="type">int</span> (*direct_IO) (<span class="type">int</span>, <span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *,<span class="type">loff_t</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>这里面最重要的是读写——readpage()和writepage()。</p>
-<p>对于readpage，Linux内核试图在页高速缓存中使用<strong>find_get_page(mapping,
-index)</strong>找到需要的数据，将一个adress_space对象和一个偏移量传给该方法。如果找不到会返回一个NULL，并且内核新分配一个页面，并之前搜索的页面加入到页高速缓存。</p>
-<p>对于writepage，首先在cache中搜索需要的页，如果需要的页不在，则新分配一个空闲项；下一步，内核会创建一个写请求，接着数据被从用户空间拷贝到内核缓冲，最后写入磁盘。</p>
-<h3 id="基树">基树</h3>
-<p>每个address_page对象都有唯一的基树，保存在page_tree结构体中。只要指定了文件偏移量，就可以在基树中迅速检索到希望的页面。</p>
-<h2 id="flusher线程">flusher线程</h2>
-<p>在内存中累积起来的脏页最终会被写回磁盘，当下列3种情况发生时，脏页被写回磁盘：</p>
-<ul>
-<li>当空闲内存低于阈值时；</li>
-<li>当脏页在内存中驻留时间过长；</li>
-<li>当用户进程调用sync()和fsync()时；</li>
-</ul>
-<p>在Linux内核中由一群flusher线程执行这三种工作，flusher线程会被周期性唤醒，或者因为空闲内存过低被唤醒。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2059,7 +2043,7 @@ index)</strong>找到需要的数据，将一个adress_space对象和一个偏�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">274</span>
+                <span class="site-state-item-count">275</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
