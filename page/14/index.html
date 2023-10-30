@@ -264,6 +264,148 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/16/%E8%A6%86%E7%9B%96equals%E6%97%B6%E6%80%BB%E8%A6%81%E8%A6%86%E7%9B%96hashcode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/16/%E8%A6%86%E7%9B%96equals%E6%97%B6%E6%80%BB%E8%A6%81%E8%A6%86%E7%9B%96hashcode/" itemprop="url">覆盖equals时总要覆盖hashcode</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:04:25+08:00">
+                2018-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="覆盖equals时总要覆盖hashcode">覆盖equals时总要覆盖hashcode</h1>
+<h2 id="概述">概述</h2>
+<p>在每个重载了equals方法的类中，也必须重载hashcode方法，这样才能保证HashMap，HashSet之类的征程工作；</p>
+<h2 id="约定">约定</h2>
+<ul>
+<li>如果同一个对象的信息没有被修改，hashcode方法应该始终如一返回同一个整数；</li>
+<li>两个对象在equals方法下相等，那么返回的hashcode也应该是相同的；</li>
+<li>两个对象在equals方法下不相等，hashcode不一定要不同，但不同的hashcode有助于hashtable的性能；</li>
+</ul>
+<p>一个理想的散列函数应该“为不同的对象产生不相等的hash code”：</p>
+<ol type="1">
+<li>把非零常数值保存在result中；</li>
+<li>byte, char, short转换为(int)f;</li>
+<li>long类型，则计算(int)(f^f&gt;&gt;32);</li>
+<li>float类型，则计算Float.floatToInBits(f);</li>
+<li>double类型，则计算Double.doubleToLongBits(f)；</li>
+<li>如果是域的对象引用，则递归调用hashcode；</li>
+<li>数组，则把每一个元素递归地调用hashcode方法调用这个值；或者利用Arrays.hashCode方法；</li>
+</ol>
+<p>然后迭代地计算result = 31*result+c；</p>
+<blockquote>
+<p>注意：必须排序equals计算中没有用到的域</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/09/%E9%81%BF%E5%85%8D%E5%88%9B%E5%BB%BA%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E5%AF%B9%E8%B1%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1787,212 +1929,6 @@ control的命令后选项：<strong>--disable</strong>和<strong>--enable</stron
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/19/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/" itemprop="url">支持向量机</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:09:13+08:00">
-                2018-08-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="支持向量机">支持向量机</h1>
-<h2 id="间隔与支持向量">间隔与支持向量</h2>
-<p>考虑这样的训练样本<span class="math inline">\(D = {(x_1, y_1), (x_2,
-y_2), ... , (x_m, y_m)}, y_i \in {-1,
-+1}\)</span>。分类学习最重要的基于训练集D找到一个划分超平面，使得不同类别的样本能够分考。虽然划分平面可能很多，但我们应该尽量找到<strong>"位于正中间"</strong>的平面，使得robust最好。</p>
-<p>在样本空间中，划分超平面可以这样描述： <span class="math display">\[
-w^Tx + b = 0
-\]</span> 其中<span
-class="math inline">\(w=(w_1;w_2;...;w_d)\)</span>为法向量，决定平面的方向，而b则是位移，决定的事平面与原点的距离。</p>
-<p>样本空间中任意点x到平面的距离记为： <span class="math display">\[
-r = \frac {|w^Tx+b|} {||w||}
-\]</span> 假设平面能够正确分类，那么对于 <span class="math display">\[
-w^T x_i + b \geq +1, y_i +1 \\
-w^T x_i + b \leq -1, y_i -1
-\]</span>
-根据这个公式可以得知，距离平面最近的点使得上式成立，那么这几个样本就成为支持向量，两个异类支持向量到平面的距离之和为：
-<span class="math display">\[
-\gamma = \frac {2} {||w||}
-\]</span> 这就是间隔(margin)。</p>
-<p>但如果我们希望找到具有最大间隔的平面，应该要最大化<span
-class="math inline">\(\gamma\)</span>，则使得<span
-class="math inline">\(\frac{1}{2}{||w||}^2\)</span>最大化。</p>
-<p>这就是<strong>support vector machine(SVM)</strong>的基本模型。</p>
-<h2 id="对偶问题">对偶问题</h2>
-<p>TODO</p>
-<h2 id="核函数">核函数</h2>
-<p>在现实生活中，很可能无法找到使得原始样本空间可分的超平面，比如抑或问题就是这样。但我们可以将样本从原始空间映射到一个更高维空间，使得样本在这个特征空间内是线性可分。</p>
-<p>经过映射后，假设超平面模型为： <span class="math display">\[
-f(x) = w^T \Phi(x) + b
-\]</span> 在利用对偶问题求解时会涉及得到计算内积——<span
-class="math inline">\(\Phi(x)^T\Phi(x)\)</span>，由于映射后的特征空间可能维度很高，甚至是无穷维，要想直接计算通常是困难的。因此可以设计这样一个函数，即<span
-class="math inline">\(x_i\)</span>与<span
-class="math inline">\(x_j\)</span>在特征空间的内积等于它们在原始空间中通过函数k计算的结果。重写解为：
-<span class="math display">\[
-f(x) = w^T\Phi(x) + b \\
-=\sum_{i=1}^{m}\alpha_iy_i\Phi(x_i)^T\Phi(x) + b \\
-=\sum_{i=1}^{m}\alpha_iy_ik(x, x_i) + b
-\]</span> 但这样还存在一个问题，在不知道$ (x)
-$形式时该怎么得到核函数呢？</p>
-<blockquote>
-<p>有这么一个定理，如果有这么一个对称函数，它在输入空间中对应的核矩阵是半正定的，那么它就能作为核函数使用。（不懂？？）</p>
-</blockquote>
-<p>以下为一些常见和核函数：</p>
-<ul>
-<li>线性核：<span class="math inline">\(k(x_i, x_j) =
-x_i^Tx_i\)</span></li>
-<li>多项式核：<span class="math inline">\(k(x_i, x_j) =
-(x_i^Tx_j)^d\)</span></li>
-<li>高斯核：<span class="math inline">\(k(x_i, x_j) = exp(- \frac{ ||
-x_i - x_j ||^2 }{2\sigma^2})\)</span></li>
-<li>拉普拉斯核：<span class="math inline">\(k(x_i, x_j) = exp(- \frac{
-|| x_i - x_j ||^2 }{\sigma})\)</span></li>
-<li>sigmoid核：<span class="math inline">\(k(x_i, x_j) = tanh(\beta
-x_i^T x_j + \theta)\)</span></li>
-</ul>
-<h2 id="软间隔与正则化">软间隔与正则化</h2>
-<p>todo</p>
-<h2 id="支持向量回归">支持向量回归</h2>
-<p>这样的训练样本<span class="math inline">\(D = {(x_1, y_1), (x_2,
-y_2), ... , (x_m,
-y_m)}\)</span>，希望学得一个回归模型，使得f(x)与y尽可能接近，在传统的回归模型中，我们是基于模型输出f(x)与真实输出y之间的差别来计算损失，在这种情况中当且仅当f(x)与y完全相同时，损失才为零。</p>
-<p>但是对于SVR，假设我们能容忍f(x)与y之间最多有<span
-class="math inline">\(\epsilon\)</span>的偏差，这相当于以f(x)为中心，构建了一个宽度为<span
-class="math inline">\(2\epsilon\)</span>的间隔带，若训练样本落入间隔带，则认为是被预测正确的。</p>
-<p>于是，SVR问题可以转化为：</p>
-<p><span class="math display">\[
-min_{w, b} \frac{1}{2}||w||^2+C\sum_{i=1}^{m}\ell_{\epsilon}(f(x_i)-y_i)
-\\
-\]</span></p>
-<p><span class="math display">\[
-f(x)=\left\{
-\begin{aligned}
-0, if |z| \le \epsilon \\
-|z| - \epsilon,otherwise \\
-\end{aligned}
-\right.
-\]</span></p>
-<p>引入松弛变量： <span class="math display">\[
-min_{w, b, \xi_{i2}, \xi_{i1}}
-\frac{1}{2}||w||^2+C\sum_{i=1}^{m}(\xi_{i2}+\xi_{i1})
-\]</span></p>
-<p>通过引入拉格朗日乘子，并对目标参数求偏导，最后得到SVR表示为： <span
-class="math display">\[
-f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
-\]</span></p>
-<h2 id="核方法">核方法</h2>
-<p>todo</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2043,7 +1979,7 @@ f(x) = \sum_{i=1}^m (\alpha_{i1}-\alpha_{i2})k(x, x_i)+b
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">275</span>
+                <span class="site-state-item-count">276</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -264,6 +264,181 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/13/%E5%9F%BA%E4%BA%8E%E6%A2%AF%E5%BA%A6%E7%9A%84%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94DeepLearning%E7%B3%BB%E5%88%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/13/%E5%9F%BA%E4%BA%8E%E6%A2%AF%E5%BA%A6%E7%9A%84%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94DeepLearning%E7%B3%BB%E5%88%97/" itemprop="url">基于梯度的学习——DeepLearning系列</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-13T00:42:15+08:00">
+                2019-02-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="基于梯度的学习">基于梯度的学习</h1>
+<h2 id="概述">概述</h2>
+<p>普通的线性模型和神经网络的最大区别，在于神经网络的非线性容易使得我们感兴趣的代价函数变得非凸，这样就只能使得代价函数达到一个非常小的值，而不能保证全局收敛。</p>
+<p>除此之外，对于前馈神经网络，将所有权重值随机化为小随机数是非常重要，偏置bias则应该初始为零或者小的正值。</p>
+<h2 id="代价函数">代价函数</h2>
+<p>神经网络的一个重要设计就是代价函数的选择，在大多数情况下，参数模型定义了一个分布式<span
+class="math inline">\(p(y | x;
+\theta)\)</span>并且我们使用最大似然原理。</p>
+<h3 id="使用最大似然学习条件分布">使用最大似然学习条件分布</h3>
+<p>如果神经网络使用最大似然来训练，这意味着代价函数就是负的对数似然。
+<span class="math display">\[
+J(\theta) = - E_{x, y - p_{data} } log _{p_{model} } (y | x)
+\]</span> 代价函数的具体形式随着模型而改变，取决于<span
+class="math inline">\(log_{Pdata}\)</span>的具体形式。</p>
+<p>使用最大似然来导出代价函数的一个好处就是减轻了为每个模型设计代价函数的负担，因为每确定一个模型<span
+class="math inline">\(p(y|x)\)</span>则自动确定了一个代价函数<span
+class="math inline">\(logp(y|x)\)</span>。另外，为了避免代价函数的梯度不够大，使得预测性减弱，我们可以使用负的对数似然来避免这个问题。另外，用于实现最大似然估计的交叉熵代价函数有一个特性，就是它用于实践模型的时候，通常没有最小值。</p>
+<h3 id="学习条件统计量">学习条件统计量</h3>
+<p>有时我们并不是想学习一个完整的概率分布，而是想学习在给定x时y的某个条件统计量。</p>
+<p>我们可以吧代价函数看做是一个泛函而不仅仅是一个函数，泛函是函数到实数的映射，因此我们可以将学习看做是选择一个函数而不仅仅是一组参数。例如我们可以设计一个代价泛函，使得它的最小值处于一个特殊的函数上，这个函数将x映射到给定x时y的期望值。</p>
+<p>对函数求解优化问题需要用到变分法，我们使用变分法导出的第一个结果是解优化问题：
+<span class="math display">\[
+f^* = arg min _{f} E_{x, y - Pdata} || y - f(x) || ^ 2
+\]</span> 得到 <span class="math display">\[
+f^*(x) = E_{y - Pdata}(y|x)[y]
+\]</span>
+因此可以看到，如果我们最小化均方误差代价函数，将得到一个函数，它可以用来对每个x的值预测出y的均值。</p>
+<p>不同的代价函数给出不同的统计量，例如： <span class="math display">\[
+f^* = arg min _{f} E_{x, y - Pdata} || y - f(x) || _1
+\]</span>
+将得到一个函数可以对每个x预测y取值的中位数，这个代价函数被称为平均绝对误差。</p>
+<h2 id="输出单元">输出单元</h2>
+<p>代价函数的选择与输出单元的选择密切相关，任何可用作输出的神经网络单元，也可以被用作隐藏单元。</p>
+<h3 id="用于高斯输出分布的线性单元">用于高斯输出分布的线性单元</h3>
+<p>一种简单的输出单元是基于仿射变换，这些单元是线性单元。</p>
+<p>给定特征h，线性输出单元层产生一个向量<span
+class="math inline">\(y&#39;=
+W^Th+b\)</span>。线性输出层经常被用来产生条件高斯分布的均值： <span
+class="math display">\[
+p(y|x) = N (y, y&#39;, I)
+\]</span> 最大化其对数似然此时等价于最小化均方误差。</p>
+<h3
+id="用于bernoulli输出分布的sigmoid单元">用于Bernoulli输出分布的sigmoid单元</h3>
+<p>许多任务需要预测二值型变量y的值，此时最大似然的方法是定义y在x条件下的Bernoulli分布。</p>
+<p>为了保证无论何时模型给出错误的答案，总能有一个较大的梯度，而不是梯度为0。因此sigmoid输出单元定义为：
+<span class="math display">\[
+y&#39; = \sigma(w^Th+b)
+\]</span>
+这里sigmoid输出单元有两个部分，一个是线性层，另一个则是使用sigmoid激活函数将z转换为概率。</p>
+<h3
+id="用于multinoulli输出分布的softmax单元">用于Multinoulli输出分布的softmax单元</h3>
+<p>任何时候，当我们想要表达一个具有n个可能取值的离散型随机变量的分布时，我们都可以使用softmax函数。</p>
+<p>其形式为： <span class="math display">\[
+softmax(z)_i = \frac{exp(z_i)}{\sum_j exp(z_j)}
+\]</span>
+softmax输出的综合为1，所以一个单元的值增加必然对应这其它单元值的减少。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/11/%E5%B0%86%E6%BA%90%E6%96%87%E4%BB%B6%E9%99%90%E5%88%B6%E4%B8%BA%E5%8D%95%E4%B8%AA%E9%A1%B6%E7%BA%A7%E7%B1%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1745,133 +1920,6 @@ class="math inline">\(D_{\theta_d}(G_{\theta_g}(z))\)</span>是假数据的输�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/28/%E6%8E%A5%E5%8F%A3%E4%BC%98%E4%BA%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/28/%E6%8E%A5%E5%8F%A3%E4%BC%98%E4%BA%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB/" itemprop="url">接口优于抽象类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-28T23:21:44+08:00">
-                2019-01-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="接口优于抽象类">接口优于抽象类</h1>
-<h2 id="概述">概述</h2>
-<p>Java有两种机制允许定义一个多实现的类型——接口和抽象类。从Java8起，接口引入了默认方法。因此这两种机制都能让用户为一些实例方法提供实现。</p>
-<h2 id="优点">优点</h2>
-<p><strong>现有类可以很容易被改造以实现一个新的接口</strong>。对于一个想要实现新接口的类来说，它只需要添加需要的方法即可。若是使用了抽象类，如果你想要让两个类扩展同一个抽象类，这样就强迫了所有的后带来都要扩展这个父类，而不管这个扩展是否合适。</p>
-<p><strong>接口是定义混合类型的理想选择</strong>。混合类型：一个类除了实现它的"primary
-type"之外，还可以声明其提供一些额外的行为。比如Complarable接口，它允许一个类声明其实例可以与其它可相互比较的对象进行排序。因为它在主要功能之外提供了一些额外的行为。而抽象类无法被改造到现有的类当中。</p>
-<p><strong>接口构造非层次结构的框架</strong>。类层次结构不一定适合一些其它的层次结构中，但接口可以，假设我们有一个接口，这个接口代表了一个歌手（singer），同时还有另一个代表作曲人（songwriter）的接口。我们就可以同时扩展这两个接口。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1922,7 +1970,7 @@ type"之外，还可以声明其提供一些额外的行为。比如Complarable�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">275</span>
+                <span class="site-state-item-count">276</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
