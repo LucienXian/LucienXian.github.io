@@ -264,6 +264,183 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/27/shared-ptr-in-C-11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/27/shared-ptr-in-C-11/" itemprop="url">shared_ptr in C++11</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-27T20:12:52+08:00">
+                2019-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="shared_ptr">shared_ptr</h1>
+<h2 id="what-is-stdshared_ptr">What is std::shared_ptr&lt;&gt;</h2>
+<p>shared_ptr是c++11提出的一种智能指针类，能够自动地删除掉相关的不再被使用的指针，它能够帮助解决内存泄漏和悬空指针的问题。</p>
+<p>shared_ptr有一个共享对象的概念，不同的shared_ptr可以共享相同的指针，并且通过内部的引用计数机制来实现这一功能。每个shared_ptr内部都指向两个内存区域，一个是指向对象的指针，另一个就是用来做引用计数的数据。</p>
+<p>引用计数的使用方式：</p>
+<ul>
+<li>当有一个新的shared_ptr与指针相关联后，其引用计数递增1；</li>
+<li>当一个shared_ptr对象离开作用域时，其引用计数递减1。并且在引用计数变为0的时候，它会delete那部分内存；</li>
+</ul>
+<h3 id="creating-a-shared_ptr-object">Creating a shared_ptr Object</h3>
+<p>创建shared_ptr对象时需要绑定一个原生指针，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>())</span></span>;</span><br></pre></td></tr></table></figure>
+<p>这样，就在堆上创建了两块内存：一个是int，一个是引用计数的数据区域。</p>
+<p>至于，要查看目前的引用计数是多少：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1.<span class="built_in">use_count</span>();</span><br></pre></td></tr></table></figure>
+<p>另外，要将一个指针赋值给shared_ptr，我们不能采用隐式的方式，因为其构造器是采用explicit的方式，所以隐式赋值会报错，但我们可以使用<strong>std::make_shared</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = <span class="keyword">new</span> <span class="built_in">int</span>(); <span class="comment">// Compile error</span></span><br><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; p1 = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;();</span><br></pre></td></tr></table></figure>
+<h3 id="detaching-the-associated-raw-pointer">Detaching the associated
+Raw Pointer</h3>
+<p>要使shared_ptr对象取消附加其附加指针，可以调用reset()方法。</p>
+<ul>
+<li>无参调用reset：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1.<span class="built_in">reset</span>(); <span class="comment">// 递减引用计数</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>有参调用：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">int</span>(<span class="number">34</span>)); <span class="comment">//指向新的指针，引用计数变为1</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用nullptr reset</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1 = <span class="literal">nullptr</span>;</span><br></pre></td></tr></table></figure>
+<p>shared_ptr可以看作是普通指针，即我们可以对shared_ptr对象使用*和-&gt;与，也可以像其他shared_ptr对象一样进行比较。</p>
+<h2 id="shared_ptr-and-custom-deletor">shared_ptr and Custom
+Deletor</h2>
+<p>在上文说过，shared_ptr对象超出作用域的时候，会递减引用计数，当计数为0时，默认情况下会调用<strong>delete</strong>函数删除指针。但如果我们的shared_ptr指向的是一个数组，就应该使用delete[]了。</p>
+<p>因此，为了避免默认调用的错误，我们可以自定义删除器。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">deleter</span><span class="params">(Sample * x)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	std::cout &lt;&lt; <span class="string">&quot;DELETER FUNCTION CALLED\n&quot;</span>;</span><br><span class="line">	<span class="keyword">delete</span>[] x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">std::shared_ptr&lt;Sample&gt; <span class="title">p3</span><span class="params">(<span class="keyword">new</span> Sample[<span class="number">12</span>], deleter)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>当然也可以利用lambda函数或者函数对象来自定义删除器。</p>
+<h2 id="shared_ptr-vs-pointer">shared_ptr vs Pointer</h2>
+<p>与原生指针不同，shared_ptr只有以下的的操作符：</p>
+<ul>
+<li>-&gt;, *, 比较符号；</li>
+</ul>
+<p>不提供原生指针的这些操作：</p>
+<ul>
+<li>+, -, ++, —和[]；</li>
+</ul>
+<p>当我们创建shared_ptr对象而不分配任何值时，它就是空的。而对于原生的指针来说，它会包含一个垃圾值。因此对于shared_ptr对象，我们可以这样检查：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;Sample&gt; ptr3;</span><br><span class="line"><span class="keyword">if</span>(!ptr3)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;Yes, ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">if</span>(ptr3 == <span class="literal">NULL</span>)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">if</span>(ptr3 == <span class="literal">nullptr</span>)</span><br><span class="line">	std::cout&lt;&lt;<span class="string">&quot;ptr3 is empty&quot;</span> &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+<h2 id="create-shared_ptr-objects-carefully">Create shared_ptr objects
+carefully</h2>
+<p>在创建shared_ptr对象时，有些情况需要注意的：</p>
+<ol type="1">
+<li>不要使用相同的原始指针来创建多个shared_ptr对象，因为不同的shared_ptr对象并不知道它们正在与其它shared_ptr对象共享指针；</li>
+<li>不要从stack中创建shared_ptr对象，因为在stack内存上调用删除操作，程序会崩溃。因此我们应该使用make_shared&lt;&gt;之类的；</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;<span class="type">int</span>&gt; ptr_1 = <span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;();</span><br><span class="line"> </span><br><span class="line"><span class="function">std::shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr_2</span> <span class="params">(ptr_1)</span></span>;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/21/Designing-Callbacks-in-C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1752,168 +1929,6 @@ policy是一个启动策略，它控制着异步执行的行为，我们可以�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/30/std-future-std-promise-and-Returning-values-from-Thread/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/30/std-future-std-promise-and-Returning-values-from-Thread/" itemprop="url">std::future , std::promise and Returning values from Thread</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-30T11:14:42+08:00">
-                2019-04-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1
-id="stdfuture-stdpromise-and-returning-values-from-thread">std::future,
-std::promise and Returning values from Thread</h1>
-<p>std::future对象常与异步一起使用。本文将主要关注使用std::future与std::promise。</p>
-<p>一般情况下，我们希望一个线程能够返回一个结果。假设这样的一个场景，我们的应用创建一个线程去压缩文件夹，然后我们希望得到返回的zip包名和大小。</p>
-<ol type="1">
-<li>老的方法：在多个线程之间通过指针共享数据</li>
-</ol>
-<p>往新的线程传递进指针，该线程将会设置其中的数据。然后在主线程中继续使用条件变量进行等待，当新线程设置数据并发出条件变量信号时，主线程将被唤醒并从该指针获取数据。</p>
-<p>这种方法使用了一个条件变量、一个互斥锁和一个指针。但假如我们希望这个线程在不同的时间点返回三个不同的值，问题就变得复杂了。一个简单的方法是使用std::future。</p>
-<ol start="2" type="1">
-<li>c++11的方法：使用std::future和std::promise</li>
-</ol>
-<p>std::future是一个类模版，对象存储的是future
-value——一个在内部存储中将在未来分配的值，提供了get()访问，但在这个未来值不可用时，调用get()将会阻塞。</p>
-<p>std::promise也是一个类模版，它的对象承诺将来会设置值，每个对象都有一个关联的std::future对象。一个std::promise对象与关联的std::future对象共享数据。</p>
-<h2 id="使用方法">使用方法</h2>
-<ol type="1">
-<li>首先在线程1创建std::promise对象，该对象将传到线程2以便设置值</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::promise&lt;<span class="type">int</span>&gt; promiseObj;</span><br></pre></td></tr></table></figure>
-<ol start="2" type="1">
-<li>在将promiseObj从线程1传递给线程2之前，可以先获得一个关联的future值</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;<span class="type">int</span>&gt; futureObj = promiseObj.<span class="built_in">get_future</span>();</span><br></pre></td></tr></table></figure>
-<ol start="3" type="1">
-<li>将promiseObj传递给线程2</li>
-<li>线程1尝试去获取线程2设置的值</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> val = futureObj.<span class="built_in">get</span>();</span><br></pre></td></tr></table></figure>
-<ol start="5" type="1">
-<li>在线程2设置值之前，线程1会阻塞住</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">promiseObj.<span class="built_in">set_value</span>(<span class="number">45</span>);</span><br></pre></td></tr></table></figure>
-<figure>
-<img
-src="https://thispointer.com//wp-content/uploads/2015/06/promise.png"
-alt="img" />
-<figcaption aria-hidden="true">img</figcaption>
-</figure>
-<h2 id="注意">注意</h2>
-<p>如果在设置值之前销毁了std::promise对象，则关联的std::future对象调用get将会抛出异常。</p>
-<p>如果希望线程在不同的时间点返回多个值，那么只需要在线程中传递多个std::promise对象。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1964,7 +1979,7 @@ alt="img" />
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">276</span>
+                <span class="site-state-item-count">277</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

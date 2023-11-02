@@ -264,6 +264,273 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/10/10/CockroachDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/10/10/CockroachDB/" itemprop="url">CockroachDB</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-10-10T22:52:37+08:00">
+                2021-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1
+id="cockroachdb-the-resilient-geo-distributed-sql-database">CockroachDB:
+The Resilient Geo-Distributed SQL Database</h1>
+<blockquote>
+<p>本文介绍了一个叫CockroachDB的数据库系统。</p>
+</blockquote>
+<h2 id="introduction">INTRODUCTION</h2>
+<p>对于现代数据库来说，OLTP的工作负载越来越与地理分布有关。一些应用可能针对不同的地区分布有着不同的数据库需求，比如某些地区的数据需要有更严格的权限控制满足法律法规，有些地区则是处于快速增长的阶段，需要考虑成本、延时、性能等等的情况。</p>
+<p>CockroachDB作为一款商业DBMS，满足了全球化公司关于数据库系统的种种需求：</p>
+<ul>
+<li><strong>容错和高可用性</strong>：在不同的地区为每个分区至少维护三个副本。节点故障，能自动恢复；</li>
+<li><strong>地理分布和副本放置</strong>：CockroachDB支持水平伸缩，添加节点时自动增加容量并迁移数据。并根据需求选择最优的数据放置方法，同时支持用户自定义选择；</li>
+<li><strong>高性能的事务</strong>：CockroachDB的事务协议支持跨多个分区的分布式事务，而不需要特定的硬件；</li>
+</ul>
+<p>除此之外，CockroachDB还实现了最新的查询优化器和分布式SQL执行引擎来支持更全面的SQL标准。</p>
+<h2 id="system-overview">SYSTEM OVERVIEW</h2>
+<h3 id="architecture-of-cockroachdb">Architecture of CockroachDB</h3>
+<p>CockroachDB是典型的shared-nothing架构，其所有节点都参与计算和存储。这些节点可由同个数据中心或者多个数据中心组成，client可以连接到任意的节点。在单个节点内部具备以下的分层架构：</p>
+<h4 id="sql">SQL</h4>
+<p>SQL层是最上层，负责与client进行交互，包括了解析器、优化器和SQL执行引擎，其将SQL语句转化成对KV存储的读写请求。SQL层并不清楚数据的具体分区情况。</p>
+<h4 id="transactional-kv">Transactional KV</h4>
+<p>SQL层的请求会来到事务KV层，负责确保跨KV对的更新原子性。</p>
+<h4 id="distribution">Distribution</h4>
+<p>该层根据key排序呈现了一个key空间的抽象，包括系统元数据和用户数据都可以在该key空间内查找。CockroachDB使用范围分区的方法将数据划分为大小约为64MiB的连续有序块，称之为Range。Range之间的顺序在一组系统Range内的两级索引结构（前面说过用于内部数据结构和元数据的系统数据也会组成Range）中维护。Range会被缓存起来用于快速查找，同时该层也主要负责对上层查询做路由。</p>
+<p>Range大小为64MB，并根据需要对Range进行合并和拆分（数据太多就拆分，太少就合并，还有根据一些热点策略做Range划分）。</p>
+<h4 id="replication">Replication</h4>
+<p>默认情况下，每个Range都是三个副本，每个副本存储在不同的节点上。</p>
+<h4 id="storage">Storage</h4>
+<p>最底下的就是存储层，CockroachDB主要依赖了RocksDB。</p>
+<h3 id="fault-tolerance-and-high-availability">Fault Tolerance and High
+Availability</h3>
+<h4 id="replication-using-raft">Replication using Raft</h4>
+<p>CockroachDB使用Raft算法来进行一致性的复制，其中Range的副本会组成一个Raft组，每个副本要么是leader，要么是follower。CockroachDB的复制单元是Command，它表示的是对存储引擎进行的一系列底层修改，当Raft
+commit日志的时候，每个副本会将Command应用到存储引擎上。</p>
+<p>CockroachDB使用Range级别的租约，其中一般是Raft组的leader来充当租约持有者，它是唯一可以提供最新读取信息或者发起提议的副本，所有的写入也是通过租约持有者进行。对于用户Range，节点会每隔4.5秒在系统范围内发送一套特殊记录的心跳；对于系统Range，则是每9秒更新一次租约。</p>
+<p>同时为了保证一致性，一次只有一个副本存留，尝试获取租约的副本会通过提交特殊的租约获取日志来达成目的。</p>
+<h4 id="membership-changes-and-automatic-load-rebalancing">Membership
+changes and automatic load (re)balancing</h4>
+<p>集群支持节点的添加和删除，节点的变更会导致负载在集群活动节点之间重新分布。</p>
+<p>对于短暂的故障，只要大多数副本可用，Raft算法能保证CockroachDB正常运行。如果leader失败，则依赖Raft重新选举leader。对于故障节点重新加入集群，则可以通过以下方式追上更新：发送完整Range数据的快照；发送一组要Apply的Raft缺失日志。二选一。</p>
+<p>对于长期故障，CockroachDB则是会根据不受影响的副本，创建一个新的副本，将其放到合适的位置。</p>
+<h4 id="replica-placement">Replica placement</h4>
+<p>CockroachDB支持手动和自动来控制副本的放置。自动放置副本的机制会根据一定的约束条件进行，并且会尽量平衡负载。</p>
+<h3 id="data-placement-policies">Data Placement Policies</h3>
+<p>CockroachDB的副本和租约holder的放置策略可以由用户根据性能和容错能力决定：</p>
+<ul>
+<li>副本按地理位置分区；</li>
+<li>租约holder按地理位置分区；</li>
+<li>重复索引：通过基于表来复制索引，并将每个索引的lease
+holder固定到特定地区，CockroachDB就可以通过较快的本地读取功能，同时提高容错性，但可能会带来写放大和跨区写延时的提高；</li>
+</ul>
+<h2 id="transactions">TRANSACTIONS</h2>
+<p>CockroachDB的事务可以跨越整个key空间，能在保证ACID的前提下访问到跨越整个集群的数据。CockroachDB是使用MVCC的变形来支持串行化隔离的。</p>
+<h3 id="overview">Overview</h3>
+<p>SQL事务从SQl连接的节点开始，该节点负责扮演事务协调者的角色。</p>
+<h4 id="execution-at-the-transaction-coordinator">Execution at the
+transaction coordinator</h4>
+<p>下面的算法给出了基于协调者角度的事务处理逻辑，在执行事务过程中，协调者接受一些列来自SQL层的KV操作。</p>
+<p><img
+src="https://pic.imgdb.cn/item/6162fdf52ab3f51d91263fb5.png" /></p>
+<p>从途中可以看出，在下一个操作发出前，需要对当前操作进行应答，为了提高性能，协调者做了两个优化：写流水线和并行提交。因此，协调者需要跟踪还没完全复制成功的操作和维护了事务时间戳（第一行）。</p>
+<p>写流水线：如果某个操作未尝试提交，并且该操作与先前任何操作都没有重叠，则可能立即执行该操作（第七行）。这就是为什么写流水线可以对不同key的进行多个操作。如果该操作依赖于先前的操作完成复制，则需要pipeline等待。inflightOps就是对运行中的状态进行追踪。第九行就是协调者将操作发送给租约持有者并等待回应。如果返回的时间戳更待，意味着存在了另一个事务影响了租约持有者的时间戳。协调者此时会调整事务时间戳，并通过一轮RPC去验证新时间戳返回的值是否相同，如果不同则事务失败。（第十到十四行）</p>
+<p>本质就是事务内语句流水线并行执行，如果两条语句有操作重叠，则通过事务上下文追踪执行过的key，如果重叠则需要等待其执行成功。</p>
+<p>并行提交：一个标准的2PC，往往需要两轮consensus，一轮完成Prepare，一轮将事务设置为Committed。并行提交的做法是使用了staging来表示一个事务操作的所有写入是否已经都复制完成，持久化staging状态和Prepare写数据同时进行（第五行），假设两者都成功，则协调者可以立即确认事务已经提交（第十五行），并且在终止前会异步将事务状态记录为commit。（十六和十七行）</p>
+<h4 id="execution-at-the-leaseholder">Execution at the leaseholder</h4>
+<p>如下，当lease
+holder接收到来自协调者的操作请求时，会按下图执行。第二行险检查租约有效性，第三行会去获取操作依赖的所有key的latch。第四行会校验相关依赖的操作完成。第五和第六行则是在执行写操作时，保证时间戳在任何冲突读取之后，并且根据需要增加时间戳。</p>
+<p><img
+src="https://pic.imgdb.cn/item/6162fdf52ab3f51d91263fd2.png" /></p>
+<p>接下来则是评估操作需要转换为对存储引擎的哪些操作。如果不是事务则无需要等待复制，lease
+holder可以直接响应协调者。如果是写操作则会被复制，达成共识后会应用到本地引擎。最后释放锁，响应协调者。</p>
+<h3 id="atomicity-guarantees">Atomicity Guarantees</h3>
+<p>CRDB通过观察所有事务的write intents来实现原子提交。write
+intents就是一个常规的MVCC kv对，所有写入都先写到临时的write
+intents，其带有的一个元数据指示是intents。该元数据会指向一个事务记录，事务记录就是一个特殊的key，保存了事务当前的状态：pending,
+staging, committed和aborted。通过write
+intents，一个Reader会读取其事务记录，如果事务记录已提交，则Reader会将intents视为常规值，并执行清除操作。如果事务是pending的，则会阻塞直至完成。如果是事务是Staging，则可能是commit，也可能是Abort，Reader尝试中止该事务。（如果所有写操作都已经完成复制，实际上就是commit，并对其进行更新）。</p>
+<h3 id="concurrency-control">Concurrency Control</h3>
+<p>如前所述，CRDB对每个事务都以commit时间戳来执行写入和读取。这样可以实现串行化的执行，但同时也会因为事物之间的冲突需要调整时间戳。</p>
+<h4 id="write-read-conflicts">Write-read conflicts</h4>
+<p>读请求遇到未commit的intent，如果其时间戳更小，则需要等待事务结束。否则可以忽略，并不需要等待。</p>
+<h4 id="read-write-conflicts">Read-write conflicts</h4>
+<p>以时间戳tb写一个key的时候，如果存在对该key有更大时间戳tb的读请求，则无法直接写入。CRDB强制将写入事务的commit时间戳增加到tb以后。</p>
+<h4 id="write-write-conflicts">Write-write conflicts</h4>
+<p>写请求如果遇到一个时间戳更小的未commit
+intent，则等到较早的事务完成。相反，遇到较大时间戳的committed
+key，则会推进该时间戳。写写冲突可能导致冲突，CRDB会采用分布式死锁检测算法来中止循环等待中的一个事务。</p>
+<h3 id="read-refreshes">Read Refreshes</h3>
+<p>前面提到的冲突会导致事务的commit
+timestamp推进。如果可以证明事务在ta读取的数据于(ta,
+tb]时间间隔内没有更小，可以将事务的read timestamp推进到tb &gt;
+ta。如果发生了数据变更，则会导致事务重启。</p>
+<p>为了确定时间戳是否可以推进，CRDB会在事务的读取集中维护键的集合，并会发出一个Read
+Refreshes请求来确认key在某个时间间隔内有没有被更新。</p>
+<h3 id="follower-reads">Follower Reads</h3>
+<p>CRDB允许非租约持有者的副本通过查询修饰符“AS OF SYSTEM
+TIME”来为带有时间戳的只读查询提供服务。为了提供该功能，其要求在给定时间戳T上执行读取操作的非租约持有者副本确认：将来不存在任何写操作使得读操作无效，并且具备读取所需要的所有数据。即要求Follower提供在时间戳T上的读取内容，并且租约持有者不再接受时间戳T'&lt;=T的写操作，Follower还要追上影响到MVCC快找的Raft前缀日志。</p>
+<p>因此，租约持有者需要记录所有传入请求的时间戳，并定期在节点级别生成closed
+timestamp，在该时间戳以前，将不接受进一步的写操作。closed
+timestamp与当时的Raft日志索引一起在副本之间定期交换，这样Follower副本就可以使用该状态来决定它们是否剧本在特定时间戳下提供一致性读取所需的所有数据。</p>
+<h2 id="clock-synchronization">CLOCK SYNCHRONIZATION</h2>
+<p>CRDB不依赖特定的硬件来进行时钟同步，通过NTP或者Amazon Time Sync
+Service在公有云或者私有云的服务器即可。</p>
+<h3 id="hybrid-logical-clocks">Hybrid-Logical Clocks</h3>
+<p>CRDB在集群的每个节点里都维护一个混合逻辑时钟HLC，该时钟提供了物理时间和逻辑时间组合的时间戳。物理时间基于节点的粗同步系统时钟，洛基适中则是基于Lamport时钟。</p>
+<p>HLC提供了一些重要的属性：</p>
+<ol type="1">
+<li>HLC在每次节点交换时钟时通过其逻辑组建提供了因果追踪。节点在发送消息的时候会附加上HLC时间戳，并使用接收到的信息里的时间戳来更新本地时钟。</li>
+<li>HLC在单个节点上的重启内或者重启之间都提供了严格的单调性。</li>
+<li>在瞬态时钟的偏斜波动情况下，HLC能提供自我稳定的功能。</li>
+</ol>
+<h3 id="uncertainty-intervals">Uncertainty Intervals</h3>
+<p>CRDB不支持严格的可串行化，而是通过追踪每个事务的不确定间隔来满足单key线性化属性，事务协调者的本地HLC会分配一个commit_ts，不确定性间隔为[commit_ts,
+commit_ts + max_offset]。</p>
+<p>当事务遇到在高于commit_ts且在不确定间隔内遇到key时，它会执行不确定性重启，将commit_ts移动到高于不确定值的位置，并保持不确定间隔的上限不变。</p>
+<h3 id="behavior-under-clock-skew">Behavior under Clock Skew</h3>
+<p>这里主要是考虑时钟偏离范围的系统行为。本身在单个Range内，通过Raft日志的读写是能够保持任意时钟偏斜下的一致性。但因为引入了Range的租约，如果存在较大的时钟偏移，多个节点可能会发生脑裂，都认为自己拥有租约。CRDB采用两种保护措施来做保护：</p>
+<ol type="1">
+<li>Range租约包含了开始和结束时间戳。租约持有者不能为超出租约间隔的读写提供服务；</li>
+<li>每次写入Range的Raft日志时，都会包含建议使用的Range租约序列号。由于Range本身的租约变更也会被写入Range的Raft日志，因此某个时刻内只有一个租约持有者能够对Range进行变更；</li>
+</ol>
+<h2 id="sql-1">SQL</h2>
+<h3 id="sql-data-model">SQL Data Model</h3>
+<p>每个SQL表或者索引都是存储在若干个Ranges里。所有的用户数据则存储在若干个索引中，其中一个是primary
+index，primary index在主key上，其他列存储在value里。Secondary
+Index则是在索引key上，并且还会存储主key以及所以模式所示定的任意数量列。</p>
+<h3 id="query-optimizer">Query Optimizer</h3>
+<p>CRDB中的转换规则时通过Optgen的DSL编写的，提供了用于定义、匹配等简洁语法。Optgen编译为Go，然后与其余CRDB代码库无缝衔接。另外，考虑到CRDB的某些规则涉及到地理分布和分区性质，因此优化器会将数据分布考虑到cost
+model内，会复制辅助索引以使每个地区都有其自己的副本，从而提高性能，减少跨地区的数据通信。</p>
+<h3 id="query-planning-and-execution">Query Planning and Execution</h3>
+<p>CRDB的SQL查询执行存在两种模式： gateway-only mode和distributed
+mode。</p>
+<p>由于分布层提供了一个全局key空间的抽象视图，SQL层可以对任何节点上的Ranges执行读写操作。CRDB根据需要的网络带宽来决定采用哪种模型。对于distributed
+mode，CRDB通过物理计划阶段，将查询优化器的计划转换为物理SQL运算符的有向无环图。物理计划将逻辑扫描操作分为多个TableReader操作符，每个节点都会包含一个扫描需要读取的Range。扫描被分割后，剩余的逻辑运算符会被安排到与TableReader相同的节点上，从而将filters,
+joins, and aggregations这些推到尽可能接近物理数据的位置。</p>
+<p><img
+src="https://pic.imgdb.cn/item/6162fdf52ab3f51d91263fe2.png" /></p>
+<p>在数据流内部，CRDB根据输入基数和计划复杂性采用两种不同的执行引擎：
+Row-at-a-time execution engine和Vectorized execution
+engine。前者主要是基于Volcano迭代器模型，一次一行。后者则是采用受MonetDB/X100启发的向量化执行引擎，主要面向的是列数据，而不是行，从CRDB的KV层读取时，会将磁盘数据从行格式转换为列格式，才发送会有用户之前再次将列格式转换为行格式。</p>
+<h3 id="schema-changes">Schema Changes</h3>
+<p>CRDB使用一种协议来执行Schema
+Changes，例如添加列或二级索引，该协议允许在Schema
+Changes期间保持表能提供在线的读写服务，允许不同的节点在不同时间内异步过渡到新表。具体的实现是将每个Schema
+Changes分解为一系列增量变更的协议来实现。</p>
+<h2 id="conclusion">CONCLUSION</h2>
+<p>CockroachDB是一个开源的SQL
+DMBS，支持全球性分布的OLTP业务，并提供了灵活的SQL使用，保证了更好的伸缩性和高可靠性、高性能。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/08/01/Rocksdb%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E4%B8%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2271,211 +2538,6 @@ src="https://img.imgdb.cn/item/6075c41e8322e6675cebd742.png" /></p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/20/Paxos-Made-Simple%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/03/20/Paxos-Made-Simple%E2%80%94%E2%80%94%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" itemprop="url">Paxos Made Simple——论文阅读</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-20T23:36:18+08:00">
-                2021-03-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="paxos-made-simple">Paxos Made Simple</h1>
-<h2 id="introduction">Introduction</h2>
-<p>Paxos——一个用于实现容错的分布式系统算法，核心是一个一致性算法——“synod”算法。基本上是根据一个一致性算法所必需满足的条件而呈现出来的，完整的Paxos算法会通过作为应用到使用状态机的分布式系统中的一致性实现部分来得出。</p>
-<h2 id="the-consensus-algorithm">The Consensus Algorithm</h2>
-<h3 id="the-problem">The Problem</h3>
-<p>假设存在一个多进程集合，里面每个进程都可以发出提案，那么一致性算法需要保证一个值能够被选定，而且一旦一个值被选定，所有进程都需要能够获知选定值。</p>
-<p>一致性safety的要求就是：</p>
-<ul>
-<li>只有被提出的值能够被选定；</li>
-<li>只能有一个选定值；</li>
-<li>只有一致同意该值，才能周知给集合里的所有进程；</li>
-</ul>
-<p>这里主要关注算法的safety，而不会明确要求liveness。</p>
-<p>在该一致性算法中，有三种角色：proposers，acceptors和learners，实际实现中，一个独立的进程可以充当不止一种角色。论文的假设是基于传统的异步模型，而不是拜占庭问题模型。</p>
-<h3 id="choosing-a-value">Choosing a Value</h3>
-<p>该算法在提案过程主要包括下面几个步骤</p>
-<p>对于proposer：</p>
-<ul>
-<li>proposer选择一个新的提案编号n，然后向acceptors集合的每个成员发送请求，要求acceptors对请求作出响应：
-<ul>
-<li><ol type="a">
-<li>一个承诺，保证不再通过任何编号小于n的提案；</li>
-</ol></li>
-<li><ol start="2" type="a">
-<li>如果接受过其他提案的话，需要返回当前通过的编号小于n的最大编号提案；</li>
-</ol></li>
-</ul></li>
-<li>如果proposer从大多数acceptors收到期待的响应，则可以接着提议一个编号为n并且值为v的提案，这里的v要么是自由选择一个值（所有的响应都没接收过任何的提案），要么是从上面b响应中选出最大编号的提案的值；</li>
-</ul>
-<p>对于acceptor，acceptors可能会收到prepare请求和accept请求，acceptors可以忽略任何请求而不用担心算法的正确性。至于acceptors在什么情况下可以对一个请求作出回应呢，对于prepare请求可以在任何时候做出响应，而对accept请求，只要它没响应过任何编号大于n的prepare请求，
-acceptor就可以接受编号为n的提案。</p>
-<p>总结起来，acceptor和proposer的算法操作可以分为两个阶段：</p>
-<ul>
-<li>阶段一</li>
-</ul>
-<ol type="a">
-<li><p>proposer提出一个编号为n的提案，向大多数acceptors发送一个带有编号为n的prepare请求；</p></li>
-<li><p>如果acceptors收到了该请求，并且n比它之前响应过的prepare请求编号都大，那么它就会对该请求作出响应，返回一个保证不再通过任何编号小于n的提案的承诺，以及如果存在的话，接受过的最大编号的提案；</p></li>
-</ol>
-<ul>
-<li>阶段二</li>
-</ul>
-<ol type="a">
-<li><p>如果proposer从大多数acceptors收到响应，则会提出一个accept请求，内容包括了编号n和值为v，其中v要么是自由选择一个的值，要么是从响应中选出最大编号的提案的值；</p></li>
-<li><p>如果acceptors收到该accept请求，并且之前没有响应过大于编号n的prepare请求，那么它就会对接受该请求；</p></li>
-</ol>
-<h3 id="learning-a-chosen-value">Learning a Chosen Value</h3>
-<p>为了获取到选定的值，learner必须要找出某个以及被大多数acceptors接受的提案。如果是每个acceptors都将通过的提案告知所有的learners，那么通信次数等于两者个数乘积；如果是只告诉一个特定learner，虽然通信次数减少了，但可靠行也降低了；更一般情况是，将它们的通过提案信息发送给一个特定的learners集合，其中的每个learner都可以将该信息告知所有的learners。</p>
-<p>由于信息的丢失，learners可能无法确定一个值是否有一个大多数的acceptors通过了，为了确定选定的值，必须重新发起一次新的提案。</p>
-<h3 id="progress">Progress</h3>
-<p>假设存在这样一个场景，两个proposers轮流提议一系列递增编号的提案，但无一通过：Proposer
-p提出一个编号为n1的提案并且完成了phase1，然后另一个Proposer
-q为编号为n2(n2&gt;n1)的提案完成了phase1。因此n1提案的accept请求会被忽略，从而触发使用一个新的编号n3(n3&gt;n2)重新开始并完成phase1，同理又导致前面编号为n2的提案的accept请求被忽略。</p>
-<p>为了保证progress的进行，必须选择一个特定proposer来作为唯一一个提议提案的。如果这个proposer可以和半数以上的acceptors通信，同时使用一个比现有通过编号都大的编号作为提案的话，就可以产生一个成功通过的提案。</p>
-<blockquote>
-<p>The famous result of Fischer, Lynch, and Pat- terson [1] implies that
-a reliable algorithm for electing a proposer must use either randomness
-or real time—for example, by using timeouts. However, safety is ensured
-regardless of the success or failure of the election.</p>
-</blockquote>
-<p>无论选举是否成功，proposer选举算法的安全性都是可以得到保证的。</p>
-<h3 id="the-implementation">The Implementation</h3>
-<p>Paxos算法假设了一个多进程网络，在该算法里，每个进程都扮演了proposer，acceptor及learner的角色。Paxos算法通过选定一个leader来扮演上面提到的特定learner和proposer。Paxos一致性算法就是上述所描述的，其中请求和响应都作为普通消息发送。acceptor在发出响应消息之前，会需要可靠性存储来记录信息。</p>
-<p>接下来就是描述一种提案编号唯一性的机制了，不同的proposer从不相交的编号集合中选择编号，并且每个proposer都会在存储设备上记录目前生成的最大编号，然后使用一个更大的编号来开始phase
-1。</p>
-<h2 id="implementing-a-state-machine">Implementing a State Machine</h2>
-<p>实现分布式系统的一种简单方式是由一组客户端向一个中央服务器发出命令请求，该服务器可以看作是一个按顺序执行客户端命令的状态机。但使用单个服务器的可用性较低，因此想到了可以使用一组服务器，每个服务器独立地实现同样的状态机，只要所有服务器都产生一致的状态和输出，那么发出命令的客户端就可以采用任意一个服务器的输出了。</p>
-<p>然而为了所有服务器的命令序列一致，需要实现一系列独立的paxos一致性算法的实例。其中第i个选定的值就是序列中的第i
-个状态机命令。每一个服务器都在每一个实例中扮演这个算法的所有角色。</p>
-<p>假设服务器的集合是固定的，一般情况下一个独立的服务器被选为了leader，它就会扮演特定的proposer角色，多个客户端发送命令到leader，leader会决定每个命令的顺序。假设存在某条命令的序号为135，那么它就会通过一致性算法的第135个实例来选定一个提案，这里的命令就是提案的值。这个提案可能成功也可能失败，失败的原因可能来自机器故障，或者是存在另一个服务器认为自己是leader，从而判断了135实例存在其他值。但该算法能够保证最多只有一个命令被选定。</p>
-<p>这个策略的关键在于，Paxos算法中被提出的值只有phase
-2才能被选定。前面说过的，phase
-1完成时，要么提案的值已经确定，要么proposer可以自由提出一个值。这是正常工作的情况，论文还提到了异常情况：前一个leader失败了，选举了新leader。</p>
-<p>新leader选出后会成为learner，假设它知道命令1-134,138及139，即对应实例，此时它需要执行实例135-137以及所有大于139的实例的phase
-1。假设执行结果表明，实例135和140中被提出的提案值已经确定，但其他实例没有限制，那么该leader就可以执行实例135和140的phase
-2，选定135和140的命令。</p>
-<p>此时136和137还没确定，leader可以选择接下来的客户端请求作为命令136和137，也可以提起一个特殊的"noop"命令来填补这两个空缺。此处，noop命令不会改变状态机状态，也可以快速填补空缺。一旦这些noop命令选定了，138-140
-号命令就可以被执行了。</p>
-<p>由此1-140命令都被选定了，leader就可以继续往下推进所有大于140的实例了。</p>
-<p>接下来讲讲空缺的产生，leader可以在提出命令141被选定之前，先提出命令142，但发送的关于141的信息可能会全部丢失，因此其他服务器可能先知道了142命令的选定，而不知道选择了什么作为命令141。这就产生了空缺。</p>
-<p>由于 leader 的故障以及新 leader
-的选举都是比较罕见的情况，因此执行状态机命令并达成一致的成本主要是phase
-2的成本。在所有的一致性算法中， paxos一致性算法的phase
-2的时间复杂度可能是最小的，因此paxos算法基本就是最优的。</p>
-<p>特殊情况下，leader选举失败，导致出现多个“疑似”的leader，但paxos算法的安全性仍然可以保证不会同时有两个命令被选为第i个状态机命令。</p>
-<p>如果服务器的集合是变化的，那么也存在某种方式来决定哪些服务器可以作为这个一致性算法的实力，论文提到的方式是通过状态机自身来实现，即当前的服务器集合作为状态的一部分，比如将在执行完第i个状态机命令后标识的服务器集合，作为一致性算法执行实例i+a的服务器集合。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2526,7 +2588,7 @@ regardless of the success or failure of the election.</p>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">276</span>
+                <span class="site-state-item-count">277</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

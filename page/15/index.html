@@ -264,6 +264,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/Pylint%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/Pylint%E5%AD%A6%E4%B9%A0/" itemprop="url">Pylint学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T22:13:23+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="pylint学习">Pylint学习</h1>
+<h2 id="install-pylint">Install Pylint</h2>
+<p>用virtualenv安装pylint：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install virtualenv</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">超时的话可以这样试一下</span></span><br><span class="line">pip --default-timeout=100 install virtualenv</span><br></pre></td></tr></table></figure>
+<p>创建一个虚拟环境：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">virtualenv --no-site-packages venv</span><br><span class="line">source venv/bin/activate</span><br></pre></td></tr></table></figure>
+<h2 id="invoking-pylint">Invoking pylint</h2>
+<p>pylint可以在命令行使用，具体用法为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint [options] modules_or_packages</span><br></pre></td></tr></table></figure>
+<p>从上面的用法可以得知，我们应该提供pylint要检查的python包或者模块的名称。而Pylint不会导入这些包，而是利用Python
+internals去进行定位。因此我们需要关注<a
+target="_blank" rel="noopener" href="https://docs.python.org/2/using/cmdline.html#envvar-PYTHONPATH">PYTHONPATH</a>，防止它去检查已安装的模块版本，而不是开发版本。</p>
+<p>如果传给pylint一个单文件，例如这样：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint mymodules.py</span><br></pre></td></tr></table></figure>
+<p>就要保证当前的工作目录为一个package（即目录下有__init__.py）。</p>
+<p>另外，也可以在其它的python程序中调用pylint，比如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pylint <span class="keyword">import</span> epylint <span class="keyword">as</span> lint</span><br><span class="line">(pylint_stdout, pylint_stderr) = lint.py_run(<span class="string">&#x27;hello.py&#x27;</span>, return_std=<span class="literal">True</span>)</span><br><span class="line"><span class="built_in">print</span> pylint_stdout.getvalue()</span><br><span class="line"><span class="built_in">print</span> pylint_stderr.getvalue()</span><br></pre></td></tr></table></figure>
+<h2 id="command-line-options">command line options</h2>
+<p>先来看两个基本的选项：</p>
+<table>
+<thead>
+<tr class="header">
+<th>--version</th>
+<th>show program's version number and exit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>-h, --help</td>
+<td>show help about the command line options</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(venv) ➜  py pylint --version</span><br><span class="line">No config file found, using default configuration</span><br><span class="line">pylint 1.9.3,</span><br><span class="line">astroid 1.6.5</span><br><span class="line">Python 2.7.10 (default, Jul 15 2017, 17:16:57)</span><br><span class="line">[GCC 4.2.1 Compatible Apple LLVM 9.0.0 (clang-900.0.31)]</span><br></pre></td></tr></table></figure>
+<p>接下来介绍一个message
+control的命令后选项：<strong>--disable</strong>和<strong>--enable</strong>，如果我们只是希望启动某些checker，可以先用--disable
+= all然后使用--enable =
+&lt;symbol&gt;，其中&lt;symbol&gt;是逗号分隔的检查器名称和消息符号列表。这样的使用方式对于仅仅希望启动少数的checkers非常有用。</p>
+<p>举个例子，假如你只想启动相似性检查，可以增加选项：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">–-disable=all –-enable=similarities</span><br></pre></td></tr></table></figure>
+<p>pylint提供的symbol，可以参考：https://docs.pylint.org/en/1.6.0/features.html#messages-control-options</p>
+<h2 id="parallel-execution">Parallel execution</h2>
+<p>如果主机的CPU数量超过1个，可以使用<strong>-j</strong>选项加速pylint的运行，比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pylint -j 4 mymodule1.py mymodule2.py mymodule3.py mymodule4.py</span><br></pre></td></tr></table></figure>
+<p>这样就会产生4个子进程，其中每个提供的模块将被并行检查。checkers发现的问题不会立即显示。
+完成检查模块后才会立即显示它们。当提供的参数为0时，将会使用主机上所有CPU的数量。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/19/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1854,174 +2019,6 @@ wait，不断消耗处理器的时间。当然有方法可以让线程先行睡�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/21/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8B%E5%8D%8A%E9%83%A8%E4%B8%8E%E6%8E%A8%E5%90%8E%E6%89%A7%E8%A1%8C%E7%9A%84%E5%B7%A5%E4%BD%9C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/21/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8B%E5%8D%8A%E9%83%A8%E4%B8%8E%E6%8E%A8%E5%90%8E%E6%89%A7%E8%A1%8C%E7%9A%84%E5%B7%A5%E4%BD%9C/" itemprop="url">Linux内核学习——下半部与推后执行的工作</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-21T17:22:22+08:00">
-                2018-07-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="下半部与推后执行的工作">下半部与推后执行的工作</h1>
-<p>中断处理程序异步执行，需要快速地执行硬件与操作系统的操作，避免其它中断停止太久，因此中断处理程序不能阻塞。</p>
-<h2 id="下半部">下半部</h2>
-<p>上半部只能通过中断处理程序实现，而下半部则提供了多种实现机制——软中断、tasklet、工作队列。</p>
-<p>内核定时器，这个机制用来将工作推后执行，推后到某个明确的时间段之后执行。</p>
-<h2 id="软中断">软中断</h2>
-<p>软中断是一组静态定义的下半部接口，有32个。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> &#123;</span></span><br><span class="line">  	<span class="type">void</span> (*action)(<span class="keyword">struct</span> softirq_action *);  </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> <span class="title">softirq_vec</span>[<span class="title">NR_SOFTIRQS</span>];</span></span><br></pre></td></tr></table></figure>
-<ol type="1">
-<li>软中断处理程序</li>
-</ol>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sofrirq_handler</span><span class="params">(<span class="keyword">struct</span> softirq_action *)</span></span><br><span class="line">&#123;</span><br><span class="line">    my_softirq-&gt;action(my_softirq);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>之所以传递一个指针而不是一个数值，是因为防止后面加上新的域时，无需对处理程序进行改动；</p>
-<ol start="2" type="1">
-<li>执行软中断</li>
-</ol>
-<p>一个注册的软中断会在中断处理程序返回前标记了之后才能被执行，会在标记之后一定时间内执行。</p>
-<p>在中断处理程序中触发软中断是比较常见的。软中断会在do_softirq()中遍历所有软中断，进行调用。</p>
-<h2 id="tasklet">tasklet</h2>
-<p>tasklet是使用软中断实现的一种下半部机制，接口更加简单。</p>
-<h3 id="tasklet的实现">tasklet的实现</h3>
-<p>tasklet有两种软中断代表：HI_SOFTIRQ和TASKLET_SOFTIRQ。</p>
-<ol type="1">
-<li>tasklet结构体</li>
-</ol>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span>&#123;</span></span><br><span class="line">  	<span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> *<span class="title">next</span>;</span> <span class="comment">//链表中下一个tasklet_struct</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> state; <span class="comment">//0, TASKLET_STATE_SCHED，TASKLET_STATE_RUN</span></span><br><span class="line">    <span class="type">atomic_t</span> count; <span class="comment">//为0时才被激活</span></span><br><span class="line">    <span class="type">void</span> (*func)(<span class="type">unsigned</span> <span class="type">long</span>);<span class="comment">//tasklet处理函数</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> data; <span class="comment">//给tasklet</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ol start="2" type="1">
-<li>调度tasklet</li>
-</ol>
-<p>已经调度的tasklet相当于被触发的软中断，会被放在两个数据结构里——tasklet_vec（普通tasklet）和tasklet_hi_vec（高优先级的tasklet）。</p>
-<p>tasklet由tasklet_schedule()和tasklet_hi_schedule()进行调度，它接受一个指向tasklet_struct结构的指针作为参数。</p>
-<p>执行步骤：</p>
-<ol type="1">
-<li>检查tasklet的状态，如果是TASKLET_STATE_SCHED则直接返回；</li>
-<li>调用_tasklet_schedule()；</li>
-<li>保持中断状态，禁止本地中断；</li>
-<li>把需要调度的tasklet加到链表里；</li>
-<li>唤起软中断，这样在后面调用do_softriq()时执行这个tasklet；</li>
-<li>恢复中断到原状态返回；</li>
-</ol>
-<h2 id="工作队列">工作队列</h2>
-<p>工作队列是另一种将工作推后实现的机制，它是通过将工作交由一个内核线程在进程上下文执行的方法。工作队列可以重新调度，也可以睡眠。</p>
-<h2 id="下半部机制的选择">下半部机制的选择</h2>
-<ul>
-<li>软中断处于中断上下文里，同类型的软中断能同时执行；</li>
-<li>tasklet处于中断上下文里，同类型不能同时执行；</li>
-<li>工作队列处于进程上下文，能睡眠和唤醒；</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2072,7 +2069,7 @@ wait，不断消耗处理器的时间。当然有方法可以让线程先行睡�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">276</span>
+                <span class="site-state-item-count">277</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
