@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="mlsys," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="LucienXian's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="MLSYS论文阅读——Universal Checkpointing  https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;2406.18820 硬件限制迫使模型必须通过模型并行（将模型状态分片至多张卡）实现扩展，但现有checkpoint技术仍难以适应分布式训练的需求：将分布式模型状态合并为单checkpoint显著拖慢训练速度，在大模型的场景下显得更为严重；而现有的分布式checkpoint与训练时的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MLSYS论文阅读——Universal Checkpointing">
+<meta property="og:url" content="http://yoursite.com/2025/07/18/MLSYS%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E2%80%94%E2%80%94Universal-Checkpointing/index.html">
+<meta property="og:site_name" content="LucienXian&#39;s Blog">
+<meta property="og:description" content="MLSYS论文阅读——Universal Checkpointing  https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;2406.18820 硬件限制迫使模型必须通过模型并行（将模型状态分片至多张卡）实现扩展，但现有checkpoint技术仍难以适应分布式训练的需求：将分布式模型状态合并为单checkpoint显著拖慢训练速度，在大模型的场景下显得更为严重；而现有的分布式checkpoint与训练时的">
+<meta property="og:locale">
+<meta property="article:published_time" content="2025-07-17T16:21:34.000Z">
+<meta property="article:modified_time" content="2025-07-17T16:22:03.239Z">
+<meta property="article:author" content="LucienXian">
+<meta property="article:tag" content="mlsys">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2025/07/18/MLSYS论文阅读——Universal-Checkpointing/"/>
+
+
+
+
+
+  <title>MLSYS论文阅读——Universal Checkpointing | LucienXian's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LucienXian's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-/tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2025/07/18/MLSYS%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E2%80%94%E2%80%94Universal-Checkpointing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MLSYS论文阅读——Universal Checkpointing</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2025-07-18T00:21:34+08:00">
+                2025-07-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="mlsys论文阅读universal-checkpointing">MLSYS论文阅读——Universal
+Checkpointing</h1>
+<blockquote>
+<p>https://arxiv.org/pdf/2406.18820
+硬件限制迫使模型必须通过模型并行（将模型状态分片至多张卡）实现扩展，但现有checkpoint技术仍难以适应分布式训练的需求：将分布式模型状态合并为单checkpoint显著拖慢训练速度，在大模型的场景下显得更为严重；而现有的分布式checkpoint与训练时的模型并行策略及硬件配置强绑定，导致其无法在不同配置下恢复训练。因此论文提出了Universal
+Checkpointing技术。</p>
+</blockquote>
+<h2 id="introduction">Introduction</h2>
+<p>以Megatron-LM和DeepSpeed为代表的分布式训练框架已被广泛用于大规模深度学习模型训练。这些系统提供了易用接口，使得用户能够轻松利用多GPU的高级并行策略（如ZeRO数据并行、张量并行等）训练大语言模型，无需关注底层分布式训练的复杂系统调优技术。尽管现有框架支持多种并行策略以加速训练，如ZeRO-DP/TP/PP/SP等。但其checkpoint机制存在显著缺陷：训练初始分配的GPU资源不可变更；无法在不同并行策略或硬件配置下恢复训练。这种限制在一些关键场景中会导致效率低下，比如GPU硬件资源因为故障或者其他原因发生动态变化，又或者从checkpoint恢复训练时，需调整GPU预算，但现有框架不支持跨配置恢复，会导致运行时错误或状态不一致。
+本文提出通用checkpoint（Universal Checkpointing,
+UCP），其核心能力概括就是支持自由恢复训练，允许用户以与原始训练不同的并行策略和硬件配置（如GPU数量）恢复分布式训练。其挑战与设计目标主要有几点：定义通用checkpoint格式，支持灵活转换ZeRO数据并行、3D并行等高级策略；不增加分布式训练过程的开销；模型质量无损，恢复后的loss需与原始策略一致。
+UCP已集成至开源库DeepSpeed，具备以下特性： *
+灵活转换支持：覆盖ZeRO-DP、TP、PP、SP等并行策略； *
+弹性资源管理：支持硬件资源动态扩缩容，适应训练与微调需求； *
+语言集成接口：提供声明式编程接口，描述并行模式并转换分布式checkpoint为UCP格式；
+* 跨框架兼容性：支持从HuggingFace Transformers Accelerate、PyTorch
+Lightning等框架恢复checkpoint（以DeepSpeed为后端）。</p>
+<h2 id="background-and-related-work">Background and Related Work</h2>
+<p>checkpoint是深度学习训练的核心组件。训练任务需周期性地将GPU上的模型参数、优化器状态以及重要CPU状态（如当前迭代次数、seed）保存至持久化文件或对象存储中。当训练因硬件/软件故障（如CUDA或NCCL
+API的运行时异常）需从checkpoint恢复时，系统需重启所有工作进程，从存储中加载checkpoint以初始化GPU和CPU状态，随后加载下一批训练数据，并从checkpoint对应的迭代继续训练。
+在分布式训练中，checkpoint的保存与加载更为复杂： 1. 数据并行场景： *
+权重和优化器状态在GPU间复制，通常仅由主节点（如rank 0）保存全量状态； *
+恢复时需在所有节点加载checkpoint。</p>
+<ol start="2" type="1">
+<li>高级并行策略场景（如DeepSpeed ZeRO、3D并行）：</li>
+</ol>
+<ul>
+<li>模型参数和优化器状态被分片至各GPU，每个节点仅保存局部状态，生成分布式checkpoint；</li>
+<li>优势：减少GPU状态到主机内存的拷贝开销，提升存储效率；</li>
+<li>局限：假设恢复时需要使用相同的并行策略，导致跨配置恢复困难。</li>
+</ul>
+<p>总结现有分布式checkpoint技术的不足：一是策略支持有限：仅支持数据并行或仅用于评估的权重转换；二是框架兼容性差：主流框架（如DeepSpeed、HuggingFace、PyTorch
+Lightning）都不支持跨并行策略恢复（例如从4路TP+4路PP切换至8路ZeRO-DP）。</p>
+<h2 id="universal-checkpointing-design-and-implementation">Universal
+Checkpointing Design and Implementation</h2>
+<h3 id="ucp-format-one-size-fits-all">UCP Format: One Size Fits All</h3>
+<ul>
+<li>Distributed checkpointing challenges</li>
+</ul>
+<p>提供UCP的挑战之一在于选择一种数据格式表示，使其能够轻松转换为不同GPU配置下的并行技术。为理解这一挑战，我们假设创建checkpoint时使用的并行技术为源（Source），而从源checkpoint恢复训练时选择的并行技术为目标（Target）。当系统使用多GPU时，源通常以分布式checkpoint的形式保存，即每个GPU保存其拥有的模型状态分片。这种设计的合理性在于：将分布式模型状态合并为单一checkpoint会显著拖慢训练速度，且在极端规模下不切实际。加载分布式checkpoint时，每个GPU加载其对应的checkpoint分片。然而，由于此类分布式checkpoint与训练运行的并行技术和硬件配置紧密耦合，它们无法在不同配置下使用（例如，当GPU数量或并行技术改变时，加载checkpoint会因名称或形状不匹配导致运行时错误）。若要将checkpoint直接从源适配到新的目标，需实现转换逻辑。然而，若存在N种分布式训练技术，每种技术有其独特的checkpoint保存与加载逻辑，则需要实现总计N×(N−1)个转换器以支持任意源到目标的转换，实现成本巨大。</p>
+<ul>
+<li>Atom Checkpoints</li>
+</ul>
+<p>为解决上述问题，UCP将通用checkpoint设计为原子checkpoint的集合。原子checkpoint是一种细粒度的持久化文件，包含以下内容：
+1.
+每个模型参数的完整表示（例如<code>language_model.embedding.word_embeddings.weight</code>）；
+2. 元数据：用于将参数分片映射到任意分布式训练配置的训练节点。</p>
+<p>以使用Adam优化器的训练为例，每个参数的原子checkpoint包含三个独立文件（如PyTorch的.pt文件）：
+1. <code>fp32.pt</code>：存储FP32权重值； 2.
+<code>exp_avg.pt</code>：存储Adam优化器的一阶动量（均值）； 3.
+<code>exp_avg_sq.pt</code>：存储Adam优化器的二阶动量（方差）。</p>
+<p>原子checkpoint的三大优势： 1. 解耦依赖：</p>
+<ul>
+<li>原子化的checkpoint表示消除了分布式checkpoint与特定并行技术及硬件配置的耦合性。因此，无需为每对源到目标单独实现转换器。相反，UCP可作为不同分布式训练技术间的通用交换格式（如下图所示），从而轻松转换为其他分布式训练策略。</li>
+<li>通过保留每个模型参数的完整表示，UCP支持按参数粒度灵活拆分和映射模型状态（或分片状态）到不同GPU，显著减少加载大模型checkpoint所需的工作内存。</li>
+</ul>
+<ol start="2" type="1">
+<li>按需惰性转换：</li>
+</ol>
+<ul>
+<li>UCP转换仅在检测到并行技术或硬件配置变化时触发（例如训练过程中动态调整资源）。</li>
+<li>现有分布式checkpoint保存逻辑无需修改，且UCP不会对正常分布式训练流程引入额外开销。</li>
+</ul>
+<ol start="3" type="1">
+<li>高级训练技术的兼容性：</li>
+</ol>
+<ul>
+<li>UCP的结构天然支持分布式训练中的高级技术（如混合精度训练）。实践中，研究者可能需要在FP16和BF16混合精度训练之间切换。通过保留FP32权重和优化器值，训练可以灵活选择以FP16或BF16精度恢复。</li>
+</ul>
+<p><a
+target="_blank" rel="noopener" href="https://pic1.imgdb.cn/item/68237e5858cb8da5c8f0c0a8.png"><img
+src="https://pic1.imgdb.cn/item/68237e5858cb8da5c8f0c0a8.png"
+alt="ucp_f1.png" /></a></p>
+<h3 id="ucp-languagein-the-box-transformation">UCP Language:"In-the-Box"
+Transformation</h3>
+<p><a
+target="_blank" rel="noopener" href="https://pic1.imgdb.cn/item/68237ef158cb8da5c8f0c0bd.png"><img
+src="https://pic1.imgdb.cn/item/68237ef158cb8da5c8f0c0bd.png"
+alt="ucp_f2.png" /></a></p>
+<p>尽管UCP为不同并行策略提供了统一接口，但将任意分布式checkpoint转换为UCP格式仍可能面临较高的工程实现成本。这是因为在分布式训练中，每个GPU会调用持久化方法（如PyTorch的torch.save()）将其拥有的模型状态保存为checkpoint文件，而不同并行技术生成的checkpoint内容存在显著差异。为解决这一问题，UCP引入了UCP语言——一种简洁但强大的规范语言，用于将各类分布式checkpoint转换为上一章所提到的通用格式。其实现方式如下：</p>
+<ol type="1">
+<li>声明式系统与预定义参数模式：覆盖广泛的模型状态并行策略；</li>
+<li>通用转换操作符：简化分布式checkpoint到原子checkpoint的转换。</li>
+</ol>
+<p>如上图所示，当需要新的目标（Target）并行技术或硬件配置变更时，UCP语言被触发。其工作流程分为两步：
+1. 转换阶段：将分布式checkpoint转换为UCP格式； 2.
+加载阶段：基于目标并行技术和新硬件配置加载UCP checkpoint。</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>参数模式</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unique_params</td>
+<td>参数唯一关联于某一GPU等级（常见于ZeRO-1/2和流水线并行）</td>
+</tr>
+<tr>
+<td>replicated_params</td>
+<td>参数在多个GPU间复制</td>
+</tr>
+<tr>
+<td>fragment_params</td>
+<td>参数需沿特定维度分片（例如张量并行中的行向或列向分片）</td>
+</tr>
+<tr>
+<td>params_to_average</td>
+<td>参数在各GPU上独立更新（需恢复时进行平均）</td>
+</tr>
+</tbody>
+</table>
+<p>上表展示了UCP的参数模式，并且UCP语言的参数模式具有高度可扩展性，可轻松支持新的分布式训练模式。例如，用户可添加名为<code>params_to_average</code>的模式，表示参数在各GPU独立更新。</p>
+<p>一旦识别出参数的模式，UCP会提供一组转换操作，帮助分布式检查点到UCP格式的转换，包括：
+* Extract：从分布式检查点中提取参数状态，保存为独立文件； *
+Union：根据参数模式合并分片（例如沿维度拼接）； *
+StripPadding：去除合并后参数中的填充数据； *
+GenUcpMetadata：为目标策略生成分片元数据（如形状和位置信息）； *
+Load：按元数据将原子检查点加载至GPU。</p>
+<p>下表详细解释了主要UCP操作。</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 81%" />
+</colgroup>
+<thead>
+<tr>
+<th>操作名称</th>
+<th>功能描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Extract</strong></td>
+<td>对分布式检查点调用<code>Extract</code>，返回该检查点包含的参数状态列表，并将每个参数状态保存为独立文件。可在多个分布式检查点上并行调用。</td>
+</tr>
+<tr>
+<td><strong>Union</strong></td>
+<td>对参数状态列表调用<code>Union</code>，返回合并后的参数列表。根据参数模式，对每个参数执行模式特定的合并逻辑。支持参数级并行处理，并行度越高速度越快，但内存消耗越大。</td>
+</tr>
+<tr>
+<td><strong>StripPadding</strong></td>
+<td>对合并后的参数调用<code>StripPadding</code>，去除其中的填充数据。避免存储冗余填充状态，同时简化检查点加载逻辑。</td>
+</tr>
+<tr>
+<td><strong>GenUcpMetadata</strong></td>
+<td>基于新的目标策略，为每个原子检查点计算并生成分片元数据（如形状和位置信息），用于将参数映射到指定GPU节点。计算分片信息时会引入填充。</td>
+</tr>
+<tr>
+<td><strong>Load</strong></td>
+<td>根据目标策略的UCP分片元数据，将原子检查点加载到各GPU节点。利用DeepNVMe库实现接近NVMe存储设备峰值带宽的顺序读取。</td>
+</tr>
+</tbody>
+</table>
+<p>这份伪代码则展示了UCP语言如何基于参数模式和操作实现不同参数模式的合并逻辑</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Algorithm <span class="number">1</span> Workflow of UCP Conversion</span><br><span class="line">▷ <span class="function">Extract</span></span><br><span class="line"><span class="function">    <span class="keyword">for</span> checkpoint ckpt in checkpoint_list <span class="keyword">do</span> in parallel</span></span><br><span class="line"><span class="function">        <span class="keyword">for</span> parameter p in ckpt <span class="keyword">do</span></span></span><br><span class="line"><span class="function">            <span class="keyword">if</span> <span class="title">PatternMatch</span><span class="params">(replicated_params, p)</span> then</span></span><br><span class="line"><span class="function">                <span class="keyword">continue</span></span></span><br><span class="line"><span class="function">            <span class="keyword">else</span></span></span><br><span class="line"><span class="function">                <span class="title">Save</span><span class="params">(p)</span></span></span><br><span class="line"><span class="function">▷ Union</span></span><br><span class="line"><span class="function">    <span class="keyword">for</span> parameter p in parameter_list <span class="keyword">do</span> in parallel</span></span><br><span class="line"><span class="function">        </span>&#123;f p1, f p2, ..., f pn&#125; ← <span class="function">all files name matches p</span></span><br><span class="line"><span class="function">        Switch p</span></span><br><span class="line"><span class="function">            <span class="keyword">case</span> <span class="title">PatternMatch</span><span class="params">(replicated_params, p)</span> then</span></span><br><span class="line"><span class="function">                ucpp </span>= <span class="function">f p1</span></span><br><span class="line"><span class="function">            <span class="keyword">case</span> <span class="title">PatternMatch</span> <span class="params">(params_to_average, p)</span> then</span></span><br><span class="line"><span class="function">                ucpp </span>= <span class="built_in">Sum</span>(f p1, f p2, ..., f pn) / <span class="function">n</span></span><br><span class="line"><span class="function">            <span class="keyword">case</span> <span class="title">PatternMatch</span><span class="params">(fragment_params, p)</span> then</span></span><br><span class="line"><span class="function">                ucpp </span>= <span class="built_in">Concat</span>(f p1, f p2, ..., f pn)</span><br><span class="line">            <span class="function"><span class="keyword">case</span> <span class="title">PatternMatch</span><span class="params">(unique_params, p)</span> then</span></span><br><span class="line"><span class="function">                <span class="title">assert</span><span class="params">(n = <span class="number">1</span>)</span></span></span><br><span class="line"><span class="function">                ucpp </span>= <span class="function">f p1</span></span><br><span class="line"><span class="function">        <span class="keyword">if</span> <span class="title">hasPadding</span><span class="params">(p)</span> then</span></span><br><span class="line"><span class="function">            ucpp </span>= <span class="built_in">StripPadding</span>(ucpp)</span><br><span class="line">        <span class="built_in">Save</span>(ucpp)</span><br></pre></td></tr></table></figure>
+<h4 id="zero-stage-3">ZeRO Stage 3</h4>
+<p>ZeRO-3对模型权重和优化器状态都进行了分片。在保存ZeRO-3
+checkpoint时，每个DP rank会将其拥有的分片参数和优化器状态保存到检查点。
+UCP应用于ZeRO-3的过程如下图所示。 1. 首先使用UCP语言识别 ZeRO-3
+的参数模式：ZeRO-3分布式checkpoint中的参数包含参数和优化器状态片段
+(fragment_params)。 2.
+基于该模式，UCP对分片参数运行<code>Extract</code>和<code>Union</code>操作，以创建原子检查点，其中包含合并后的参数及其优化器状态。
+3. UCP会移除为硬件对齐添加的填充，并将原子检查点保存到持久文件中。 4.
+恢复ZeRO-3训练时，每个GPU都会通过<code>GenUcpMetadata</code>计算其新的分区元数据，然后按照层顺序依次加载参数片段和优化器状态，​​并添加硬件对齐填充以实现高性能。加载完成后，会将更新后的扁平化内存属性（如
+<code>fp32_partitioned_groups_flat</code>）广播至其他必要属性（如混合精度训练的
+<code>fp16_partitioned_groups_flat</code>）</p>
+<p><a
+target="_blank" rel="noopener" href="https://pic1.imgdb.cn/item/684118d058cb8da5c82de775.png"><img
+src="https://pic1.imgdb.cn/item/684118d058cb8da5c82de775.png"
+alt="ucp_f3.png" /></a></p>
+<h4 id="d-parallelism">3D parallelism</h4>
+<p>3D并行是一种常见的分布式训练策略，它通过流水线并行（PP）水平切片模型
++ 张量切片并行（TP）垂直切片模型，
+在保存检查点时，每个GPU仅存储其拥有的模型状态切片。
+UCP语言识别了3D并行的参数模式，然后执行以下的步骤： 1.
+<strong>模式识别</strong>：<br />
+- <strong>TP 并行度 &gt;1</strong>：参数可能为
+<code>replicated_params</code>, <code>fragment_params</code>,
+<code>params_to_average</code>；<br />
+- <strong>PP 并行度 &gt;1</strong>：参数为
+<code>replicated_params</code>；<br />
+2. <strong>转换操作</strong>：<br />
+- 执行 <code>Extract</code> + <code>Union</code> →
+按模式合并参数，生成去填充的原子检查点；<br />
+- 比如：TP采用行列分片 → 合并时需沿特定维度拼接为完整张量；<br />
+3. <strong>恢复训练</strong>：<br />
+- 生成原子检查点与GPU节点的新映射关系；<br />
+- 各节点按新映射策略从原子检查点加载数据。</p>
+<p>需要注意的是，其中一些模式（例如
+fragment_params）包含具有额外形状和分区维度信息的子模式，以处理更复杂的检查点，上图右侧展示了两个示例。
+1. <strong>MoE 模型示例</strong>：<br />
+- FFN 层权重张量形状为
+<code>[n_experts × hidden_out, hidden_in]</code>；<br />
+- TP 分片沿 <code>hidden_out</code> 维度 →
+子模式识别为三维张量并指定分片维度；<br />
+2. <strong>GQA示例</strong>：<br />
+- QKV 矩阵尺寸不同但合并为单一张量
+<code>[q_size + k_size + v_size, hidden]</code>；<br />
+- TP 分片沿第一维度（Q/K/V 尺寸不同）→
+子模式识别变长分片并自适应处理。</p>
+<p>UCP具有很强的可扩展性，允许用户轻松定义新的子模式来整合参数。</p>
+<h2 id="conclusion-and-future-work">Conclusion and Future Work</h2>
+<p>文章提出了通用checkpoint
+(UCP)，作为一种灵活高效的checkpoint机制，可用于从分布式checkpoint恢复训练，并支持不同的分布式训练技术和硬件配置。UCP提供了一种通用的数据表示，可以轻松映射不同的分布式训练策略，包括ZeRO风格的数据并行、3D并行和序列并行。同时，UCP提供了UCP语言，这是一种简单而强大的规范语言，用于将分布式checkpoint转换为UCP格式。目前已经在
+DeepSpeed库中实现了UCP，并证明UCP能够转换和加载具有不同并行策略和硬件配置的分布式检查点，而不会影响模型收敛性。与现有的分布式检查点相比，UCP不会增加额外的检查点保存开销，并且转换和加载UCP的开销极小。UCP的未来工作可能包括为新兴的并行策略添加可扩展模式，并进一步提高UCP的转换和加载效率。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mlsys/" rel="tag"># mlsys</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/11/08/MIT18-06S-2-3%E7%AC%94%E8%AE%B0/" rel="next" title="MIT18-06S 2.3笔记">
+                <i class="fa fa-chevron-left"></i> MIT18-06S 2.3笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">279</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mlsys%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BBuniversal-checkpointing"><span class="nav-number">1.</span> <span class="nav-text">MLSYS论文阅读——Universal
+Checkpointing</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#background-and-related-work"><span class="nav-number">1.2.</span> <span class="nav-text">Background and Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#universal-checkpointing-design-and-implementation"><span class="nav-number">1.3.</span> <span class="nav-text">Universal
+Checkpointing Design and Implementation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ucp-format-one-size-fits-all"><span class="nav-number">1.3.1.</span> <span class="nav-text">UCP Format: One Size Fits All</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ucp-languagein-the-box-transformation"><span class="nav-number">1.3.2.</span> <span class="nav-text">UCP Language:&quot;In-the-Box&quot;
+Transformation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#zero-stage-3"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">ZeRO Stage 3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#d-parallelism"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">3D parallelism</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion-and-future-work"><span class="nav-number">1.4.</span> <span class="nav-text">Conclusion and Future Work</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LucienXian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

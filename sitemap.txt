@@ -1,3 +1,4 @@
+http://yoursite.com/2025/07/18/MLSYS%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E2%80%94%E2%80%94Universal-Checkpointing/
 http://yoursite.com/2023/11/08/MIT18-06S-2-3%E7%AC%94%E8%AE%B0/
 http://yoursite.com/2023/11/03/MIT18-06S-2-2%E7%AC%94%E8%AE%B0/
 http://yoursite.com/2023/10/31/MIT18-06S-2-1%E7%AC%94%E8%AE%B0/
@@ -307,3 +308,4 @@ http://yoursite.com/tags/DeepLearning/
 http://yoursite.com/tags/AiSys/
 http://yoursite.com/tags/Blockchain/
 http://yoursite.com/tags/Interview/
+http://yoursite.com/tags/mlsys/

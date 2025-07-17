@@ -376,6 +376,167 @@ mjx-container[display="true"] + br {
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/09/SGI-STL%E4%B8%AD%E7%9A%84copy%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LucienXian's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/09/SGI-STL%E4%B8%AD%E7%9A%84copy%E7%AE%97%E6%B3%95/" itemprop="url">SGI STL中的copy算法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-09T18:56:28+08:00">
+                2018-07-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="sgi-stl中的copy算法">SGI STL中的copy算法</h1>
+<p>在stl中，copy是一个调用非常频繁的函数，而这些操作又涉及到了各种的内存操作——运用assignment
+operator或者copy constructor。为了提高效率，对于拥有trivial assignment
+operator的元素类型，可以使用直接的内存复制（例如C库函数——memmove或者memcpy）。</p>
+<p>copy算法脉络：</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_2.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>在这里有一个需要注意的问题，就是由于copy算啊是将输入区间内的元素复制到输出区间中，因此当输入区间与输出区间重叠的时候很有可能出现问题。</p>
+<figure>
+<img src="http://ou7boskhm.bkt.clouddn.com/stl_copy_6_3.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>这里出现问题的原因是由于deque的迭代器不是原生指针，如果使用的是vector，迭代器是原生指针，调用copy算法后会以memmove执行实际的复制操作，这样整块内存进行复制就不会出错。</p>
+<blockquote>
+<p>但是这个在我的机器上运行是正确的</p>
+<p>gcc version 5.4.0</p>
+</blockquote>
+<p><a
+target="_blank" rel="noopener" href="https://github.com/LucienXian/stl_algorithms/blob/master/algobase/my_copy_overlap.cpp">my_copy_overlap.cpp</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iterator&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;deque&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print</span><span class="params">(<span class="type">int</span> v[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">9</span>;i++)</span><br><span class="line">        cout &lt;&lt; v[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="built_in">copy</span>(ia+<span class="number">2</span>, ia+<span class="number">7</span>,ia);<span class="comment">//输出区间的终点与输入区间重叠，copy正常</span></span><br><span class="line">        <span class="built_in">print</span>(ia); <span class="comment">//2 3 4 5 6 5 6 7 8</span></span><br><span class="line">    &#125;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="function">deque&lt;<span class="type">int</span>&gt; <span class="title">id</span><span class="params">(ia, ia+<span class="number">9</span>)</span></span>;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator first = id.<span class="built_in">begin</span>();</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator last = id.<span class="built_in">end</span>();</span><br><span class="line">        ++++first; <span class="comment">//advance 2</span></span><br><span class="line">        cout &lt;&lt; *first &lt;&lt; endl;</span><br><span class="line">        ----last; <span class="comment">//advance -2</span></span><br><span class="line">        cout &lt;&lt; *last &lt;&lt; endl;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator res = id.<span class="built_in">begin</span>();</span><br><span class="line">        <span class="built_in">copy</span>(first, last, res);</span><br><span class="line">        <span class="built_in">copy</span>(id.<span class="built_in">begin</span>(), id.<span class="built_in">end</span>(), <span class="built_in">ostream_iterator</span>&lt;<span class="type">int</span>&gt;(cout, <span class="string">&quot; &quot;</span>));<span class="comment">//2 3 4 5 6 5 6 7 8</span></span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        <span class="function">deque&lt;<span class="type">int</span>&gt; <span class="title">id</span><span class="params">(ia, ia+<span class="number">9</span>)</span></span>;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator first = id.<span class="built_in">begin</span>();</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator last = id.<span class="built_in">end</span>();</span><br><span class="line">        ++++first; <span class="comment">//advance 2</span></span><br><span class="line">        cout &lt;&lt; *first &lt;&lt; endl;</span><br><span class="line">        ----last; <span class="comment">//advance -2</span></span><br><span class="line">        cout &lt;&lt; *last &lt;&lt; endl;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt;::iterator res = id.<span class="built_in">begin</span>();</span><br><span class="line">        res = res+<span class="number">4</span>;</span><br><span class="line">        <span class="built_in">copy</span>(first, last, res);</span><br><span class="line">        <span class="built_in">copy</span>(id.<span class="built_in">begin</span>(), id.<span class="built_in">end</span>(), <span class="built_in">ostream_iterator</span>&lt;<span class="type">int</span>&gt;(cout, <span class="string">&quot; &quot;</span>));<span class="comment">//0 1 2 3 2 3 4 5 6</span></span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们还是回到SGI的STL吧，以下是唯一的对外接口：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> OutputIterator <span class="title">copy</span><span class="params">(InputIterator first, InputIterator last, OutputIterator result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> __copy_dispatch&lt;InputIterator, OutputIterator&gt;()(first, last, result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外，会有两个重载函数，针对原始指针——const char<em>和const
+wchar_t</em>，进行内存直接拷贝操作：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">char</span>* <span class="title">copy</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* first, <span class="type">const</span> <span class="type">char</span>* last, <span class="type">char</span>* result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">memmove</span>(result, first, last-first);</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">wchar_t</span>* <span class="title">copy</span><span class="params">(<span class="type">const</span> <span class="type">wchar_t</span>* first, <span class="type">const</span> <span class="type">wchar_t</span>* last, <span class="type">wchar_t</span>* result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">memmove</span>(result, first, <span class="built_in">sizeof</span>(<span class="type">wchar_t</span>)*(last-first));</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来，我们看一下copy()函数中调用的__copy_dispatch()：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line">strcut __copy_dispatch</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function">OutputIterator <span class="title">operator</span><span class="params">()</span><span class="params">(InputIterator first, InputIterator last, OutputIterator result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> __copy(first, last, result, <span class="built_in">iterator_category</span>(first));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//另外，提供两个偏特化版本，针对的是T*指针类型</span></span><br><span class="line"><span class="comment">//这里的目的是在参数为原生指针的前提下，判断指针所指对象是否拥有trivial assignment operator，如果是，则直接使用memmove进行内存拷贝，否则，需要调用assignment operator进行复制</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">strcut __copy_dispatch&lt;T*, T*&gt;</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function">T* <span class="title">operator</span><span class="params">()</span><span class="params">(T* first, T* last, T* result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">typedef</span> <span class="keyword">typename</span> __type_traits&lt;T&gt;::has_trivial_assignment_operator t;</span><br><span class="line">		<span class="keyword">return</span> <span class="type">__copy_t</span>(first, last, result, <span class="built_in">t</span>());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">strcut __copy_dispatch&lt;<span class="type">const</span> T*, T*&gt;</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function">T* <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> T* first, <span class="type">const</span> T* last, T* result)</span></span>&#123;</span><br><span class="line">		<span class="keyword">typedef</span> <span class="keyword">typename</span> __type_traits&lt;T&gt;::has_trivial_assignment_operator t;</span><br><span class="line">		<span class="keyword">return</span> <span class="type">__copy_t</span>(first, last, result, <span class="built_in">t</span>());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先来看看泛化版本的**__copy_dispatch调用的**
+函数**__copy**，该函数针对不同类型的迭代器使用的循环条件不同：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> OutputIterator __copy(InputIterator first, InputIterator last, OutputIterator result, input_iterator_tag)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (; first!=last; ++result, ++first)</span><br><span class="line">        *result = *first;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">RandomAccessIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> OutputIterator __copy(RandomAccessIterator first, RandomAccessIterator last, OutputIterator result, random_access_iterator_tag)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//抽出这个函数，是因为接下来也有被使用的地方</span></span><br><span class="line">    <span class="keyword">return</span> __copy_d(first, last, result, <span class="built_in">distance_type</span>(first));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来是__copy_d的实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">RandomAccessIterator</span>, <span class="keyword">class</span> <span class="title class_">OutputIterator</span>, <span class="keyword">class</span> <span class="title class_">Distance</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> OutputIterator __copy_d(RandomAccessIterator first, RandomAccessIterator last, OutputIterator result, Distance*)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (Distance n = last-first; n&gt;<span class="number">0</span>; --n, ++result, ++first)</span><br><span class="line">        *result = *first;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>回到__copy_dispatch的偏特化版本中，这个函数里面调用 __copy_t()</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> T* <span class="type">__copy_t</span>(<span class="type">const</span> T* first, <span class="type">const</span> T* last, T* result, __true_type)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">memmove</span>(result, first, <span class="built_in">sizeof</span>(T)*(last-first));</span><br><span class="line">    <span class="keyword">return</span> result+(last-first);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> T* <span class="type">__copy_t</span>(<span class="type">const</span> T* first, <span class="type">const</span> T* last, T* result, __false_type)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//原生指针是一种RandomAccessIterator，所以交给了__copy_d</span></span><br><span class="line">    <span class="keyword">return</span> __copy_d(first, last, result, (<span class="type">ptrdiff_t</span>*)<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>即便自定义的class C具备trivial
+operator=，它仍然可能被判断__false_type，这是因为&lt;type_triais.h&gt;中只针对某些类型做了记录。</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/09/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E8%BF%9B%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1943,140 +2104,6 @@ lt, lf)后面跟随的LABEL(lf)。</p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/06/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LucienXian's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/06/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95/" itemprop="url">抽象语法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-06T22:25:00+08:00">
-                2018-05-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="抽象语法">抽象语法</h1>
-<blockquote>
-<p>Abstract: disassociated from any specific instance</p>
-</blockquote>
-<h2 id="语义动作">语义动作</h2>
-<p>每个终结符和非终结符都可关联一个语义值类型。</p>
-<h3 id="递归下降">递归下降</h3>
-<p>在递归下降的语法分析器中，semantic
-action是语法分析函数所返回的值，或者是这些函数所产生的副作用。</p>
-<h2 id="抽象语法分析树">抽象语法分析树</h2>
-<p>为了有利于模块化，我们尽量将语法分析和语义分析分开处理，往往的一个做法就是由语法分析器生成一种数据结构——<strong>语法分析树</strong>，编译器在后面的阶段对其进行后序遍历。但如果遇到了引入新的非终结符和文法production的情况，我们应该尽量将这些细节限制在语法分析，而不应该干扰语义分析。</p>
-<p>抽象语法就是起到了在语法分析与编译器等后面阶段之间建立接口的作用。</p>
-<h3 id="位置">位置</h3>
-<p>有只过一遍的编译器中，词法分析，语法分析和语义分析是一起进行的。因此发送错误时，我们可以取得词法分析的当前位置，因为这里是最接近错误源的位置。而如果使用了抽象语法分析树之后，进行遍历时如果出现了语义错误，就不能简单地判断此时词法分析的位置，因为此时词法分析已经到了文件末尾。</p>
-<p>因此，我们需要记录每一个节点在源程序中的位置。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2127,7 +2154,7 @@ action是语法分析函数所返回的值，或者是这些函数所产生的�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">278</span>
+                <span class="site-state-item-count">279</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2140,7 +2167,7 @@ action是语法分析函数所返回的值，或者是这些函数所产生的�
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
